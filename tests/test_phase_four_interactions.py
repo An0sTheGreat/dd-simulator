@@ -315,7 +315,7 @@ def test_ui_preferences_round_trip_and_reset(tmp_path: Path) -> None:
     assert abs(saved["ui"]["splitters"]["concept_t_ratio"] - expected_ratio) < 0.01
     # The retired tab/filter and splitter keys are no longer written.
     assert not {"utility_tab", "quest_tab"} & set(saved["ui"])
-    assert set(saved["ui"]["splitters"]) == {"concept_t_ratio", "people"}
+    assert set(saved["ui"]["splitters"]) == {"concept_t_ratio", "people_row"}
     close_window(app, window)
 
     # Old keys left in an existing preferences file are ignored on load.

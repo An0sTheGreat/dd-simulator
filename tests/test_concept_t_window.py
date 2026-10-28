@@ -366,7 +366,7 @@ def test_untouched_concept_split_stays_even_when_the_window_resizes(tmp_path: Pa
     # Nothing the user chose, so nothing is saved for the split.
     window.save_ui_preferences()
     saved = json.loads((tmp_path / "preferences.json").read_text(encoding="utf-8"))
-    assert set(saved["ui"]["splitters"]) == {"people"}
+    assert set(saved["ui"]["splitters"]) == {"people_row"}
     close(app, window)
 
 
@@ -693,10 +693,11 @@ def test_people_page_runs_conversation_trade_then_people_column(tmp_path: Path) 
     # Left to right: Conversation, Trade, then People above Speaking with.
     assert conversation.right() < trade.left() < trade.right() < people.left()
     assert abs(people.left() - identity.left()) <= 1
-    assert identity.top() > people.bottom()
+    assert people.top() > identity.bottom()  # Speaking with sits above People
+    assert people.height() > identity.height()  # People takes the spare height
     # The row's full height: Trade and the column run from the Conversation's top to the bottom.
-    assert conversation.top() == trade.top() == people.top()
-    assert abs(trade.bottom() - identity.bottom()) <= 1
+    assert conversation.top() == trade.top() == identity.top()
+    assert abs(trade.bottom() - people.bottom()) <= 1
     # HEAD 83240e2 gave the Conversation 291 px at a 14 px line (about 21 lines); now about 1.8x.
     assert conversation.height() >= 36 * page.fontMetrics().height()
     close(app, window)

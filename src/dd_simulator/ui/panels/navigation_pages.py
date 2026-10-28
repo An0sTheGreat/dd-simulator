@@ -567,17 +567,17 @@ class NpcNavigationPage(NavigationPage):
         self.people_splitter.setStretchFactor(1, 4)
         self.people_splitter.setSizes([500, 400])  # [conversation, trade]
         body.addWidget(self.people_splitter, 1)
-        # People list above Speaking with, both in one right column.
+        # Speaking with (its own height) above the People list (the rest), one right column.
         side = QVBoxLayout()
         side.setContentsMargins(0, 0, 0, 0)
         side.setSpacing(8)
-        side.addWidget(self.selector_card, 1)
         self.identity_card, card = codex_card("Speaking with", "npcIdentityCard")
         self.identity_host = QWidget()
         self.identity_layout = QVBoxLayout(self.identity_host)
         self.identity_layout.setContentsMargins(0, 0, 0, 0)
         card.addWidget(self.identity_host)
         side.addWidget(self.identity_card)
+        side.addWidget(self.selector_card, 1)
         for column_card in (self.selector_card, self.identity_card):
             column_card.setFixedWidth(260)
         body.addLayout(side)
