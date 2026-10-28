@@ -106,6 +106,8 @@ Required behavior:
 
 ### Phase 30 — Concept T dashboard
 
+Status: complete except the README screenshots (Release 28, 0.28.0).
+
 Rebuild the Adventure dashboard as the approved Concept T, following `docs/UI_REDESIGN_PLAN.md` (plan Phases 1–7b).
 
 Required behavior:

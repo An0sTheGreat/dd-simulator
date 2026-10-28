@@ -242,7 +242,7 @@ class MainWindow(QMainWindow):
     ) -> None:
         super().__init__()
         self.setObjectName("mainWindow")
-        self.setWindowTitle("D&D Simulator - Release 27")
+        self.setWindowTitle("D&D Simulator - Release 28")
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint, True)
         self.setWindowFlag(Qt.WindowType.WindowMinimizeButtonHint, True)
         self.setWindowFlag(Qt.WindowType.WindowMaximizeButtonHint, True)
@@ -693,7 +693,7 @@ class MainWindow(QMainWindow):
         left_layout = QHBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
-        phase = QLabel("RELEASE 27")
+        phase = QLabel("RELEASE 28")
         phase.setObjectName("phaseLabel")
         phase.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         left_layout.addWidget(phase)
