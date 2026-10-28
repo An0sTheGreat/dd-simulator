@@ -5,7 +5,7 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtCore import QByteArray, QMimeData, QPointF, Qt
+from PySide6.QtCore import QByteArray, QMimeData, QPoint, QPointF, QRect, Qt
 from PySide6.QtGui import QDragMoveEvent, QDropEvent, QPalette
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QLabel
@@ -226,3 +226,69 @@ def test_codex_card_row_keeps_both_cards_at_equal_height() -> None:
     QApplication.processEvents()
     assert row.inventory_card.height() == row.powers_card.height() == 390
     assert CARD_COLUMNS == 5
+
+
+def _rect_in(widget, ancestor) -> QRect:  # type: ignore[no-untyped-def]
+    return QRect(widget.mapTo(ancestor, QPoint(0, 0)), widget.size())
+
+
+def test_inventory_card_lays_out_whole_square_rows_clear_of_the_scrollbar(tmp_path: Path) -> None:
+    application = app()
+    manager = ThemeManager(
+        themes_root=THEMES_ROOT, preferences_path=tmp_path / "prefs.json",
+        default_theme_id="high_fantasy",
+    )
+    try:
+        # None = no theme: the platform style's (wider) scrollbar must still sit clear.
+        for theme_id in (None, "high_fantasy", "modern_proof"):
+            if theme_id is None:
+                application.setStyleSheet("")
+            else:
+                manager.apply_loaded_theme(application, manager.load_theme(theme_id), persist=False)
+            for scale, height in ((1.0, 600), (1.0, 390), (0.76, 290), (0.6, 200), (1.0, 230)):
+                row = CodexCardRow(InventoryCard(bag(17)), PowersCard((action("a", "ability"),)))
+                card = row.inventory_card
+                card.set_scale(scale)
+                row.resize(724, height)
+                row.show()
+                QApplication.processEvents()
+                where = f"{theme_id} scale={scale} height={height}"
+                viewport = _rect_in(card.scroll.viewport(), card)
+                bar = _rect_in(card.scroll.verticalScrollBar(), card)
+                assert card.contentsRect().contains(viewport), where
+                top = card.scroll.verticalScrollBar().value()
+                visible = [
+                    (slot, _rect_in(slot, card)) for slot in card.grid.slots
+                    if slot.y() + slot.height() > top and slot.y() < top + viewport.height()
+                ]
+                rows = {rect.y() for _slot, rect in visible}
+                assert 1 <= len(rows) <= 5 and len(visible) == 5 * len(rows), where
+                assert len(rows) == 5 or height < 390, where  # 5 rows whenever they fit
+                assert {rect.width() for _s, rect in visible} == {card.grid.slot_size}, where
+                for index, (slot, rect) in enumerate(visible):
+                    assert rect.width() == rect.height(), where
+                    assert viewport.contains(rect), f"{where} slot {slot.index} cut"
+                    assert not rect.intersects(bar), f"{where} slot {slot.index} under bar"
+                    assert not any(rect.intersects(other) for _o, other in visible[index + 1:]), where
+                    # well art fills the frame's inside; the icon is centred on the slot
+                    frame = slot.contentsRect()
+                    assert slot.artwork_label.geometry() == frame, where
+                    if not slot.item.is_empty:
+                        icon = slot.icon_label.geometry()
+                        assert frame.contains(icon), where
+                        assert abs(icon.center().x() - slot.rect().center().x()) <= 1, where
+                        assert abs(icon.center().y() - slot.rect().center().y()) <= 1, where
+                # even gutters: one column pitch and one row pitch
+                xs = sorted({rect.x() for _s, rect in visible})
+                ys = sorted(rows)
+                assert len(xs) == CARD_COLUMNS, where
+                assert len({b - a for a, b in zip(xs, xs[1:])}) == 1, where
+                assert len({b - a for a, b in zip(ys, ys[1:])}) <= 1, where
+                # grid centred vertically between heading and footer, within a pixel
+                above = viewport.top() - card.contentsRect().top()
+                below = card.contentsRect().bottom() - viewport.bottom()
+                assert below >= 0 and above >= 0, where
+                row.close()
+                row.deleteLater()
+    finally:
+        application.setStyleSheet("")
