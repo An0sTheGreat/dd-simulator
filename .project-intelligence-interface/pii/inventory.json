@@ -1,0 +1,922 @@
+{
+  "project": {
+    "root": "Y:\\Games\\D&D Simulator\\project",
+    "name": "D&D Simulator — local-first single-player tabletop adventure",
+    "folder": ".project-intelligence-interface",
+    "git": true
+  },
+  "roles": {
+    "handoff": "HANDOFF.md",
+    "rules": "PROJECT_RULES.md",
+    "overview": "README.md"
+  },
+  "documents": [
+    {
+      "path": "HANDOFF.md",
+      "role": "handoff",
+      "words": 2018,
+      "headings": [
+        [
+          1,
+          "Handoff"
+        ],
+        [
+          2,
+          "Current state"
+        ],
+        [
+          2,
+          "In progress: Concept T redesign (branch `ui-concept-t`, not pushed)"
+        ],
+        [
+          2,
+          "Phase 29 summary (branch `phase-29-unsloth`)"
+        ],
+        [
+          2,
+          "Known issues"
+        ],
+        [
+          2,
+          "Testing notes"
+        ],
+        [
+          2,
+          "Next steps"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "PROJECT.md",
+      "role": null,
+      "words": 1576,
+      "headings": [
+        [
+          1,
+          "Project"
+        ],
+        [
+          2,
+          "Project Goal"
+        ],
+        [
+          2,
+          "Target Project"
+        ],
+        [
+          2,
+          "Authoritative Supporting Documents"
+        ],
+        [
+          2,
+          "Existing Work"
+        ],
+        [
+          2,
+          "Remaining Work"
+        ],
+        [
+          3,
+          "Phase 28 — Version control and verification baseline"
+        ],
+        [
+          3,
+          "Phase 29 — Unsloth Studio primary provider, LM Studio secondary"
+        ],
+        [
+          3,
+          "Phase 30 — Concept T dashboard"
+        ],
+        [
+          3,
+          "Phase 31 — RPG Mega item icons"
+        ],
+        [
+          3,
+          "Phase 32 — Music"
+        ],
+        [
+          3,
+          "Phase 33 — Target hardware profile and final model selection"
+        ],
+        [
+          3,
+          "Phase 34 — Content catalog expansion"
+        ],
+        [
+          3,
+          "Phase 35 — User data location and backup retention"
+        ],
+        [
+          2,
+          "Constraints"
+        ],
+        [
+          2,
+          "Completion Criteria"
+        ],
+        [
+          2,
+          "Execution Guidance"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "PROJECT_RULES.md",
+      "role": "rules",
+      "words": 503,
+      "headings": [
+        [
+          1,
+          "Project Rules"
+        ],
+        [
+          2,
+          "Authority and state"
+        ],
+        [
+          2,
+          "Local AI boundary"
+        ],
+        [
+          2,
+          "Schema and saved data"
+        ],
+        [
+          2,
+          "UI and themes"
+        ],
+        [
+          2,
+          "Verification"
+        ],
+        [
+          2,
+          "Repository hygiene"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "README.md",
+      "role": "overview",
+      "words": 1118,
+      "headings": [
+        [
+          1,
+          "D&D Simulator — local-first single-player tabletop adventure"
+        ],
+        [
+          2,
+          "Introduction"
+        ],
+        [
+          2,
+          "Screenshots"
+        ],
+        [
+          2,
+          "Description"
+        ],
+        [
+          2,
+          "Windows application"
+        ],
+        [
+          2,
+          "Setup"
+        ],
+        [
+          2,
+          "Packaged smoke tests"
+        ],
+        [
+          2,
+          "Documentation"
+        ],
+        [
+          2,
+          "Safety and recovery"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/ASSET_CREDITS.md",
+      "role": null,
+      "words": 1039,
+      "headings": [
+        [
+          1,
+          "Release 26.7 Asset Credits and Distribution Notes"
+        ],
+        [
+          2,
+          "CraftPix item icons"
+        ],
+        [
+          2,
+          "Semantic item icons (retired in Phase 8)"
+        ],
+        [
+          2,
+          "CraftPix skill, ability and spell icons"
+        ],
+        [
+          2,
+          "Music and ambience (Untitled RPG)"
+        ],
+        [
+          2,
+          "UI Pack 3"
+        ],
+        [
+          2,
+          "Original Release 26 textures"
+        ],
+        [
+          2,
+          "Supplied Release 26.5 background"
+        ],
+        [
+          2,
+          "Supplied Release 26.6 background and card references"
+        ],
+        [
+          2,
+          "Supplied Release 26.7 background and Deep Dark Fantasy UI"
+        ],
+        [
+          2,
+          "Supplied inventory and equipment layout art"
+        ],
+        [
+          2,
+          "Concept T codex assets (UI redesign Phase 1)"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/AUDIO.md",
+      "role": null,
+      "words": 352,
+      "headings": [
+        [
+          1,
+          "Music and ambience"
+        ],
+        [
+          2,
+          "Manifest format"
+        ],
+        [
+          2,
+          "Selection"
+        ],
+        [
+          2,
+          "Silence and failure"
+        ],
+        [
+          2,
+          "Importing"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "role": null,
+      "words": 1573,
+      "headings": [
+        [
+          1,
+          "Project Decision Record"
+        ],
+        [
+          2,
+          "Confirmed decisions"
+        ],
+        [
+          2,
+          "Current milestone"
+        ],
+        [
+          2,
+          "Decisions still requiring later input"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/GAME_STATE_LEDGER.md",
+      "role": null,
+      "words": 2476,
+      "headings": [
+        [
+          1,
+          "Game-State Ledger"
+        ],
+        [
+          2,
+          "Boundaries"
+        ],
+        [
+          2,
+          "Schema versions"
+        ],
+        [
+          2,
+          "Startup and recovery"
+        ],
+        [
+          2,
+          "Current mutation boundary"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/PACKAGING.md",
+      "role": null,
+      "words": 361,
+      "headings": [
+        [
+          1,
+          "Release 27 Packaging and First Run"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/RECOMMENDED_UNSLOTH_SETTINGS.md",
+      "role": null,
+      "words": 380,
+      "headings": [
+        [
+          1,
+          "Recommended Unsloth Studio Settings"
+        ],
+        [
+          2,
+          "Initial baseline"
+        ],
+        [
+          2,
+          "Acceptance guidance"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/RELEASE26_ASSET_INVENTORY.md",
+      "role": null,
+      "words": 1033,
+      "headings": [
+        [
+          1,
+          "Release 26 approved asset inventory"
+        ],
+        [
+          2,
+          "Available assets"
+        ],
+        [
+          3,
+          "UI_pack_3"
+        ],
+        [
+          3,
+          "Icons_svg"
+        ],
+        [
+          3,
+          "Existing scene art"
+        ],
+        [
+          2,
+          "Practical UI mapping"
+        ],
+        [
+          2,
+          "Gaps at inventory time"
+        ],
+        [
+          2,
+          "Implemented Release 26 assets"
+        ],
+        [
+          2,
+          "Mockup status"
+        ],
+        [
+          2,
+          "Release 26.1 fidelity correction"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/RELEASE_HISTORY.md",
+      "role": null,
+      "words": 7307,
+      "headings": [
+        [
+          1,
+          "Release History"
+        ],
+        [
+          2,
+          "Release 28 behavior"
+        ],
+        [
+          2,
+          "Current inventory and equipment presentation"
+        ],
+        [
+          2,
+          "Release 26.6 behavior"
+        ],
+        [
+          2,
+          "Release 26.5 behavior"
+        ],
+        [
+          2,
+          "Release 26.4 behavior"
+        ],
+        [
+          2,
+          "Release 26.3 behavior"
+        ],
+        [
+          2,
+          "Release 26.2 behavior"
+        ],
+        [
+          2,
+          "Release 26.1 behavior"
+        ],
+        [
+          2,
+          "Release 26 behavior"
+        ],
+        [
+          2,
+          "Release 25 behavior"
+        ],
+        [
+          2,
+          "Release 24 behavior"
+        ],
+        [
+          2,
+          "Release 23 behavior"
+        ],
+        [
+          2,
+          "Release 22 behavior"
+        ],
+        [
+          2,
+          "Release 21 behavior"
+        ],
+        [
+          2,
+          "Release 20 behavior"
+        ],
+        [
+          2,
+          "Release 19 behavior"
+        ],
+        [
+          2,
+          "Release 18 behavior"
+        ],
+        [
+          2,
+          "Release 17 behavior"
+        ],
+        [
+          2,
+          "Historical Release 16 behavior"
+        ],
+        [
+          2,
+          "Historical Release 15 behavior"
+        ],
+        [
+          2,
+          "Historical Release 14 behavior"
+        ],
+        [
+          2,
+          "Phase 13 behavior"
+        ],
+        [
+          2,
+          "Phase 12 behavior"
+        ],
+        [
+          2,
+          "Architecture boundary"
+        ],
+        [
+          2,
+          "Release 26.9.1 interaction maintenance"
+        ],
+        [
+          2,
+          "Release 26.9 behavior"
+        ],
+        [
+          2,
+          "Release 27 behavior"
+        ],
+        [
+          2,
+          "Release 26.9.4 behavior"
+        ],
+        [
+          2,
+          "Release 26.9.3 behavior"
+        ],
+        [
+          2,
+          "Release 26.9.2 behavior"
+        ],
+        [
+          2,
+          "Release 26.8.3 behavior"
+        ],
+        [
+          2,
+          "Release 26.8.2 behavior"
+        ],
+        [
+          2,
+          "Release 26.8.1 behavior"
+        ],
+        [
+          2,
+          "Release 26.8 behavior"
+        ],
+        [
+          2,
+          "Release 26.7 behavior"
+        ],
+        [
+          2,
+          "Smoke-test switches"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/RESOURCE_MAP.md",
+      "role": null,
+      "words": 1217,
+      "headings": [
+        [
+          1,
+          "Project Resource Map"
+        ],
+        [
+          2,
+          "Authoritative resources"
+        ],
+        [
+          2,
+          "Implementation constraints carried forward"
+        ],
+        [
+          2,
+          "Visual verification"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/UI_REDESIGN_PLAN.md",
+      "role": null,
+      "words": 2333,
+      "headings": [
+        [
+          1,
+          "UI Redesign Plan — Concept T"
+        ],
+        [
+          2,
+          "1. What changes for the player"
+        ],
+        [
+          2,
+          "2. Decisions needed before Phase 2"
+        ],
+        [
+          2,
+          "3. Assets"
+        ],
+        [
+          2,
+          "4. Phases"
+        ],
+        [
+          3,
+          "Phase 1 — Assets, tokens and reference (no visible change)"
+        ],
+        [
+          3,
+          "Phase 2 — Data and projection (no visible change)"
+        ],
+        [
+          3,
+          "Phase 3 — Left column widgets"
+        ],
+        [
+          3,
+          "Phase 4 — Right column widgets"
+        ],
+        [
+          3,
+          "Phase 5 — Tooltips"
+        ],
+        [
+          3,
+          "Phase 6 — Main window assembly"
+        ],
+        [
+          3,
+          "Phase 7 — Verification and release"
+        ],
+        [
+          3,
+          "Phase 7b — Proof screenshots"
+        ],
+        [
+          3,
+          "Phase 8 — Library item icons (D5)"
+        ],
+        [
+          3,
+          "Phase 9 — Music by context"
+        ],
+        [
+          2,
+          "5. Risks"
+        ],
+        [
+          2,
+          "6. Other pages"
+        ],
+        [
+          2,
+          "7. Project plan update"
+        ],
+        [
+          2,
+          "8. Out of scope"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/UNSLOTH.md",
+      "role": null,
+      "words": 2516,
+      "headings": [
+        [
+          1,
+          "Unsloth Studio Integration"
+        ],
+        [
+          2,
+          "Unsloth Studio API boundary"
+        ],
+        [
+          2,
+          "Request flow"
+        ],
+        [
+          2,
+          "People dialogue"
+        ],
+        [
+          2,
+          "Trust boundary"
+        ],
+        [
+          2,
+          "Local setup"
+        ],
+        [
+          2,
+          "LM Studio (secondary provider)"
+        ],
+        [
+          2,
+          "Release 26.8 structured-output compatibility"
+        ],
+        [
+          2,
+          "Release 18 evaluation"
+        ],
+        [
+          2,
+          "Non-combat player turns"
+        ],
+        [
+          2,
+          "Combat narration and intent"
+        ],
+        [
+          2,
+          "Quest boundary"
+        ],
+        [
+          2,
+          "Travel boundary"
+        ],
+        [
+          2,
+          "NPC dialogue boundary"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "docs/WORKFLOW_STATUS.md",
+      "role": null,
+      "words": 3137,
+      "headings": [
+        [
+          1,
+          "Release and Workflow Status"
+        ],
+        [
+          2,
+          "Current status"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "src/dd_simulator/ui/themes/high_fantasy/assets/README.md",
+      "role": null,
+      "words": 33,
+      "headings": [
+        [
+          1,
+          "High Fantasy Theme Assets"
+        ]
+      ],
+      "error": null
+    },
+    {
+      "path": "src/dd_simulator/ui/themes/modern_proof/assets/README.md",
+      "role": null,
+      "words": 30,
+      "headings": [
+        [
+          1,
+          "Modern Proof Theme Assets"
+        ]
+      ],
+      "error": null
+    }
+  ],
+  "images": [
+    "artifacts/previews/journal-high_fantasy.png",
+    "artifacts/previews/journal-modern_proof.png",
+    "artifacts/previews/tooltips-high_fantasy.png",
+    "artifacts/previews/tooltips-modern_proof.png",
+    "artifacts/previews/window-high_fantasy.png",
+    "artifacts/previews/window-modern_proof.png",
+    "artifacts/ui-concepts/concept-a-chronicle.png",
+    "artifacts/ui-concepts/concept-b-guild-hud.png",
+    "artifacts/ui-concepts/concept-c-vignette.png",
+    "artifacts/ui-concepts/concept-d-cartographer.png",
+    "artifacts/ui-concepts/concept-e-chronicle-dashboard.png",
+    "artifacts/ui-concepts/concept-f-vignette-dashboard.png",
+    "artifacts/ui-concepts/concept-g-cartographer-dashboard.png",
+    "artifacts/ui-concepts/concept-h-twin-pane.png",
+    "artifacts/ui-concepts/concept-i-bottom-dock.png",
+    "artifacts/ui-concepts/concept-j-scene-armory.png",
+    "artifacts/ui-concepts/concept-k-paperdoll-codex.png",
+    "artifacts/ui-concepts/concept-l-center-stage.png",
+    "artifacts/ui-concepts/concept-m-codex-vista.png",
+    "artifacts/ui-concepts/concept-m-tooltips.png",
+    "artifacts/ui-concepts/concept-n-ledger-columns.png",
+    "artifacts/ui-concepts/concept-n-tooltips.png",
+    "artifacts/ui-concepts/concept-o-hero-banner.png",
+    "artifacts/ui-concepts/concept-o-tooltips.png",
+    "artifacts/ui-concepts/concept-p-faithful-merge.png",
+    "artifacts/ui-concepts/concept-q-balanced-merge.png",
+    "artifacts/ui-concepts/concept-r-paired-cards.png",
+    "artifacts/ui-concepts/concept-s-rounded-messages.png",
+    "artifacts/ui-concepts/concept-t-classic-messages.png",
+    "artifacts/ui-concepts/current-build-high_fantasy.png",
+    "artifacts/ui-concepts/current-build-modern_proof.png",
+    "artifacts/ui-concepts/assets/ab_disengage.png",
+    "artifacts/ui-concepts/assets/ab_field_dressing.png",
+    "artifacts/ui-concepts/assets/ab_hunters_focus.png",
+    "artifacts/ui-concepts/assets/ab_quick_shot.png",
+    "artifacts/ui-concepts/assets/ab_rally.png",
+    "artifacts/ui-concepts/assets/ab_shield_wall.png",
+    "artifacts/ui-concepts/assets/ab_wardens_mark.png",
+    "artifacts/ui-concepts/assets/dt_btn_hover.png",
+    "artifacts/ui-concepts/assets/dt_btn_normal.png",
+    "artifacts/ui-concepts/assets/dt_inset.png",
+    "artifacts/ui-concepts/assets/dt_menu_background.png",
+    "artifacts/ui-concepts/assets/dt_panel_side.png",
+    "artifacts/ui-concepts/assets/dt_panel_window.png",
+    "artifacts/ui-concepts/assets/dt_tab_current.png",
+    "artifacts/ui-concepts/assets/enemy_goblin.png",
+    "artifacts/ui-concepts/assets/item_amulet.png",
+    "artifacts/ui-concepts/assets/item_armor.png",
+    "artifacts/ui-concepts/assets/item_arrows.png",
+    "artifacts/ui-concepts/assets/item_belt.png",
+    "artifacts/ui-concepts/assets/item_berries.png",
+    "artifacts/ui-concepts/assets/item_bone.png",
+    "artifacts/ui-concepts/assets/item_book.png",
+    "artifacts/ui-concepts/assets/item_boots.png",
+    "artifacts/ui-concepts/assets/item_bow.png",
+    "artifacts/ui-concepts/assets/item_dagger.png",
+    "artifacts/ui-concepts/assets/item_food.png",
+    "artifacts/ui-concepts/assets/item_gloves.png",
+    "artifacts/ui-concepts/assets/item_heirloom.png",
+    "artifacts/ui-concepts/assets/item_helmet.png",
+    "artifacts/ui-concepts/assets/item_ingredient.png",
+    "artifacts/ui-concepts/assets/item_mushroom.png",
+    "artifacts/ui-concepts/assets/item_potion.png",
+    "artifacts/ui-concepts/assets/item_potion2.png",
+    "artifacts/ui-concepts/assets/item_pouch.png",
+    "artifacts/ui-concepts/assets/item_ring.png",
+    "artifacts/ui-concepts/assets/item_scroll.png",
+    "artifacts/ui-concepts/assets/item_shield.png",
+    "artifacts/ui-concepts/assets/item_sword.png",
+    "artifacts/ui-concepts/assets/item_tome.png",
+    "artifacts/ui-concepts/assets/item_trinket.png",
+    "artifacts/ui-concepts/assets/loc_forest_dawn.png",
+    "artifacts/ui-concepts/assets/loc_road.png",
+    "artifacts/ui-concepts/assets/loc_road_sunset.png",
+    "artifacts/ui-concepts/assets/mmo_bar_track.png",
+    "artifacts/ui-concepts/assets/mmo_button_hover.png",
+    "artifacts/ui-concepts/assets/mmo_button_normal.png",
+    "artifacts/ui-concepts/assets/mmo_header.png",
+    "artifacts/ui-concepts/assets/mmo_inset.png",
+    "artifacts/ui-concepts/assets/mmo_panel.png",
+    "artifacts/ui-concepts/assets/mmo_paperdoll.png",
+    "artifacts/ui-concepts/assets/mmo_separator.png",
+    "artifacts/ui-concepts/assets/mmo_slot_normal.png",
+    "artifacts/ui-concepts/assets/mmo_slot_selected.png",
+    "artifacts/ui-concepts/assets/mmo_tab_normal.png",
+    "artifacts/ui-concepts/assets/mmo_tab_selected.png",
+    "artifacts/ui-concepts/assets/mmo_tooltip.png",
+    "artifacts/ui-concepts/assets/mmo_window.png",
+    "artifacts/ui-concepts/assets/portrait_kaelen.png",
+    "artifacts/ui-concepts/assets/portrait_merchant.png",
+    "artifacts/ui-concepts/assets/quest_emblem.png",
+    "artifacts/ui-concepts/assets/skill_attack.png",
+    "artifacts/ui-concepts/assets/skill_crafting.png",
+    "artifacts/ui-concepts/assets/skill_defense.png",
+    "artifacts/ui-concepts/assets/skill_herblore.png",
+    "artifacts/ui-concepts/assets/skill_magic.png",
+    "artifacts/ui-concepts/assets/skill_ranged.png",
+    "artifacts/ui-concepts/assets/skill_strength.png",
+    "artifacts/ui-concepts/assets/skill_survival.png",
+    "artifacts/ui-concepts/assets/sp_ember_ward.png",
+    "artifacts/ui-concepts/assets/sp_root_snare.png",
+    "artifacts/ui-concepts/assets/ui_button_hover.png",
+    "artifacts/ui-concepts/assets/ui_button_normal.png",
+    "artifacts/ui-concepts/assets/ui_hotbar.png",
+    "artifacts/ui-concepts/assets/ui_minimap_frame.png",
+    "artifacts/ui-concepts/assets/ui_panel_large.png",
+    "artifacts/ui-concepts/assets/ui_panel_small.png",
+    "artifacts/ui-concepts/assets/ui_quest_tracker.png",
+    "artifacts/ui-concepts/assets/ui_tab_active.png",
+    "artifacts/ui-concepts/assets/ui_tab_normal.png",
+    "artifacts/ui-concepts/assets/ui_tooltip.png",
+    "docs/design/concept-t-tooltips.png",
+    "docs/design/concept-t.png",
+    "docs/screenshots/adventure-dark.png",
+    "docs/screenshots/adventure-fantasy.png",
+    "docs/screenshots/character-sheet-fantasy.png",
+    "docs/screenshots/combat-fantasy.png",
+    "docs/screenshots/journal-fantasy.png",
+    "docs/screenshots/tooltip-fantasy.png"
+  ],
+  "theme": {
+    "accent": "",
+    "theme": "default",
+    "notes": [
+      "The images are mostly neutral (greys, black or white), so no accent colour was derived."
+    ]
+  },
+  "terminology": [],
+  "keptExisting": [],
+  "warnings": []
+}

@@ -42,14 +42,14 @@ These documents define the project requirements, implementation constraints, arc
 
 ## Existing Work
 
-Release 28 (package version 0.28.0, database schema 24) is implemented and packaged on branch `ui-concept-t`; Release 27 (schema 21) is the last release on `main`.
+Release 28 (package version 0.28.0, database schema 24) plus Phases 31-32 (library item icons, music) is merged into `main` and pushed.
 Canonical Workflow Steps 1–19 are complete; Releases 20–27 are gameplay and presentation
 expansions. Implemented and covered by the pytest suite and packaged smoke tests:
 
 - First-run Local AI Setup: bundled CPU/Vulkan llama.cpp with a pinned, checksum-verified
   Qwen3-4B download, existing-GGUF selection, and an external OpenAI-compatible server
   mode (currently the former local-server client; see Phase 29).
-- SQLite ledger with 21 append-only migrations, foreign keys, WAL, integrity checks,
+- SQLite ledger with 24 append-only migrations, foreign keys, WAL, integrity checks,
   checkpoints, replay checksums, safe repair, and recovery backups.
 - Character creation (D&D 5E point-buy, class hit dice, validated generated suggestions),
   campaign generation, and the preset *The Last Orrery of Sol*.
@@ -57,6 +57,7 @@ expansions. Implemented and covered by the pytest suite and packaged smoke tests
   archetypes, quests with ordered gates and rewards, map travel and camping, NPC dialogue
   with social checks, merchants and bartering, crafting, levels 1–20, tiered loot,
   Visual Registry, model evaluation, diagnostics export, two themes, accessibility checks.
+- Concept T dashboard, CraftPix library item and power icons, context music and ambience.
 
 Do not reimplement completed work unless current validation demonstrates that it is incomplete, incorrect, or regressed.
 
@@ -120,7 +121,7 @@ Required behavior:
 
 ### Phase 31 — RPG Mega item icons
 
-Status: complete on `integration-p8-p9` (1,686 records to 1,247 CraftPix library icons; review sheet `docs/design/item-icons.png`).
+Status: complete, merged into `main` (1,686 records to 1,247 CraftPix library icons; review sheet `docs/design/item-icons.png`).
 
 Replace the SVG item icons with RPG Mega painted icons for every item category (plan Phase 8).
 
@@ -131,7 +132,7 @@ Required behavior:
 
 ### Phase 32 — Music
 
-Status: complete on `integration-p8-p9` (22 tracks, `docs/AUDIO.md`; tavern_inn still uses the village day placeholder).
+Status: complete, merged into `main` (22 tracks, `docs/AUDIO.md`; tavern_inn still uses the village day placeholder).
 
 Add context-driven music and ambience (plan Phase 9).
 

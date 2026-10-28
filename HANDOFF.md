@@ -1,22 +1,31 @@
 # Handoff
 
-Last updated: 2026-10-27
+Last updated: 2026-10-28
 
 ## Current state
 
-- **Release 27 + Phase 29** merged into `main` and pushed to
-  `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.27.0`, database schema **21** on `main` (**24** on `ui-concept-t`).
+- **Release 28 + Phases 31-32** merged into `main` (`412212e`) and pushed to
+  `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.28.0`, database
+  schema **24**. No other branches or worktrees remain.
+- **Release 28:** the Concept T dashboard (codex column, scene view, conversation,
+  Journal, shared tooltip cards); README screenshots in `docs/screenshots/`.
+- **Phase 31 item icons:** all 1,686 catalog records resolve to 1,247 CraftPix library
+  icons (`ui/assets/icons/library/`); the SVG set is retired. Review sheet
+  `docs/design/item-icons.png`.
+- **Phase 32 music:** 22 tracks by context with a replaceable manifest
+  (`docs/AUDIO.md`), crossfades, ambience by biome and weather, and Music volume,
+  Ambience volume and Mute in Settings.
 - **Local AI providers:** bundled llama.cpp (recommended), existing GGUF, **Unsloth
   Studio (primary external server)**, **LM Studio (secondary)**. All share
   `dd_simulator.local_model.LocalModelClient`, selected by `provider=`
   (`"openai"` for llama.cpp, `"unsloth"`, `"lm_studio"`).
-- **Tests:** 301 passed, 0 failed, about 2 min 20 s (`.\scripts\test.ps1`).
-- **Packaged build** rebuilt from `phase-29-unsloth`. These smoke switches exit 0:
-  `--smoke-test`, `--smoke-test-release27`, `--smoke-test-release19`,
-  `--smoke-test-preset-campaign`, `--smoke-test-character-creation`.
-  `--smoke-test-release18` exits 18 on `main` too (Known issue 2).
+- **Tests:** 465 passed, 0 failed (full suite, offscreen, 2026-10-28).
+- **Packaged build** (`dist/DnDSimulator`, 592 MB) rebuilt from the merged tree. These
+  smoke switches exit 0: `--smoke-test`, `--smoke-test-release27`,
+  `--smoke-test-release28`, `--smoke-test-preset-campaign`,
+  `--smoke-test-character-creation`, `--smoke-test-combat`.
 
-## In progress: Concept T redesign (branch `ui-concept-t`, not pushed)
+## Completed: Release 28, Phases 31-32 (merged into `main`)
 
 Plan: `docs/UI_REDESIGN_PLAN.md` (approved 2026-10-27; D5 icons from `Project Resources/assets`, D7 keep 320 cap).
 
@@ -43,8 +52,8 @@ Plan: `docs/UI_REDESIGN_PLAN.md` (approved 2026-10-27; D5 icons from `Project Re
 | (p7 release commit) | Release 28: version 0.28.0, header "RELEASE 28", `--smoke-test-release28` (regions, demo conversation, Journal, item and ability tooltip cards, `older_messages`), docs (RELEASE_HISTORY, README, PROJECT.md); packaged build passed the six smoke switches. Still owed: `docs/screenshots/` and README screenshots |
 | (screenshots commit) | Release 28 README screenshots: `capture_concept_t.py --set readme` writes six 1280 px PNGs to `docs/screenshots/` (adventure fantasy and dark, combat with two enemies, item tooltip with equipped comparison composited from the card window, Journal, character sheet) and README gets a Screenshots section. Known look issues (src untouched): Journal event log and recent events sit at the bottom of tall empty panels; the quest bar label overlaps its fill; the character sheet combat summary values run together ("42 / 4215"). |
 | `977969c`, `36c7793`, `b824867`, `2e558b5`, (this commit) | Release 28 final fixes: Character Sheet Combat Summary in five equal-stretch columns (10 px gutter); Journal event log and recent events anchored to the top; quest count beside the progress bar (`questProgressLabel`, both themes); `ConversationView.older_load_failed()` called by `_load_older_messages` on no service/campaign or `GameStateError`; 150% font tests use the `large_font_window` fixture (reset in `finally`); contrast test covers all 95 images, 98th-percentile band luminance, `NARRATOR_COLOR` regex `(?<![-\w])color:` (worst 5.40:1 fantasy, 6.25:1 dark, `OVERLAY_STOPS` unchanged); `sync_character_combat_catalog` clamps `current_uses`; Journal and character-sheet README screenshots recaptured. Not fixed: a saved `current_uses` of NULL stays NULL when the catalog adds a maximum. |
-| `7e6cc79`, `880209f`, `c852fb4`, `41d0541`, (this commit) | Phase 8 item icons: library remap — all 1,686 catalog records now resolve to 1,247 CraftPix paintings (128 px, `ui/assets/icons/library/`; SVG set and atlas removed; package grows about 23 MB). Manifest `ui/assets/icons/item_icon_manifest.json`: `sources` (packaged PNG name -> path under `Project Resources/assets`) and `records` (catalog index -> packaged PNG name); `item_manifest.json` keeps only semantic fields. Scripts: `scripts/build_item_icon_manifest.py` (`NAME_ICONS` 211 exact names, then `KEYWORD_POOLS` by subtype, then `SUBTYPE_POOLS`; pool syntax `pack+pack`, `pack#1-25,30`), `scripts/import_item_icons.py` (idempotent: second run 0 written, 0 removed), `scripts/render_item_icon_sheet.py` -> `docs/design/item-icons.png` (114 records, every category and rarity). All `NAME_ICONS` viewed; 9 remapped. Weak spots: arrows use framed skill art; no icon fits Hourglass, Campfire, Cooking Pan/Ladle (also Iron Gear, Pinecone, Wooden Doll are loose fits); fish and ingot pools are small. Preset reward names map through `EXACT_ICON_INDEX` in `ui/item_icons.py`. |
-| (phase9-music) | Plan Phase 9 music: `scripts/import_audio.py` copies 22 Untitled RPG tracks unchanged into `ui/assets/audio/<context>/` (+44.7 MB, packaged); `music_manifest.json` (format in `docs/AUDIO.md`); `ui/audio.py` `MusicController` (pure context/track/ambience selection, 2 s crossfade, battle rotation without repeats, ambience by biome and weather; no players offscreen, with `DDSIM_DISABLE_AUDIO=1` or under any `--smoke-test*`); `_show_navigation` updates it (covers every `_reload_dashboard`); Settings Music volume, Ambience volume, Mute in UI preferences and Reset UI defaults; QSS sliders in both themes; credits "supplied as CC0; verify before public release"; `scripts/audio_smoke.py`; `tests/test_music.py`. Boss = active enemy of archetype tier 4 (no boss flag exists). |
+| `7e6cc79`, `880209f`, `c852fb4`, `41d0541`, (this commit) | Phase 8 item icons: library remap — all 1,686 catalog records now resolve to 1,247 CraftPix paintings (128 px, `ui/assets/icons/library/`; SVG set and atlas removed; package grows about 23 MB). Manifest `ui/assets/icons/item_icon_manifest.json`: `sources` (packaged PNG name -> path under `Project Resources/assets`) and `records` (catalog index -> packaged PNG name); `item_manifest.json` keeps only semantic fields. Scripts: `scripts/build_item_icon_manifest.py` (`NAME_ICONS` 211 exact names, then `KEYWORD_POOLS` by subtype, then `SUBTYPE_POOLS`; pool syntax `pack+pack`, `pack#1-25,30`), `scripts/import_item_icons.py` (idempotent: second run 0 written, 0 removed), `scripts/render_item_icon_sheet.py` -> `docs/design/item-icons.png` (114 records, every category and rarity). All `NAME_ICONS` viewed; 9 remapped. Weak spots: arrows use framed skill art; no icon fits Hourglass, Campfire, Cooking Pan/Ladle (also Iron Gear, Pinecone, Wooden Doll are loose fits); fish and ingot pools are small. Preset reward names map through `EXACT_ICON_INDEX` in `ui/item_icons.py` (`55dba88`). Preset rewards outside the catalog have no equip slot, so a quest bracer or shield probably cannot be equipped. |
+| `b8a29f5`, `a5fe1bb`, `3115e60`, `1325e88` | Phase 9 music: `scripts/import_audio.py` copies 22 Untitled RPG tracks unchanged into `ui/assets/audio/<context>/` (+44.7 MB, packaged); `music_manifest.json` (format in `docs/AUDIO.md`); `ui/audio.py` `MusicController` (pure context/track/ambience selection, 2 s crossfade, battle rotation without repeats, ambience by biome and weather; no players offscreen, with `DDSIM_DISABLE_AUDIO=1` or under any `--smoke-test*`); `_show_navigation` updates it (covers every `_reload_dashboard`); Settings Music volume, Ambience volume, Mute in UI preferences and Reset UI defaults; QSS sliders in both themes; credits "supplied as CC0; verify before public release"; `scripts/audio_smoke.py`; `tests/test_music.py`. Boss = active enemy of archetype tier 4 (no boss flag exists). Review fixes `1325e88`: no repeat across consecutive battles, fade continuity, invalid track skipped, debounced audio preferences, tests always silent. |
 
 Open items: `InventorySlotView` needs a bag `position` for Phase 6 drag and drop; turn notes are not yet written for combat ammo, potion and HP changes or for quests started from dialogue; the Phase 1 source frames include identical placeholder images (panel = tooltip = quest tracker); `CommerceHoverEntry.enterEvent` (navigation_pages.py) lacks the rebuild-while-visible guard added to the inventory and skill hosts.
 Icon library (28 supplied CraftPix packs + RPG Mega gap packs): `Y:/Games/D&D Simulator/Project Resources/assets`.
@@ -108,4 +117,5 @@ Icon library (28 supplied CraftPix packs + RPG Mega gap packs): `Y:/Games/D&D Si
 ## Next steps
 
 1. Run the manual gate (Known issue 1).
-2. Phase 30: target hardware profile and final model selection (PROJECT.md).
+2. Phase 33: target hardware profile and final model selection (PROJECT.md).
+3. Replace the `tavern_inn` placeholder track (village day) with a real tavern track; verify the music licences before any public release.

@@ -1,0 +1,358 @@
+{
+  "pillars": [
+    {
+      "name": "The model narrates, code rules",
+      "text": "The model writes prose and typed proposals only; application code validates and commits every state change."
+    },
+    {
+      "name": "SQLite is the authority",
+      "text": "The Game-State Ledger is the only authority for game state; the model never writes to it."
+    },
+    {
+      "name": "Preserve the player's work",
+      "text": "Invalid model output rejects the whole turn, database errors roll back, migrations and restores back up first, and a damaged ledger opens an in-memory recovery session."
+    },
+    {
+      "name": "Local and private",
+      "text": "Everything runs on the player's machine; model endpoints stay localhost-only and Unsloth server-side tools are never enabled."
+    },
+    {
+      "name": "Saves keep loading",
+      "text": "Schema migrations are append-only; existing saved campaigns must keep loading."
+    }
+  ],
+  "phases": [
+    {
+      "number": 28,
+      "title": "Version control baseline",
+      "status": "done"
+    },
+    {
+      "number": 29,
+      "title": "Unsloth primary, LM Studio secondary",
+      "status": "done"
+    },
+    {
+      "number": 30,
+      "title": "Concept T dashboard",
+      "status": "done"
+    },
+    {
+      "number": 31,
+      "title": "RPG Mega item icons",
+      "status": "done"
+    },
+    {
+      "number": 32,
+      "title": "Music",
+      "status": "done"
+    },
+    {
+      "number": 33,
+      "title": "Target hardware and model selection",
+      "status": "next"
+    },
+    {
+      "number": 34,
+      "title": "Content catalog expansion",
+      "status": "planned"
+    },
+    {
+      "number": 35,
+      "title": "User data location and backups",
+      "status": "planned"
+    }
+  ],
+  "roadmap": [
+    {
+      "id": "P28",
+      "title": "Version control and verification baseline",
+      "status": "done",
+      "summary": "Git baseline of the cleaned Release 27 tree."
+    },
+    {
+      "id": "P29",
+      "title": "Unsloth Studio primary, LM Studio secondary",
+      "status": "done",
+      "summary": "Provider-neutral `LocalModelClient`, Bearer auth, load/unload routes, LM Studio kept working."
+    },
+    {
+      "id": "P30",
+      "title": "Concept T dashboard",
+      "status": "done",
+      "summary": "Release 28 (0.28.0): codex column, scene view, conversation, Journal, shared tooltips; README screenshots pushed."
+    },
+    {
+      "id": "P31",
+      "title": "RPG Mega item icons",
+      "status": "done",
+      "summary": "1,686 catalog records mapped to 1,247 CraftPix library icons; review sheet `docs/design/item-icons.png`."
+    },
+    {
+      "id": "P32",
+      "title": "Music",
+      "status": "done",
+      "summary": "22 tracks by context with a replaceable manifest (`docs/AUDIO.md`); tavern_inn still uses the village day placeholder."
+    },
+    {
+      "id": "P33",
+      "title": "Target hardware profile and final model selection",
+      "status": "next",
+      "summary": "Record target hardware; evaluate Qwen3-4B and Gemma 4 E4B; choose recommended models."
+    },
+    {
+      "id": "P34",
+      "title": "Content catalog expansion",
+      "status": "planned",
+      "summary": "Expanded spell catalogs, campaign-authored enemy archetypes, catalog validation tests."
+    },
+    {
+      "id": "P35",
+      "title": "User data location and backup retention",
+      "status": "planned",
+      "summary": "Final campaign data location and a bounded backup retention policy."
+    }
+  ],
+  "decisions": [
+    {
+      "title": "Target hardware profile",
+      "detail": "Target GPU, VRAM, RAM and storage profile."
+    },
+    {
+      "title": "Preferred model and quantization",
+      "detail": "Final preferred Unsloth Studio model and quantization after in-app evaluation on the target hardware."
+    },
+    {
+      "title": "Catalog expansion",
+      "detail": "Expanded spell catalogs and campaign-authored enemy archetypes beyond the Phase 11 starter catalog."
+    },
+    {
+      "title": "Campaign data location and backups",
+      "detail": "Final location for user campaign data and backup retention policy."
+    }
+  ],
+  "planStatus": {
+    "1": {
+      "status": "implemented",
+      "note": ""
+    },
+    "2": {
+      "status": "implemented",
+      "note": ""
+    },
+    "3": {
+      "status": "implemented",
+      "note": ""
+    },
+    "4": {
+      "status": "implemented",
+      "note": ""
+    },
+    "5": {
+      "status": "implemented",
+      "note": ""
+    },
+    "6": {
+      "status": "planned",
+      "note": ""
+    },
+    "7": {
+      "status": "planned",
+      "note": ""
+    },
+    "8": {
+      "status": "planned",
+      "note": ""
+    }
+  },
+  "milestoneMatches": {},
+  "health": [
+    {
+      "label": "Test suite",
+      "value": "465 passed, 0 failed",
+      "status": "healthy",
+      "detail": "Full suite, offscreen, 2026-10-28 (HANDOFF.md)."
+    },
+    {
+      "label": "Packaged smoke",
+      "value": "6 switches exit 0",
+      "status": "healthy",
+      "detail": "Rebuilt dist from the merged tree (HANDOFF.md)."
+    },
+    {
+      "label": "Live provider gate",
+      "value": "Not run",
+      "status": "warning",
+      "detail": "Play a turn against a live Unsloth Studio with a real key, and against LM Studio (Known issue 1)."
+    },
+    {
+      "label": "Music licences",
+      "value": "Unverified",
+      "status": "warning",
+      "detail": "MP3/OGG tracks supplied as CC0; verify before public release (ASSET_CREDITS.md)."
+    }
+  ],
+  "systems": [
+    {
+      "name": "Game-State Ledger",
+      "status": "stable",
+      "summary": "SQLite schema, migrations, repositories, reliability and recovery.",
+      "paths": [
+        "src/dd_simulator/state/database.py",
+        "src/dd_simulator/state/migrations.py",
+        "src/dd_simulator/state/repositories.py",
+        "src/dd_simulator/state/reliability.py"
+      ],
+      "tags": [
+        "SQLite",
+        "WAL",
+        "backups"
+      ]
+    },
+    {
+      "name": "Turn engine and service",
+      "status": "stable",
+      "summary": "Bounded turns, projection and the game-state service.",
+      "paths": [
+        "src/dd_simulator/state/service.py",
+        "src/dd_simulator/state/projection.py",
+        "src/dd_simulator/state/turns.py"
+      ]
+    },
+    {
+      "name": "Combat and progression",
+      "status": "stable",
+      "paths": [
+        "src/dd_simulator/state/combat.py",
+        "src/dd_simulator/state/abilities.py",
+        "src/dd_simulator/state/encounters.py",
+        "src/dd_simulator/state/progression.py"
+      ],
+      "tags": [
+        "spells",
+        "archetypes",
+        "levels 1-20"
+      ]
+    },
+    {
+      "name": "World systems",
+      "status": "stable",
+      "summary": "Quests, travel, dialogue, commerce, crafting, items.",
+      "paths": [
+        "src/dd_simulator/state/quests.py",
+        "src/dd_simulator/state/travel.py",
+        "src/dd_simulator/state/dialogue.py",
+        "src/dd_simulator/state/commerce.py",
+        "src/dd_simulator/state/crafting.py",
+        "src/dd_simulator/state/item_*.py"
+      ]
+    },
+    {
+      "name": "Local AI client",
+      "status": "stable",
+      "summary": "llama.cpp, Unsloth Studio and LM Studio behind one client.",
+      "paths": [
+        "src/dd_simulator/local_model/*",
+        "src/dd_simulator/local_ai.py"
+      ],
+      "tags": [
+        "Unsloth",
+        "LM Studio",
+        "llama.cpp"
+      ]
+    },
+    {
+      "name": "Concept T UI",
+      "status": "active",
+      "summary": "Main window, codex widgets, scene and conversation views, themes.",
+      "paths": [
+        "src/dd_simulator/ui/main_window.py",
+        "src/dd_simulator/ui/widgets/*",
+        "src/dd_simulator/ui/panels/*",
+        "src/dd_simulator/ui/themes/*"
+      ]
+    },
+    {
+      "name": "Item and power icons",
+      "status": "active",
+      "summary": "Library icon manifests and resolvers.",
+      "paths": [
+        "src/dd_simulator/ui/item_icons.py",
+        "src/dd_simulator/ui/power_icons.py",
+        "src/dd_simulator/ui/assets/icons/*",
+        "scripts/*icon*"
+      ]
+    },
+    {
+      "name": "Music and ambience",
+      "status": "active",
+      "summary": "Context music with crossfades, ambience by biome and weather.",
+      "paths": [
+        "src/dd_simulator/ui/audio.py",
+        "src/dd_simulator/ui/assets/audio/*",
+        "scripts/import_audio.py"
+      ]
+    },
+    {
+      "name": "Presets and seed content",
+      "status": "stable",
+      "paths": [
+        "src/dd_simulator/state/presets/*",
+        "src/dd_simulator/state/presets.py",
+        "src/dd_simulator/state/seed.py"
+      ]
+    }
+  ],
+  "captures": [
+    {
+      "source": "docs/screenshots/adventure-fantasy.png",
+      "title": "Adventure dashboard",
+      "caption": "Concept T, High Fantasy theme."
+    },
+    {
+      "source": "docs/screenshots/adventure-dark.png",
+      "title": "Dark theme",
+      "caption": "Modern Dark theme."
+    },
+    {
+      "source": "docs/screenshots/combat-fantasy.png",
+      "title": "Combat",
+      "caption": "Two-enemy combat."
+    },
+    {
+      "source": "docs/screenshots/tooltip-fantasy.png",
+      "title": "Item tooltip",
+      "caption": "Tooltip with equipped comparison."
+    },
+    {
+      "source": "docs/screenshots/journal-fantasy.png",
+      "title": "Journal",
+      "caption": "Event log, recent events and quests."
+    },
+    {
+      "source": "docs/screenshots/character-sheet-fantasy.png",
+      "title": "Character sheet",
+      "caption": ""
+    },
+    {
+      "source": "docs/design/item-icons.png",
+      "title": "Item icon review sheet",
+      "caption": "114 records across every category and rarity."
+    },
+    {
+      "source": "artifacts/ui-concepts/concept-t-classic-messages.png",
+      "title": "Concept T mockup",
+      "caption": "The approved concept."
+    },
+    {
+      "source": "artifacts/ui-concepts/current-build-high_fantasy.png",
+      "title": "Pre-Concept T build",
+      "caption": "Release 27 dashboard, for comparison."
+    }
+  ],
+  "banner": {
+    "source": "docs/screenshots/adventure-fantasy.png",
+    "title": "Adventure dashboard",
+    "caption": "Release 28"
+  }
+}

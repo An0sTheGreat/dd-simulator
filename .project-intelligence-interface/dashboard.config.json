@@ -1,0 +1,207 @@
+{
+  "project": {
+    "name": "D&D Simulator",
+    "subtitle": "Local-first, single-player tabletop adventure narrated by a local language model",
+    "description": "A Windows desktop game that plays like a solo tabletop role-playing campaign. A local language model narrates, but application code and a SQLite Game-State Ledger own every rule, roll, hit point, item, quest step and coin. Nothing leaves the player's computer.",
+    "repository": "https://github.com/An0sTheGreat/dd-simulator",
+    "timezone": "",
+    "accent": "",
+    "theme": "default",
+    "version": "0.28.0",
+    "stage": "Release 28",
+    "flow": [
+      "Workflow Steps 1-19",
+      "Releases 20-27",
+      "Release 28",
+      "Phases 33-35"
+    ],
+    "facts": [
+      {
+        "label": "Language",
+        "value": "Python 3.12+ (dev on 3.14.3)",
+        "group": "Technology"
+      },
+      {
+        "label": "UI",
+        "value": "PySide6 / Qt, QSS themes (High Fantasy, Modern Dark)",
+        "group": "Technology"
+      },
+      {
+        "label": "State",
+        "value": "SQLite Game-State Ledger, schema 24, append-only migrations",
+        "group": "Technology"
+      },
+      {
+        "label": "Local AI",
+        "value": "Bundled llama.cpp; Unsloth Studio (primary external); LM Studio (secondary)",
+        "group": "Technology"
+      },
+      {
+        "label": "Network",
+        "value": "Localhost-only",
+        "group": "Technology"
+      },
+      {
+        "label": "Target",
+        "value": "Windows desktop .exe",
+        "group": "Build"
+      },
+      {
+        "label": "Packaging",
+        "value": "PyInstaller one-folder (dist/DnDSimulator)",
+        "group": "Build"
+      },
+      {
+        "label": "Tests",
+        "value": "pytest + Qt offscreen + packaged smoke switches",
+        "group": "Build"
+      },
+      {
+        "label": "Game-State Ledger",
+        "value": "The SQLite database that is the only authority for game state",
+        "group": "Terminology"
+      },
+      {
+        "label": "Turn loop",
+        "value": "player action -> bounded snapshot -> model proposal -> validation -> atomic commit -> UI rebuilt",
+        "group": "Terminology"
+      },
+      {
+        "label": "Concept T",
+        "value": "The approved dashboard layout (Release 28)",
+        "group": "Terminology"
+      },
+      {
+        "label": "Visual Registry",
+        "value": "Registry of portrait and location images, ahead of any image generation",
+        "group": "Terminology"
+      },
+      {
+        "label": "Preset",
+        "value": "Authored campaign, e.g. The Last Orrery of Sol",
+        "group": "Terminology"
+      }
+    ]
+  },
+  "repoRoot": "..",
+  "paths": {
+    "handoff": "HANDOFF.md",
+    "rules": "PROJECT_RULES.md",
+    "overview": "README.md",
+    "doc3": "docs/ASSET_CREDITS.md",
+    "doc4": "docs/AUDIO.md",
+    "doc5": "docs/DECISIONS.md",
+    "doc6": "docs/GAME_STATE_LEDGER.md",
+    "doc7": "docs/PACKAGING.md",
+    "doc8": "docs/RECOMMENDED_UNSLOTH_SETTINGS.md",
+    "doc9": "docs/RELEASE26_ASSET_INVENTORY.md",
+    "doc10": "docs/RELEASE_HISTORY.md",
+    "doc11": "docs/RESOURCE_MAP.md",
+    "doc12": "docs/UI_REDESIGN_PLAN.md",
+    "doc13": "docs/UNSLOTH.md",
+    "doc14": "docs/WORKFLOW_STATUS.md",
+    "plan": "PROJECT.md"
+  },
+  "handoff": {
+    "currentState": "Current state",
+    "inProgress": "In progress",
+    "nextSteps": "Next steps"
+  },
+  "headingLevels": {
+    "completed": 2,
+    "plan": 3
+  },
+  "planHeadingPattern": "",
+  "content": [
+    {
+      "label": "PNG images",
+      "glob": "*.png"
+    },
+    {
+      "label": "Markdown docs",
+      "glob": "*.md"
+    },
+    {
+      "label": "WAV audio",
+      "glob": "*.wav"
+    },
+    {
+      "label": "Fonts",
+      "glob": "*.ttf"
+    },
+    {
+      "label": "JSON data",
+      "glob": "*.json"
+    },
+    {
+      "label": "OGG audio",
+      "glob": "*.ogg"
+    },
+    {
+      "label": "MP3 audio",
+      "glob": "*.mp3"
+    },
+    {
+      "label": "JPEG images",
+      "glob": "*.jpg"
+    }
+  ],
+  "source": {
+    "include": [
+      "*"
+    ],
+    "exclude": [
+      "node_modules/*",
+      "vendor/*",
+      "third_party/*",
+      "addons/*",
+      "*.min.js",
+      ".project-intelligence-interface/*"
+    ],
+    "languages": {
+      ".py": "Python",
+      ".js": "JavaScript",
+      ".css": "CSS",
+      ".html": "HTML",
+      ".ps1": "PowerShell"
+    }
+  },
+  "capturesFolder": "",
+  "banner": "docs/screenshots/adventure-fantasy.png",
+  "size": {
+    "enabled": true,
+    "groups": [
+      {
+        "label": "Git history",
+        "match": [
+          ".git"
+        ]
+      },
+      {
+        "label": "Dependencies & caches",
+        "match": [
+          ".cache",
+          ".godot",
+          ".import",
+          ".venv",
+          "Library",
+          "Temp",
+          "__pycache__",
+          "bin",
+          "build",
+          "dist",
+          "node_modules",
+          "obj",
+          "target",
+          "venv"
+        ]
+      },
+      {
+        "label": "Intelligence interface",
+        "match": [
+          ".project-intelligence-interface"
+        ]
+      }
+    ]
+  }
+}

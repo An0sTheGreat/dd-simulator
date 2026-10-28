@@ -1,0 +1,6 @@
+__pycache__/
+*.tmp
+# Generated snapshot and copied media: rebuild them with refresh.py (see README, "Git").
+data/project.json
+data/project-data.js
+media/
