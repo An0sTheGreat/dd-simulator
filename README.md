@@ -7,6 +7,21 @@ campaign. A local language model acts as the narrator, but it never runs the rul
 roll, hit point, item, quest step, and coin is calculated and saved by the application
 itself. Nothing leaves your computer.
 
+## Screenshots
+
+![Adventure dashboard, high fantasy theme](docs/screenshots/adventure-fantasy.png)
+
+*The adventure dashboard: character, inventory, powers and scene.*
+
+| | |
+| --- | --- |
+| ![Dark theme](docs/screenshots/adventure-dark.png)<br>*Dark theme* | ![Combat](docs/screenshots/combat-fantasy.png)<br>*Two-enemy combat* |
+| ![Item tooltip with equipped comparison](docs/screenshots/tooltip-fantasy.png)<br>*Item tooltip with comparison* | ![Journal](docs/screenshots/journal-fantasy.png)<br>*Journal* |
+
+![Character sheet](docs/screenshots/character-sheet-fantasy.png)
+
+*The character sheet.*
+
 ## Description
 
 You create a character, pick or generate a campaign, and play by typing what you do.
