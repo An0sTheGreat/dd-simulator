@@ -1,17 +1,17 @@
 """User-safe LM Studio integration failures."""
 
 
-class LMStudioError(RuntimeError):
+class LocalModelError(RuntimeError):
     """Base class for local model failures."""
 
 
-class LMStudioConnectionError(LMStudioError):
+class LocalModelConnectionError(LocalModelError):
     """The local server could not be reached in time."""
 
 
-class LMStudioModelError(LMStudioError):
+class LocalModelModelError(LocalModelError):
     """No usable loaded model was available."""
 
 
-class LMStudioResponseError(LMStudioError):
+class LocalModelResponseError(LocalModelError):
     """The local model returned malformed or unsafe output."""

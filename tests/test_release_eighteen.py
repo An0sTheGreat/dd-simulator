@@ -10,8 +10,8 @@ from PySide6.QtCore import QPointF
 from PySide6.QtGui import QEnterEvent
 from PySide6.QtWidgets import QApplication
 
-from dd_simulator.lm_studio import LMStudioClient, LMStudioModelInfo
-from dd_simulator.lm_studio.evaluation import ModelEvaluationService
+from dd_simulator.local_model import LocalModelClient, LocalModelModelInfo
+from dd_simulator.local_model.evaluation import ModelEvaluationService
 from dd_simulator.ui.models.presentation import EquipmentSlotView, InventorySlotView
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
 from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
@@ -27,7 +27,7 @@ def _app() -> QApplication:
 
 
 def test_model_discovery_lists_loaded_and_installed_metadata(monkeypatch) -> None:
-    client = LMStudioClient()
+    client = LocalModelClient()
     monkeypatch.setattr(
         client,
         "_json_request_url",
@@ -70,15 +70,15 @@ def test_settings_model_picker_selects_loaded_model_by_default() -> None:
     panel = SettingsPanel(manager.available_themes())
     panel.set_models(
         (
-            LMStudioModelInfo("unloaded", "Unloaded", False),
-            LMStudioModelInfo("loaded", "Loaded", True, instance_id="loaded-instance"),
+            LocalModelModelInfo("unloaded", "Unloaded", False),
+            LocalModelModelInfo("loaded", "Loaded", True, instance_id="loaded-instance"),
         ),
         "unloaded",
     )
 
     assert panel.model_selector.currentData() == "loaded-instance"
     assert panel.model_evaluate_button.isEnabled()
-    panel.set_models((LMStudioModelInfo("only-unloaded", "Only Unloaded", False),), None)
+    panel.set_models((LocalModelModelInfo("only-unloaded", "Only Unloaded", False),), None)
     panel.set_model_busy(False, "Connected")
     assert not panel.model_evaluate_button.isEnabled()
     assert panel.model_load_button.isEnabled()
@@ -95,12 +95,12 @@ def test_selected_model_preference_survives_ui_reset(tmp_path: Path) -> None:
 
 
 def test_model_evaluation_isolated_metrics_and_report(monkeypatch, tmp_path: Path) -> None:
-    client = LMStudioClient()
+    client = LocalModelClient()
     monkeypatch.setattr(
         client,
         "discover_model_details",
         lambda: (
-            LMStudioModelInfo(
+            LocalModelModelInfo(
                 "gemma-model",
                 "Gemma Test",
                 True,

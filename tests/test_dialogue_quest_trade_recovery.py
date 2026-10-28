@@ -5,8 +5,8 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from dd_simulator.lm_studio.action_resolver import LMStudioActionResolver
-from dd_simulator.lm_studio.errors import LMStudioConnectionError
+from dd_simulator.local_model.action_resolver import LocalModelActionResolver
+from dd_simulator.local_model.errors import LocalModelConnectionError
 from dd_simulator.state import GameStateDatabase, GameStateService
 from dd_simulator.state.dialogue import DialogueNarration
 from dd_simulator.state.migrations import LATEST_SCHEMA_VERSION
@@ -121,15 +121,15 @@ def test_action_resolver_uses_safe_narration_after_two_format_failures() -> None
         def _json_request(self, _path: str, *, method: str, payload: dict):
             del method
             if "response_format" in payload:
-                raise LMStudioConnectionError("LM Studio returned HTTP 400")
+                raise LocalModelConnectionError("LM Studio returned HTTP 400")
             if "format correction retry" in payload["messages"][0]["content"]:
-                raise LMStudioConnectionError("Channel Error")
+                raise LocalModelConnectionError("Channel Error")
             return {"choices": [{"message": {"content": "The road opens ahead."}}]}
 
         def is_model_loaded(self, _model: str) -> bool:
             return True
 
-    outcome = LMStudioActionResolver(Client()).resolve_action(  # type: ignore[arg-type]
+    outcome = LocalModelActionResolver(Client()).resolve_action(  # type: ignore[arg-type]
         action="Continue down the road", context={"allowed_targets": {}, "inventory": []}
     )
     assert outcome.narration == "The road opens ahead."

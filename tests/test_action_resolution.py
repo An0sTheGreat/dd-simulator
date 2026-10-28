@@ -10,8 +10,8 @@ import pytest
 from PySide6.QtCore import QThreadPool
 from PySide6.QtTest import QSignalSpy
 
-from dd_simulator.lm_studio import LMStudioResponseError
-from dd_simulator.lm_studio.action_resolver import LMStudioActionResolver
+from dd_simulator.local_model import LocalModelResponseError
+from dd_simulator.local_model.action_resolver import LocalModelActionResolver
 from dd_simulator.app import build_application
 from dd_simulator.state import (
     ActionCancelledError,
@@ -221,7 +221,7 @@ def test_integer_like_resource_amounts_are_normalized(amount: object) -> None:
 def test_explicit_pickup_fallback_adds_generated_item_to_inventory() -> None:
     _database, service = seeded_service()
     provider = FixedProvider(outcome())
-    provider.result = LMStudioActionResolver._ensure_explicit_acquisition(
+    provider.result = LocalModelActionResolver._ensure_explicit_acquisition(
         provider.result, "I pick up the etched rune stone from the floor."
     )
 
@@ -241,7 +241,7 @@ def test_narrated_direct_gift_adds_generated_item_to_inventory() -> None:
         quest_notes=("The smith's gift may prove useful.",),
         suggested_actions=outcome().suggested_actions,
     )
-    gifted = LMStudioActionResolver._ensure_explicit_acquisition(
+    gifted = LocalModelActionResolver._ensure_explicit_acquisition(
         gifted, "I accept the smith's gift."
     )
 
@@ -549,7 +549,7 @@ def test_action_worker_reports_success_failure_and_prestart_cancellation() -> No
 
     class FailedProvider:
         def resolve_action(self, **_kwargs):  # type: ignore[no-untyped-def]
-            raise LMStudioResponseError("malformed turn")
+            raise LocalModelResponseError("malformed turn")
 
     failed_task = ActionResolutionTask(service, FailedProvider(), "listen")  # type: ignore[arg-type]
     failed = QSignalSpy(failed_task.signals.failed)
@@ -608,7 +608,7 @@ def test_state_backed_ui_failure_keeps_action_and_offers_retry(tmp_path) -> None
     class BlockingFailure:
         def resolve_action(self, **_kwargs):  # type: ignore[no-untyped-def]
             assert release.wait(3)
-            raise LMStudioResponseError("Turn JSON was malformed.")
+            raise LocalModelResponseError("Turn JSON was malformed.")
 
     window.action_resolver = BlockingFailure()
     window.controller.navigate("dashboard")

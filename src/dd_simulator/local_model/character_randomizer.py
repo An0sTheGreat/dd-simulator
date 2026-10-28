@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Any
 
-from dd_simulator.lm_studio.client import LMStudioClient
-from dd_simulator.lm_studio.errors import LMStudioResponseError
+from dd_simulator.local_model.client import LocalModelClient
+from dd_simulator.local_model.errors import LocalModelResponseError
 from dd_simulator.state.character_creation import (
     DEFAULT_CONTENT_PREFERENCES,
     CharacterCreationDraft,
@@ -15,7 +15,7 @@ from dd_simulator.state.presets import preset_fallback_intro, preset_intro_conte
 
 
 class CharacterRandomizationService:
-    def __init__(self, client: LMStudioClient) -> None:
+    def __init__(self, client: LocalModelClient) -> None:
         self.client = client
 
     def generate_options(
@@ -67,7 +67,7 @@ class CharacterRandomizationService:
         name = raw.get("campaign_name")
         description = raw.get("campaign_description")
         if not isinstance(name, str) or not isinstance(description, str):
-            raise LMStudioResponseError("Generated campaign details were invalid.")
+            raise LocalModelResponseError("Generated campaign details were invalid.")
         return replace(
             draft,
             campaign_name=name,

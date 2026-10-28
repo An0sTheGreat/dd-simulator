@@ -7,7 +7,7 @@ from threading import Event
 
 from PySide6.QtCore import QObject, QRunnable, Signal
 
-from dd_simulator.lm_studio import LMStudioError
+from dd_simulator.local_model import LocalModelError
 from dd_simulator.state import ActionCancelledError, GameStateError, GameStateService
 from dd_simulator.state.turns import ActionOutcomeProvider
 
@@ -48,7 +48,7 @@ class ActionResolutionTask(QRunnable):
             )
         except ActionCancelledError:
             self.signals.cancelled.emit()
-        except (LMStudioError, GameStateError) as exc:
+        except (LocalModelError, GameStateError) as exc:
             self.signals.failed.emit(str(exc))
         except Exception:
             LOGGER.exception("Unexpected player-action resolution failure")

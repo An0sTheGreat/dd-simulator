@@ -5,7 +5,7 @@ from collections.abc import Iterable
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QCheckBox, QComboBox, QFormLayout, QHBoxLayout, QVBoxLayout
 
-from dd_simulator.lm_studio import LMStudioModelInfo, ModelEvaluation
+from dd_simulator.local_model import LocalModelModelInfo, ModelEvaluation
 from dd_simulator.ui.panels.common import DashboardPanel, semantic_label
 from dd_simulator.ui.themes.theme_schema import ThemeDefinition
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
@@ -265,7 +265,7 @@ class SettingsPanel(DashboardPanel):
 
     def set_models(
         self,
-        models: Iterable[LMStudioModelInfo],
+        models: Iterable[LocalModelModelInfo],
         selected_model_id: str | None,
     ) -> None:
         values = tuple(sorted(models, key=lambda item: (not item.loaded, item.display_name.casefold())))

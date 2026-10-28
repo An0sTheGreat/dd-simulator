@@ -10,7 +10,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel
 
 from dd_simulator.app import build_application
-from dd_simulator.lm_studio import LMStudioModelInfo
+from dd_simulator.local_model import LocalModelModelInfo
 from dd_simulator.state import GameStateDatabase, GameStateService
 from dd_simulator.state.commerce import merchant_price
 from dd_simulator.state.seed import DEMO_CAMPAIGN_ID, seed_demo_campaign
@@ -37,7 +37,7 @@ def test_first_run_explains_setup_and_key_controls_are_accessible(tmp_path: Path
 
     settings.set_models(
         (
-            LMStudioModelInfo(
+            LocalModelModelInfo(
                 "story-model",
                 "Story Model",
                 True,

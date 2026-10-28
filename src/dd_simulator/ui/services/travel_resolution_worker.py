@@ -6,7 +6,7 @@ import logging
 
 from PySide6.QtCore import QObject, QRunnable, Signal
 
-from dd_simulator.lm_studio import LMStudioError
+from dd_simulator.local_model import LocalModelError
 from dd_simulator.state import GameStateError, GameStateService
 from dd_simulator.state.travel import TravelNarrationProvider
 
@@ -49,7 +49,7 @@ class TravelResolutionTask(QRunnable):
                 )
             else:
                 raise GameStateError("Travel task did not receive an action.")
-        except (LMStudioError, GameStateError) as exc:
+        except (LocalModelError, GameStateError) as exc:
             self.signals.failed.emit(str(exc))
         except Exception:
             LOGGER.exception("Unexpected travel resolution failure")

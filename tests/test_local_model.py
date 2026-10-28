@@ -9,13 +9,13 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtTest import QSignalSpy
 
-from dd_simulator.lm_studio import (
+from dd_simulator.local_model import (
     CharacterRandomizationService,
-    LMStudioClient,
-    LMStudioConnectionError,
-    LMStudioResponseError,
-    LMStudioActionResolver,
-    LMStudioCombatNarrator,
+    LocalModelClient,
+    LocalModelConnectionError,
+    LocalModelResponseError,
+    LocalModelActionResolver,
+    LocalModelCombatNarrator,
 )
 from dd_simulator.ui.services.randomization_worker import RandomizationTask
 from test_character_creation import valid_draft
@@ -37,9 +37,9 @@ class FakeResponse:
 
 def test_client_rejects_non_local_endpoints() -> None:
     with pytest.raises(ValueError, match="localhost"):
-        LMStudioClient("https://example.com/v1")
+        LocalModelClient("https://example.com/v1")
     with pytest.raises(ValueError, match="end at /v1"):
-        LMStudioClient("http://localhost:1234/api")
+        LocalModelClient("http://localhost:1234/api")
 
 
 def test_client_discovers_model_and_requests_plain_json_options(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -65,8 +65,8 @@ def test_client_discovers_model_and_requests_plain_json_options(monkeypatch) -> 
             }
         )
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
-    client = LMStudioClient(timeout_seconds=7)
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
+    client = LocalModelClient(timeout_seconds=7)
     options = client.generate_options(
         section="biography",
         context={"name": "Aria", "content_preferences": "No graphic injury"},
@@ -107,9 +107,9 @@ def test_client_accepts_safe_common_response_variants(monkeypatch, content) -> N
         calls += 1
         return FakeResponse({"choices": [{"message": {"content": content}}]})
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
 
-    options = LMStudioClient(model_id="model").generate_options(
+    options = LocalModelClient(model_id="model").generate_options(
         section="face_description", context={}
     )
 
@@ -141,9 +141,9 @@ def test_client_retries_once_with_field_specific_instruction(monkeypatch) -> Non
             }
         )
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
 
-    options = LMStudioClient(model_id="model").generate_options(
+    options = LocalModelClient(model_id="model").generate_options(
         section="face_description", context={"name": "Aria"}
     )
 
@@ -172,10 +172,10 @@ def test_client_retry_failure_is_bounded_and_diagnostics_are_sanitized(
             }
         )
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
 
-    with pytest.raises(LMStudioResponseError, match="after one retry"):
-        LMStudioClient(model_id="model").generate_options(
+    with pytest.raises(LocalModelResponseError, match="after one retry"):
+        LocalModelClient(model_id="model").generate_options(
             section="clothing_style", context={"private": "secret-context"}
         )
 
@@ -188,7 +188,7 @@ def test_client_retry_failure_is_bounded_and_diagnostics_are_sanitized(
 
 def test_client_accepts_tool_call_arguments_without_visible_content(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {
                 "choices": [{
@@ -211,7 +211,7 @@ def test_client_accepts_tool_call_arguments_without_visible_content(monkeypatch)
             }
         ),
     )
-    assert LMStudioClient(model_id="model").generate_options(
+    assert LocalModelClient(model_id="model").generate_options(
         section="body_description", context={}
     ) == (
         "Height: 6 feet; Build: lean and long-limbed",
@@ -224,7 +224,7 @@ def test_generated_option_limits_and_name_cleanup() -> None:
     response = lambda values: {  # noqa: E731
         "choices": [{"message": {"content": json.dumps({"options": values})}}]
     }
-    assert LMStudioClient._parse_options(
+    assert LocalModelClient._parse_options(
         response([
             '1. **Campaign Name: "Crown of Embers"**',
             "2) The Silent Frontier",
@@ -232,17 +232,17 @@ def test_generated_option_limits_and_name_cleanup() -> None:
         ]),
         section="campaign_name",
     ) == ("Crown of Embers", "The Silent Frontier", "Ashes Beneath Dawn")
-    with pytest.raises(LMStudioResponseError, match="oversized"):
-        LMStudioClient._parse_options(
+    with pytest.raises(LocalModelResponseError, match="oversized"):
+        LocalModelClient._parse_options(
             response(["word " * 76, "A valid second appearance", "A valid third appearance"]),
             section="body_description",
         )
-    with pytest.raises(LMStudioResponseError, match="oversized"):
-        LMStudioClient._parse_options(
+    with pytest.raises(LocalModelResponseError, match="oversized"):
+        LocalModelClient._parse_options(
             response(["first", "second", "third"]), section="clothing_style"
         )
-    with pytest.raises(LMStudioResponseError, match="Height and Build"):
-        LMStudioClient._parse_options(
+    with pytest.raises(LocalModelResponseError, match="Height and Build"):
+        LocalModelClient._parse_options(
             response([
                 "A mage reads beside the fire",
                 "A ranger checks a bow",
@@ -256,14 +256,14 @@ def test_campaign_details_accept_labeled_text_and_nested_json() -> None:
     response = lambda content: {  # noqa: E731
         "choices": [{"message": {"content": content}}]
     }
-    assert LMStudioClient._parse_campaign_details(response(
+    assert LocalModelClient._parse_campaign_details(response(
         "CAMPAIGN NAME: Crown of Embers\n"
         "CAMPAIGN PREMISE: Rival heirs hunt an ember crown on the frontier."
     )) == {
         "campaign_name": "Crown of Embers",
         "campaign_description": "Rival heirs hunt an ember crown on the frontier.",
     }
-    assert LMStudioClient._parse_campaign_details(response(json.dumps({
+    assert LocalModelClient._parse_campaign_details(response(json.dumps({
         "campaign": {
             "title": "The Silent Frontier",
             "premise": {"text": "A vanished patrol exposes an ancient border pact."},
@@ -287,13 +287,13 @@ def test_campaign_details_accept_unlabeled_premise_without_overwriting_name() ->
             "CAMPAIGN PREMISE: A sealed gate beneath the village begins to wake."
         )}}]
     }
-    assert LMStudioClient._parse_campaign_details(
+    assert LocalModelClient._parse_campaign_details(
         labeled, fallback_name="The Silent Frontier"
     ) == {
         "campaign_name": "The Silent Frontier",
         "campaign_description": "A sealed gate beneath the village begins to wake.",
     }
-    assert LMStudioClient._parse_campaign_details(
+    assert LocalModelClient._parse_campaign_details(
         response, fallback_name="The Silent Frontier"
     ) == {
         "campaign_name": "The Silent Frontier",
@@ -310,7 +310,7 @@ def test_campaign_details_accept_short_title_line_before_unlabeled_premise() -> 
             "Crown of Embers\nRival heirs hunt an ember crown across the frontier."
         )}}]
     }
-    assert LMStudioClient._parse_campaign_details(response) == {
+    assert LocalModelClient._parse_campaign_details(response) == {
         "campaign_name": "Crown of Embers",
         "campaign_description": "Rival heirs hunt an ember crown across the frontier.",
     }
@@ -322,11 +322,11 @@ def test_campaign_introduction_is_capped_at_220_words() -> None:
             "introduction": "word " * 240,
         })}}]
     }
-    assert len(LMStudioClient._parse_introduction(response).split()) == 220
+    assert len(LocalModelClient._parse_introduction(response).split()) == 220
 
 
 def test_loading_a_model_unloads_other_active_instances(monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    client = LMStudioClient(model_id="old")
+    client = LocalModelClient(model_id="old")
     requests: list[tuple[str, str, object]] = []
 
     def fake_request(url, *, method="GET", payload=None, timeout_seconds=None):  # type: ignore[no-untyped-def]
@@ -354,16 +354,16 @@ def test_loading_a_model_unloads_other_active_instances(monkeypatch) -> None:  #
 
 def test_client_preserves_fields_on_connection_and_schema_failures(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(URLError("offline")),
     )
-    with pytest.raises(LMStudioConnectionError, match="localhost:1234"):
-        LMStudioClient(model_id="model").generate_options(
+    with pytest.raises(LocalModelConnectionError, match="localhost:1234"):
+        LocalModelClient(model_id="model").generate_options(
             section="backstory", context={}
         )
 
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {
                 "choices": [
@@ -372,8 +372,8 @@ def test_client_preserves_fields_on_connection_and_schema_failures(monkeypatch) 
             }
         ),
     )
-    with pytest.raises(LMStudioResponseError, match="duplicate"):
-        LMStudioClient(model_id="model").generate_options(
+    with pytest.raises(LocalModelResponseError, match="duplicate"):
+        LocalModelClient(model_id="model").generate_options(
             section="backstory", context={}
         )
 
@@ -405,7 +405,7 @@ def test_randomizer_sends_bounded_current_character_context() -> None:
 def test_randomization_worker_reports_failure_and_completion() -> None:
     class OfflineRandomizer:
         def generate_options(self, _section, _draft):  # type: ignore[no-untyped-def]
-            raise LMStudioConnectionError("offline")
+            raise LocalModelConnectionError("offline")
 
     task = RandomizationTask(OfflineRandomizer(), "biography", valid_draft())  # type: ignore[arg-type]
     failed = QSignalSpy(task.signals.failed)
@@ -463,8 +463,8 @@ def test_action_resolver_requests_strict_bounded_turn_schema(monkeypatch) -> Non
             {"choices": [{"message": {"content": json.dumps(valid_turn_content(operation="spend_resource"))}}]}
         )
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
-    resolver = LMStudioActionResolver(LMStudioClient(model_id="model", timeout_seconds=9))
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
+    resolver = LocalModelActionResolver(LocalModelClient(model_id="model", timeout_seconds=9))
 
     result = resolver.resolve_action(
         action="climb the wall",
@@ -492,7 +492,7 @@ def test_action_resolver_caps_narrative_segments_at_125_words() -> None:
         {"kind": "spoken", "text": "more " * 20},
     ]
     response = {"choices": [{"message": {"content": json.dumps(raw)}}]}
-    result = LMStudioActionResolver._parse(response)
+    result = LocalModelActionResolver._parse(response)
     assert sum(len(segment.text.split()) for segment in result.narrative_segments) == 125
 
 
@@ -507,9 +507,9 @@ def test_action_resolver_accepts_wrapped_json_and_retries_once(monkeypatch) -> N
         wrapped = "```json\n" + json.dumps({"turn_result": valid_turn_content()}) + "\n```"
         return FakeResponse({"choices": [{"message": {"content": wrapped}}]})
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
 
-    result = LMStudioActionResolver(LMStudioClient(model_id="model")).resolve_action(
+    result = LocalModelActionResolver(LocalModelClient(model_id="model")).resolve_action(
         action="listen",
         context={},
     )
@@ -521,22 +521,22 @@ def test_action_resolver_accepts_wrapped_json_and_retries_once(monkeypatch) -> N
 
 
 def test_action_resolver_remembers_plain_json_after_schema_channel_failure(monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    from dd_simulator.lm_studio.errors import LMStudioConnectionError
+    from dd_simulator.local_model.errors import LocalModelConnectionError
 
-    client = LMStudioClient(model_id="model")
+    client = LocalModelClient(model_id="model")
     payloads: list[dict[str, object]] = []
 
     def request(_path, *, method="GET", payload=None):  # type: ignore[no-untyped-def]
         assert method == "POST"
         payloads.append(payload)
         if len(payloads) == 1:
-            raise LMStudioConnectionError("LM Studio returned HTTP 400. Channel Error")
+            raise LocalModelConnectionError("LM Studio returned HTTP 400. Channel Error")
         return {
             "choices": [{"message": {"content": json.dumps(valid_turn_content())}}]
         }
 
     monkeypatch.setattr(client, "_json_request", request)
-    resolver = LMStudioActionResolver(client)
+    resolver = LocalModelActionResolver(client)
     resolver.resolve_action(action="listen", context={})
     resolver.resolve_action(action="wait", context={})
 
@@ -553,13 +553,13 @@ def test_action_resolver_keeps_narration_and_drops_unknown_operations_without_lo
         {"kind": "narrative", "text": "private narration marker"}
     ]
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {"choices": [{"message": {"content": json.dumps(raw)}}]}
         ),
     )
 
-    result = LMStudioActionResolver(LMStudioClient(model_id="model")).resolve_action(
+    result = LocalModelActionResolver(LocalModelClient(model_id="model")).resolve_action(
         action="private action marker",
         context={"private": "private context marker"},
     )
@@ -575,13 +575,13 @@ def test_action_resolver_accepts_plain_narration_and_builds_local_suggestions(
     monkeypatch,
 ) -> None:  # type: ignore[no-untyped-def]
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {"choices": [{"message": {"content": "The barmaid offers ale and stew."}}]}
         ),
     )
 
-    result = LMStudioActionResolver(LMStudioClient(model_id="model")).resolve_action(
+    result = LocalModelActionResolver(LocalModelClient(model_id="model")).resolve_action(
         action="Ask the barmaid about her wares",
         context={},
     )
@@ -599,8 +599,8 @@ def test_action_resolver_accepts_alternate_suggestion_shapes_and_removes_placeho
         "third": "suggested_actions_2",
     }
 
-    result = LMStudioActionResolver._sanitize_suggestions(
-        LMStudioActionResolver._parse(
+    result = LocalModelActionResolver._sanitize_suggestions(
+        LocalModelActionResolver._parse(
             {"choices": [{"message": {"content": json.dumps(raw)}}]}
         ),
         {},
@@ -634,7 +634,7 @@ def test_action_resolver_accepts_valid_examine_and_equippable_item_targets(
         },
     ]
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {"choices": [{"message": {"content": json.dumps(raw)}}]}
         ),
@@ -650,7 +650,7 @@ def test_action_resolver_accepts_valid_examine_and_equippable_item_targets(
         },
     }
 
-    result = LMStudioActionResolver(LMStudioClient(model_id="model")).resolve_action(
+    result = LocalModelActionResolver(LocalModelClient(model_id="model")).resolve_action(
         action="Examine the letter and equip the Longsword",
         context=context,
     )
@@ -667,7 +667,7 @@ def test_action_resolver_recovers_explicit_examine_omitted_by_model(
     raw = valid_turn_content()
     raw["state_changes"] = []
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {"choices": [{"message": {"content": json.dumps(raw)}}]}
         ),
@@ -679,7 +679,7 @@ def test_action_resolver_recovers_explicit_examine_omitted_by_model(
         },
     }
 
-    result = LMStudioActionResolver(LMStudioClient(model_id="model")).resolve_action(
+    result = LocalModelActionResolver(LocalModelClient(model_id="model")).resolve_action(
         action="Read the Merchant Letter closely",
         context=context,
     )
@@ -703,7 +703,7 @@ def test_action_resolver_sanitizes_internal_ids_and_impossible_equip_suggestions
     raw = valid_turn_content()
     raw["suggested_actions"][0] = suggestion  # type: ignore[index]
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {"choices": [{"message": {"content": json.dumps(raw)}}]}
         ),
@@ -715,7 +715,7 @@ def test_action_resolver_sanitizes_internal_ids_and_impossible_equip_suggestions
         },
     }
 
-    result = LMStudioActionResolver(LMStudioClient(model_id="model")).resolve_action(
+    result = LocalModelActionResolver(LocalModelClient(model_id="model")).resolve_action(
         action="look around",
         context=context,
     )
@@ -735,14 +735,14 @@ def test_combat_narrator_accepts_only_allowed_enemy_intents(monkeypatch) -> None
         ],
     }
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {"choices": [{"message": {"content": json.dumps(raw)}}]}
         ),
     )
 
-    result = LMStudioCombatNarrator(
-        LMStudioClient(model_id="model")
+    result = LocalModelCombatNarrator(
+        LocalModelClient(model_id="model")
     ).resolve_combat_turn(
         context={"resolved_player_action": "The player defended."},
         allowed_intents={"combatant-goblin": ("advance", "defend")},
@@ -760,15 +760,15 @@ def test_combat_narrator_rejects_mechanical_or_unavailable_intent(monkeypatch) -
         ],
     }
     monkeypatch.setattr(
-        "dd_simulator.lm_studio.client.urlopen",
+        "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: FakeResponse(
             {"choices": [{"message": {"content": json.dumps(raw)}}]}
         ),
     )
 
-    with pytest.raises(LMStudioResponseError, match="after one retry"):
-        LMStudioCombatNarrator(
-            LMStudioClient(model_id="model")
+    with pytest.raises(LocalModelResponseError, match="after one retry"):
+        LocalModelCombatNarrator(
+            LocalModelClient(model_id="model")
         ).resolve_combat_turn(
             context={},
             allowed_intents={"combatant-goblin": ("attack", "defend")},

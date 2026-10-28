@@ -6,7 +6,7 @@ import logging
 
 from PySide6.QtCore import QObject, QRunnable, Signal
 
-from dd_simulator.lm_studio import LMStudioError
+from dd_simulator.local_model import LocalModelError
 from dd_simulator.state import CombatCommand, GameStateError, GameStateService
 from dd_simulator.state.combat import CombatNarrationProvider
 
@@ -42,7 +42,7 @@ class CombatResolutionTask(QRunnable):
                 result = self.service.execute_combat_command(
                     self.command, narrator=self.narrator
                 )
-        except (LMStudioError, GameStateError) as exc:
+        except (LocalModelError, GameStateError) as exc:
             self.signals.failed.emit(str(exc))
         except Exception:
             LOGGER.exception("Unexpected combat resolution failure")

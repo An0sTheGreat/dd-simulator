@@ -12,13 +12,13 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-from dd_simulator.lm_studio.errors import (
-    LMStudioConnectionError,
-    LMStudioError,
-    LMStudioModelError,
-    LMStudioResponseError,
+from dd_simulator.local_model.errors import (
+    LocalModelConnectionError,
+    LocalModelError,
+    LocalModelModelError,
+    LocalModelResponseError,
 )
-from dd_simulator.lm_studio.prompts import DUNGEON_MASTER_SYSTEM
+from dd_simulator.local_model.prompts import DUNGEON_MASTER_SYSTEM
 from dd_simulator.state.character_creation import plain_name
 from dd_simulator.state.turns import limit_words, sanitize_model_text
 
@@ -27,7 +27,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
-class LMStudioModelInfo:
+class LocalModelModelInfo:
     """Presentation-safe model metadata reported by the local LM Studio server."""
 
     model_id: str
@@ -134,7 +134,7 @@ INTRODUCTION_RESPONSE_FORMAT: dict[str, Any] = {
 }
 
 
-class LMStudioClient:
+class LocalModelClient:
     def __init__(
         self,
         base_url: str = "http://localhost:1234/v1",
@@ -168,7 +168,7 @@ class LMStudioClient:
 
         normalized = " ".join(model_id.split())
         if not normalized:
-            raise LMStudioModelError("Select an installed model before loading.")
+            raise LocalModelModelError("Select an installed model before loading.")
         native_root = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
         try:
             response = self._json_request_url(
@@ -177,13 +177,13 @@ class LMStudioClient:
                 payload={"model": normalized},
                 timeout_seconds=max(300.0, self.timeout_seconds),
             )
-        except LMStudioConnectionError as exc:
-            raise LMStudioModelError(
+        except LocalModelConnectionError as exc:
+            raise LocalModelModelError(
                 "LM Studio could not load the model. Native model loading requires "
                 f"LM Studio 0.4 or newer. Details: {exc}"
             ) from exc
         if response.get("status") != "loaded":
-            raise LMStudioModelError("LM Studio did not confirm that the model loaded.")
+            raise LocalModelModelError("LM Studio did not confirm that the model loaded.")
         return str(response.get("instance_id") or normalized).strip()
 
     def load_exclusive_model(self, model_id: str) -> str:
@@ -191,7 +191,7 @@ class LMStudioClient:
 
         normalized = " ".join(model_id.split())
         if not normalized:
-            raise LMStudioModelError("Select an installed model before loading.")
+            raise LocalModelModelError("Select an installed model before loading.")
         native_root = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
         try:
             response = self._json_request_url(native_root + "/api/v1/models")
@@ -223,8 +223,8 @@ class LMStudioClient:
             if retained_instance:
                 return retained_instance
             return self.load_model(normalized)
-        except LMStudioError as exc:
-            raise LMStudioModelError(
+        except LocalModelError as exc:
+            raise LocalModelModelError(
                 "LM Studio could not switch models cleanly. Check the local server log. "
                 f"Details: {exc}"
             ) from exc
@@ -236,10 +236,10 @@ class LMStudioClient:
         self._plain_json_models.add(model_id)
 
     @staticmethod
-    def supports_schema_fallback(error: LMStudioError) -> bool:
+    def supports_schema_fallback(error: LocalModelError) -> bool:
         message = str(error).casefold()
         return (
-            isinstance(error, LMStudioResponseError)
+            isinstance(error, LocalModelResponseError)
             or "http 400" in message
             or "http 422" in message
             or "channel error" in message
@@ -289,20 +289,20 @@ class LMStudioClient:
                 LOGGER.warning(
                     "LM Studio HTTP %s response body: %s", exc.code, detail,
                 )
-            raise LMStudioConnectionError(
+            raise LocalModelConnectionError(
                 f"LM Studio returned HTTP {exc.code}. Check the loaded model and server log."
                 + (f" Server detail: {detail}" if detail else "")
             ) from exc
         except (URLError, TimeoutError, socket.timeout, OSError) as exc:
-            raise LMStudioConnectionError(
+            raise LocalModelConnectionError(
                 "Could not reach LM Studio at localhost:1234. Start its local server and load a model."
             ) from exc
         try:
             parsed = json.loads(raw)
         except json.JSONDecodeError as exc:
-            raise LMStudioResponseError("LM Studio returned invalid JSON.") from exc
+            raise LocalModelResponseError("LM Studio returned invalid JSON.") from exc
         if not isinstance(parsed, dict):
-            raise LMStudioResponseError("LM Studio returned an unexpected response object.")
+            raise LocalModelResponseError("LM Studio returned an unexpected response object.")
         return parsed
 
     def is_model_loaded(self, model_id: str) -> bool:
@@ -337,11 +337,11 @@ class LMStudioClient:
                         return str(first["id"]).strip()
                     if str(model.get("key", "")).strip():
                         return str(model["key"]).strip()
-        except (LMStudioConnectionError, LMStudioResponseError):
+        except (LocalModelConnectionError, LocalModelResponseError):
             LOGGER.warning("LM Studio native loaded-model discovery was unavailable")
         return self.discover_models()[0]
 
-    def discover_model_details(self) -> tuple[LMStudioModelInfo, ...]:
+    def discover_model_details(self) -> tuple[LocalModelModelInfo, ...]:
         """Return installed models and their loaded state without loading anything."""
 
         native_root = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
@@ -358,17 +358,17 @@ class LMStudioClient:
                 )
                 if details:
                     return details
-        except (LMStudioConnectionError, LMStudioResponseError):
+        except (LocalModelConnectionError, LocalModelResponseError):
             LOGGER.warning("LM Studio native model metadata was unavailable")
 
         # The OpenAI-compatible endpoint normally lists only inference-ready models.
         return tuple(
-            LMStudioModelInfo(model_id=value, display_name=value, loaded=True, instance_id=value)
+            LocalModelModelInfo(model_id=value, display_name=value, loaded=True, instance_id=value)
             for value in self.discover_models()
         )
 
     @staticmethod
-    def _model_info(raw: dict[str, Any]) -> LMStudioModelInfo | None:
+    def _model_info(raw: dict[str, Any]) -> LocalModelModelInfo | None:
         key = str(raw.get("key") or raw.get("id") or "").strip()
         if not key:
             return None
@@ -396,7 +396,7 @@ class LMStudioClient:
                 return None
             return parsed if parsed > 0 else None
 
-        return LMStudioModelInfo(
+        return LocalModelModelInfo(
             model_id=key,
             display_name=str(raw.get("display_name") or raw.get("name") or key).strip(),
             loaded=bool(loaded_instances),
@@ -412,14 +412,14 @@ class LMStudioClient:
         response = self._json_request("/models")
         data = response.get("data")
         if not isinstance(data, list):
-            raise LMStudioResponseError("LM Studio's model list is malformed.")
+            raise LocalModelResponseError("LM Studio's model list is malformed.")
         models = tuple(
             str(item["id"]).strip()
             for item in data
             if isinstance(item, dict) and str(item.get("id", "")).strip()
         )
         if not models:
-            raise LMStudioModelError("LM Studio is running, but no model is loaded.")
+            raise LocalModelModelError("LM Studio is running, but no model is loaded.")
         return models
 
     def generate_options(
@@ -429,7 +429,7 @@ class LMStudioClient:
         context: dict[str, Any],
     ) -> tuple[str, str, str]:
         model = self.preferred_model_id()
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         for retry in (False, True):
             try:
                 response = self._json_request(
@@ -443,7 +443,7 @@ class LMStudioClient:
                     ),
                 )
                 return self._parse_options(response, section=section)
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
                     "LM Studio option response rejected: section=%s model=%s attempt=%s reason=%s",
@@ -453,12 +453,12 @@ class LMStudioClient:
                     exc,
                 )
                 if (
-                    not isinstance(exc, LMStudioResponseError)
+                    not isinstance(exc, LocalModelResponseError)
                     and not self.supports_schema_fallback(exc)
                 ):
                     raise
         assert last_error is not None
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return three usable options after one retry. "
             f"Last response: {last_error}"
         ) from last_error
@@ -467,7 +467,7 @@ class LMStudioClient:
         """Generate one complete profile while application code validates every value."""
 
         model = self.preferred_model_id()
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         for retry in (False, True):
             try:
                 response = self._json_request(
@@ -476,19 +476,19 @@ class LMStudioClient:
                     payload=self._profile_payload(model=model, context=context, retry=retry),
                 )
                 return self._parse_profile(response)
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
                     "LM Studio character profile rejected: model=%s attempt=%s reason=%s",
                     model, 2 if retry else 1, exc,
                 )
                 if (
-                    not isinstance(exc, LMStudioResponseError)
+                    not isinstance(exc, LocalModelResponseError)
                     and not self.supports_schema_fallback(exc)
                 ):
                     raise
         assert last_error is not None
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return a valid character profile after one retry. "
             f"Last response: {last_error}"
         ) from last_error
@@ -503,7 +503,7 @@ class LMStudioClient:
             if isinstance(campaign, dict)
             else ""
         )
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         for retry in (False, True):
             try:
                 response = self._json_request(
@@ -512,19 +512,19 @@ class LMStudioClient:
                     payload=self._campaign_payload(model=model, context=context, retry=retry),
                 )
                 return self._parse_campaign_details(response, fallback_name=fallback_name)
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
                     "LM Studio campaign details rejected: model=%s attempt=%s reason=%s",
                     model, 2 if retry else 1, exc,
                 )
                 if (
-                    not isinstance(exc, LMStudioResponseError)
+                    not isinstance(exc, LocalModelResponseError)
                     and not self.supports_schema_fallback(exc)
                 ):
                     raise
         assert last_error is not None
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return valid campaign details after one retry. "
             f"Last response: {last_error}"
         ) from last_error
@@ -533,7 +533,7 @@ class LMStudioClient:
         """Generate the opening scene after the deterministic campaign is saved."""
 
         model = self.preferred_model_id()
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         for retry in (False, True):
             try:
                 response = self._json_request(
@@ -544,19 +544,19 @@ class LMStudioClient:
                     ),
                 )
                 return self._parse_introduction(response)
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
                     "LM Studio campaign introduction rejected: model=%s attempt=%s reason=%s",
                     model, 2 if retry else 1, exc,
                 )
                 if (
-                    not isinstance(exc, LMStudioResponseError)
+                    not isinstance(exc, LocalModelResponseError)
                     and not self.supports_schema_fallback(exc)
                 ):
                     raise
         assert last_error is not None
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return a usable campaign introduction after one retry. "
             f"Last response: {last_error}"
         ) from last_error
@@ -742,15 +742,15 @@ class LMStudioClient:
         try:
             message = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "The completion response did not contain a message."
             ) from exc
         if not isinstance(message, dict):
-            raise LMStudioResponseError("The completion message was not an object.")
+            raise LocalModelResponseError("The completion message was not an object.")
         content = cls._message_content(message)
         try:
             result = cls._decode_option_json(content)
-        except LMStudioResponseError:
+        except LocalModelResponseError:
             result = cls._decode_plain_options(content)
         if isinstance(result, list):
             raw_options = result
@@ -767,14 +767,14 @@ class LMStudioClient:
         else:
             raw_options = None
         if raw_options is None:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "The completion JSON did not contain an options array."
             )
         if not isinstance(raw_options, list) or len(raw_options) != 3:
-            raise LMStudioResponseError("LM Studio must return exactly three options.")
+            raise LocalModelResponseError("LM Studio must return exactly three options.")
         option_text = tuple(cls._option_text(option) for option in raw_options)
         if any(option is None for option in option_text):
-            raise LMStudioResponseError("LM Studio options must contain text.")
+            raise LocalModelResponseError("LM Studio options must contain text.")
         options = tuple(
             cls._normalize_option(option, section)
             for option in option_text
@@ -791,15 +791,15 @@ class LMStudioClient:
             or option.casefold() in placeholders
             for option in options
         ):
-            raise LMStudioResponseError("LM Studio returned an empty or oversized option.")
+            raise LocalModelResponseError("LM Studio returned an empty or oversized option.")
         if len({option.casefold() for option in options}) != 3:
-            raise LMStudioResponseError("LM Studio returned duplicate options.")
+            raise LocalModelResponseError("LM Studio returned duplicate options.")
         if section == "body_description" and any(
             not re.search(r"\bheight\s*:", option, re.IGNORECASE)
             or not re.search(r"\bbuild\s*:", option, re.IGNORECASE)
             for option in options
         ):
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "Body and height options must contain explicit Height and Build details."
             )
         return options  # type: ignore[return-value]
@@ -826,7 +826,7 @@ class LMStudioClient:
     @staticmethod
     def _decode_plain_options(content: Any) -> list[str]:
         if not isinstance(content, str):
-            raise LMStudioResponseError("The completion content was not option text.")
+            raise LocalModelResponseError("The completion content was not option text.")
         options = [
             match.group(1).strip()
             for line in content.splitlines()
@@ -837,7 +837,7 @@ class LMStudioClient:
             ))
         ]
         if len(options) != 3:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "The completion text did not contain exactly three numbered options."
             )
         return options
@@ -874,18 +874,18 @@ class LMStudioClient:
         try:
             message = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "The completion response did not contain a profile message."
             ) from exc
         if not isinstance(message, dict):
-            raise LMStudioResponseError("The profile completion message was not an object.")
+            raise LocalModelResponseError("The profile completion message was not an object.")
         result = cls._decode_option_json(cls._message_content(message))
         if isinstance(result, dict) and isinstance(result.get("profile"), dict):
             result = result["profile"]
         if not isinstance(result, dict):
-            raise LMStudioResponseError("The completion JSON did not contain a profile object.")
+            raise LocalModelResponseError("The completion JSON did not contain a profile object.")
         if set(result) != set(PROFILE_FIELDS):
-            raise LMStudioResponseError("The profile did not contain the required fields.")
+            raise LocalModelResponseError("The profile did not contain the required fields.")
         return result
 
     @classmethod
@@ -898,11 +898,11 @@ class LMStudioClient:
         try:
             message = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "The campaign response did not contain a message."
             ) from exc
         if not isinstance(message, dict):
-            raise LMStudioResponseError("The campaign message was not an object.")
+            raise LocalModelResponseError("The campaign message was not an object.")
         content = cls._message_content(message)
         result: dict[str, Any] | None = None
         try:
@@ -910,7 +910,7 @@ class LMStudioClient:
             if isinstance(decoded, dict):
                 nested = decoded.get("campaign")
                 result = nested if isinstance(nested, dict) else decoded
-        except LMStudioResponseError:
+        except LocalModelResponseError:
             pass
         if result is None:
             raw_name, raw_description = cls._decode_campaign_text(
@@ -927,7 +927,7 @@ class LMStudioClient:
         raw_name = cls._clean_bounded_text(raw_name, 120, "campaign name")
         name = cls._normalize_option(raw_name, "campaign_name")
         if not name or len(name.split()) > 12:
-            raise LMStudioResponseError("The campaign name was empty or oversized.")
+            raise LocalModelResponseError("The campaign name was empty or oversized.")
         description = cls._clean_bounded_text(
             raw_description, 4000, "campaign description"
         )
@@ -956,7 +956,7 @@ class LMStudioClient:
         if isinstance(content, list) and all(isinstance(value, str) for value in content):
             content = "\n".join(content)
         if not isinstance(content, str):
-            raise LMStudioResponseError("The campaign completion was not text.")
+            raise LocalModelResponseError("The campaign completion was not text.")
         text = content.strip().strip("`").replace("**", "").replace("__", "").strip()
         match = re.search(
             r"(?ims)^\s*(?:campaign\s+)?name\s*:\s*(.+?)\s*"
@@ -976,7 +976,7 @@ class LMStudioClient:
         lines = [line.strip(" #-*\t") for line in text.splitlines() if line.strip()]
         if len(lines) >= 2 and len(lines[0].split()) <= 12:
             return lines[0], " ".join(lines[1:])
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "The campaign completion did not contain a usable premise or campaign name."
         )
 
@@ -984,7 +984,7 @@ class LMStudioClient:
     def _parse_introduction(cls, response: dict[str, Any]) -> str:
         result = cls._response_object(response, "introduction")
         if set(result) != {"introduction"}:
-            raise LMStudioResponseError("Introduction did not contain the required field.")
+            raise LocalModelResponseError("Introduction did not contain the required field.")
         introduction = cls._clean_bounded_text(
             result["introduction"], 4000, "introduction"
         )
@@ -995,23 +995,23 @@ class LMStudioClient:
         try:
             message = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 f"The {label} response did not contain a message."
             ) from exc
         if not isinstance(message, dict):
-            raise LMStudioResponseError(f"The {label} message was not an object.")
+            raise LocalModelResponseError(f"The {label} message was not an object.")
         result = cls._decode_option_json(cls._message_content(message))
         if not isinstance(result, dict):
-            raise LMStudioResponseError(f"The {label} response was not a JSON object.")
+            raise LocalModelResponseError(f"The {label} response was not a JSON object.")
         return result
 
     @staticmethod
     def _clean_bounded_text(value: Any, maximum: int, label: str) -> str:
         if not isinstance(value, str):
-            raise LMStudioResponseError(f"The {label} must be text.")
+            raise LocalModelResponseError(f"The {label} must be text.")
         normalized = " ".join(sanitize_model_text(value).split())
         if not normalized or len(normalized) > maximum:
-            raise LMStudioResponseError(f"The {label} was empty or oversized.")
+            raise LocalModelResponseError(f"The {label} was empty or oversized.")
         return normalized
 
     @staticmethod
@@ -1044,7 +1044,7 @@ class LMStudioClient:
                     if isinstance(arguments, str) and arguments.strip():
                         return arguments
         if content is None or (isinstance(content, str) and not content.strip()):
-            raise LMStudioResponseError("The completion message contained no option text.")
+            raise LocalModelResponseError("The completion message contained no option text.")
         return content
 
     @staticmethod
@@ -1052,7 +1052,7 @@ class LMStudioClient:
         if isinstance(content, (dict, list)):
             return content
         if not isinstance(content, str):
-            raise LMStudioResponseError("The completion content was not text or JSON.")
+            raise LocalModelResponseError("The completion content was not text or JSON.")
         text = content.strip()
         try:
             return json.loads(text)
@@ -1068,6 +1068,6 @@ class LMStudioClient:
                 continue
             if isinstance(candidate, (dict, list)):
                 return candidate
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "The completion text did not contain a valid JSON object or array."
         )

@@ -8,7 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from dd_simulator.lm_studio.travel_narrator import LMStudioTravelNarrator
+from dd_simulator.local_model.travel_narrator import LocalModelTravelNarrator
 from dd_simulator.state import GameStateDatabase, GameStateError, GameStateService
 from dd_simulator.state.migrations import LATEST_SCHEMA_VERSION
 from dd_simulator.state.seed import DEMO_CAMPAIGN_ID, seed_demo_campaign
@@ -116,7 +116,7 @@ def test_generated_travel_narration_is_capped_at_125_words() -> None:
     response = {
         "choices": [{"message": {"content": '{"narration":"' + "word " * 150 + '"}'}}]
     }
-    assert len(LMStudioTravelNarrator._parse(response).split()) == 125
+    assert len(LocalModelTravelNarrator._parse(response).split()) == 125
 
 
 def test_blocked_route_and_insufficient_stamina_roll_back(tmp_path: Path) -> None:

@@ -12,7 +12,7 @@ from PySide6.QtTest import QSignalSpy, QTest
 from PySide6.QtWidgets import QApplication, QDialog, QLabel, QPlainTextEdit
 
 from dd_simulator.app import build_application
-from dd_simulator.lm_studio import CharacterRandomizationService, LMStudioModelInfo
+from dd_simulator.local_model import CharacterRandomizationService, LocalModelModelInfo
 from dd_simulator.state import GameStateDatabase, GameStateError, GameStateService
 from dd_simulator.state.character_creation import (
     CLASSES,
@@ -43,7 +43,7 @@ VALID_ABILITY_SCORES = (
 
 def unlock_panel(panel: CharacterCreationPanel) -> None:
     panel.set_models(
-        (LMStudioModelInfo("local", "Local Model", True, "local-instance"),),
+        (LocalModelModelInfo("local", "Local Model", True, "local-instance"),),
         "local-instance",
     )
 
@@ -418,9 +418,9 @@ def test_full_click_combo_opens_from_its_main_surface() -> None:
 def test_failed_randomization_reenables_button_and_preserves_text() -> None:
     class OfflineRandomizer:
         def generate_options(self, _section, _draft):  # type: ignore[no-untyped-def]
-            from dd_simulator.lm_studio import LMStudioConnectionError
+            from dd_simulator.local_model import LocalModelConnectionError
 
-            raise LMStudioConnectionError("LM Studio is offline")
+            raise LocalModelConnectionError("LM Studio is offline")
 
     class ImmediatePool:
         def start(self, task):  # type: ignore[no-untyped-def]

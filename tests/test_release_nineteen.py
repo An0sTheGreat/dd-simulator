@@ -8,7 +8,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtTest import QSignalSpy
 from PySide6.QtWidgets import QApplication
 
-from dd_simulator.lm_studio import LMStudioClient, LMStudioModelInfo
+from dd_simulator.local_model import LocalModelClient, LocalModelModelInfo
 from dd_simulator.ui.main_window import MainWindow
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
@@ -31,7 +31,7 @@ def _themes(tmp_path: Path):  # type: ignore[no-untyped-def]
 
 
 def test_client_loads_installed_model_through_native_api(monkeypatch) -> None:
-    client = LMStudioClient()
+    client = LocalModelClient()
     calls: list[tuple[str, str, dict[str, object] | None, float | None]] = []
 
     def request(  # type: ignore[no-untyped-def]
@@ -56,7 +56,7 @@ def test_client_loads_installed_model_through_native_api(monkeypatch) -> None:
 def test_unloaded_model_is_selectable_and_emits_explicit_load(tmp_path: Path) -> None:
     _app()
     panel = SettingsPanel(_themes(tmp_path))
-    panel.set_models((LMStudioModelInfo("gemma-model", "Gemma", False),), None)
+    panel.set_models((LocalModelModelInfo("gemma-model", "Gemma", False),), None)
     load_spy = QSignalSpy(panel.model_load_requested)
 
     panel.model_load_button.click()

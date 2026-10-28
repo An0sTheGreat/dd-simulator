@@ -7,7 +7,7 @@ from threading import Event
 
 from PySide6.QtCore import QObject, QRunnable, Signal
 
-from dd_simulator.lm_studio import LMStudioClient, LMStudioError
+from dd_simulator.local_model import LocalModelClient, LocalModelError
 from dd_simulator.local_ai import (
     LOCAL_MODEL_ALIAS,
     LlamaCppRuntime,
@@ -75,12 +75,12 @@ class LocalAiActivationTask(QRunnable):
                 model_id = LOCAL_MODEL_ALIAS
             elif self.configuration.mode == "lm_studio":
                 endpoint = "http://localhost:1234/v1"
-                client = LMStudioClient(endpoint, timeout_seconds=10)
+                client = LocalModelClient(endpoint, timeout_seconds=10)
                 model_id = client.discover_models()[0]
             else:
                 raise LocalAiError("Unsupported local AI setup mode.")
             self.signals.succeeded.emit(self.configuration, endpoint, model_id)
-        except (OSError, LocalAiError, LMStudioError) as exc:
+        except (OSError, LocalAiError, LocalModelError) as exc:
             self.runtime.stop()
             self.signals.failed.emit(str(exc))
         finally:

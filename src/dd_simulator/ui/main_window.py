@@ -45,14 +45,14 @@ from dd_simulator.state.turns import (
     SkillCheckResult,
 )
 from dd_simulator.state.travel import CampResult, TravelNarrationProvider, TravelResult
-from dd_simulator.lm_studio import (
+from dd_simulator.local_model import (
     CharacterRandomizationService,
-    LMStudioActionResolver,
-    LMStudioClient,
-    LMStudioCombatNarrator,
-    LMStudioDialogueNarrator,
-    LMStudioModelInfo,
-    LMStudioTravelNarrator,
+    LocalModelActionResolver,
+    LocalModelClient,
+    LocalModelCombatNarrator,
+    LocalModelDialogueNarrator,
+    LocalModelModelInfo,
+    LocalModelTravelNarrator,
     ModelEvaluation,
     ModelEvaluationService,
 )
@@ -188,7 +188,7 @@ class MainWindow(QMainWindow):
         combat_narrator: CombatNarrationProvider | None = None,
         travel_narrator: TravelNarrationProvider | None = None,
         dialogue_narrator: DialogueNarrationProvider | None = None,
-        lm_client: LMStudioClient | None = None,
+        lm_client: LocalModelClient | None = None,
         model_evaluator: ModelEvaluationService | None = None,
         local_ai_configuration: LocalAiConfiguration | None = None,
         local_ai_runtime: LlamaCppRuntime | None = None,
@@ -236,7 +236,7 @@ class MainWindow(QMainWindow):
         self._local_ai_download_task: RecommendedModelDownloadTask | None = None
         self._local_ai_activation_task: LocalAiActivationTask | None = None
         self._models_scanned = False
-        self._discovered_models: tuple[LMStudioModelInfo, ...] = ()
+        self._discovered_models: tuple[LocalModelModelInfo, ...] = ()
         self.startup_readiness = "Startup checks pending."
         self._reward_dialog: CombatRewardsDialog | None = None
         self._quest_reward_dialog: QuestRewardsDialog | None = None
@@ -1683,13 +1683,13 @@ class MainWindow(QMainWindow):
             model_path=configuration.model_path,
             model_id=model_id,
         )
-        client = LMStudioClient(endpoint, timeout_seconds=90, model_id=model_id)
+        client = LocalModelClient(endpoint, timeout_seconds=90, model_id=model_id)
         self._finish_local_ai_setup(completed, client)
 
     def _finish_local_ai_setup(
         self,
         configuration: LocalAiConfiguration,
-        client: LMStudioClient | None,
+        client: LocalModelClient | None,
     ) -> None:
         self.local_ai_configuration = configuration
         self.lm_client = client
@@ -1702,10 +1702,10 @@ class MainWindow(QMainWindow):
             self.model_evaluator = None
         else:
             self.character_randomizer = CharacterRandomizationService(client)
-            self.action_resolver = LMStudioActionResolver(client)
-            self.combat_narrator = LMStudioCombatNarrator(client)
-            self.travel_narrator = LMStudioTravelNarrator(client)
-            self.dialogue_narrator = LMStudioDialogueNarrator(client)
+            self.action_resolver = LocalModelActionResolver(client)
+            self.combat_narrator = LocalModelCombatNarrator(client)
+            self.travel_narrator = LocalModelTravelNarrator(client)
+            self.dialogue_narrator = LocalModelDialogueNarrator(client)
             self.model_evaluator = ModelEvaluationService(
                 client, self.config_dir / "model-evaluations"
             )

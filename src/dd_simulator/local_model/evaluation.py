@@ -9,8 +9,8 @@ from pathlib import Path
 from time import perf_counter
 from typing import Any
 
-from dd_simulator.lm_studio.client import LMStudioClient, LMStudioModelInfo
-from dd_simulator.lm_studio.errors import LMStudioError, LMStudioResponseError
+from dd_simulator.local_model.client import LocalModelClient, LocalModelModelInfo
+from dd_simulator.local_model.errors import LocalModelError, LocalModelResponseError
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,14 +47,14 @@ class ModelEvaluation:
 class ModelEvaluationService:
     """Probe one selected model without reading or changing campaign state."""
 
-    def __init__(self, client: LMStudioClient, report_directory: Path) -> None:
+    def __init__(self, client: LocalModelClient, report_directory: Path) -> None:
         self.client = client
         self.report_directory = Path(report_directory)
 
     def evaluate(self, model_id: str, *, samples: int = 3) -> ModelEvaluation:
         selected = " ".join(model_id.split())
         if not selected:
-            raise LMStudioResponseError("Select a loaded model before running evaluation.")
+            raise LocalModelResponseError("Select a loaded model before running evaluation.")
         sample_count = max(1, min(int(samples), 5))
         model = self._model_details(selected)
         valid = strict_valid = retries = prompt_tokens = completion_tokens = 0
@@ -74,7 +74,7 @@ class ModelEvaluationService:
                 )
                 parsed = self._parse_probe(response, index=index)
                 strict_valid += 1
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 retries += 1
                 try:
                     response = self.client._json_request(  # noqa: SLF001
@@ -83,7 +83,7 @@ class ModelEvaluationService:
                         payload=self._payload(selected, index=index, strict=False),
                     )
                     parsed = self._parse_probe(response, index=index)
-                except LMStudioError as retry_exc:
+                except LocalModelError as retry_exc:
                     errors.append(str(retry_exc or exc))
             elapsed = max(0.0001, perf_counter() - started)
             elapsed_values.append(elapsed)
@@ -122,16 +122,16 @@ class ModelEvaluationService:
         self.write_report(result)
         return result
 
-    def _model_details(self, model_id: str) -> LMStudioModelInfo:
+    def _model_details(self, model_id: str) -> LocalModelModelInfo:
         details = self.client.discover_model_details()
         for item in details:
             if model_id in {item.model_id, item.instance_id}:
                 if not item.loaded:
-                    raise LMStudioResponseError(
+                    raise LocalModelResponseError(
                         f"{item.display_name} is installed but not loaded in LM Studio."
                     )
                 return item
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "The selected model is no longer available. Refresh the LM Studio model list."
         )
 
@@ -150,13 +150,13 @@ class ModelEvaluationService:
         contract = index % 3
         if contract < 2:
             section = "body_description" if contract == 0 else "campaign_name"
-            return LMStudioClient._option_payload(  # noqa: SLF001
+            return LocalModelClient._option_payload(  # noqa: SLF001
                 model=model_id,
                 section=section,
                 context=context,
                 retry=not strict,
             )
-        return LMStudioClient._campaign_payload(  # noqa: SLF001
+        return LocalModelClient._campaign_payload(  # noqa: SLF001
             model=model_id,
             context={"campaign": context, "player": {"name": "Aria Vale"}},
             retry=not strict,
@@ -166,11 +166,11 @@ class ModelEvaluationService:
     def _parse_probe(response: dict[str, Any], *, index: int) -> object:
         contract = index % 3
         if contract < 2:
-            return LMStudioClient._parse_options(  # noqa: SLF001
+            return LocalModelClient._parse_options(  # noqa: SLF001
                 response,
                 section="body_description" if contract == 0 else "campaign_name",
             )
-        return LMStudioClient._parse_campaign_details(response)  # noqa: SLF001
+        return LocalModelClient._parse_campaign_details(response)  # noqa: SLF001
 
     @staticmethod
     def _nonnegative_int(value: Any) -> int:

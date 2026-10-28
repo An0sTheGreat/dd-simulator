@@ -8,11 +8,11 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication, QPushButton, QWidget
 
-from dd_simulator.lm_studio import (
+from dd_simulator.local_model import (
     CharacterRandomizationService,
-    LMStudioClient,
-    LMStudioConnectionError,
-    LMStudioResponseError,
+    LocalModelClient,
+    LocalModelConnectionError,
+    LocalModelResponseError,
 )
 from dd_simulator.ui.panels.campaign_panels import CharacterCreationPanel
 from test_character_creation import unlock_panel, valid_draft
@@ -142,7 +142,7 @@ def test_campaign_generation_changes_only_name_and_premise() -> None:
     assert client.context["campaign"]["world_type"] == "Dark fantasy"  # type: ignore[index]
     assert client.context["player"]["class"] == draft.character_class  # type: ignore[index]
 
-    with pytest.raises(LMStudioResponseError, match="invalid"):
+    with pytest.raises(LocalModelResponseError, match="invalid"):
         invalid = {"campaign_name": 7, "campaign_description": "Valid premise"}
         CharacterRandomizationService(RecordingClient(invalid)).generate_campaign(draft)  # type: ignore[arg-type]
 
@@ -166,8 +166,8 @@ def test_profile_request_and_ui_failure_are_bounded(monkeypatch) -> None:  # typ
         captured["payload"] = json.loads(request.data.decode("utf-8"))
         return Response()
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
-    assert LMStudioClient(model_id="local").generate_character_profile(
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
+    assert LocalModelClient(model_id="local").generate_character_profile(
         context={"world_and_safety": {"world_type": "Dark fantasy"}}
     )["name"] == "Mira Thorn"
     payload = captured["payload"]
@@ -176,7 +176,7 @@ def test_profile_request_and_ui_failure_are_bounded(monkeypatch) -> None:  # typ
 
     class OfflineRandomizer:
         def generate_campaign(self, _draft):  # type: ignore[no-untyped-def]
-            raise LMStudioConnectionError("LM Studio is offline")
+            raise LocalModelConnectionError("LM Studio is offline")
 
     class ImmediatePool:
         def start(self, task):  # type: ignore[no-untyped-def]
@@ -224,8 +224,8 @@ def test_campaign_and_intro_requests_use_plain_json_dm_prompts(monkeypatch) -> N
             })
         return Response({"introduction": "Dawn finds the ranger at the frontier gate."})
 
-    monkeypatch.setattr("dd_simulator.lm_studio.client.urlopen", fake_urlopen)
-    client = LMStudioClient(model_id="local")
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
+    client = LocalModelClient(model_id="local")
     details = client.generate_campaign_details(context={"player": {"name": "Aria"}})
     intro = client.generate_campaign_introduction(
         context={"campaign": details, "player": {"name": "Aria"}}

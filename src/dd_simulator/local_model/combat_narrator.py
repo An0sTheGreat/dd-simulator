@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from dd_simulator.lm_studio.client import LMStudioClient
-from dd_simulator.lm_studio.errors import LMStudioError, LMStudioResponseError
-from dd_simulator.lm_studio.prompts import DUNGEON_MASTER_SYSTEM
+from dd_simulator.local_model.client import LocalModelClient
+from dd_simulator.local_model.errors import LocalModelError, LocalModelResponseError
+from dd_simulator.local_model.prompts import DUNGEON_MASTER_SYSTEM
 from dd_simulator.state.combat import CombatNarrationOutcome
 from dd_simulator.state.turns import (
     NarrativeSegment,
@@ -16,10 +16,10 @@ from dd_simulator.state.turns import (
 )
 
 
-class LMStudioCombatNarrator:
+class LocalModelCombatNarrator:
     """Request prose and bounded intent choices without accepting mechanics."""
 
-    def __init__(self, client: LMStudioClient) -> None:
+    def __init__(self, client: LocalModelClient) -> None:
         self.client = client
 
     def resolve_combat_turn(
@@ -29,7 +29,7 @@ class LMStudioCombatNarrator:
         allowed_intents: dict[str, tuple[str, ...]],
     ) -> CombatNarrationOutcome:
         model = self.client.preferred_model_id()
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         checker = getattr(self.client, "uses_plain_json", None)
         compatibility = bool(checker(model)) if callable(checker) else False
         for attempt in range(2):
@@ -45,16 +45,16 @@ class LMStudioCombatNarrator:
                     ),
                 )
                 return self._parse(response, allowed_intents)
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
-                if attempt or not LMStudioClient.supports_schema_fallback(exc):
+                if attempt or not LocalModelClient.supports_schema_fallback(exc):
                     break
                 compatibility = True
                 remember = getattr(self.client, "remember_plain_json", None)
                 if callable(remember):
                     remember(model)
         assert last_error is not None
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return usable combat narration after one retry."
         ) from last_error
 
@@ -160,39 +160,39 @@ class LMStudioCombatNarrator:
         try:
             message = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError("Combat response did not contain a message.") from exc
+            raise LocalModelResponseError("Combat response did not contain a message.") from exc
         if not isinstance(message, dict):
-            raise LMStudioResponseError("Combat response message was invalid.")
-        content = LMStudioClient._message_content(message)  # noqa: SLF001
-        result = LMStudioClient._decode_option_json(content)  # noqa: SLF001
+            raise LocalModelResponseError("Combat response message was invalid.")
+        content = LocalModelClient._message_content(message)  # noqa: SLF001
+        result = LocalModelClient._decode_option_json(content)  # noqa: SLF001
         if not isinstance(result, dict):
-            raise LMStudioResponseError("Combat response was not a JSON object.")
+            raise LocalModelResponseError("Combat response was not a JSON object.")
         raw_segments = result.get("narrative_segments")
         raw_intents = result.get("enemy_intents")
         if not isinstance(raw_segments, list) or not 1 <= len(raw_segments) <= 4:
-            raise LMStudioResponseError("Combat narration was not a bounded array.")
+            raise LocalModelResponseError("Combat narration was not a bounded array.")
         segments: list[NarrativeSegment] = []
         for raw in raw_segments:
             if not isinstance(raw, dict):
-                raise LMStudioResponseError("Combat narration segment was invalid.")
+                raise LocalModelResponseError("Combat narration segment was invalid.")
             kind = raw.get("kind")
             text = raw.get("text")
             if kind not in {"narrative", "monologue", "spoken"}:
-                raise LMStudioResponseError("Combat narration kind was invalid.")
+                raise LocalModelResponseError("Combat narration kind was invalid.")
             if not isinstance(text, str) or not text.strip() or len(text) > 1000:
-                raise LMStudioResponseError("Combat narration text was invalid.")
+                raise LocalModelResponseError("Combat narration text was invalid.")
             segments.append(NarrativeSegment(str(kind), sanitize_model_text(text)))
         if not isinstance(raw_intents, list) or len(raw_intents) > 12:
-            raise LMStudioResponseError("Enemy intents were not a bounded array.")
+            raise LocalModelResponseError("Enemy intents were not a bounded array.")
         intents: dict[str, str] = {}
         for raw in raw_intents:
             if not isinstance(raw, dict):
-                raise LMStudioResponseError("Enemy intent entry was invalid.")
+                raise LocalModelResponseError("Enemy intent entry was invalid.")
             combatant_id = raw.get("combatant_id")
             intent = raw.get("intent")
             if combatant_id not in allowed_intents:
-                raise LMStudioResponseError("Enemy intent targeted an unavailable combatant.")
+                raise LocalModelResponseError("Enemy intent targeted an unavailable combatant.")
             if not isinstance(intent, str) or intent not in allowed_intents[combatant_id]:
-                raise LMStudioResponseError("Enemy intent was not allowed by combat rules.")
+                raise LocalModelResponseError("Enemy intent was not allowed by combat rules.")
             intents[combatant_id] = intent
         return CombatNarrationOutcome(limit_narrative_segments(segments), intents)

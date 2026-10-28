@@ -6,7 +6,7 @@ import logging
 
 from PySide6.QtCore import QObject, QRunnable, Signal
 
-from dd_simulator.lm_studio import LMStudioClient, LMStudioError, ModelEvaluationService
+from dd_simulator.local_model import LocalModelClient, LocalModelError, ModelEvaluationService
 
 
 LOGGER = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class ModelTaskSignals(QObject):
 
 
 class ModelDiscoveryTask(QRunnable):
-    def __init__(self, client: LMStudioClient) -> None:
+    def __init__(self, client: LocalModelClient) -> None:
         super().__init__()
         self.client = client
         self.signals = ModelTaskSignals()
@@ -27,7 +27,7 @@ class ModelDiscoveryTask(QRunnable):
     def run(self) -> None:
         try:
             result = self.client.discover_model_details()
-        except LMStudioError as exc:
+        except LocalModelError as exc:
             self._emit(self.signals.failed, str(exc))
         except Exception:
             LOGGER.exception("Unexpected LM Studio discovery failure")
@@ -56,7 +56,7 @@ class ModelEvaluationTask(QRunnable):
     def run(self) -> None:
         try:
             result = self.service.evaluate(self.model_id)
-        except (LMStudioError, OSError) as exc:
+        except (LocalModelError, OSError) as exc:
             ModelDiscoveryTask._emit(self.signals.failed, str(exc))
         except Exception:
             LOGGER.exception("Unexpected LM Studio evaluation failure")
@@ -70,7 +70,7 @@ class ModelEvaluationTask(QRunnable):
 
 
 class ModelLoadTask(QRunnable):
-    def __init__(self, client: LMStudioClient, model_id: str) -> None:
+    def __init__(self, client: LocalModelClient, model_id: str) -> None:
         super().__init__()
         self.client = client
         self.model_id = model_id
@@ -79,7 +79,7 @@ class ModelLoadTask(QRunnable):
     def run(self) -> None:
         try:
             instance_id = self.client.load_exclusive_model(self.model_id)
-        except LMStudioError as exc:
+        except LocalModelError as exc:
             ModelDiscoveryTask._emit(self.signals.failed, str(exc))
         except Exception:
             LOGGER.exception("Unexpected LM Studio model-load failure")

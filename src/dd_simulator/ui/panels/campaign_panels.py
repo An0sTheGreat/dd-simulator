@@ -56,9 +56,9 @@ from dd_simulator.state.character_creation import (
     level_one_hit_points,
     point_buy_spent,
 )
-from dd_simulator.lm_studio import (
+from dd_simulator.local_model import (
     CharacterRandomizationService,
-    LMStudioModelInfo,
+    LocalModelModelInfo,
     ModelEvaluation,
 )
 from dd_simulator.state.models import CampaignRecord
@@ -575,7 +575,7 @@ class CharacterCreationPanel(DashboardPanel):
 
     def set_models(
         self,
-        models: Iterable[LMStudioModelInfo],
+        models: Iterable[LocalModelModelInfo],
         selected_model_id: str | None,
     ) -> None:
         values = tuple(

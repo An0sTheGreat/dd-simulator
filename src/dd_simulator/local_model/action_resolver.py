@@ -8,9 +8,9 @@ import re
 from dataclasses import replace
 from typing import Any
 
-from dd_simulator.lm_studio.client import LMStudioClient
-from dd_simulator.lm_studio.errors import LMStudioError, LMStudioResponseError
-from dd_simulator.lm_studio.prompts import DUNGEON_MASTER_SYSTEM
+from dd_simulator.local_model.client import LocalModelClient
+from dd_simulator.local_model.errors import LocalModelError, LocalModelResponseError
+from dd_simulator.local_model.prompts import DUNGEON_MASTER_SYSTEM
 from dd_simulator.state.turns import (
     ActionOutcome,
     NarrativeSegment,
@@ -149,8 +149,8 @@ TURN_RESPONSE_FORMAT: dict[str, Any] = {
 }
 
 
-class LMStudioActionResolver:
-    def __init__(self, client: LMStudioClient) -> None:
+class LocalModelActionResolver:
+    def __init__(self, client: LocalModelClient) -> None:
         self.client = client
 
     def resolve_action(
@@ -160,7 +160,7 @@ class LMStudioActionResolver:
         context: dict[str, Any],
     ) -> ActionOutcome:
         model = self.client.preferred_model_id()
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         model_reported_unloaded = False
         checker = getattr(self.client, "uses_plain_json", None)
         starts_plain = bool(checker(model)) if callable(checker) else False
@@ -183,7 +183,7 @@ class LMStudioActionResolver:
                 outcome = self._ensure_explicit_acquisition(outcome, action)
                 outcome = self._filter_context_contract(outcome, context)
                 return self._sanitize_suggestions(outcome, context)
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
                     "LM Studio turn response rejected: model=%s attempt=%s reason=%s shape=%s",
@@ -192,7 +192,7 @@ class LMStudioActionResolver:
                     exc,
                     self._response_shape(response),
                 )
-                if not LMStudioClient.supports_schema_fallback(exc):
+                if not LocalModelClient.supports_schema_fallback(exc):
                     break
                 remember = getattr(self.client, "remember_plain_json", None)
                 if mode == "schema" and callable(remember):
@@ -203,10 +203,10 @@ class LMStudioActionResolver:
                         model_reported_unloaded = True
         assert last_error is not None
         if model_reported_unloaded:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "The selected LM Studio model appears to be unloaded. Reload it in Settings."
             ) from last_error
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return a usable turn after bounded compatibility recovery. "
             f"Last response: {last_error}"
         ) from last_error
@@ -289,13 +289,13 @@ class LMStudioActionResolver:
         try:
             message = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError("The turn response did not contain a message.") from exc
+            raise LocalModelResponseError("The turn response did not contain a message.") from exc
         if not isinstance(message, dict):
-            raise LMStudioResponseError("The turn message was not an object.")
-        content = LMStudioClient._message_content(message)  # noqa: SLF001
+            raise LocalModelResponseError("The turn message was not an object.")
+        content = LocalModelClient._message_content(message)  # noqa: SLF001
         try:
-            result = LMStudioClient._decode_option_json(content)  # noqa: SLF001
-        except LMStudioResponseError:
+            result = LocalModelClient._decode_option_json(content)  # noqa: SLF001
+        except LocalModelResponseError:
             if isinstance(content, str) and content.strip():
                 return cls._plain_text_outcome(content)
             raise
@@ -308,7 +308,7 @@ class LMStudioActionResolver:
             if isinstance(result, list) and result:
                 result = {"narrative_segments": result}
             else:
-                raise LMStudioResponseError("The turn content did not contain narration.")
+                raise LocalModelResponseError("The turn content did not contain narration.")
         raw_segments = result.get("narrative_segments")
         if raw_segments is None:
             raw_segments = result.get("segments")
@@ -338,13 +338,13 @@ class LMStudioActionResolver:
         if isinstance(raw_segments, str):
             raw_segments = [{"kind": "narrative", "text": raw_segments}]
         if not isinstance(raw_segments, list) or not 1 <= len(raw_segments) <= 12:
-            raise LMStudioResponseError("Turn narrative segments were not a bounded array.")
+            raise LocalModelResponseError("Turn narrative segments were not a bounded array.")
         narrative_segments: list[NarrativeSegment] = []
         for raw_segment in raw_segments:
             if isinstance(raw_segment, str):
                 raw_segment = {"kind": "narrative", "text": raw_segment}
             if not isinstance(raw_segment, dict):
-                raise LMStudioResponseError("A narrative segment was not an object.")
+                raise LocalModelResponseError("A narrative segment was not an object.")
             kind = str(raw_segment.get("kind", raw_segment.get("type", "narrative"))).casefold()
             kind = {
                 "dialogue": "spoken", "speech": "spoken", "thought": "monologue",
@@ -357,16 +357,16 @@ class LMStudioActionResolver:
                 or not text.strip()
                 or len(text) > 2000
             ):
-                raise LMStudioResponseError("A narrative segment contained invalid content.")
+                raise LocalModelResponseError("A narrative segment contained invalid content.")
             narrative_segments.extend(normalize_narrative_segment(str(kind), text))
         if len(narrative_segments) > 12:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "Turn narrative required too many semantic segments after normalization."
             )
         narrative_segments = list(limit_narrative_segments(narrative_segments))
         narration = "\n\n".join(segment.text for segment in narrative_segments)
         if len(narration) > 6000:
-            raise LMStudioResponseError("Turn narration was oversized.")
+            raise LocalModelResponseError("Turn narration was oversized.")
         if not isinstance(raw_changes, list) or len(raw_changes) > 12:
             LOGGER.warning("Ignoring malformed turn state_changes field")
             raw_changes = []
@@ -624,7 +624,7 @@ class LMStudioActionResolver:
 
         text = content.strip().strip("`").strip()
         if not text:
-            raise LMStudioResponseError("The turn content did not contain narration.")
+            raise LocalModelResponseError("The turn content did not contain narration.")
         suggestions: tuple[str, ...] = ()
         marker = re.search(
             r"(?im)^\s*(?:suggested|next)\s+(?:actions?|responses?)\s*:?\s*$",
@@ -634,7 +634,7 @@ class LMStudioActionResolver:
             suggestions = cls._coerce_string_array(text[marker.end():], maximum=6)
             text = text[:marker.start()].strip()
         if not text:
-            raise LMStudioResponseError("The turn content did not contain narration.")
+            raise LocalModelResponseError("The turn content did not contain narration.")
         segments = limit_narrative_segments(normalize_narrative_segment("narrative", text))
         narration = "\n\n".join(segment.text for segment in segments)
         return ActionOutcome(
@@ -701,8 +701,8 @@ class LMStudioActionResolver:
         maximum: int,
     ) -> tuple[str, ...]:
         if not isinstance(value, list) or not minimum <= len(value) <= maximum:
-            raise LMStudioResponseError(f"Turn {label} were not a bounded array.")
+            raise LocalModelResponseError(f"Turn {label} were not a bounded array.")
         cleaned = tuple(" ".join(item.split()) for item in value if isinstance(item, str))
         if len(cleaned) != len(value) or any(not item or len(item) > 500 for item in cleaned):
-            raise LMStudioResponseError(f"Turn {label} contained invalid text.")
+            raise LocalModelResponseError(f"Turn {label} contained invalid text.")
         return cleaned

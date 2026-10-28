@@ -11,8 +11,8 @@ import pytest
 from PySide6.QtTest import QSignalSpy
 from PySide6.QtWidgets import QApplication, QLineEdit
 
-from dd_simulator.lm_studio.dialogue_narrator import LMStudioDialogueNarrator
-from dd_simulator.lm_studio import LMStudioClient
+from dd_simulator.local_model.dialogue_narrator import LocalModelDialogueNarrator
+from dd_simulator.local_model import LocalModelClient
 from dd_simulator.state import GameStateDatabase, GameStateError, GameStateService
 from dd_simulator.state.migrations import LATEST_SCHEMA_VERSION
 from dd_simulator.state.migrations import MIGRATIONS
@@ -56,7 +56,7 @@ class _CompatibilityClient:
 
 def test_gemma_compatible_dialogue_retry_drops_strict_response_format() -> None:
     client = _CompatibilityClient()
-    narrator = LMStudioDialogueNarrator(client)  # type: ignore[arg-type]
+    narrator = LocalModelDialogueNarrator(client)  # type: ignore[arg-type]
     speech, monologue = narrator.phrase_dialogue(
         context={"player_text": "Do you sell headgear?", "recent_conversation": []}
     )
@@ -72,14 +72,14 @@ def test_dialogue_prose_is_capped_at_125_total_words() -> None:
         "speech": "word " * 100,
         "monologue": "thought " * 100,
     })}}]}
-    speech, monologue = LMStudioDialogueNarrator._parse(
+    speech, monologue = LocalModelDialogueNarrator._parse(
         response, allow_plain_text=False
     )
     assert len(speech.split()) + len(monologue.split()) == 125
 
 
 def test_model_selection_prefers_lm_studio_loaded_instance(monkeypatch: pytest.MonkeyPatch) -> None:
-    client = LMStudioClient()
+    client = LocalModelClient()
     monkeypatch.setattr(
         client,
         "_json_request_url",

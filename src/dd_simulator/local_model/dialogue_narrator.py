@@ -6,9 +6,9 @@ import json
 import logging
 from typing import Any
 
-from dd_simulator.lm_studio.client import LMStudioClient
-from dd_simulator.lm_studio.errors import LMStudioError, LMStudioResponseError
-from dd_simulator.lm_studio.prompts import DUNGEON_MASTER_SYSTEM
+from dd_simulator.local_model.client import LocalModelClient
+from dd_simulator.local_model.errors import LocalModelError, LocalModelResponseError
+from dd_simulator.local_model.prompts import DUNGEON_MASTER_SYSTEM
 from dd_simulator.state.turns import limit_words, sanitize_model_text
 from dd_simulator.state.dialogue import DialogueNarration
 
@@ -16,14 +16,14 @@ from dd_simulator.state.dialogue import DialogueNarration
 LOGGER = logging.getLogger(__name__)
 
 
-class LMStudioDialogueNarrator:
-    def __init__(self, client: LMStudioClient) -> None:
+class LocalModelDialogueNarrator:
+    def __init__(self, client: LocalModelClient) -> None:
         self.client = client
 
     def phrase_dialogue(self, *, context: dict[str, object]) -> DialogueNarration:
         selector = getattr(self.client, "preferred_model_id", None)
         model = selector() if callable(selector) else self.client.model_id or self.client.discover_models()[0]
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         model_reported_unloaded = False
         checker = getattr(self.client, "uses_plain_json", None)
         starts_plain = bool(checker(model)) if callable(checker) else False
@@ -40,7 +40,7 @@ class LMStudioDialogueNarrator:
                     ),
                 )
                 return self._parse(response, allow_plain_text=mode == "prose")
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
                     "LM Studio dialogue response rejected: model=%s attempt=%s reason=%s",
@@ -48,7 +48,7 @@ class LMStudioDialogueNarrator:
                     attempt + 1,
                     exc,
                 )
-                if not LMStudioClient.supports_schema_fallback(exc):
+                if not LocalModelClient.supports_schema_fallback(exc):
                     break
                 remember = getattr(self.client, "remember_plain_json", None)
                 if mode == "schema" and callable(remember):
@@ -59,10 +59,10 @@ class LMStudioDialogueNarrator:
                         model_reported_unloaded = True
         assert last_error is not None
         if model_reported_unloaded:
-            raise LMStudioResponseError(
+            raise LocalModelResponseError(
                 "The selected LM Studio model appears to be unloaded. Reload it in Settings."
             ) from last_error
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return usable NPC dialogue after bounded compatibility recovery. "
             f"Last response: {last_error}"
         ) from last_error
@@ -166,12 +166,12 @@ class LMStudioDialogueNarrator:
         allow_plain_text: bool,
     ) -> DialogueNarration:
         try:
-            content = LMStudioClient._message_content(response["choices"][0]["message"])  # noqa: SLF001
+            content = LocalModelClient._message_content(response["choices"][0]["message"])  # noqa: SLF001
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError("Dialogue response did not contain a message.") from exc
+            raise LocalModelResponseError("Dialogue response did not contain a message.") from exc
         try:
-            parsed = LMStudioClient._decode_option_json(content)  # noqa: SLF001
-        except LMStudioResponseError:
+            parsed = LocalModelClient._decode_option_json(content)  # noqa: SLF001
+        except LocalModelResponseError:
             if allow_plain_text and isinstance(content, str):
                 speech = sanitize_model_text(content)
                 if speech and len(speech) <= 2000:
@@ -184,7 +184,7 @@ class LMStudioDialogueNarrator:
                     parsed = nested
                     break
         if not isinstance(parsed, dict):
-            raise LMStudioResponseError("Dialogue response did not match the required schema.")
+            raise LocalModelResponseError("Dialogue response did not match the required schema.")
         speech = next(
             (
                 parsed[key]
@@ -207,7 +207,7 @@ class LMStudioDialogueNarrator:
         speech = sanitize_model_text(str(speech))
         monologue = sanitize_model_text(str(monologue))
         if not speech or len(speech) > 2000 or len(monologue) > 1000:
-            raise LMStudioResponseError("Dialogue response did not match the required schema.")
+            raise LocalModelResponseError("Dialogue response did not match the required schema.")
         speech = limit_words(speech, 125)
         remaining = max(0, 125 - len(speech.split()))
         return DialogueNarration(

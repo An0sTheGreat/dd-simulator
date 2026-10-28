@@ -29,14 +29,14 @@ from dd_simulator.state.combat import CombatService
 from dd_simulator.state.migrations import LATEST_SCHEMA_VERSION
 from dd_simulator.state.quests import progress_quests
 from dd_simulator.state.seed import DEMO_CAMPAIGN_ID
-from dd_simulator.lm_studio import (
+from dd_simulator.local_model import (
     CharacterRandomizationService,
-    LMStudioActionResolver,
-    LMStudioClient,
-    LMStudioCombatNarrator,
-    LMStudioTravelNarrator,
-    LMStudioDialogueNarrator,
-    LMStudioModelInfo,
+    LocalModelActionResolver,
+    LocalModelClient,
+    LocalModelCombatNarrator,
+    LocalModelTravelNarrator,
+    LocalModelDialogueNarrator,
+    LocalModelModelInfo,
     ModelEvaluationService,
 )
 from dd_simulator.local_ai import LlamaCppRuntime, LocalAiConfiguration, LocalAiError
@@ -128,11 +128,11 @@ def build_application(
         preferences_store.load_local_ai()
     )
     local_ai_runtime = LlamaCppRuntime(resolved_config_dir / "logs")
-    lm_client: LMStudioClient | None = None
+    lm_client: LocalModelClient | None = None
     if local_ai_configuration.usable() and local_ai_configuration.mode == "llama_cpp":
         try:
             endpoint = local_ai_runtime.start(Path(local_ai_configuration.model_path))
-            lm_client = LMStudioClient(
+            lm_client = LocalModelClient(
                 endpoint, timeout_seconds=90, model_id=local_ai_configuration.model_id
             )
         except (OSError, LocalAiError):
@@ -142,7 +142,7 @@ def build_application(
             )
     elif local_ai_configuration.mode == "lm_studio" and local_ai_configuration.setup_complete:
         model_preference = preferences_store.load_lm_studio().get("model_id")
-        lm_client = LMStudioClient(
+        lm_client = LocalModelClient(
             timeout_seconds=90,
             model_id=model_preference if isinstance(model_preference, str) else None,
         )
@@ -152,10 +152,10 @@ def build_application(
         preferences_store=preferences_store,
         game_state_service=game_state_service,
         character_randomizer=CharacterRandomizationService(lm_client) if lm_client else None,
-        action_resolver=LMStudioActionResolver(lm_client) if lm_client else None,
-        combat_narrator=LMStudioCombatNarrator(lm_client) if lm_client else None,
-        travel_narrator=LMStudioTravelNarrator(lm_client) if lm_client else None,
-        dialogue_narrator=LMStudioDialogueNarrator(lm_client) if lm_client else None,
+        action_resolver=LocalModelActionResolver(lm_client) if lm_client else None,
+        combat_narrator=LocalModelCombatNarrator(lm_client) if lm_client else None,
+        travel_narrator=LocalModelTravelNarrator(lm_client) if lm_client else None,
+        dialogue_narrator=LocalModelDialogueNarrator(lm_client) if lm_client else None,
         lm_client=lm_client,
         model_evaluator=(
             ModelEvaluationService(lm_client, resolved_config_dir / "model-evaluations")
@@ -612,7 +612,7 @@ def _run_release_nineteen_smoke(app: QApplication, window: MainWindow) -> None:
             raise RuntimeError("Packaged Release 19 startup readiness is unavailable")
         window._models_scanned = True  # noqa: SLF001 - offline smoke fixture
         window.settings_panel.set_models(
-            (LMStudioModelInfo("release-19-smoke-model", "Smoke Model", False),),
+            (LocalModelModelInfo("release-19-smoke-model", "Smoke Model", False),),
             None,
         )
         window.controller.navigate("settings")
@@ -1005,7 +1005,7 @@ def _run_character_creation_smoke(
             window.controller.navigate("character_creation")
         panel.set_models(
             (
-                LMStudioModelInfo(
+                LocalModelModelInfo(
                     "creation-smoke-model",
                     "Creation Smoke Model",
                     True,

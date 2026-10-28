@@ -5,16 +5,16 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from dd_simulator.lm_studio.client import LMStudioClient
-from dd_simulator.lm_studio.errors import LMStudioError, LMStudioResponseError
-from dd_simulator.lm_studio.prompts import DUNGEON_MASTER_SYSTEM
+from dd_simulator.local_model.client import LocalModelClient
+from dd_simulator.local_model.errors import LocalModelError, LocalModelResponseError
+from dd_simulator.local_model.prompts import DUNGEON_MASTER_SYSTEM
 from dd_simulator.state.turns import limit_words, sanitize_model_text
 
 
-class LMStudioTravelNarrator:
+class LocalModelTravelNarrator:
     """Return prose only; route, time, costs, danger, and outcomes stay local."""
 
-    def __init__(self, client: LMStudioClient) -> None:
+    def __init__(self, client: LocalModelClient) -> None:
         self.client = client
 
     def narrate_travel(self, context: dict[str, object]) -> str:
@@ -42,7 +42,7 @@ class LMStudioTravelNarrator:
         }
         checker = getattr(self.client, "uses_plain_json", None)
         compatibility = bool(checker(model)) if callable(checker) else False
-        last_error: LMStudioError | None = None
+        last_error: LocalModelError | None = None
         for attempt in range(2):
             instruction = (
                 DUNGEON_MASTER_SYSTEM
@@ -72,16 +72,16 @@ class LMStudioTravelNarrator:
                     "/chat/completions", method="POST", payload=payload
                 )
                 return self._parse(response)
-            except LMStudioError as exc:
+            except LocalModelError as exc:
                 last_error = exc
-                if attempt or not LMStudioClient.supports_schema_fallback(exc):
+                if attempt or not LocalModelClient.supports_schema_fallback(exc):
                     break
                 compatibility = True
                 remember = getattr(self.client, "remember_plain_json", None)
                 if callable(remember):
                     remember(model)
         assert last_error is not None
-        raise LMStudioResponseError(
+        raise LocalModelResponseError(
             "LM Studio did not return usable travel narration after one compatibility retry."
         ) from last_error
 
@@ -90,10 +90,10 @@ class LMStudioTravelNarrator:
         try:
             message = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
-            raise LMStudioResponseError("Travel response did not contain a message.") from exc
-        content = LMStudioClient._message_content(message)  # noqa: SLF001
-        parsed = LMStudioClient._decode_option_json(content)  # noqa: SLF001
+            raise LocalModelResponseError("Travel response did not contain a message.") from exc
+        content = LocalModelClient._message_content(message)  # noqa: SLF001
+        parsed = LocalModelClient._decode_option_json(content)  # noqa: SLF001
         narration = parsed.get("narration") if isinstance(parsed, dict) else None
         if not isinstance(narration, str) or not narration.strip():
-            raise LMStudioResponseError("Travel response did not contain narration.")
+            raise LocalModelResponseError("Travel response did not contain narration.")
         return limit_words(sanitize_model_text(narration), 125)
