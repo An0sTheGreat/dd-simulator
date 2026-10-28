@@ -83,6 +83,19 @@ class AbilityHoverCard(PositionedHoverCard):
         layout.addWidget(description)
 
 
+def skill_tooltip(skill: SkillView) -> str:
+    tooltip = [f"{skill.name}: level {skill.level}"]
+    if skill.next_level_xp:
+        tooltip.append(f"XP: {skill.current_xp} / {skill.next_level_xp}")
+    if skill.bonus:
+        tooltip.append(f"Temporary bonus: +{skill.bonus}")
+    if skill.locked:
+        tooltip.append("Locked")
+    if skill.recently_increased:
+        tooltip.append("Recently increased")
+    return "\n".join(tooltip)
+
+
 class SkillGridItem(QFrame):
     def __init__(self, skill: SkillView) -> None:
         super().__init__()
@@ -127,16 +140,7 @@ class SkillGridItem(QFrame):
         )
         layout.addWidget(progress)
 
-        tooltip = [f"{skill.name}: level {skill.level}"]
-        if skill.next_level_xp:
-            tooltip.append(f"XP: {skill.current_xp} / {skill.next_level_xp}")
-        if skill.bonus:
-            tooltip.append(f"Temporary bonus: +{skill.bonus}")
-        if skill.locked:
-            tooltip.append("Locked")
-        if skill.recently_increased:
-            tooltip.append("Recently increased")
-        self.setToolTip("\n".join(tooltip))
+        self.setToolTip(skill_tooltip(skill))
         self._icon_name = skill.name
 
     def refresh_theme_icon(self) -> None:

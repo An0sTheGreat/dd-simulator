@@ -1092,3 +1092,52 @@ QProgressBar#resourceBar[resourceType="mana"]::chunk {
 QProgressBar#resourceBar[resourceType="spell_slots"]::chunk {
     background-color: #b05fd3;
 }
+
+/* Concept T: character strip, paperdoll, skills */
+QFrame#characterStrip { background: transparent; border: none; }
+QLabel#characterStripName { font-family: "Georgia"; font-size: 22px; color: {{codex.ink}}; }
+QLabel#characterStripClass { font-family: "Oxanium"; font-size: 10px; font-weight: 600; color: {{codex.muted}}; }
+QLabel#characterStripPurse { font-family: "Oxanium"; font-size: 14px; font-weight: 600; color: {{colors.loot}}; }
+QLabel#characterStripCarry { font-family: "Oxanium"; font-size: 11px; font-weight: 600; color: {{codex.muted}}; }
+QLabel#codexResourceName { font-family: "Oxanium"; font-size: 9px; font-weight: 600; color: {{codex.muted}}; }
+QLabel#codexResourceValue { font-family: "Oxanium"; font-size: 9px; font-weight: 600; color: {{codex.ink}}; }
+QProgressBar#codexResourceBar {
+    min-height: 7px; max-height: 7px;
+    background: {{colors.background_primary}}; border: 1px solid {{colors.border_primary}}; border-radius: 4px;
+}
+QProgressBar#codexResourceBar::chunk { border-radius: 3px; background: {{codex.gold}}; }
+QProgressBar#codexResourceBar[resourceType="health"]::chunk { background: {{colors.danger}}; }
+QProgressBar#codexResourceBar[resourceType="stamina"]::chunk { background: {{colors.experience}}; }
+QProgressBar#codexResourceBar[resourceType="focus"]::chunk { background: {{colors.warning}}; }
+QProgressBar#codexResourceBar[resourceType="resolve"]::chunk { background: {{colors.quest}}; }
+QProgressBar#codexResourceBar[resourceType="experience"]::chunk { background: {{colors.success}}; }
+
+QWidget#paperdollPanel { background: transparent; }
+QWidget#paperdollPanel QFrame#equipmentSlot {
+    background: {{colors.background_elevated}}; border: 1px solid {{colors.border_primary}}; border-radius: 4px;
+}
+QWidget#paperdollPanel QFrame#equipmentSlot[rarity="uncommon"] { border-color: {{codex.rarity_uncommon}}; }
+QWidget#paperdollPanel QFrame#equipmentSlot[rarity="rare"] { border-color: {{codex.rarity_rare}}; }
+QWidget#paperdollPanel QFrame#equipmentSlot[rarity="epic"] { border-color: {{codex.rarity_epic}}; }
+QWidget#paperdollPanel QFrame#equipmentSlot[rarity="legendary"] { border-color: {{codex.rarity_legendary}}; }
+QWidget#paperdollPanel QFrame#equipmentSlot[empty="true"] { background: {{colors.background_secondary}}; border-color: {{colors.border_primary}}; }
+QWidget#paperdollPanel QLabel#itemQuantityBadge { background: transparent; border: none; color: {{colors.text_primary}}; font-family: "Oxanium"; font-size: 10px; font-weight: 600; }
+QLabel#paperdollSlotCaption { background: transparent; font-family: "Oxanium"; font-size: 8px; font-weight: 600; color: {{codex.muted}}; }
+QLabel#paperdollPortrait {
+    background: {{colors.background_elevated}}; border: 1px solid {{colors.border_primary}}; border-radius: 4px;
+    font-family: "Georgia"; font-size: 40px; color: {{codex.gold}};
+}
+QLabel#paperdollStats {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(13, 13, 14, 0), stop:1 rgba(13, 13, 14, 217));
+    padding-bottom: 6px; font-family: "Oxanium"; font-size: 11px; font-weight: 600; color: {{codex.ink}};
+}
+
+QWidget#skillDetailList, QFrame#skillDetailRow { background: transparent; border: none; }
+QLabel#skillDetailIcon { background: {{colors.background_elevated}}; border: 1px solid {{colors.border_primary}}; border-radius: 4px; }
+QLabel#skillDetailName { font-family: "Oxanium"; font-size: 12px; font-weight: 600; color: {{codex.ink}}; }
+QLabel#skillDetailValue { font-family: "Oxanium"; font-size: 12px; font-weight: 600; color: {{codex.gold}}; }
+QLabel#skillDetailDescription { font-size: 10px; color: {{codex.muted}}; }
+QFrame#skillDetailRow[recentlyIncreased="true"] QLabel#skillDetailValue { color: {{codex.success}}; }
+QFrame#skillDetailRow[locked="true"] QLabel { color: {{codex.muted}}; }
+QProgressBar#skillDetailXpBar { min-height: 3px; max-height: 3px; background: {{colors.background_elevated}}; border: none; border-radius: 0; }
+QProgressBar#skillDetailXpBar::chunk { background: {{colors.experience}}; }
