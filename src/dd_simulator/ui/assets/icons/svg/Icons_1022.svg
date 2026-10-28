@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
-<title>Sugar Cubes</title>
-<desc>Atlas index 1022; category food; subtype ingredient; tags ingredient|cooking|white; visual tier 0</desc>
-<path fill="#313131" d="M4 3h3v1h-3zM3 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM8 5h1v1h-1zM9 6h1v1h-1zM1 6h1v2h-1zM9 7h2v1h-2zM8 8h1v1h-1zM11 8h1v1h-1zM0 8h1v2h-1zM7 9h1v1h-1zM1 10h1v1h-1zM6 10h1v1h-1zM12 9h1v2h-1zM2 11h4v1h-4zM5 12h1v1h-1zM13 11h1v2h-1zM6 13h1v1h-1zM12 13h1v1h-1zM7 14h5v1h-5z"/>
-<path fill="#C5C5C5" d="M6 4h1v1h-1zM7 5h1v1h-1zM2 6h1v1h-1zM7 6h2v1h-2zM6 7h1v1h-1zM8 7h1v1h-1zM1 8h1v1h-1zM5 8h1v1h-1zM7 8h1v1h-1zM10 8h1v1h-1zM1 9h2v1h-2zM4 9h1v1h-1zM6 9h1v1h-1zM2 10h4v1h-4zM11 9h1v2h-1zM10 11h1v1h-1zM12 11h1v1h-1zM6 12h1v1h-1zM9 12h1v1h-1zM11 12h2v1h-2zM7 13h5v1h-5z"/>
-<path fill="#F2F2F2" d="M2 7h1v1h-1zM4 7h1v1h-1zM7 7h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM5 9h1v1h-1zM7 10h1v1h-1zM9 10h1v1h-1zM8 11h1v1h-1zM11 11h1v1h-1zM10 12h1v1h-1z"/>
-<path fill="#FFFFFF" d="M4 4h2v1h-2zM3 5h4v2h-4zM3 7h1v1h-1zM5 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM9 8h1v1h-1zM3 9h1v1h-1zM8 9h3v1h-3zM8 10h1v1h-1zM10 10h1v1h-1zM6 11h2v1h-2zM9 11h1v1h-1zM7 12h2v1h-2z"/>
-</svg>

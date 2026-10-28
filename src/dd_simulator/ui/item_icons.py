@@ -1,4 +1,4 @@
-"""Deterministic semantic SVG icons for the Default theme."""
+"""Deterministic semantic item icons from the packaged CraftPix icon library."""
 
 from __future__ import annotations
 
@@ -10,12 +10,12 @@ from pathlib import Path
 import re
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon, QPainter, QPixmap
-from PySide6.QtSvg import QSvgRenderer
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import QLabel
 
 
 ASSET_ROOT = Path(__file__).parent / "assets" / "icons"
+LIBRARY_ROOT = ASSET_ROOT / "library"
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
 RARITY_TIER = {
     "common": 0,
@@ -90,10 +90,6 @@ class IconRecord:
     subtype: str
     tags: str
     visual_tier: int
-    x: int
-    png_y: int
-    width: int
-    height: int
 
 
 def _tokens(value: str) -> frozenset[str]:
@@ -111,10 +107,6 @@ def icon_records() -> tuple[IconRecord, ...]:
             subtype=str(value["subtype"]).casefold(),
             tags=str(value["tags"]).casefold(),
             visual_tier=int(value["visual_tier"]),
-            x=int(value["x"]),
-            png_y=int(value["png_y"]),
-            width=int(value["width"]),
-            height=int(value["height"]),
         )
         for value in raw
     )
@@ -191,18 +183,27 @@ def resolve_icon(
     return max(icon_records(), key=rank, default=None)
 
 
+@lru_cache(maxsize=1)
+def _library_icons() -> dict[str, str]:
+    raw = json.loads((ASSET_ROOT / "item_icon_manifest.json").read_text(encoding="utf-8"))
+    return raw["records"]
+
+
+def icon_path(record: IconRecord) -> Path:
+    """Return the packaged library painting mapped to a catalog record."""
+
+    return LIBRARY_ROOT / _library_icons()[str(record.index)]
+
+
 @lru_cache(maxsize=4096)
 def _record_pixmap(index: int, size: int) -> QPixmap:
-    path = ASSET_ROOT / "svg" / f"Icons_{index:04d}.svg"
-    renderer = QSvgRenderer(str(path))
-    if not renderer.isValid():
+    pixmap = QPixmap(str(LIBRARY_ROOT / _library_icons().get(str(index), "")))
+    if pixmap.isNull():
         return QPixmap()
-    pixmap = QPixmap(size, size)
-    pixmap.fill(Qt.GlobalColor.transparent)
-    painter = QPainter(pixmap)
-    renderer.render(painter)
-    painter.end()
-    return pixmap
+    return pixmap.scaled(
+        size, size, Qt.AspectRatioMode.KeepAspectRatio,
+        Qt.TransformationMode.SmoothTransformation,
+    )
 
 
 def item_icon_pixmap(

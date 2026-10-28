@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
-<title>Berserker Rush</title>
-<desc>Atlas index 1654; category skill; subtype berserker; tags berserker|ability|purple; visual tier 2</desc>
-<path fill="#390180" d="M2 1h2v1h-2zM5 1h2v1h-2zM8 1h1v1h-1zM12 1h2v1h-2zM1 2h1v1h-1zM4 2h1v1h-1zM6 2h2v1h-2zM13 2h2v1h-2zM3 3h1v1h-1zM12 3h1v1h-1zM14 3h1v1h-1zM5 3h1v3h-1zM13 4h1v2h-1zM2 4h1v3h-1zM6 6h2v1h-2zM12 6h1v1h-1zM3 7h1v1h-1zM8 7h1v1h-1zM10 7h2v1h-2zM4 8h6v1h-6zM14 7h1v2h-1zM3 9h5v1h-5zM13 9h1v1h-1zM2 10h1v1h-1zM11 10h2v1h-2zM1 11h4v1h-4zM9 11h2v1h-2zM12 11h1v1h-1zM10 12h2v1h-2zM1 13h2v1h-2zM8 13h2v1h-2zM14 13h1v1h-1zM2 14h6v1h-6zM12 14h2v1h-2z"/>
-<path fill="#653BB9" d="M4 1h1v1h-1zM9 1h3v1h-3zM2 2h2v1h-2zM8 2h5v1h-5zM1 3h2v1h-2zM8 3h4v1h-4zM6 3h1v2h-1zM9 4h4v1h-4zM6 5h2v1h-2zM10 5h3v1h-3zM1 4h1v3h-1zM8 6h4v1h-4zM1 7h2v1h-2zM9 7h1v1h-1zM1 8h3v1h-3zM1 9h2v1h-2zM14 9h1v1h-1zM1 10h1v1h-1zM13 10h2v1h-2zM14 11h1v2h-1zM10 13h1v1h-1zM13 13h1v1h-1zM8 14h4v1h-4z"/>
-<path fill="#A578FF" d="M7 3h1v1h-1zM7 4h2v1h-2zM8 5h2v1h-2zM13 11h1v1h-1zM12 12h2v1h-2zM11 13h2v1h-2z"/>
-<path fill="#FFFFFF" d="M7 1h1v1h-1zM5 2h1v1h-1zM4 3h1v1h-1zM13 3h1v1h-1zM3 4h2v2h-2zM14 4h1v2h-1zM3 6h3v1h-3zM13 6h2v1h-2zM4 7h4v1h-4zM12 7h2v1h-2zM10 8h4v1h-4zM8 9h5v1h-5zM3 10h8v1h-8zM5 11h4v1h-4zM11 11h1v1h-1zM1 12h9v1h-9zM3 13h5v1h-5z"/>
-</svg>

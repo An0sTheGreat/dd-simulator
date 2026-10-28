@@ -37,7 +37,7 @@ dd_simulator = [
     "ui/assets/fonts/*",
     "ui/assets/icons/*",
     "ui/assets/icons/powers/*/*.png",
-    "ui/assets/icons/svg/*",
+    "ui/assets/icons/library/*.png",
     "ui/assets/icons/ui_pack/*",
     "ui/assets/inventory/*",
     "ui/assets/location/*/*.png",

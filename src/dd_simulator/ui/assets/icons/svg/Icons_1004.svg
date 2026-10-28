@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
-<title>Brown Egg</title>
-<desc>Atlas index 1004; category food; subtype prepared; tags consumable|ingredient|white; visual tier 1</desc>
-<path fill="#441C00" d="M10 4h1v1h-1zM11 5h1v2h-1zM12 7h1v5h-1zM11 12h1v1h-1zM5 13h6v1h-6z"/>
-<path fill="#552B00" d="M7 2h2v1h-2zM6 3h1v1h-1zM9 3h1v1h-1zM5 4h1v1h-1zM4 5h1v2h-1zM3 7h1v5h-1zM4 12h1v1h-1z"/>
-<path fill="#C39A69" d="M10 5h1v1h-1zM11 7h1v3h-1zM10 10h2v1h-2zM4 11h1v1h-1zM9 11h3v1h-3zM5 12h6v1h-6z"/>
-<path fill="#FFF2DE" d="M7 3h2v1h-2zM6 4h4v1h-4zM5 5h5v1h-5zM5 6h6v1h-6zM4 7h7v3h-7zM4 10h6v1h-6zM5 11h4v1h-4z"/>
-</svg>

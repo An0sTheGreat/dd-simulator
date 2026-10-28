@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
-<title>Frostbite</title>
-<desc>Atlas index 1282; category spell; subtype ice; tags ice|magic|blue; visual tier 3</desc>
-<path fill="#3675F7" d="M2 1h1v1h-1zM7 1h6v1h-6zM1 2h1v1h-1zM10 2h2v1h-2zM14 2h1v2h-1zM7 4h2v1h-2zM13 4h2v1h-2zM6 5h4v1h-4zM12 5h3v1h-3zM7 6h8v1h-8zM1 7h1v1h-1zM14 7h1v1h-1zM1 8h2v1h-2zM1 9h4v1h-4zM1 10h2v1h-2zM4 10h2v1h-2zM1 11h3v1h-3zM5 11h2v1h-2zM1 12h2v1h-2zM5 12h1v1h-1zM1 13h1v1h-1zM4 13h1v1h-1zM14 13h1v1h-1zM2 14h2v1h-2zM13 14h1v1h-1z"/>
-<path fill="#51A9FB" d="M3 1h4v1h-4zM2 2h2v1h-2zM9 2h1v1h-1zM1 3h2v1h-2zM6 4h1v1h-1zM5 5h1v1h-1zM10 5h2v1h-2zM1 4h1v3h-1zM6 6h1v1h-1zM11 7h3v1h-3zM13 8h2v1h-2zM6 9h1v1h-1zM7 10h2v1h-2zM6 12h1v1h-1zM14 9h1v4h-1zM5 13h1v1h-1zM8 11h2v3h-2zM13 13h1v1h-1zM4 14h1v1h-1zM12 14h1v1h-1z"/>
-<path fill="#AAD5FC" d="M13 1h1v1h-1zM4 2h1v1h-1zM8 2h1v1h-1zM12 2h1v1h-1zM2 4h1v1h-1zM9 4h1v1h-1zM5 6h1v1h-1zM2 7h1v1h-1zM6 7h4v1h-4zM3 8h1v1h-1zM10 8h1v1h-1zM5 9h1v1h-1zM3 10h1v1h-1zM6 10h1v1h-1zM11 9h1v2h-1zM4 11h1v1h-1zM3 12h2v1h-2zM7 11h1v2h-1zM2 13h2v1h-2zM6 13h1v1h-1zM5 14h1v1h-1zM7 14h2v1h-2z"/>
-<path fill="#FFFFFF" d="M5 2h3v1h-3zM13 2h1v1h-1zM3 3h11v1h-11zM3 4h3v1h-3zM10 4h3v1h-3zM2 5h3v2h-3zM3 7h3v1h-3zM10 7h1v1h-1zM4 8h6v1h-6zM11 8h2v1h-2zM7 9h4v1h-4zM9 10h2v1h-2zM12 9h2v2h-2zM10 11h4v2h-4zM7 13h1v1h-1zM10 13h3v1h-3zM6 14h1v1h-1zM9 14h3v1h-3z"/>
-</svg>
