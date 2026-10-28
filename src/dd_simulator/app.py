@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QEvent, QTimer
 from PySide6.QtGui import QColor, QFont, QImage
 from PySide6.QtWidgets import QApplication, QLabel, QProgressBar, QPushButton, QWidget
 
@@ -573,6 +573,8 @@ def _run_release_twenty_one_smoke(app: QApplication, window: MainWindow) -> None
         ):
             if window.findChild(QWidget, object_name) is None:
                 raise RuntimeError(f"Packaged Release 21 control is missing: {object_name}")
+        # the rebuilt page leaves the previous panel queued for deletion: flush it, then measure
+        app.sendPostedEvents(None, QEvent.Type.DeferredDelete.value)
         trade = window.findChild(QWidget, "merchantTradePanel")
         people = window.navigation_pages["people"]
         if trade is None or abs(trade.width() * 2 - people.width()) >= 60:
