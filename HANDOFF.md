@@ -27,7 +27,7 @@ Plan: `docs/UI_REDESIGN_PLAN.md` (approved 2026-10-27; D5 icons from `Project Re
 | `a24cf02` | 2a: schema 22 `narrative_messages.speaker_npc_id`; dialogue and turn speakers |
 | `2dd587a` | 2b: schema 23 `turn_notes`; per-turn note tags; transcript pages of 40 whole turns |
 | `d440dd8` | 2c: skill descriptions, abilities/spells split with status, full inventory list, portrait path |
-| (this commit) | 3a: `power_icon_manifest.json` maps 8 skills + 44 catalog actions to CraftPix icons; `scripts/import_power_icons.py` copies them at 128 px to `ui/assets/icons/powers/`; resolver `ui/power_icons.py`; contact sheet `docs/design/power-icons.png` |
+| `f328f11` | 3a: `power_icon_manifest.json` maps 8 skills + 44 catalog actions to CraftPix icons; `scripts/import_power_icons.py` copies them at 128 px to `ui/assets/icons/powers/`; resolver `ui/power_icons.py`; contact sheet `docs/design/power-icons.png` |
 
 Open items: `InventorySlotView` needs a bag `position` for Phase 6 drag and drop; turn notes are not yet written for combat ammo, potion and HP changes or for quests started from dialogue; the Phase 1 source frames include identical placeholder images (panel = tooltip = quest tracker).
 Icon library (28 supplied CraftPix packs + RPG Mega gap packs): `Y:/Games/D&D Simulator/Project Resources/assets`.

@@ -1,7 +1,7 @@
 {
   "skills": {
     "Attack": "skills/swordsman/50 Swordsman Skill Icons/PNG/14.png",
-    "Strength": "skills/warrior/warrior-skills-vector-icon-pack/PNG/12.png",
+    "Strength": "skills/berserker/rpg-berserker-skill-icons/PNG/32.png",
     "Defense": "skills/swordsman/50 Swordsman Skill Icons/PNG/10.png",
     "Ranged": "skills/crossbowman/rpg-crossbowman-skill-icons/PNG/31.png",
     "Survival": "skills/forest-elf/RPG-Forest-Elf-Skill-Icons/PNG/43.png",
@@ -20,12 +20,12 @@
     "quick_shot": "skills/forest-elf/RPG-Forest-Elf-Skill-Icons/PNG/21.png",
     "piercing_shot": "skills/forest-elf/RPG-Forest-Elf-Skill-Icons/PNG/39.png",
     "volley": "skills/forest-elf/RPG-Forest-Elf-Skill-Icons/PNG/17.png",
-    "field_dressing": "skills/warrior/warrior-skills-vector-icon-pack/PNG/25.png",
+    "field_dressing": "skills/priest/rpg-priest-skill-icons/PNG/10.png",
     "battle_song": "skills/bard/rpg-bard-skill-icons/PNG/48.png",
     "lay_on_hands": "skills/paladin/50-rpg-paladin-skill-icons/PNG/3.png",
     "flurry": "skills/monk/RPG-Monk-Skill-Game-Icons/PNG/20.png",
     "patient_defense": "skills/monk/RPG-Monk-Skill-Game-Icons/PNG/32.png",
-    "arcane_turret": "skills/engineering/Engineering-Skills-Icon-Pack/PNG/8.png",
+    "arcane_turret": "skills/engineering/RPG-Engineering-Skill-Icons/PNG/27.png",
     "combat_ward": "skills/buff/rpg-buff-skill-icons/PNG/13.png",
     "fire_bolt": "skills/pyromancer/rpg-pyromancer-skill-icons/PNG/21.png",
     "magic_missile": "skills/aeromancer/Free 50 Aeromancer Skills/PNG/27.png",
