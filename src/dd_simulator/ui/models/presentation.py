@@ -224,6 +224,7 @@ class InventorySlotView:
     bonuses: str = ""
     penalties: str = ""
     generated_difficulty: str = "Adventurer"
+    position: int | None = None  # bag position; None for padding and mock data
 
     @property
     def is_empty(self) -> bool:

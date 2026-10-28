@@ -771,6 +771,7 @@ class DashboardProjection:
                 bonuses=str(row["bonuses_json"]),
                 penalties=str(row["penalties_json"]),
                 generated_difficulty=str(row["generated_difficulty"]),
+                position=index,
             )
             for index in range(capacity)
         )

@@ -363,6 +363,8 @@ class InventorySlotWidget(QFrame):
         index: int,
         comparison_item: InventorySlotView | None = None,
         offhand_comparison_item: InventorySlotView | None = None,
+        *,
+        slot_size: int = INVENTORY_SLOT_SIZE,
     ) -> None:
         super().__init__()
         self.item = item
@@ -376,7 +378,7 @@ class InventorySlotWidget(QFrame):
             f"Inventory slot {index + 1}: {item.name or 'empty'}"
         )
         self.setAcceptDrops(True)
-        self.setFixedSize(INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE)
+        self.setFixedSize(slot_size, slot_size)
         self.setFocusPolicy(
             Qt.FocusPolicy.NoFocus if item.is_empty else Qt.FocusPolicy.StrongFocus
         )
@@ -394,7 +396,7 @@ class InventorySlotWidget(QFrame):
         self.artwork_label.setAttribute(
             Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
         )
-        self.artwork_label.setFixedSize(INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE)
+        self.artwork_label.setFixedSize(slot_size, slot_size)
         layout.addWidget(self.artwork_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
         self._refresh_artwork()
         self.icon_label = item_icon_label(
@@ -402,7 +404,7 @@ class InventorySlotWidget(QFrame):
             rarity=item.rarity,
             category=item.category,
             context=_icon_context(item),
-            size=68,
+            size=max(16, slot_size * 68 // INVENTORY_SLOT_SIZE),
         )
         if item.is_empty:
             self.icon_label.hide()
@@ -452,7 +454,7 @@ class InventorySlotWidget(QFrame):
         self.artwork_label.setPixmap(
             _themed_artwork(
                 "Inventory_Slot_1.png",
-                INVENTORY_SLOT_SIZE,
+                self.artwork_label.width(),
                 _current_theme_id(),
             )
         )
@@ -626,6 +628,7 @@ class InventoryGrid(QWidget):
     context_action_requested = Signal(int, str)
     move_requested = Signal(int, int)
     equipment_drop_requested = Signal(int, int)
+    focus_moved = Signal(int)
 
     def __init__(
         self,
@@ -635,9 +638,13 @@ class InventoryGrid(QWidget):
         slot_count: int | None = None,
         index_offset: int = 0,
         equipment: tuple[EquipmentSlotView, ...] = (),
+        slot_size: int = INVENTORY_SLOT_SIZE,
+        spacing: int = 0,
     ) -> None:
         super().__init__()
         self.setObjectName("inventoryGrid")
+        self.slot_size = slot_size
+        self.spacing = spacing
         self.columns = max(1, columns)
         self.slot_count = max(len(items), slot_count or len(items))
         self.index_offset = max(0, index_offset)
@@ -646,14 +653,15 @@ class InventoryGrid(QWidget):
         self.slots: list[InventorySlotWidget] = []
         self.grid = QGridLayout(self)
         self.grid.setContentsMargins(0, -50, 0, 0)
-        self.grid.setSpacing(0)
+        self.grid.setSpacing(spacing)
         self.set_items(items)
 
     def _refresh_geometry(self) -> None:
         rows = max(1, (self.slot_count + self.columns - 1) // self.columns)
+        pitch = self.slot_size + self.spacing
         self.setFixedSize(
-            self.columns * INVENTORY_SLOT_SIZE,
-            rows * INVENTORY_SLOT_SIZE,
+            self.columns * pitch - self.spacing,
+            rows * pitch - self.spacing,
         )
 
     def _relayout_slots(self) -> None:
@@ -689,7 +697,10 @@ class InventoryGrid(QWidget):
         for local_index, item in enumerate(padded):
             index = self.index_offset + local_index
             main_comparison, offhand_comparison = self._equipped_comparisons(item)
-            slot = InventorySlotWidget(item, index, main_comparison, offhand_comparison)
+            slot = InventorySlotWidget(
+                item, index, main_comparison, offhand_comparison,
+                slot_size=self.slot_size,
+            )
             slot.activated.connect(self.select_index)
             slot.navigation_requested.connect(self._move_focus)
             slot.context_action_requested.connect(self.context_action_requested)
@@ -735,6 +746,7 @@ class InventoryGrid(QWidget):
             slot = self.slots[candidate - self.index_offset]
             if not slot.item.is_empty:
                 slot.setFocus()
+                self.focus_moved.emit(candidate)
                 return
             candidate += offsets[direction]
 
