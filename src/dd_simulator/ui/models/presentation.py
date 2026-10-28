@@ -79,6 +79,8 @@ class LocationSummaryView:
     route_status: str
     visual: VisualAssetView | None = None
     biome: str = "road"
+    day: int = 1
+    turn_number: int = 0  # campaign_clock.turn_number
 
 
 @dataclass(frozen=True, slots=True)

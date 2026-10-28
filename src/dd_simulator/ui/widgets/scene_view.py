@@ -54,6 +54,12 @@ COMBAT_ACTIONS = (
     ("Flee", CombatAction.FLEE),
 )
 TARGETED_ACTIONS = {CombatAction.ATTACK, CombatAction.NEGOTIATE}
+# Shown instead of combat actions while a generated encounter is being prepared.
+PREPARATION_CHOICES = (
+    ("Take Cover (+2 Armor)", "take_cover"),
+    ("Scout (+1 Attack)", "scout"),
+    ("Charge (Close 15 ft)", "charge"),
+)
 CHOICE_KEYS = {getattr(Qt.Key, f"Key_{number}"): number for number in range(1, 7)}
 TEXT_ENTRY_WIDGETS = (QLineEdit, QTextEdit, QPlainTextEdit)
 CHOICE_ICON_SIZE = 22
@@ -528,6 +534,10 @@ class ChoiceGrid(QWidget):
             return
         if self.combat_actions:
             action = self.combat_actions[number - 1][1]
+            if action is CombatAction.PREPARE:
+                preparation = PREPARATION_CHOICES[number - 1][1]
+                self.combat_action_requested.emit(CombatCommand(action, preparation=preparation))
+                return
             target = self.target_id if action in TARGETED_ACTIONS else None
             self.combat_action_requested.emit(CombatCommand(action, target_id=target))
             return
@@ -759,6 +769,11 @@ class SceneView(QWidget):
                 key=lambda c: -c.initiative,
             )
             self.choice_grid.target_id = enemies[0].id if enemies else None
+            if encounter.generated and not encounter.intro_complete:
+                self.choice_grid.set_combat_actions(
+                    tuple((label, CombatAction.PREPARE) for label, _key in PREPARATION_CHOICES)
+                )
+                return
             player_turn = any(c.side == "player" and c.active_turn for c in encounter.combatants)
             self.choice_grid.set_combat_actions(COMBAT_ACTIONS, enabled=player_turn)
             return

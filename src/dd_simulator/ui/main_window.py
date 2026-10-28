@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
 )
 
 from dd_simulator.state import (
+    CombatAction,
     CombatCommand,
     GameStateError,
     GameStateService,
@@ -66,7 +67,6 @@ from dd_simulator.local_ai import (
 from dd_simulator.ui.controllers.ui_controller import UiController
 from dd_simulator.ui.models.presentation import DashboardView
 from dd_simulator.ui.item_icons import ui_icon
-from dd_simulator.ui.panels.activity_panels import EventLogPanel, RecentEventsPanel
 from dd_simulator.ui.panels.campaign_panels import (
     CampaignBrowserPanel,
     CharacterCreationPanel,
@@ -76,14 +76,8 @@ from dd_simulator.ui.panels.navigation_pages import (
     centered_third,
     create_navigation_pages,
 )
-from dd_simulator.ui.panels.narrative_panels import NarrativePanel, QuestObjectivePanel
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
 from dd_simulator.ui.panels.local_ai_setup_panel import LocalAiSetupPanel
-from dd_simulator.ui.panels.summary_panels import LocationSummaryPanel, PlayerSummaryPanel
-from dd_simulator.ui.panels.utility_panels import (
-    MinimapPanel,
-    UtilityContentPanel,
-)
 from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
 from dd_simulator.ui.services.action_resolution_worker import ActionResolutionTask
 from dd_simulator.ui.services.combat_resolution_worker import CombatResolutionTask
@@ -100,11 +94,16 @@ from dd_simulator.ui.services.local_ai_worker import (
     RecommendedModelDownloadTask,
 )
 from dd_simulator.ui.themes.theme_schema import ThemeDefinition
-from dd_simulator.ui.widgets.inventory_grid import (
-    INVENTORY_PAGE_SIZE,
-    EquipmentGrid,
-    InventoryGrid,
+from dd_simulator.ui.widgets.inventory_grid import EquipmentGrid, InventoryGrid
+from dd_simulator.ui.widgets.codex_cards import CodexCardRow, InventoryCard, PowersCard
+from dd_simulator.ui.widgets.codex_character import (
+    CharacterStrip,
+    PaperdollPanel,
+    SkillDetailList,
 )
+from dd_simulator.ui.widgets.conversation_view import ConversationView
+from dd_simulator.ui.widgets.crafting_page import CraftingPage
+from dd_simulator.ui.widgets.scene_view import SceneView
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.ui.widgets.combat_rewards_dialog import CombatRewardsDialog
@@ -128,6 +127,8 @@ WS_MINIMIZEBOX = 0x00020000
 WS_MAXIMIZEBOX = 0x00010000
 WS_SYSMENU = 0x00080000
 NATIVE_SNAP_STYLE = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU
+# Concept T: codex column about 724 px beside the scene at the 1600 px design width.
+CONCEPT_T_SIZES = (724, 876)
 
 
 class SkillCheckPopup(QDialog):
@@ -250,7 +251,7 @@ class MainWindow(QMainWindow):
         self._resource_animation_starts: dict[str, int] = {}
         self.current_page = "dashboard"
         self._dialog_dim_depth = 0
-        self.navigation_buttons: dict[str, SemanticButton] = {}
+        self._last_turn_shown: int | None = None
         self.page_indices: dict[str, int] = {}
         self.theme_selector = QComboBox()
         self.theme_selector.setObjectName("themeSelector")
@@ -272,8 +273,6 @@ class MainWindow(QMainWindow):
         self.root_layout.setSpacing(8)
         self.root_layout.addWidget(self._build_header())
         self._build_content_stack()
-        self.bottom_navigation = self._build_bottom_navigation()
-        self.root_layout.addWidget(self.bottom_navigation)
         self.setCentralWidget(self.root)
 
         self.dialog_dimmer = QFrame(self)
@@ -301,8 +300,9 @@ class MainWindow(QMainWindow):
         self.page_indices = {}
         self.content_stack = QStackedWidget()
         self.content_stack.setObjectName("mainContentStack")
-        self.main_splitter = self._build_main_splitter()
-        self.page_indices["dashboard"] = self.content_stack.addWidget(self.main_splitter)
+        self.concept_splitter = self._build_concept_t()
+        self.page_indices["dashboard"] = self.content_stack.addWidget(self.concept_splitter)
+        self.page_indices["crafting"] = self.content_stack.addWidget(self._build_crafting_page())
 
         self.navigation_pages = create_navigation_pages(self.dashboard)
         for target, page in self.navigation_pages.items():
@@ -411,28 +411,22 @@ class MainWindow(QMainWindow):
                 self.character_creation_panel
             )
 
-        if hasattr(self, "bottom_navigation"):
-            self.root_layout.insertWidget(1, self.content_stack, 1)
-        else:
-            self.root_layout.addWidget(self.content_stack, 1)
+        self.root_layout.insertWidget(1, self.content_stack, 1)
         self._connect_dashboard_interactions()
 
     def _connect_dashboard_interactions(self) -> None:
-        self.controller.validation_failed.connect(self.narrative_panel.show_validation_error)
-        self.narrative_panel.submission_requested.connect(self.controller.submit_player_action)
-        self.narrative_panel.cancellation_requested.connect(self._cancel_action_resolution)
-        self.narrative_panel.retry_requested.connect(self._start_action_resolution)
-        self.utility_panel.tab_changed.connect(
-            lambda index: self.controller.change_tab("utility", index)
+        grid = self.scene_view.choice_grid
+        self.controller.validation_failed.connect(grid.show_validation_error)
+        self.scene_view.submission_requested.connect(self.controller.submit_player_action)
+        self.scene_view.cancellation_requested.connect(self._cancel_action_resolution)
+        self.scene_view.retry_requested.connect(self._start_action_resolution)
+        self.scene_view.combat_action_requested.connect(self._resolve_combat_action)
+        self.scene_view.navigation_requested.connect(self.controller.navigate)
+        self.powers_card.action_activated.connect(self._activate_power)
+        self.powers_card.rest_requested.connect(
+            lambda: self._resolve_combat_action(CombatCommand(CombatAction.RECOVER))
         )
-        self.utility_panel.combat_start_requested.connect(self._start_combat)
-        self.utility_panel.combat_action_requested.connect(self._resolve_combat_action)
-        self.quest_panel.tab_changed.connect(
-            lambda index: self.controller.change_tab("quest", index)
-        )
-        self.event_panel.filter_changed.connect(
-            lambda index: self.controller.change_tab("event", index)
-        )
+        self.conversation_view.older_requested.connect(self._load_older_messages)
         map_page = self.navigation_pages.get("map")
         if map_page is not None:
             world_map = map_page.findChild(WorldMapPanel)
@@ -617,8 +611,6 @@ class MainWindow(QMainWindow):
                 dashboard,
                 target_page="dashboard" if result.encounter_required else "map",
             )
-            if result.encounter_required:
-                self.utility_panel.set_current_tab(0)
             updates = " ".join(result.quest_updates)
         elif isinstance(result, CampResult):
             self._reload_dashboard(dashboard, target_page="map")
@@ -816,144 +808,127 @@ class MainWindow(QMainWindow):
         if hasattr(self, "dialog_dimmer"):
             self.dialog_dimmer.setGeometry(self.rect())
 
-    def _build_main_splitter(self) -> QSplitter:
+    def _build_concept_t(self) -> QSplitter:
+        """Codex column (character, paperdoll and skills, cards) beside the scene."""
+
+        dashboard = self.dashboard
         splitter = QSplitter(Qt.Orientation.Horizontal)
-        splitter.setObjectName("mainContentSplitter")
+        splitter.setObjectName("conceptTSplitter")
         splitter.setChildrenCollapsible(False)
-
-        left_center = ThemedFrame("leftCenterArea", role="content")
-        left_layout = QVBoxLayout(left_center)
-        left_layout.setContentsMargins(8, 8, 8, 8)
-        left_layout.setSpacing(8)
-
-        self.summary_splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.summary_splitter.setObjectName("summarySplitter")
-        self.summary_splitter.setChildrenCollapsible(False)
-        self.player_summary_panel = PlayerSummaryPanel(
-            self.dashboard.player,
-            resources=self.dashboard.sidebar_resources,
-            initial_resource_values=self._resource_animation_starts,
-            animate_resources=(
-                bool(self._resource_animation_starts)
-                and not self.reduced_motion_preference
-            ),
+        codex = QWidget()
+        codex.setObjectName("conceptTCodex")
+        layout = QVBoxLayout(codex)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(8)
+        self.character_strip = CharacterStrip(dashboard)
+        layout.addWidget(self.character_strip)
+        row = QHBoxLayout()
+        row.setSpacing(8)
+        self.paperdoll_panel = PaperdollPanel(dashboard.player, dashboard.equipment)
+        self.skill_detail_list = SkillDetailList(dashboard.skills)
+        row.addWidget(self.paperdoll_panel)
+        row.addWidget(self.skill_detail_list, 1)
+        layout.addLayout(row)
+        self.inventory_card = InventoryCard(
+            dashboard.inventory,
+            capacity=dashboard.inventory_capacity,
+            equipment=dashboard.equipment,
         )
-        self.summary_splitter.addWidget(self.player_summary_panel)
-        self.summary_splitter.addWidget(LocationSummaryPanel(self.dashboard.location))
-        self.summary_splitter.setSizes([620, 480])
+        self.powers_card = PowersCard(dashboard.abilities, dashboard.spells)
+        self.codex_card_row = CodexCardRow(self.inventory_card, self.powers_card)
+        layout.addWidget(self.codex_card_row, 1)
 
-        self.narrative_splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.narrative_splitter.setObjectName("narrativeQuestSplitter")
-        self.narrative_splitter.setChildrenCollapsible(False)
-        self.narrative_panel = NarrativePanel(self.dashboard.narrative)
-        self.narrative_panel.setMinimumWidth(420)
-        self.narrative_panel.set_combat_active(
-            self.dashboard.combat is not None and self.dashboard.combat.status == "active"
+        self.scene_view = SceneView(
+            dashboard.location,
+            dashboard.quest,
+            dashboard.narrative.suggested_actions,
+            quest_list=dashboard.quest_list,
+            combat=dashboard.combat,
         )
-        self.quest_panel = QuestObjectivePanel(
-            self.dashboard.quest,
-            self.dashboard.quest_list,
+        self.scene_view.set_clock(dashboard.location.day, dashboard.location.turn_number)
+        self.conversation_view = ConversationView(
+            reduced_motion=self.reduced_motion_preference
         )
-        self.quest_panel.setMinimumWidth(300)
-        self.narrative_splitter.addWidget(self.narrative_panel)
-        self.narrative_splitter.addWidget(self.quest_panel)
-        self.narrative_splitter.setSizes([700, 400])
+        self._show_conversation(dashboard.narrative)
+        self.scene_view.set_conversation(self.conversation_view)
+        combat = dashboard.combat
+        self.powers_card.rest_button.setVisible(combat is None or combat.status != "active")
 
-        self.lower_splitter = QSplitter(Qt.Orientation.Horizontal)
-        self.lower_splitter.setObjectName("lowerInformationSplitter")
-        self.lower_splitter.setChildrenCollapsible(False)
-        self.event_panel = EventLogPanel(self.dashboard.event_log)
-        self.lower_splitter.addWidget(self.event_panel)
-        self.recent_events_panel = RecentEventsPanel(self.dashboard.recent_events)
-        self.lower_splitter.addWidget(self.recent_events_panel)
-        self.lower_splitter.setSizes([650, 450])
-
-        self.dashboard_rows_splitter = QSplitter(Qt.Orientation.Vertical)
-        self.dashboard_rows_splitter.setObjectName("dashboardRowsSplitter")
-        self.dashboard_rows_splitter.setChildrenCollapsible(False)
-        self.narrative_splitter.setMinimumHeight(160)
-        self.lower_splitter.setMinimumHeight(120)
-        self.dashboard_rows_splitter.addWidget(self.narrative_splitter)
-        self.dashboard_rows_splitter.addWidget(self.lower_splitter)
-        self.dashboard_rows_splitter.setStretchFactor(0, 5)
-        self.dashboard_rows_splitter.setStretchFactor(1, 3)
-        self.dashboard_rows_splitter.setSizes([500, 300])
-
-        left_layout.addWidget(self.summary_splitter, 2)
-        left_layout.addWidget(self.dashboard_rows_splitter, 8)
-
-        self.right_sidebar = ThemedFrame("rightUtilitySidebar", role="sidebar")
-        self.right_sidebar.setMinimumWidth(360)
-        sidebar_layout = QVBoxLayout(self.right_sidebar)
-        sidebar_layout.setContentsMargins(8, 8, 8, 8)
-        sidebar_layout.setSpacing(0)
-        self.sidebar_utility_splitter = QSplitter(Qt.Orientation.Vertical)
-        self.sidebar_utility_splitter.setObjectName("sidebarUtilitySplitter")
-        self.sidebar_utility_splitter.setChildrenCollapsible(False)
-        minimap_panel = MinimapPanel(
-            self.dashboard.location, self.dashboard.present_npcs
-        )
-        minimap_panel.setMinimumHeight(150)
-        self.sidebar_utility_splitter.addWidget(minimap_panel)
-        self.utility_panel = UtilityContentPanel(
-            self.dashboard.skills,
-            self.dashboard.inventory_preview,
-            self.dashboard.equipment,
-            self.dashboard.combat_skills,
-            self.dashboard.combat,
-            self.dashboard.crafting_recipes,
-        )
-        self.utility_panel.setMinimumHeight(260)
-        self.sidebar_utility_splitter.addWidget(self.utility_panel)
-        self.sidebar_utility_splitter.setStretchFactor(0, 2)
-        self.sidebar_utility_splitter.setStretchFactor(1, 5)
-        self.sidebar_utility_splitter.setSizes([220, 570])
-        sidebar_layout.addWidget(self.sidebar_utility_splitter, 1)
-
-        splitter.addWidget(left_center)
-        splitter.addWidget(self.right_sidebar)
-        splitter.setStretchFactor(0, 7)
-        splitter.setStretchFactor(1, 3)
-        splitter.setSizes([1000, 600])
+        splitter.addWidget(codex)
+        splitter.addWidget(self.scene_view)
+        splitter.setStretchFactor(0, 0)
+        splitter.setStretchFactor(1, 1)
+        splitter.setSizes(list(CONCEPT_T_SIZES))
         return splitter
 
-    def _build_bottom_navigation(self) -> QFrame:
-        navigation = ThemedFrame("bottomNavigationBar", role="navigation")
-        navigation.setFixedHeight(58)
-        layout = QHBoxLayout(navigation)
-        layout.setContentsMargins(8, 7, 8, 7)
-        layout.setSpacing(6)
+    def _show_conversation(self, narrative) -> None:  # type: ignore[no-untyped-def]
+        """First load shows the transcript; after a commit the new turns arrive via append_turn."""
 
-        targets = (None, None, "map", "people", "character_sheet", "settings")
-        for index, target in enumerate(targets):
-            label = target.replace("_", " ").title() if target is not None else ""
-            button = SemanticButton(
-                label,
-                role="navigation",
-                object_name=(
-                    "navigationButton" if target is not None
-                    else "navigationPlaceholderButton"
-                ),
+        # ponytail: the last shown turn is not reset when another campaign loads, so its
+        # later turns get the new-turn emphasis once; key it by campaign if that matters.
+        last = self._last_turn_shown
+        messages = tuple(narrative.messages)
+        shown = tuple(m for m in messages if last is None or m.turn_number <= last)
+        fresh = tuple(m for m in messages if last is not None and m.turn_number > last)
+        self.conversation_view.set_messages(shown, narrative.has_older_messages)
+        if fresh:
+            self.conversation_view.append_turn(fresh)
+        self._last_turn_shown = max((m.turn_number for m in messages), default=0)
+
+    def _load_older_messages(self, before_turn: int) -> None:
+        if self.game_state_service is None:
+            return
+        campaign_id = self.game_state_service.campaigns.active_campaign_id()
+        if not campaign_id:
+            return
+        older = self.game_state_service.older_messages(campaign_id, before_turn)
+        first = min((m.turn_number for m in older), default=before_turn)
+        has_older = bool(older) and bool(
+            self.game_state_service.older_messages(campaign_id, first, 1)
+        )
+        self.conversation_view.prepend_messages(older, has_older)
+
+    def _build_crafting_page(self) -> QWidget:
+        # Temporary home until the crafting move into the Character Sheet.
+        page = QWidget()
+        page.setObjectName("craftingNavigationPage")
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(8, 8, 8, 8)
+        self.crafting_page = CraftingPage(self.dashboard.crafting_recipes)
+        self.crafting_page.craft_requested.connect(self._request_crafting)
+        layout.addWidget(self.crafting_page, 1)
+        back = SemanticButton("Back", role="navigation", object_name="craftingBackButton")
+        back.setToolTip("Return to the adventure")
+        back.clicked.connect(lambda: self.controller.navigate("dashboard"))
+        layout.addWidget(centered_third(back, "craftingCenteredFooter"))
+        return page
+
+    def _activate_power(self, key: str) -> None:
+        combat = self.dashboard.combat
+        if combat is None or combat.status != "active":
+            self._show_status_message("Abilities and spells are used during combat")
+            return
+        action = (
+            CombatAction.SPELL
+            if any(spell.key == key for spell in self.dashboard.spells)
+            else CombatAction.ABILITY
+        )
+        self._resolve_combat_action(
+            CombatCommand(
+                action, target_id=self.scene_view.choice_grid.target_id, ability_key=key
             )
-            if target is None:
+        )
+
+    def _set_combat_pending(self, pending: bool) -> None:
+        self.powers_card.setEnabled(not pending)
+        if pending:
+            for button in self.scene_view.choice_grid.choice_buttons:
                 button.setEnabled(False)
-                button.setAccessibleName(f"Empty navigation slot {index + 1}")
-            else:
-                button.setToolTip(f"Open {label}")
-                button.setProperty("navigationTarget", target)
-                button.setIcon(ui_icon(target))
-                button.setIconSize(QSize(24, 24))
-                button.setCheckable(True)
-                button.clicked.connect(
-                    lambda _checked=False, destination=target:
-                    self.controller.navigate(destination)
-                )
-                self.navigation_buttons[target] = button
-            layout.addWidget(button)
-        return navigation
+        else:
+            self.scene_view.set_combat(self.dashboard.combat)
 
     def _connect_item_interactions(self) -> None:
-        for grid in self.findChildren(InventoryGrid):
+        for grid in self.content_stack.findChildren(InventoryGrid):
             grid.selection_changed.connect(
                 self._inventory_selection_changed
             )
@@ -968,22 +943,27 @@ class MainWindow(QMainWindow):
             grid.equipment_drop_requested.connect(
                 self._unequip_equipment_to_inventory
             )
-        for grid in self.findChildren(EquipmentGrid):
-            grid.selection_changed.connect(
-                lambda index: self.controller.select_item("equipment", index)
+        for grid in self.content_stack.findChildren(EquipmentGrid):
+            self._connect_equipment_grid(grid)
+        self.inventory_card.auto_sort_requested.connect(self._auto_sort_inventory)
+
+    def _connect_equipment_grid(self, grid: EquipmentGrid) -> None:
+        grid.selection_changed.connect(
+            lambda index: self.controller.select_item("equipment", index)
+        )
+        grid.context_action_requested.connect(
+            lambda index, action: self.controller.request_context_action(
+                "equipment",
+                index,
+                action,
             )
-            grid.context_action_requested.connect(
-                lambda index, action: self.controller.request_context_action(
-                    "equipment",
-                    index,
-                    action,
-                )
-            )
-            grid.inventory_drop_requested.connect(
-                self._equip_inventory_to_equipment
-            )
-        self.utility_panel.inventory_auto_sort_requested.connect(self._auto_sort_inventory)
-        self.utility_panel.craft_requested.connect(self._request_crafting)
+        )
+        grid.inventory_drop_requested.connect(self._equip_inventory_to_equipment)
+
+    def _bag_item(self, position: int):  # type: ignore[no-untyped-def]
+        return next(
+            (item for item in self.dashboard.inventory if item.position == position), None
+        )
 
     def _request_crafting(self, recipe_id: str) -> None:
         if self.game_state_service is None:
@@ -1017,14 +997,14 @@ class MainWindow(QMainWindow):
         except GameStateError as exc:
             self._show_status_message(str(exc))
             return
-        self._reload_dashboard(dashboard, target_page="dashboard")
-        self.utility_panel.set_current_tab(3)
+        self._reload_dashboard(dashboard, target_page="crafting")
         self._show_status_message(result.summary)
         self._show_pending_crafting_result()
 
     def _inventory_selection_changed(self, index: int) -> None:
-        if 0 <= index < len(self.dashboard.inventory_preview):
-            self._selected_inventory_item_id = self.dashboard.inventory_preview[index].id
+        item = self._bag_item(index)
+        if item is not None:
+            self._selected_inventory_item_id = item.id
         self.controller.select_item("inventory", index)
 
     def _move_inventory_item(self, source: int, destination: int) -> None:
@@ -1084,8 +1064,8 @@ class MainWindow(QMainWindow):
 
     def _handle_context_action(self, collection: str, index: int, action: str) -> None:
         if action == "inspect":
-            if collection == "inventory" and 0 <= index < len(self.dashboard.inventory_preview):
-                item = self.dashboard.inventory_preview[index]
+            item = self._bag_item(index) if collection == "inventory" else None
+            if item is not None:
                 detail = item.description or item.name or "Empty inventory slot"
                 self._show_status_message(f"{item.name or 'Empty'}: {detail}")
             elif collection == "equipment" and 0 <= index < len(self.dashboard.equipment):
@@ -1109,7 +1089,10 @@ class MainWindow(QMainWindow):
             self._show_status_message(f"{action.title()} is not valid for {collection}")
             return
         if item_action is ItemAction.DROP:
-            item = self.dashboard.inventory_preview[index]
+            item = self._bag_item(index)
+            if item is None:
+                self._show_status_message("That inventory slot is empty.")
+                return
             answer = QMessageBox.question(
                 self,
                 "Drop item",
@@ -1137,7 +1120,7 @@ class MainWindow(QMainWindow):
 
     def _handle_player_action_submission(self, action: str) -> None:
         if self.action_resolver is None or self.game_state_service is None:
-            self.narrative_panel.show_resolution_error("Action resolution is unavailable.")
+            self.scene_view.choice_grid.show_resolution_error("Action resolution is unavailable.")
             return
         self._start_action_resolution(action)
 
@@ -1154,8 +1137,7 @@ class MainWindow(QMainWindow):
         if self.game_state_service is None:
             self._show_status_message("Combat requires a state-backed campaign")
             return
-        self.utility_panel.set_current_tab(0)
-        self.utility_panel.combat_page.set_pending(True)
+        self._set_combat_pending(True)
         self._show_status_message(
             "Starting encounter..." if command is None else "Resolving combat turn..."
         )
@@ -1187,7 +1169,6 @@ class MainWindow(QMainWindow):
             self._combat_resolution_failed(task, str(exc))
             return
         self._reload_dashboard(dashboard, target_page="dashboard")
-        self.utility_panel.set_current_tab(0)
         status = getattr(result, "status", "active")
         summaries = getattr(result, "summaries", ())
         detail = summaries[-1] if summaries else "Combat state updated"
@@ -1334,8 +1315,7 @@ class MainWindow(QMainWindow):
             return
         if self._crafting_result_dialog is not None:
             self._crafting_result_dialog.allow_close()
-        self._reload_dashboard(dashboard, target_page="dashboard")
-        self.utility_panel.set_current_tab(3)
+        self._reload_dashboard(dashboard, target_page="crafting")
         self._show_status_message("Crafting result recorded")
 
     def _claim_quest_reward_item(self, item_id: str) -> None:
@@ -1403,7 +1383,7 @@ class MainWindow(QMainWindow):
         self, task: CombatResolutionTask, message: str
     ) -> None:
         if task is self._combat_task:
-            self.utility_panel.combat_page.set_pending(False)
+            self._set_combat_pending(False)
             self._show_status_message(message)
 
     def _combat_resolution_finished(self, task: CombatResolutionTask) -> None:
@@ -1416,7 +1396,7 @@ class MainWindow(QMainWindow):
             return
         normalized = " ".join(action.split())
         if not normalized:
-            self.narrative_panel.show_validation_error("Enter an action before sending.")
+            self.scene_view.choice_grid.show_validation_error("Enter an action before sending.")
             return
         if (
             self.game_state_service is not None
@@ -1429,9 +1409,9 @@ class MainWindow(QMainWindow):
         if self._route_npc_action(normalized):
             return
         if self.action_resolver is None or self.game_state_service is None:
-            self.narrative_panel.show_resolution_error("Action resolution is unavailable.")
+            self.scene_view.choice_grid.show_resolution_error("Action resolution is unavailable.")
             return
-        self.narrative_panel.show_resolution_pending(normalized)
+        self.scene_view.choice_grid.show_resolution_pending(normalized)
         task = ActionResolutionTask(
             self.game_state_service,
             self.action_resolver,
@@ -1521,12 +1501,9 @@ class MainWindow(QMainWindow):
         try:
             dashboard = self.game_state_service.load_active_dashboard()
         except GameStateError as exc:
-            self.narrative_panel.show_resolution_error(str(exc))
+            self.scene_view.choice_grid.show_resolution_error(str(exc))
             return
         self._reload_dashboard(dashboard, target_page="dashboard")
-        self.narrative_panel.highlight_latest_turn(
-            reduced_motion=self.reduced_motion_preference
-        )
         detail = "; ".join(result.state_summaries)
         self._show_status_message(
             "Turn committed" + (f": {detail}" if detail else "")
@@ -1538,12 +1515,12 @@ class MainWindow(QMainWindow):
         message: str,
     ) -> None:
         if task is self._action_task:
-            self.narrative_panel.show_resolution_error(message)
+            self.scene_view.choice_grid.show_resolution_error(message)
             self._show_status_message("Action was not committed")
 
     def _action_resolution_cancelled(self, task: ActionResolutionTask) -> None:
         if task is self._action_task:
-            self.narrative_panel.show_resolution_cancelled()
+            self.scene_view.choice_grid.show_resolution_cancelled()
             self._show_status_message("Action cancelled; no state was changed")
 
     def _action_resolution_finished(self, task: ActionResolutionTask) -> None:
@@ -1556,11 +1533,7 @@ class MainWindow(QMainWindow):
             return
         self.current_page = target
         self.content_stack.setCurrentIndex(self.page_indices[target])
-        self.bottom_navigation.setVisible(
-            target not in {"character_creation", "local_ai_setup"}
-        )
-        for name, button in self.navigation_buttons.items():
-            button.set_selected(name == target)
+        self.scene_view.tabs.set_current(target)
         self._show_status_message(
             "Adventure dashboard"
             if target == "dashboard"
@@ -2091,24 +2064,27 @@ class MainWindow(QMainWindow):
     def _refresh_item_views(self, dashboard: DashboardView) -> None:
         """Refresh item-dependent widgets without rebuilding the complete UI tree."""
 
-        scroll_value = self.utility_panel.inventory_scroll.verticalScrollBar().value()
         current_page = self.current_page
         self.dashboard = dashboard
         self._update_application_title()
-        self.utility_panel.update_inventory_equipment(
-            dashboard.inventory_preview,
-            dashboard.equipment,
+        self.inventory_card.set_inventory(
+            dashboard.inventory,
+            capacity=dashboard.inventory_capacity,
+            equipment=dashboard.equipment,
         )
-        self.player_summary_panel.update_view(
-            dashboard.player,
-            resources=dashboard.sidebar_resources,
-            animate_resources=not self.reduced_motion_preference,
-        )
+        # Strip (purse, carry, resources) and paperdoll (AC, slots) are rebuilt in place.
+        for name, widget in (
+            ("character_strip", CharacterStrip(dashboard)),
+            ("paperdoll_panel", PaperdollPanel(dashboard.player, dashboard.equipment)),
+        ):
+            old = getattr(self, name)
+            old.parentWidget().layout().replaceWidget(old, widget)
+            old.deleteLater()
+            setattr(self, name, widget)
+        self._connect_equipment_grid(self.paperdoll_panel)
         self._refresh_character_sheet(dashboard)
         self.content_stack.setCurrentIndex(self.page_indices.get(current_page, 0))
-        QTimer.singleShot(
-            0, lambda: self._restore_inventory_ui_state(scroll_value)
-        )
+        QTimer.singleShot(0, lambda: self._restore_inventory_ui_state(None))
 
     def _reload_dashboard(
         self,
@@ -2117,34 +2093,8 @@ class MainWindow(QMainWindow):
         target_page: str = "dashboard",
     ) -> None:
         theme_id = str(self.theme_selector.currentData() or "high_fantasy")
-        previous_event_signature = tuple(
-            (event.time_label, event.category, event.summary)
-            for event in (*self.dashboard.event_log, *self.dashboard.recent_events)
-        )
-        next_event_signature = tuple(
-            (event.time_label, event.category, event.summary)
-            for event in (*dashboard.event_log, *dashboard.recent_events)
-        )
-        events_changed = next_event_signature != previous_event_signature
-        utility_tab = self.utility_panel.current_tab()
-        inventory_page = self.utility_panel.current_inventory_page()
-        quest_tab = self.quest_panel.current_tab()
-        event_filter = self.event_panel.current_filter()
-        event_scroll = self.event_panel.scroll_state()
-        recent_scroll = self.recent_events_panel.scroll_state()
-        inventory_scroll_widget = self.utility_panel.inventory_scroll
-        inventory_scroll = (
-            inventory_scroll_widget.verticalScrollBar().value()
-            if inventory_scroll_widget is not None else 0
-        )
-        splitter_sizes = {
-            "main": self.main_splitter.sizes(),
-            "summary": self.summary_splitter.sizes(),
-            "narrative": self.narrative_splitter.sizes(),
-            "lower": self.lower_splitter.sizes(),
-            "rows": self.dashboard_rows_splitter.sizes(),
-            "sidebar": self.sidebar_utility_splitter.sizes(),
-        }
+        inventory_scroll = self.inventory_card.scroll.verticalScrollBar().value()
+        splitter_sizes = {"concept_t": self.concept_splitter.sizes()}
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
             splitter_sizes["people"] = people_splitter.sizes()
@@ -2160,17 +2110,9 @@ class MainWindow(QMainWindow):
         self._update_application_title()
         self._build_content_stack()
         self._resource_animation_starts = {}
-        for name, splitter in (
-            ("main", self.main_splitter),
-            ("summary", self.summary_splitter),
-            ("narrative", self.narrative_splitter),
-            ("lower", self.lower_splitter),
-            ("rows", self.dashboard_rows_splitter),
-            ("sidebar", self.sidebar_utility_splitter),
-        ):
-            sizes = self._valid_sizes(splitter_sizes.get(name), splitter.count())
-            if sizes:
-                splitter.setSizes(sizes)
+        sizes = self._valid_sizes(splitter_sizes.get("concept_t"), self.concept_splitter.count())
+        if sizes:
+            self.concept_splitter.setSizes(sizes)
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
             sizes = self._valid_sizes(splitter_sizes.get("people"), people_splitter.count())
@@ -2179,16 +2121,6 @@ class MainWindow(QMainWindow):
         people_page = self.navigation_pages.get("people")
         if selected_npc_id and people_page is not None and hasattr(people_page, "open_npc"):
             people_page.open_npc(selected_npc_id)
-        self.utility_panel.set_current_tab(utility_tab)
-        self.utility_panel.set_inventory_page(inventory_page)
-        self.quest_panel.set_current_tab(quest_tab)
-        self.event_panel.set_current_filter(event_filter)
-        if events_changed:
-            QTimer.singleShot(0, self.event_panel.scroll_to_latest)
-            QTimer.singleShot(0, self.recent_events_panel.scroll_to_latest)
-        else:
-            QTimer.singleShot(0, lambda: self.event_panel.restore_scroll_state(event_scroll))
-            QTimer.singleShot(0, lambda: self.recent_events_panel.restore_scroll_state(recent_scroll))
         QTimer.singleShot(0, lambda: self._restore_inventory_ui_state(inventory_scroll))
         self.select_theme(theme_id)
         self._show_navigation(
@@ -2198,26 +2130,20 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(0, self._show_pending_crafting_result)
         QTimer.singleShot(400, self._show_pending_level_up)
 
-    def _restore_inventory_ui_state(self, scroll_value: int) -> None:
-        scroll = self.utility_panel.inventory_scroll
-        if scroll is not None:
-            scroll.verticalScrollBar().setValue(
-                min(scroll_value, scroll.verticalScrollBar().maximum())
-            )
+    def _restore_inventory_ui_state(self, scroll_value: int | None) -> None:
+        if scroll_value is not None:
+            bar = self.inventory_card.scroll.verticalScrollBar()
+            bar.setValue(min(scroll_value, bar.maximum()))
         if self._selected_inventory_item_id is None:
             return
-        index = next(
-            (
-                position for position, item in enumerate(self.dashboard.inventory_preview)
-                if item.id == self._selected_inventory_item_id
-            ),
+        item = next(
+            (value for value in self.dashboard.inventory if value.id == self._selected_inventory_item_id),
             None,
         )
-        if index is None:
+        if item is None or item.position is None:
             return
-        self.utility_panel.set_inventory_page(index // INVENTORY_PAGE_SIZE)
-        for grid in self.findChildren(InventoryGrid):
-            grid.select_index(index)
+        self.inventory_card.scroll_to_position(item.position)
+        self.inventory_card.grid.select_index(item.position)
 
     def _show_status_message(self, message: str) -> None:
         self.statusBar().showMessage(message, 5000)
@@ -2277,30 +2203,14 @@ class MainWindow(QMainWindow):
         ui = self.preferences_store.load_ui()
         splitters = ui.get("splitters")
         if isinstance(splitters, dict):
-            for name, splitter in (
-                ("main", self.main_splitter),
-                ("summary", self.summary_splitter),
-                ("narrative", self.narrative_splitter),
-                ("lower", self.lower_splitter),
-                ("rows", self.dashboard_rows_splitter),
-                ("sidebar", self.sidebar_utility_splitter),
-            ):
-                sizes = self._valid_sizes(splitters.get(name), splitter.count())
-                if sizes:
-                    splitter.setSizes(sizes)
+            sizes = self._valid_sizes(splitters.get("concept_t"), self.concept_splitter.count())
+            if sizes:
+                self.concept_splitter.setSizes(sizes)
             people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
             if people_splitter is not None:
                 sizes = self._valid_sizes(splitters.get("people"), people_splitter.count())
                 if sizes:
                     people_splitter.setSizes(sizes)
-        for key, setter in (
-            ("utility_tab", self.utility_panel.set_current_tab),
-            ("quest_tab", self.quest_panel.set_current_tab),
-            ("event_filter", self.event_panel.set_current_filter),
-        ):
-            value = ui.get(key)
-            if isinstance(value, int):
-                setter(value)
         page = ui.get("page")
         if isinstance(page, str):
             self._show_navigation(page if page in self.page_indices else "dashboard")
@@ -2318,21 +2228,13 @@ class MainWindow(QMainWindow):
         self.preferences_store.save_ui(
             {
                 "splitters": {
-                    "main": self.main_splitter.sizes(),
-                    "summary": self.summary_splitter.sizes(),
-                    "narrative": self.narrative_splitter.sizes(),
-                    "lower": self.lower_splitter.sizes(),
-                    "rows": self.dashboard_rows_splitter.sizes(),
-                    "sidebar": self.sidebar_utility_splitter.sizes(),
+                    "concept_t": self.concept_splitter.sizes(),
                     "people": (
                         self.findChild(QSplitter, "peopleTradeConversationSplitter").sizes()
                         if self.findChild(QSplitter, "peopleTradeConversationSplitter")
                         is not None else [210, 500]
                     ),
                 },
-                "utility_tab": self.utility_panel.current_tab(),
-                "quest_tab": self.quest_panel.current_tab(),
-                "event_filter": self.event_panel.current_filter(),
                 "page": self.current_page,
                 "font_size": self.font_size_preference,
                 "reduced_motion": self.reduced_motion_preference,
@@ -2458,18 +2360,10 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Replay Verification", result.message)
 
     def _reset_ui_preferences(self) -> None:
-        self.main_splitter.setSizes([1000, 600])
-        self.summary_splitter.setSizes([620, 480])
-        self.narrative_splitter.setSizes([700, 400])
-        self.lower_splitter.setSizes([650, 450])
-        self.dashboard_rows_splitter.setSizes([500, 300])
-        self.sidebar_utility_splitter.setSizes([220, 570])
+        self.concept_splitter.setSizes(list(CONCEPT_T_SIZES))
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
             people_splitter.setSizes([210, 500])
-        self.utility_panel.set_current_tab(1)
-        self.quest_panel.set_current_tab(0)
-        self.event_panel.set_current_filter(0)
         if self.preferences_store is not None:
             self.preferences_store.reset_ui()
         self.select_font_size(100)
@@ -2496,8 +2390,6 @@ class MainWindow(QMainWindow):
             self.theme_selector.setCurrentIndex(index)
             self.theme_selector.blockSignals(False)
         self.settings_panel.select_theme(theme_id)
-        for target, button in self.navigation_buttons.items():
-            button.setIcon(ui_icon(target))
         for widget in self.findChildren(QWidget):
             refresh = getattr(widget, "refresh_theme_icon", None)
             if callable(refresh):

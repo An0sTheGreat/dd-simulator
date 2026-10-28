@@ -391,7 +391,8 @@ class DashboardProjection:
             location = _required(
                 connection.execute(
                     """
-                    SELECT locations.*, campaign_clock.time_label
+                    SELECT locations.*, campaign_clock.time_label, campaign_clock.day AS clock_day,
+                        campaign_clock.turn_number AS clock_turn
                     FROM locations
                     JOIN campaign_clock ON campaign_clock.campaign_id = locations.campaign_id
                     WHERE locations.campaign_id = ? AND locations.is_current = 1
@@ -1307,6 +1308,8 @@ class DashboardProjection:
                 route_status=str(location["route_status"]),
                 visual=_visual_view(location_visual),
                 biome=str(location["biome"]),
+                day=int(location["clock_day"]),
+                turn_number=int(location["clock_turn"]),
             ),
             narrative=NarrativeView(
                 title=str(narrative["title"]),
