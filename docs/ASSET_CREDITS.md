@@ -79,3 +79,26 @@ confirming that the intended distribution complies with the supplied asset terms
   otherwise preserves the authored colors; the supplied source files are not modified.
 - Occupied equipment targets reuse that same packaged slot image as a precisely aligned
   cell overlay. Empty targets continue to show the board's original silhouettes.
+
+## Concept T codex assets (UI redesign Phase 1)
+
+Imported by `scripts/import_codex_assets.py`, which records every source path and can be
+re-run to reproduce the runtime copies byte for byte.
+
+- **UI frames and markers.** Runtime copies: the PNGs in `src/dd_simulator/ui/assets/codex`
+  (frames, original size) and `codex/markers` (downscaled to 64 px). Sources:
+  `Untitled RPG/Assets/Art/UI/Textures` and `Untitled RPG/Assets/Art/UI/Source/Icons`.
+  This art is original: it is drawn in code by the project owner's Untitled RPG project
+  (`Tools/art/flat_library.py`) and can be regenerated at a higher resolution there.
+- **Portrait fallbacks.** Runtime copies: `codex/portraits/<pack>/1.png` … `50.png`, downscaled
+  from 512 px to 256 px. Sources: the `PNG/background` folder of the RPG Mega packs
+  `Free RPG Fantasy Avatars` (`fantasy`), `rpg-avatar-dwarf-icons` (`dwarf`),
+  `rpg-avatar-goblin-icons` (`goblin`), `rpg-avatar-fairy-icons` (`fairy`),
+  `rpg-avatar-demon-icons` (`demon`) and `50-rpg-avatar-undead-icons` (`undead`) under
+  `Untitled RPG/Assets/RPG Mega`. Creator: CraftPix. License: in-game use allowed; no
+  standalone redistribution of the files (https://craftpix.net/file-licenses/). The
+  application ships them only as integrated game assets.
+- **Oxanium font.** Runtime copies: `Oxanium-Regular.ttf`, `Oxanium-SemiBold.ttf` and
+  `Oxanium-Bold.ttf` in `src/dd_simulator/ui/assets/fonts`, from
+  `Untitled RPG/Assets/Fonts/Oxanium`. SIL Open Font License 1.1; the license text ships
+  beside the fonts as `oxanium-ofl.txt`.

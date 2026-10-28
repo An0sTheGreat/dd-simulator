@@ -10,7 +10,13 @@ from PySide6.QtGui import QFontDatabase
 
 LOGGER = logging.getLogger(__name__)
 FONT_DIRECTORY = Path(__file__).parent / "assets" / "fonts"
-FONT_FILES = ("Vera.ttf", "VeraBd.ttf")
+FONT_FILES = (
+    "Vera.ttf",
+    "VeraBd.ttf",
+    "Oxanium-Regular.ttf",
+    "Oxanium-SemiBold.ttf",
+    "Oxanium-Bold.ttf",
+)
 
 
 def register_application_fonts() -> tuple[str, ...]:
