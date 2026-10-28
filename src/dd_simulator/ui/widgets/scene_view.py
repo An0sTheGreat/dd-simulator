@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 import re
 
 from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, QSize, Qt, Property, Signal
-from PySide6.QtGui import Qt as GuiQt, QColor, QLinearGradient, QPainter, QPen, QPixmap
+from PySide6.QtGui import Qt as GuiQt, QColor, QFontMetricsF, QLinearGradient, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QScrollArea,
     QApplication,
@@ -144,6 +145,18 @@ def _clear_layout(layout) -> None:  # type: ignore[no-untyped-def]
             _clear_layout(item.layout())
 
 
+def shared_width_cap(widths: list[int], room: int) -> int:
+    """Largest cap such that sum(min(width, cap)) fits ``room``: narrow items keep their width."""
+
+    remaining = len(widths)
+    for width in sorted(widths):
+        if width * remaining > room:
+            return max(0, room // remaining)
+        room -= width
+        remaining -= 1
+    return max(widths, default=0)
+
+
 CONVERSATION_MIN_HEIGHT = 150
 SCENE_CARD_WIDTH = 340
 
@@ -176,9 +189,43 @@ class NavTabs(QWidget):
             layout.addWidget(button)
         layout.addStretch(1)
         self.clock_label = ElidedLabel("", "sceneClockLabel", tooltip_on_self=True)
-        self.clock_label.setAccessibleName("Day and turn")
+        self.clock_label.setAccessibleDescription("Day and turn")  # the name is the clock text
         layout.addWidget(self.clock_label)
         self.set_current("dashboard")
+
+    def event(self, event) -> bool:  # type: ignore[no-untyped-def]
+        kind = event.type()
+        if kind == QEvent.Type.StyleChange and self.property("compact"):
+            self._set_compact(False)  # theme or font scale changed: measure the full padding again
+        # LayoutRequest follows a font, text or width change of any tab, so the caps follow too.
+        if kind in (QEvent.Type.LayoutRequest, QEvent.Type.Resize):
+            self._fit_tabs()
+        return super().event(event)
+
+    def _set_compact(self, compact: bool) -> None:
+        self.setProperty("compact", compact)  # QSS narrows the tab padding
+        for button in self.buttons.values():
+            _repolish(button)
+
+    def _fit_tabs(self) -> None:
+        """Short labels keep their natural width; one shared cap makes only the longest elide.
+
+        A box layout takes the same width from every item, so short tabs such as MAP were the
+        first to shrink to an ellipsis. Tabs that do not fit at full padding go compact first.
+        """
+
+        items = [*self.buttons.values(), self.clock_label]
+        room = self.width() - self.layout().spacing() * (len(items) - 1)
+        hints = [item.sizeHint().width() for item in items]
+        compact = bool(self.property("compact"))
+        if not compact:
+            self._natural_width = sum(hints)  # remembered so compact padding cannot flip it back
+        if (self._natural_width > room) != compact:
+            self._set_compact(not compact)
+            return  # the repolish posts another LayoutRequest with the new hints
+        cap = shared_width_cap(hints, room)
+        for item in items:
+            item.setMaximumWidth(max(cap, item.minimumSizeHint().width()))
 
     def set_current(self, target: str) -> None:
         button = self.buttons.get(target)
@@ -474,6 +521,7 @@ class ElidedLabel(QLabel):
         owner = None if self.tooltip_on_self else self.parentWidget()
         tip = GuiQt.convertFromPlainText(self.full_text) if shown != self.full_text else ""
         (owner if owner is not None else self).setToolTip(tip)
+        _name_full_text(self)
 
 
 class ElidedButton(QPushButton):
@@ -489,7 +537,9 @@ class ElidedButton(QPushButton):
         return _with_text_width(self, super().sizeHint(), self.full_text)
 
     def minimumSizeHint(self) -> QSize:  # noqa: N802
-        return _with_text_width(self, super().minimumSizeHint(), ELLIPSIS)
+        # Not super().minimumSizeHint(): QPushButton's calls our sizeHint (the full text), which
+        # made the minimum grow as the shown text got shorter.
+        return _with_text_width(self, super().sizeHint(), ELLIPSIS)
 
     def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         super().resizeEvent(event)
@@ -507,16 +557,27 @@ class ElidedButton(QPushButton):
         shown = self.fontMetrics().elidedText(self.full_text, Qt.TextElideMode.ElideRight, width)
         if shown != self.text():
             self.setText(shown)
+        _name_full_text(self)
 
 
 ELLIPSIS = "…"
+
+
+def _name_full_text(widget) -> None:  # type: ignore[no-untyped-def]
+    """Screen readers get the full text, not the elided one, unless a caller named the widget."""
+
+    if widget.accessibleName() == getattr(widget, "_auto_name", ""):
+        widget._auto_name = widget.full_text
+        widget.setAccessibleName(widget.full_text)
 
 
 def _with_text_width(widget: QWidget, hint: QSize, text: str) -> QSize:
     """``hint`` with the width of the shown text swapped for the width of ``text``."""
 
     metrics = widget.fontMetrics()
-    width = hint.width() - metrics.horizontalAdvance(widget.text()) + metrics.horizontalAdvance(text)
+    # Rounded up: elidedText compares the fractional width, so a rounded-down hint elides "MAP".
+    full = math.ceil(QFontMetricsF(widget.font()).horizontalAdvance(text))
+    width = hint.width() - metrics.horizontalAdvance(widget.text()) + full
     return QSize(max(0, width), hint.height())
 
 

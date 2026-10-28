@@ -28,7 +28,7 @@ from dd_simulator.state import (
 )
 from dd_simulator.state.combat import CombatService, EnemySpec
 from dd_simulator.ui.main_window import MainWindow
-from dd_simulator.ui.widgets.scene_view import CONVERSATION_MIN_HEIGHT
+from dd_simulator.ui.widgets.scene_view import CONVERSATION_MIN_HEIGHT, ElidedButton, ElidedLabel
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
 from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
 from dd_simulator.ui.themes.theme_manager import ThemeManager
@@ -379,5 +379,36 @@ def test_no_dashboard_text_is_cut_off_at_1280x720_and_150_percent(tmp_path: Path
     # The long tab label is elided, not dropped: its full name stays in the tooltip.
     tab = window.scene_view.tabs.buttons["character_sheet"]
     assert tab.text() != tab.full_text and "Character Sheet" in tab.toolTip()
+    # Every tab keeps its first letters: short labels such as MAP are not squeezed to "…".
+    for button in window.scene_view.tabs.buttons.values():
+        assert button.text() == button.full_text or len(button.text().rstrip("…")) >= 3, button.full_text
+    assert window.scene_view.tabs.buttons["map"].text() == "MAP"
+    assert len(window.scene_view.tabs.clock_label.text().rstrip("…")) >= 3  # the clock row shares the room
+    window.font_size_requested.emit(100)
+    close(app, window)
+
+
+def test_elided_text_keeps_its_full_text_as_the_accessible_name(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.font_size_requested.emit(150)
+    window.resize(1280, 720)
+    window.show()
+    window.controller.navigate("dashboard")
+    for _ in range(3):
+        app.processEvents()
+    scene = window.scene_view
+    elided = [
+        widget for widget in (*window.findChildren(ElidedLabel), *window.findChildren(ElidedButton))
+        if widget.isVisible() and widget.text() != widget.full_text
+    ]
+    kinds = {widget.objectName() for widget in elided}
+    assert {"sceneChip", "codexResourceName", "sceneNavTab"} <= kinds, kinds
+    for widget in elided:
+        name = widget.accessibleName()
+        assert widget.full_text.casefold() in name.casefold() or widget.property("navigationTarget"), name
+    # Tabs keep their own descriptive names ("Character Sheet tab"), never the shortened text.
+    assert scene.tabs.buttons["character_sheet"].accessibleName() == "Character Sheet tab"
+    scene.time_chip.set_full_text("DAY 18 · EVENING")
+    assert scene.time_chip.accessibleName() == "DAY 18 · EVENING"
     window.font_size_requested.emit(100)
     close(app, window)

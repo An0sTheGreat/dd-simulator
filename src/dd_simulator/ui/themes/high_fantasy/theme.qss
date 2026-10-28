@@ -1370,6 +1370,7 @@ QPushButton#sceneNavTab {
 }
 QPushButton#sceneNavTab:hover, QPushButton#sceneNavTab:focus { color: {{codex.ink}}; border-color: {{codex.gold_dark}}; }
 QPushButton#sceneNavTab:checked { color: {{codex.gold}}; border-color: {{codex.gold}}; }
+QWidget#sceneNavTabs[compact="true"] QPushButton#sceneNavTab { padding: 6px 7px; letter-spacing: 0.6px; }
 QLabel#sceneClockLabel { font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: {{codex.muted}}; background: transparent; }
 QLabel#sceneLocationTitle { font-family: "Georgia"; font-size: 38px; color: #f6ead0; background: transparent; }
 QLabel#sceneLocationSubtitle { font-family: "Oxanium"; font-size: 11px; font-weight: 600; letter-spacing: 1.7px; color: #e8d9b8; background: transparent; }
