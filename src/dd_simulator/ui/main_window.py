@@ -80,6 +80,11 @@ from dd_simulator.ui.panels.navigation_pages import (
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
 from dd_simulator.ui.panels.local_ai_setup_panel import LocalAiSetupPanel
 from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
+from dd_simulator.ui.audio import (
+    DEFAULT_AMBIENCE_VOLUME,
+    DEFAULT_MUSIC_VOLUME,
+    MusicController,
+)
 from dd_simulator.ui.services.action_resolution_worker import ActionResolutionTask
 from dd_simulator.ui.services.combat_resolution_worker import CombatResolutionTask
 from dd_simulator.ui.services.travel_resolution_worker import TravelResolutionTask
@@ -291,6 +296,14 @@ class MainWindow(QMainWindow):
         self._selected_inventory_item_id: str | None = None
         self.font_size_preference = 100
         self.reduced_motion_preference = False
+        self.music_volume_preference = DEFAULT_MUSIC_VOLUME
+        self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
+        self.audio_muted_preference = False
+        self.music = MusicController(self)
+        self._audio_save_timer = QTimer(self)
+        self._audio_save_timer.setSingleShot(True)
+        self._audio_save_timer.setInterval(400)
+        self._audio_save_timer.timeout.connect(self.save_ui_preferences)
         self._resource_animation_starts: dict[str, int] = {}
         self.current_page = "dashboard"
         self._dialog_dim_depth = 0
@@ -338,6 +351,7 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(0, self._show_pending_quest_reward)
             QTimer.singleShot(0, self._show_pending_crafting_result)
             QTimer.singleShot(400, self._show_pending_level_up)
+        self.music.update(self.current_page, self.dashboard)
 
     def _build_content_stack(self) -> None:
         self.page_indices = {}
@@ -380,6 +394,8 @@ class MainWindow(QMainWindow):
             self._on_reduced_motion_changed
         )
         self.settings_panel.select_reduced_motion(self.reduced_motion_preference)
+        self.settings_panel.audio_requested.connect(self._on_audio_changed)
+        self._apply_audio_preferences()
         self.settings_panel.checkpoint_create_requested.connect(self._create_checkpoint)
         self.settings_panel.checkpoint_load_requested.connect(self._load_checkpoint)
         self.settings_panel.repair_requested.connect(self._inspect_and_repair_campaign)
@@ -1604,6 +1620,7 @@ class MainWindow(QMainWindow):
                 self._discovered_models,
                 self.lm_client.model_id if self.lm_client is not None else None,
             )
+        self.music.update(target, self.dashboard)
 
     def _configure_local_ai(self, mode: str, directory: str, model_path: str) -> None:
         folder = Path(directory or default_model_directory()).expanduser()
@@ -2301,6 +2318,17 @@ class MainWindow(QMainWindow):
         event_filter = ui.get("event_filter")
         if isinstance(event_filter, int):
             self.navigation_pages["journal"].event_log.set_current_filter(event_filter)
+        for key, attribute in (
+            ("music_volume", "music_volume_preference"),
+            ("ambience_volume", "ambience_volume_preference"),
+        ):
+            value = ui.get(key)
+            if isinstance(value, int) and not isinstance(value, bool):
+                setattr(self, attribute, min(100, max(0, value)))
+        muted = ui.get("audio_muted")
+        if isinstance(muted, bool):
+            self.audio_muted_preference = muted
+        self._apply_audio_preferences()
 
     def save_ui_preferences(self) -> None:
         if self.preferences_store is None:
@@ -2319,6 +2347,9 @@ class MainWindow(QMainWindow):
                 "font_size": self.font_size_preference,
                 "reduced_motion": self.reduced_motion_preference,
                 "event_filter": self.navigation_pages["journal"].event_log.current_filter(),
+                "music_volume": self.music_volume_preference,
+                "ambience_volume": self.ambience_volume_preference,
+                "audio_muted": self.audio_muted_preference,
             }
         )
 
@@ -2441,6 +2472,7 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Replay Verification", result.message)
 
     def _reset_ui_preferences(self) -> None:
+        self._flush_ui_preferences()
         self.concept_splitter.setSizes(list(CONCEPT_T_SIZES))
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
@@ -2451,6 +2483,10 @@ class MainWindow(QMainWindow):
         self.reduced_motion_preference = False
         self.settings_panel.select_reduced_motion(False)
         self.navigation_pages["journal"].event_log.set_current_filter(0)
+        self.music_volume_preference = DEFAULT_MUSIC_VOLUME
+        self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
+        self.audio_muted_preference = False
+        self._apply_audio_preferences()
         self.font_size_requested.emit(100)
         self.theme_requested.emit("high_fantasy")
         self.controller.navigate("dashboard")
@@ -2482,6 +2518,30 @@ class MainWindow(QMainWindow):
         self.font_size_requested.emit(self.font_size_preference)
         self.save_ui_preferences()
 
+    def _on_audio_changed(self, music: int, ambience: int, muted: bool) -> None:
+        self.music_volume_preference = music
+        self.ambience_volume_preference = ambience
+        self.audio_muted_preference = muted
+        self.music.set_volumes(music, ambience, muted)
+        self._audio_save_timer.start()  # debounce: sliders emit on every tick
+
+    def _flush_ui_preferences(self) -> None:
+        if self._audio_save_timer.isActive():
+            self._audio_save_timer.stop()
+            self.save_ui_preferences()
+
+    def _apply_audio_preferences(self) -> None:
+        self.settings_panel.select_audio(
+            self.music_volume_preference,
+            self.ambience_volume_preference,
+            self.audio_muted_preference,
+        )
+        self.music.set_volumes(
+            self.music_volume_preference,
+            self.ambience_volume_preference,
+            self.audio_muted_preference,
+        )
+
     def _on_reduced_motion_changed(self, enabled: bool) -> None:
         self.reduced_motion_preference = bool(enabled)
         self.settings_panel.select_reduced_motion(self.reduced_motion_preference)
@@ -2502,5 +2562,7 @@ class MainWindow(QMainWindow):
         if self._local_ai_download_task is not None:
             self._local_ai_download_task.cancel()
         self.local_ai_runtime.stop()
+        self.music.stop()
+        self._audio_save_timer.stop()
         self.save_ui_preferences()
         super().closeEvent(event)

@@ -3,7 +3,9 @@
 from collections.abc import Iterable
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QCheckBox, QComboBox, QFormLayout, QHBoxLayout, QVBoxLayout
+from PySide6.QtWidgets import (
+    QCheckBox, QComboBox, QFormLayout, QHBoxLayout, QSlider, QVBoxLayout
+)
 
 from dd_simulator.local_model import LocalModelModelInfo, ModelEvaluation
 from dd_simulator.ui.panels.common import DashboardPanel, semantic_label
@@ -15,6 +17,7 @@ class SettingsPanel(DashboardPanel):
     theme_requested = Signal(str)
     font_size_requested = Signal(int)
     reduced_motion_requested = Signal(bool)
+    audio_requested = Signal(int, int, bool)  # music volume, ambience volume, muted
     reset_requested = Signal()
     back_requested = Signal()
     checkpoint_create_requested = Signal()
@@ -155,6 +158,20 @@ class SettingsPanel(DashboardPanel):
             semantic_label("Contrast", text_role="body"), self.high_contrast_checkbox
         )
 
+        self.music_volume_slider = self._volume_slider("musicVolumeSlider", "Music volume")
+        form.addRow(semantic_label("Music volume", text_role="body"), self.music_volume_slider)
+        self.ambience_volume_slider = self._volume_slider(
+            "ambienceVolumeSlider", "Ambience volume"
+        )
+        form.addRow(
+            semantic_label("Ambience volume", text_role="body"), self.ambience_volume_slider
+        )
+        self.mute_checkbox = QCheckBox("Mute music and ambience")
+        self.mute_checkbox.setObjectName("muteAudioPreference")
+        self.mute_checkbox.setAccessibleName("Mute music and ambience")
+        self.mute_checkbox.toggled.connect(self._audio_changed)
+        form.addRow(semantic_label("Audio", text_role="body"), self.mute_checkbox)
+
         self.content_layout.addLayout(form)
         self.content_layout.addWidget(
             semantic_label(
@@ -219,6 +236,35 @@ class SettingsPanel(DashboardPanel):
         reset.setToolTip("Reset splitters, tabs, navigation, theme, and font size")
         reset.clicked.connect(self.reset_requested)
         self.content_layout.addWidget(reset)
+
+    def _volume_slider(self, object_name: str, accessible_name: str) -> QSlider:
+        slider = QSlider(Qt.Orientation.Horizontal)
+        slider.setObjectName(object_name)
+        slider.setAccessibleName(accessible_name)
+        slider.setRange(0, 100)
+        slider.setPageStep(10)
+        slider.valueChanged.connect(self._audio_changed)
+        return slider
+
+    def _audio_changed(self, *_args: object) -> None:
+        self.audio_requested.emit(
+            self.music_volume_slider.value(),
+            self.ambience_volume_slider.value(),
+            self.mute_checkbox.isChecked(),
+        )
+
+    def select_audio(self, music: int, ambience: int, muted: bool) -> None:
+        for widget, value in (
+            (self.music_volume_slider, music),
+            (self.ambience_volume_slider, ambience),
+            (self.mute_checkbox, muted),
+        ):
+            widget.blockSignals(True)
+            if isinstance(widget, QSlider):
+                widget.setValue(int(value))
+            else:
+                widget.setChecked(bool(value))
+            widget.blockSignals(False)
 
     def _theme_changed(self, index: int) -> None:
         theme_id = self.theme_selector.itemData(index)

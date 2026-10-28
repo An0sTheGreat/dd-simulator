@@ -41,6 +41,25 @@ Release 24 uses only assets currently present under
   game is permitted; do not redistribute, resell, or reupload the files as a standalone pack.
 - The application packages them only as integrated in-game icons.
 
+## Music and ambience (Untitled RPG)
+
+- Source: `Untitled RPG/Assets/Audio/Music` and `Audio/Ambience`; provenance in that
+  project's `Assets/Audio/SOURCES.md`.
+- Runtime copies: unchanged files beneath `src/dd_simulator/ui/assets/audio`, copied by
+  `scripts/import_audio.py`; mapping in `music_manifest.json` (see `docs/AUDIO.md`).
+- Supplied as CC0; verify before public release. SOURCES.md records no per-track creator
+  or license for these:
+  - `menu/music_menu.mp3` ("Shores of Yore"), `town/music_village_day.mp3` ("Awakening"),
+    `town/music_village_night.mp3` ("Akash Chamber"),
+    `forest_wilderness/music_forest_day.mp3` ("Faerie Shrine"),
+    `forest_wilderness/music_forest_night.mp3` ("Aural"): from a folder named CC0.
+  - `battle/combat_1_better_tomorrow_metal.ogg` to `battle/combat_7_survive.ogg`: from a
+    folder named CC0, converted to OGG by the Untitled RPG project.
+- Original synthesis by the Untitled RPG project (`generate_audio.py`):
+  `boss/music_boss.wav`, `exploration_cave/music_cave.wav`, the five `ambience/amb_*.wav`
+  loops, and the unused fallbacks `battle/music_combat.wav`,
+  `forest_wilderness/music_forest.wav` and `town/music_village.wav`.
+
 ## UI Pack 3
 
 - Creator: Kibyra.

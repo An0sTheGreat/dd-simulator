@@ -1474,3 +1474,36 @@ QScrollArea#skillDetailList, QWidget#skillDetailListBody,
 QScrollArea#sceneCardScroll, QWidget#sceneCardHost {
     background: transparent;
 }
+
+/* Phase 9: Settings audio volume sliders */
+QSlider#musicVolumeSlider, QSlider#ambienceVolumeSlider {
+    min-height: 22px;
+}
+
+QSlider#musicVolumeSlider::groove:horizontal, QSlider#ambienceVolumeSlider::groove:horizontal {
+    height: 6px;
+    background-color: {{colors.background_secondary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: 3px;
+}
+
+QSlider#musicVolumeSlider::sub-page:horizontal, QSlider#ambienceVolumeSlider::sub-page:horizontal {
+    background-color: {{colors.accent_primary}};
+    border-radius: 3px;
+}
+
+QSlider#musicVolumeSlider::handle:horizontal, QSlider#ambienceVolumeSlider::handle:horizontal {
+    width: 14px;
+    margin: -5px 0;
+    background-color: {{colors.panel_surface_alt}};
+    border: {{geometry.border_width}} solid {{colors.border_highlight}};
+    border-radius: 7px;
+}
+
+QSlider#musicVolumeSlider:focus::handle:horizontal, QSlider#ambienceVolumeSlider:focus::handle:horizontal {
+    border: 2px solid {{colors.accent_primary}};
+}
+
+QSlider#musicVolumeSlider:disabled::sub-page:horizontal, QSlider#ambienceVolumeSlider:disabled::sub-page:horizontal {
+    background-color: {{colors.text_muted}};
+}
