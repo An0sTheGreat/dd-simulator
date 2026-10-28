@@ -78,8 +78,9 @@ def test_phase_three_window_binds_counts_selection_and_tooltips(tmp_path: Path) 
     assert len(equipment) == 9
     assert len(skills) == 8
     assert len(resources) == 5
-    # The quest list is gone from the window; the scene's quest card carries the quest.
-    assert window.findChildren(QuestListItem) == []
+    # The quest list left the dashboard for the Journal page; the scene's quest card carries the quest.
+    assert window.concept_splitter.findChildren(QuestListItem) == []
+    assert window.navigation_pages["journal"].findChildren(QuestListItem)
     assert sum(bool(slot.property("selected")) for slot in inventory) == 1
     assert all(
         widget.hover_card is None

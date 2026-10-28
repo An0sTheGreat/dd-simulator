@@ -67,8 +67,8 @@ def test_redundant_navigation_is_blank_and_campaigns_live_in_settings(tmp_path: 
         "dashboard", "map", "people", "character_sheet", "settings", "journal"
     ]
     assert not {"skills", "quests", "campaigns"} & set(window.page_indices)
-    # Journal is the one tab without a page yet; blank placeholder buttons are gone.
-    assert set(tabs) - set(window.page_indices) == {"journal"}
+    # Every tab opens a page; blank placeholder buttons are gone.
+    assert set(tabs) <= set(window.page_indices)
     assert not window.findChildren(QPushButton, "navigationPlaceholderButton")
     assert window.settings_page.isAncestorOf(window.campaign_browser)
     assert abs(window.settings_panel.width() - window.campaign_browser.width()) < 40

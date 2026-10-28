@@ -21,11 +21,13 @@ from dd_simulator.ui.models.presentation import (
     InventorySlotView,
 )
 from dd_simulator.ui.item_icons import item_icon_label
+from dd_simulator.ui.panels.activity_panels import EventLogPanel, RecentEventsPanel
 from dd_simulator.ui.panels.common import highlight_recent_turn, semantic_label
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.state.progression import saving_throw_proficiencies
 from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard, equipped_comparisons
+from dd_simulator.ui.widgets.quest_list import QuestListWidget
 from dd_simulator.ui.widgets.world_map import WorldMapPanel
 
 
@@ -731,6 +733,26 @@ class NpcNavigationPage(NavigationPage):
         self.dialogue_status.style().polish(self.dialogue_status)
 
 
+class JournalPage(NavigationPage):
+    """Quest log beside the filtered event log and the most recent events."""
+
+    def __init__(self, dashboard: DashboardView) -> None:
+        super().__init__(
+            "journalNavigationPage",
+            "JOURNAL",
+            "Quests, objectives, and the recorded history of this campaign.",
+        )
+        self.quest_list = QuestListWidget(dashboard.quest_list)
+        self.event_log = EventLogPanel(dashboard.event_log)
+        self.recent_events = RecentEventsPanel(dashboard.recent_events)
+        columns = QHBoxLayout()
+        columns.setSpacing(8)
+        for widget, stretch in ((self.quest_list, 4), (self.event_log, 5), (self.recent_events, 3)):
+            columns.addWidget(widget, stretch)
+        self.layout.addLayout(columns, 1)
+        self.finish()
+
+
 def create_navigation_pages(dashboard: DashboardView) -> dict[str, NavigationPage]:
     pages: dict[str, NavigationPage] = {}
 
@@ -747,5 +769,6 @@ def create_navigation_pages(dashboard: DashboardView) -> dict[str, NavigationPag
     pages["people"] = people
 
     pages["character_sheet"] = CharacterSheetPage(dashboard)
+    pages["journal"] = JournalPage(dashboard)
 
     return pages

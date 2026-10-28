@@ -190,7 +190,7 @@ def test_navigation_and_tabs_switch_real_content(tmp_path: Path) -> None:
     # The bottom navigation bar (and its placeholders) is gone; the scene tabs navigate.
     assert not hasattr(window, "navigation_buttons")
     assert window.findChildren(object, "navigationPlaceholderButton") == []
-    assert not {"profile", "inventory", "journal", "skills", "quests"} & set(
+    assert not {"profile", "inventory", "skills", "quests"} & set(
         window.page_indices
     )
     assert {"map", "people", "character_sheet", "settings", "crafting"} <= set(

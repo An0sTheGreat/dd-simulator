@@ -2100,6 +2100,16 @@ class MainWindow(QMainWindow):
         target_page: str = "dashboard",
     ) -> None:
         theme_id = str(self.theme_selector.currentData() or "high_fantasy")
+        def event_signature(view: DashboardView) -> tuple[tuple[str, str, str], ...]:
+            return tuple(
+                (event.time_label, event.category, event.summary)
+                for event in (*view.event_log, *view.recent_events)
+            )
+        events_changed = event_signature(dashboard) != event_signature(self.dashboard)
+        journal = self.navigation_pages["journal"]
+        event_filter = journal.event_log.current_filter()
+        event_scroll = journal.event_log.scroll_state()
+        recent_scroll = journal.recent_events.scroll_state()
         inventory_scroll = self.inventory_card.scroll.verticalScrollBar().value()
         splitter_sizes = {"concept_t": self.concept_splitter.sizes()}
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
@@ -2130,6 +2140,14 @@ class MainWindow(QMainWindow):
         people_page = self.navigation_pages.get("people")
         if selected_npc_id and people_page is not None and hasattr(people_page, "open_npc"):
             people_page.open_npc(selected_npc_id)
+        journal = self.navigation_pages["journal"]
+        journal.event_log.set_current_filter(event_filter)
+        if events_changed:
+            QTimer.singleShot(0, journal.event_log.scroll_to_latest)
+            QTimer.singleShot(0, journal.recent_events.scroll_to_latest)
+        else:
+            QTimer.singleShot(0, lambda: journal.event_log.restore_scroll_state(event_scroll))
+            QTimer.singleShot(0, lambda: journal.recent_events.restore_scroll_state(recent_scroll))
         QTimer.singleShot(0, lambda: self._restore_inventory_ui_state(inventory_scroll))
         self.select_theme(theme_id)
         self._show_navigation(

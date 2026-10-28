@@ -1,4 +1,4 @@
-"""Capture the Concept T dashboard at 1600x900 in both shipped themes."""
+"""Capture the Concept T dashboard and Journal page at 1600x900 in both shipped themes."""
 
 from __future__ import annotations
 
@@ -30,9 +30,12 @@ def main() -> int:
             end = time.monotonic() + 1.5
             while time.monotonic() < end:
                 app.processEvents()
-            path = out / f"window-{theme}.png"
-            window.grab().save(str(path))
-            print(path)
+            for page, prefix in (("dashboard", "window"), ("journal", "journal")):
+                window._show_navigation(page)
+                app.processEvents()
+                path = out / f"{prefix}-{theme}.png"
+                window.grab().save(str(path))
+                print(path)
         window.close()
         app.processEvents()
     finally:
