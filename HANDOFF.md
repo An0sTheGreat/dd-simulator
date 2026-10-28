@@ -4,9 +4,8 @@ Last updated: 2026-10-27
 
 ## Current state
 
-- **Release 27 + Phase 29** on branch `phase-29-unsloth` (not merged, not pushed).
-  `main` (pushed to `github.com/An0sTheGreat/dd-simulator`, private) holds the Phase 28
-  baseline. Package version `0.27.0`, database schema **21**.
+- **Release 27 + Phase 29** merged into `main` and pushed to
+  `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.27.0`, database schema **21**.
 - **Local AI providers:** bundled llama.cpp (recommended), existing GGUF, **Unsloth
   Studio (primary external server)**, **LM Studio (secondary)**. All share
   `dd_simulator.local_model.LocalModelClient`, selected by `provider=`
@@ -75,5 +74,5 @@ Last updated: 2026-10-27
 
 ## Next steps
 
-1. Run the manual gate (Known issue 1), then merge `phase-29-unsloth` into `main` and push.
+1. Run the manual gate (Known issue 1).
 2. Phase 30: target hardware profile and final model selection (PROJECT.md).
