@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import os
+
 import pytest
 from PySide6.QtCore import QCoreApplication, QEvent
 from PySide6.QtWidgets import QApplication
+
+
+os.environ.setdefault("DDSIM_DISABLE_AUDIO", "1")
 
 
 @pytest.fixture(autouse=True)

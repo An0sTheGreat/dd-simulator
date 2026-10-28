@@ -7,6 +7,7 @@ what they choose. Audio failure is logged and otherwise silent.
 
 from __future__ import annotations
 
+import functools
 import json
 import logging
 import os
@@ -15,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from PySide6.QtCore import QObject, QTimer, QUrl
+from PySide6.QtGui import QGuiApplication
 
 from dd_simulator.state.encounters import archetype_by_key
 from dd_simulator.ui.location_images import (
@@ -53,10 +55,26 @@ DEFAULT_AMBIENCE_VOLUME = 40
 
 
 def audio_disabled() -> bool:
+    app = QGuiApplication.instance()
     return (
         os.environ.get("DDSIM_DISABLE_AUDIO") == "1"
         or os.environ.get("QT_QPA_PLATFORM") == "offscreen"
+        or (app is not None and app.platformName() in ("offscreen", "minimal"))
     )
+
+
+def _guarded(method: Any) -> Any:
+    """Log and swallow errors: audio must never take the UI down."""
+
+    @functools.wraps(method)
+    def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
+        try:
+            return method(self, *args, **kwargs)
+        except Exception:  # noqa: BLE001
+            LOGGER.exception("Audio %s failed", method.__name__)
+            return None
+
+    return wrapper
 
 
 def load_manifest(path: Path = MANIFEST_PATH) -> dict[str, Any]:
@@ -148,7 +166,11 @@ class MusicController(QObject):
         self.ambience: Path | None = None
         self.players: list[Any] = []
         self._tracks: list[Path] = []
-        self._fade = 1.0
+        self._fade = 1.0  # incoming player level
+        self._fade_out = 0.0  # outgoing player level
+        self._fade_target = 1.0
+        self._last_track_by_context: dict[str, Path] = {}
+        self._invalid_skips = 0
         if not self.enabled:
             return
         try:
@@ -179,29 +201,32 @@ class MusicController(QObject):
             media.mediaStatusChanged.connect(self._media_status_changed)
         self.players = [*self._music, self._ambience_player]
         self._end_status = QMediaPlayer.MediaStatus.EndOfMedia
+        self._invalid_status = QMediaPlayer.MediaStatus.InvalidMedia
+        self._loaded_status = QMediaPlayer.MediaStatus.LoadedMedia
         self._infinite = QMediaPlayer.Loops.Infinite
         self._fade_timer = QTimer(self)
         self._fade_timer.setInterval(FADE_STEP_MS)
         self._fade_timer.timeout.connect(self._fade_step)
 
+    @_guarded
     def update(self, page: str, dashboard: DashboardView | None) -> None:
         """Follow the game state; a no-op when audio is disabled."""
 
-        if not self.enabled:
-            return
-        try:
+        if self.enabled:
             self._update(page, dashboard)
-        except Exception:  # noqa: BLE001
-            LOGGER.exception("Audio update failed")
+
+    def _next_in_context(self) -> Path | None:
+        return next_track(self._tracks, self._last_track_by_context.get(self.context))
 
     def _update(self, page: str, dashboard: DashboardView | None) -> None:
         context = select_context(page, dashboard)
         night = dashboard is not None and is_night(dashboard.location.time_label)
         tracks = context_tracks(self.manifest, context, night)
         self._tracks = tracks
-        if context != self.context or (context not in ROTATING_CONTEXTS and self.track not in tracks):
+        stale = self.track not in tracks and (tracks or self.track is not None)
+        if context != self.context or (context not in ROTATING_CONTEXTS and stale):
             self.context = context
-            self._crossfade_to(next_track(tracks, self.track))
+            self._crossfade_to(self._next_in_context())
         ambience = None
         if dashboard is not None and context != "menu":
             ambience = select_ambience(
@@ -217,29 +242,50 @@ class MusicController(QObject):
 
     def _crossfade_to(self, track: Path | None) -> None:
         self.track = track
+        if track is not None:
+            self._last_track_by_context[self.context] = track
         outgoing, incoming = self._music
         self._music = [incoming, outgoing]
+        # Players swap roles but keep their current levels, so the volume never jumps.
+        self._fade, self._fade_out = self._fade_out, self._fade
         if track is not None:
             incoming.setSource(QUrl.fromLocalFile(str(track)))
             incoming.setLoops(1 if self.context in ROTATING_CONTEXTS else self._infinite)
             incoming.play()
-        self._fade = 0.0
+        else:
+            incoming.stop()
+            self._fade = 0.0
+        self._fade_target = 1.0 if track is not None else 0.0
         self._fade_timer.start()
         self._apply_volumes()
 
+    @_guarded
     def _fade_step(self) -> None:
-        self._fade = min(1.0, self._fade + FADE_STEP_MS / CROSSFADE_MS)
-        if self._fade >= 1.0:
+        step = FADE_STEP_MS / CROSSFADE_MS
+        if self._fade < self._fade_target:
+            self._fade = min(self._fade_target, self._fade + step)
+        self._fade_out = max(0.0, self._fade_out - step)
+        if self._fade >= self._fade_target and self._fade_out <= 0.0:
             self._fade_timer.stop()
             self._music[1].stop()
         self._apply_volumes()
 
+    @_guarded
     def _media_status_changed(self, status: Any) -> None:
-        # Rotating contexts play each track once, then move to a different one.
-        if status == self._end_status and self.sender() is self._music[0]:
-            if self.context in ROTATING_CONTEXTS:
-                self._crossfade_to(next_track(self._tracks, self.track))
+        if self.sender() is not self._music[0]:
+            return
+        if status == self._loaded_status:
+            self._invalid_skips = 0
+        # Rotating contexts play each track once, then move to a different one; an
+        # unplayable file is skipped too, unless every track has failed in a row.
+        rotating = self.context in ROTATING_CONTEXTS
+        if status == self._end_status and rotating:
+            self._crossfade_to(self._next_in_context())
+        elif status == self._invalid_status and rotating and self._invalid_skips < len(self._tracks):
+            self._invalid_skips += 1
+            self._crossfade_to(self._next_in_context())
 
+    @_guarded
     def set_volumes(self, music: int, ambience: int, muted: bool) -> None:
         self.music_volume = min(100, max(0, int(music)))
         self.ambience_volume = min(100, max(0, int(ambience)))
@@ -252,9 +298,10 @@ class MusicController(QObject):
         music = scale * self.music_volume / 100
         incoming, outgoing = self._music
         incoming.audioOutput().setVolume(music * self._fade)
-        outgoing.audioOutput().setVolume(music * (1.0 - self._fade))
+        outgoing.audioOutput().setVolume(music * self._fade_out)
         self._ambience_player.audioOutput().setVolume(scale * self.ambience_volume / 100)
 
+    @_guarded
     def stop(self) -> None:
         if not self.enabled:
             return

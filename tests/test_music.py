@@ -145,6 +145,8 @@ def test_audio_settings_round_trip_and_reset(tmp_path: Path) -> None:
     panel.music_volume_slider.setValue(25)
     panel.ambience_volume_slider.setValue(70)
     panel.mute_checkbox.setChecked(True)
+    assert not preferences_path.exists() or window._audio_save_timer.isActive()
+    window._flush_ui_preferences()
     saved = json.loads(preferences_path.read_text(encoding="utf-8"))["ui"]
     assert (saved["music_volume"], saved["ambience_volume"], saved["audio_muted"]) == (25, 70, True)
     close_window(app, window)
@@ -160,3 +162,114 @@ def test_audio_settings_round_trip_and_reset(tmp_path: Path) -> None:
     assert panel.ambience_volume_slider.value() == audio.DEFAULT_AMBIENCE_VOLUME
     assert not panel.mute_checkbox.isChecked() and not restored.music.muted
     close_window(app, restored)
+
+
+def test_missing_manifest_loads_as_empty(tmp_path: Path) -> None:
+    assert load_manifest(tmp_path / "missing.json") == {}
+
+
+class _Out:
+    def __init__(self) -> None:
+        self.volume = 0.0
+
+    def setVolume(self, value: float) -> None:  # noqa: N802
+        self.volume = value
+
+
+class _Player:
+    def __init__(self) -> None:
+        self.out, self.source, self.playing = _Out(), None, False
+
+    def audioOutput(self) -> _Out:  # noqa: N802
+        return self.out
+
+    def setSource(self, url) -> None:  # noqa: N802
+        self.source = url.toLocalFile()
+
+    def setLoops(self, _loops) -> None:  # noqa: N802
+        pass
+
+    def play(self) -> None:
+        self.playing = True
+
+    def stop(self) -> None:
+        self.playing = False
+
+
+class _Timer:
+    def start(self) -> None:
+        pass
+
+    def stop(self) -> None:
+        pass
+
+
+def _fake_controller() -> MusicController:
+    controller = MusicController(enabled=False)
+    controller.enabled = True
+    controller._music = [_Player(), _Player()]
+    controller._ambience_player = _Player()
+    controller._fade_timer = _Timer()
+    controller._infinite = -1
+    controller._end_status, controller._invalid_status, controller._loaded_status = "end", "bad", "ok"
+    return controller
+
+
+def test_battles_never_open_on_the_previous_battle_track() -> None:
+    controller = _fake_controller()
+    battle = _dashboard(combat=_combat("road_bandit"))
+    calm = _dashboard()
+    previous_opening = None
+    for _ in range(60):
+        controller.update("dashboard", battle)
+        assert controller.context == "battle"
+        assert controller.track != previous_opening
+        previous_opening = controller.track
+        controller.update("dashboard", calm)
+        assert controller.context != "battle"
+
+
+def test_end_of_media_advances_to_a_different_track() -> None:
+    controller = _fake_controller()
+    controller.update("dashboard", _dashboard(combat=_combat("road_bandit")))
+    controller.sender = lambda: controller._music[0]
+    for _ in range(20):
+        before = controller.track
+        controller._media_status_changed("end")
+        assert controller.track != before
+    before = controller.track
+    controller._media_status_changed("bad")
+    assert controller.track != before
+
+
+def test_context_without_tracks_fades_out_instead_of_back_in() -> None:
+    controller = _fake_controller()
+    controller.update("dashboard", _dashboard())
+    controller._fade_step()
+    controller.manifest = {}
+    controller.update("dashboard", _dashboard("forest"))
+    incoming = controller._music[0]
+    assert controller.track is None and not incoming.playing and incoming.out.volume == 0.0
+    for _ in range(100):
+        controller._fade_step()
+    assert all(not player.playing and player.out.volume == 0.0 for player in controller._music)
+
+
+def test_fast_context_switch_does_not_jump_volume() -> None:
+    controller = _fake_controller()
+    controller.update("dashboard", _dashboard())
+    for _ in range(10):
+        controller._fade_step()
+    first = controller._music[0]
+    level = first.out.volume
+    assert level > 0
+    controller.update("dashboard", _dashboard("forest"))
+    assert controller._music[1] is first and first.out.volume == level
+
+
+def test_audio_slots_swallow_errors() -> None:
+    controller = _fake_controller()
+    controller._music = None  # any later use raises
+    controller._fade_step()
+    controller.set_volumes(1, 2, False)
+    controller.stop()

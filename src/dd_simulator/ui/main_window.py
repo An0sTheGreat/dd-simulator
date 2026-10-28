@@ -300,6 +300,10 @@ class MainWindow(QMainWindow):
         self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
         self.audio_muted_preference = False
         self.music = MusicController(self)
+        self._audio_save_timer = QTimer(self)
+        self._audio_save_timer.setSingleShot(True)
+        self._audio_save_timer.setInterval(400)
+        self._audio_save_timer.timeout.connect(self.save_ui_preferences)
         self._resource_animation_starts: dict[str, int] = {}
         self.current_page = "dashboard"
         self._dialog_dim_depth = 0
@@ -2468,6 +2472,7 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Replay Verification", result.message)
 
     def _reset_ui_preferences(self) -> None:
+        self._flush_ui_preferences()
         self.concept_splitter.setSizes(list(CONCEPT_T_SIZES))
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
@@ -2518,7 +2523,12 @@ class MainWindow(QMainWindow):
         self.ambience_volume_preference = ambience
         self.audio_muted_preference = muted
         self.music.set_volumes(music, ambience, muted)
-        self.save_ui_preferences()
+        self._audio_save_timer.start()  # debounce: sliders emit on every tick
+
+    def _flush_ui_preferences(self) -> None:
+        if self._audio_save_timer.isActive():
+            self._audio_save_timer.stop()
+            self.save_ui_preferences()
 
     def _apply_audio_preferences(self) -> None:
         self.settings_panel.select_audio(
@@ -2553,5 +2563,6 @@ class MainWindow(QMainWindow):
             self._local_ai_download_task.cancel()
         self.local_ai_runtime.stop()
         self.music.stop()
+        self._audio_save_timer.stop()
         self.save_ui_preferences()
         super().closeEvent(event)
