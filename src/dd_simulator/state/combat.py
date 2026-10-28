@@ -156,6 +156,17 @@ WEAPON_PROFILES: dict[str, tuple[int, int, int]] = {
 }
 
 
+def player_attack_bonus(strength: int, attack_skill: int, character: sqlite3.Row) -> int:
+    """The player's weapon attack modifier, shared by combat and the paperdoll caption."""
+
+    return (
+        strength
+        + attack_skill
+        + proficiency_bonus(int(character["level"]))
+        + int(character["equipment_attack_bonus"])
+    )
+
+
 class CombatService:
     """Own combat mechanics; the LLM may phrase results but never calculate them."""
 
@@ -630,11 +641,8 @@ class CombatService:
             "current_health": int(health["current_value"]),
             "maximum_health": int(health["maximum_value"]),
             "armor_class": 10 + attributes.get("dexterity", 0) + int(character["equipment_armor_bonus"]),
-            "attack_bonus": (
-                attributes.get("strength", 0)
-                + skills.get("attack", 0)
-                + proficiency_bonus(int(character["level"]))
-                + int(character["equipment_attack_bonus"])
+            "attack_bonus": player_attack_bonus(
+                attributes.get("strength", 0), skills.get("attack", 0), character
             ),
             "damage_dice_count": dice_count,
             "damage_die_size": die_size,

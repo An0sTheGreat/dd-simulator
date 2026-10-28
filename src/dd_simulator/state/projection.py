@@ -13,6 +13,7 @@ from dd_simulator.state.abilities import (
     scaled_definition,
 )
 from dd_simulator.state.character_creation import SKILL_DESCRIPTIONS, plain_name
+from dd_simulator.state.combat import player_attack_bonus
 from dd_simulator.state.database import GameStateDatabase
 from dd_simulator.state.commerce import merchant_price
 from dd_simulator.state.dialogue import SUGGESTED_RESPONSES
@@ -1296,6 +1297,25 @@ class DashboardProjection:
                 biography=str(character["biography"] or ""),
                 backstory=str(character["backstory"] or ""),
                 proficiency_bonus=proficiency_bonus(int(character["level"])),
+                attack_bonus=player_attack_bonus(
+                    next(
+                        (
+                            int(row["modifier"])
+                            for row in attribute_rows
+                            if str(row["name"]).casefold() == "strength"
+                        ),
+                        0,
+                    ),
+                    next(
+                        (
+                            int(row["bonus"])
+                            for row in skill_rows
+                            if str(row["name"]).casefold() == "attack"
+                        ),
+                        0,
+                    ),
+                    character,
+                ),
                 pending_ability_points=int(character["pending_ability_points"]),
                 portrait_path=portrait_path,
             ),
@@ -1417,6 +1437,11 @@ class DashboardProjection:
                     objectives=tuple(objectives_by_quest.get(str(row["id"]), ())),
                     reward_summary=(
                         f"{row['reward_experience']} XP, {row['reward_currency']} gold"
+                        + (
+                            f", {row['reward_faction']} {int(row['reward_reputation']):+d}"
+                            if row["reward_faction"] and int(row["reward_reputation"])
+                            else ""
+                        )
                     ),
                 )
                 for row in quest_rows

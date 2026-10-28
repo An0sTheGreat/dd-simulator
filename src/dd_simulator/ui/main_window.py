@@ -827,7 +827,9 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.character_strip)
         row = QHBoxLayout()
         row.setSpacing(8)
-        self.paperdoll_panel = PaperdollPanel(dashboard.player, dashboard.equipment)
+        self.paperdoll_panel = PaperdollPanel(
+            dashboard.player, dashboard.equipment, attack_bonus=dashboard.player.attack_bonus
+        )
         self.skill_detail_list = SkillDetailList(dashboard.skills)
         row.addWidget(self.paperdoll_panel)
         row.addWidget(self.skill_detail_list, 1)

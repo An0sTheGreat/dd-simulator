@@ -64,6 +64,7 @@ class PlayerSummaryView:
     biography: str = ""
     backstory: str = ""
     proficiency_bonus: int = 2
+    attack_bonus: int | None = None
     pending_ability_points: int = 0
     # Confirmed Visual Registry portrait, else a codex fallback; empty means initials.
     portrait_path: str = ""
