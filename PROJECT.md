@@ -42,7 +42,7 @@ These documents define the project requirements, implementation constraints, arc
 
 ## Existing Work
 
-Release 27 (package version 0.27.0, database schema 21) is implemented and packaged.
+Release 28 (package version 0.28.0, database schema 24) is implemented and packaged on branch `ui-concept-t`; Release 27 (schema 21) is the last release on `main`.
 Canonical Workflow Steps 1–19 are complete; Releases 20–27 are gameplay and presentation
 expansions. Implemented and covered by the pytest suite and packaged smoke tests:
 
@@ -105,6 +105,8 @@ Required behavior:
   from `dist`.
 
 ### Phase 30 — Concept T dashboard
+
+Status: complete except the README screenshots (Release 28, 0.28.0).
 
 Rebuild the Adventure dashboard as the approved Concept T, following `docs/UI_REDESIGN_PLAN.md` (plan Phases 1–7b).
 

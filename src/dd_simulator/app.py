@@ -232,6 +232,8 @@ def main() -> int:
     window.show()
     if "--smoke-test-preset-campaign" in sys.argv:
         QTimer.singleShot(50, lambda: _run_character_creation_smoke(app, window, preset=True))
+    elif "--smoke-test-release28" in sys.argv:
+        QTimer.singleShot(50, lambda: _run_release_twenty_eight_smoke(app, window))
     elif "--smoke-test-release27" in sys.argv:
         QTimer.singleShot(50, lambda: _run_release_twenty_six_smoke(app, window))
     elif "--smoke-test-release26-9-4" in sys.argv:
@@ -311,6 +313,45 @@ def main() -> int:
     elif "--smoke-test" in sys.argv:
         QTimer.singleShot(250, app.quit)
     return app.exec()
+
+
+def _run_release_twenty_eight_smoke(app: QApplication, window: MainWindow) -> None:
+    """Verify the packaged Concept T dashboard regions, conversation, journal and tooltips."""
+
+    try:
+        from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard
+        from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
+
+        service = window.game_state_service
+        if service is None or service.database.schema_version() != LATEST_SCHEMA_VERSION:
+            raise RuntimeError("Packaged Release 28 database startup check failed")
+        for region in (
+            "character_strip", "paperdoll_panel", "skill_detail_list", "inventory_card",
+            "powers_card", "scene_view", "conversation_view",
+        ):
+            if getattr(window, region, None) is None:
+                raise RuntimeError(f"Packaged Concept T region is missing: {region}")
+        messages = window.dashboard.narrative.messages
+        if not messages or len(window.conversation_view.messages) != len(messages):
+            raise RuntimeError("Packaged conversation does not show the demo messages")
+        window._show_navigation("journal")  # noqa: SLF001 - packaged smoke boundary
+        if window.current_page != "journal" or window.navigation_pages["journal"] is None:
+            raise RuntimeError("Packaged Journal page did not open")
+        item = next((slot for slot in window.dashboard.inventory if slot.name), None)
+        if item is None or not window.dashboard.abilities:
+            raise RuntimeError("Packaged dashboard has no item or ability for tooltips")
+        ItemHoverCard(item, window)
+        AbilityHoverCard(window.dashboard.abilities[0], window)
+        campaign_id = service.campaigns.active_campaign_id()
+        older = service.older_messages(campaign_id, window.dashboard.location.turn_number)
+        if not isinstance(older, tuple):
+            raise RuntimeError("Packaged older_messages did not return a tuple")
+    except Exception:
+        LOGGER.exception("Packaged Release 28 smoke test failed")
+        app.exit(28)
+        return
+    window.close()
+    app.quit()
 
 
 def _run_release_twenty_six_smoke(app: QApplication, window: MainWindow) -> None:

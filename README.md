@@ -55,10 +55,12 @@ named executable under `build` is a PyInstaller intermediate and cannot run on i
 - **Character Creation** has four tabs: Local AI Model Selection (required), Character
   Sheet (27-point buy, class hit dice), Campaign (premise, optional full-campaign
   generation), and Final Review with explicit confirmation.
-- **Adventure dashboard** — narrative and player action, six suggested actions,
-  objectives, Event Log, location artwork, inventory (36 slots per page), 3 x 3 equipment
-  board, skills, combat, crafting, and resource bars. All splitters are draggable and
-  saved.
+- **Adventure dashboard** — left: character strip, paperdoll, skills with descriptions,
+  a scrolling 5 x 5 inventory (up to 320 slots) and an Abilities & Spells card with Short
+  Rest. Right: tabs over the location art, a quest or encounter card, a conversation that
+  fades into the scene with scroll-back history, and a 2 x 3 choice grid. Item, ability
+  and skill tooltips share one card style. The Journal tab holds the event log and quests;
+  crafting is on the Character Sheet. Splitters are draggable and saved.
 - **People, Map, Character Sheet, Settings** — NPC conversations and trade, route travel,
   the live sheet, and model selection, evaluation, checkpoints, repair, diagnostics
   export, theme (Modern Fantasy Simple / Modern Dark Simple), and font scaling (75–150%).
