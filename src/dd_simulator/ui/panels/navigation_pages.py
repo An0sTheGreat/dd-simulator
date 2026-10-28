@@ -117,6 +117,20 @@ def _lines(layout: QVBoxLayout, rows: tuple[tuple[str, str], ...]) -> None:
     layout.addLayout(grid)
 
 
+def _two_columns(layout: QVBoxLayout, widgets: list[QWidget]) -> None:
+    """Lay widgets out row by row in two equal columns."""
+
+    grid = QGridLayout()
+    grid.setContentsMargins(0, 0, 0, 0)
+    grid.setHorizontalSpacing(10)
+    grid.setVerticalSpacing(5)
+    for index, widget in enumerate(widgets):
+        grid.addWidget(widget, index // 2, index % 2)
+    grid.setColumnStretch(0, 1)
+    grid.setColumnStretch(1, 1)
+    layout.addLayout(grid)
+
+
 class CharacterSheetPage(NavigationPage):
     """Original, read-only 5E-inspired view of authoritative campaign state."""
 
@@ -245,17 +259,20 @@ class CharacterSheetPage(NavigationPage):
         if not weapons:
             attacks_layout.addWidget(plain_label("No damaging weapon equipped.", "pageCardMeta"))
 
-        # Lives inside the Skills card, beneath the skill rows.
+        # The second section of the Equipment card, beneath the worn items.
         powers = QWidget()
         powers.setObjectName("characterSheetPowers")
         powers.setAccessibleName("Abilities & Spells")
         powers_layout = QVBoxLayout(powers)
-        powers_layout.setContentsMargins(0, 4, 0, 0)
+        powers_layout.setContentsMargins(0, 8, 0, 0)
         powers_layout.setSpacing(5)
         powers_layout.addWidget(_heading("Abilities & Spells", len(dashboard.combat_skills)))
-        for action in dashboard.combat_skills:
-            effect = next((value for key, value in action.stats if key == "Effect"), "")
-            powers_layout.addWidget(PowerEntry(action, detail=effect or None))
+        _two_columns(powers_layout, [
+            PowerEntry(action, detail=next(
+                (value for key, value in action.stats if key == "Effect"), ""
+            ) or None)
+            for action in dashboard.combat_skills
+        ])
         if not dashboard.combat_skills:
             powers_layout.addWidget(plain_label("No abilities unlocked.", "pageCardMeta"))
 
@@ -269,15 +286,18 @@ class CharacterSheetPage(NavigationPage):
 
         equipped = tuple(slot for slot in dashboard.equipment if slot.item_name)
         equipment, equipment_layout = codex_card("Equipment", "characterSheetSection", count=len(equipped))
+        worn = []
         for slot in equipped:
             rarity = slot.item.rarity if slot.item else "common"
             category = slot.item.item_type if slot.item else "misc"
-            equipment_layout.addWidget(icon_row(
+            worn.append(icon_row(
                 item_icon_label(str(slot.item_name), rarity=rarity, category=category, context=slot.slot_name, size=30),
                 str(slot.item_name), slot.slot_name, rarity=rarity,
             ))
+        _two_columns(equipment_layout, worn)
         if not equipped:
             equipment_layout.addWidget(plain_label("No equipment worn.", "pageCardMeta"))
+        equipment_layout.addWidget(powers)
 
         carried = tuple(item for item in dashboard.inventory_preview if not item.is_empty)
         possessions, possessions_layout = codex_card(
@@ -298,7 +318,6 @@ class CharacterSheetPage(NavigationPage):
             # The sheet shows the total with bonuses, as it always has.
             row.value_label.setText(f"{skill.level + skill.bonus:+d}")
             skills_layout.addWidget(row)
-        skills_layout.addWidget(powers)
 
         # The right half runs top to bottom on its own, so its columns are not held to
         # the height of the Identity and Ability Scores stack on the left.
@@ -308,7 +327,7 @@ class CharacterSheetPage(NavigationPage):
         )):
             grid.addLayout(_stack(*cards), 1, column)
             grid.setColumnStretch(column, 1)
-        for column, cards in ((2, (attacks, equipment)), (3, (vitals, skills))):
+        for column, cards in ((2, (vitals, skills)), (3, (attacks, equipment))):
             grid.addLayout(_stack(*cards), 0, column, 2, 1)
             grid.setColumnStretch(column, 1)
         grid.setRowStretch(1, 1)

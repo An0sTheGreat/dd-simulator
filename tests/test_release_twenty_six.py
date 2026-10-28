@@ -65,16 +65,21 @@ def test_character_sheet_card_order_at_1600x900(tmp_path: Path) -> None:
     _, scores, _ = card("Ability Scores")
     assert scores.x() == identity.x() and scores.y() >= identity_end.y()
     _, attacks, attacks_end = card("Weapon Attacks")
-    _, vitals, _ = card("Combat Summary")
-    _, equipment, _ = card("Equipment")
-    skills_widget, skills, _ = card("Skills")
+    _, vitals, vitals_end = card("Combat Summary")
+    equipment_widget, equipment, _ = card("Equipment")
+    _, skills, _ = card("Skills")
     half = surface.width() / 2
-    assert attacks.x() >= half - 4 and attacks_end.x() <= vitals.x()
+    # Combat Summary and Skills on the left of the right half, Weapon Attacks and
+    # Equipment (with Abilities & Spells) on its right.
+    assert vitals.x() >= half - 4 and vitals_end.x() <= attacks.x()
     assert attacks.y() == vitals.y()
     assert equipment.y() >= attacks_end.y() and equipment.x() == attacks.x()
     assert skills.y() > vitals.y() and skills.x() == vitals.x()
-    powers = skills_widget.findChild(QWidget, "characterSheetPowers")
-    assert powers is not None and powers.mapTo(surface, powers.rect().topLeft()).y() > skills.y() + 40
+    powers = equipment_widget.findChild(QWidget, "characterSheetPowers")
+    assert powers is not None and powers.mapTo(surface, powers.rect().topLeft()).y() > equipment.y() + 40
+    # Both sections lay their entries out in two columns.
+    rows = [w for w in equipment_widget.findChildren(QWidget, "pageCardName") if w.isVisible()]
+    assert len({w.mapTo(surface, w.rect().topLeft()).x() for w in rows}) == 2
     _, role, role_end = card("Role & Character")
     _, possessions, _ = card("Possessions & Currency")
     assert possessions.x() == role.x() and possessions.y() >= role_end.y()
