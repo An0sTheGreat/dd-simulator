@@ -228,6 +228,8 @@ def main() -> int:
             ),
         ),
     )
+    if any(argument.startswith("--smoke-test") for argument in sys.argv):
+        os.environ.setdefault("DDSIM_DISABLE_AUDIO", "1")  # smoke runs stay silent
     app, window, _theme_manager = build_application(config_dir=config_dir)
     window.show()
     if "--smoke-test-preset-campaign" in sys.argv:
