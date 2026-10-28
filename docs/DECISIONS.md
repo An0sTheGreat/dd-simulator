@@ -51,14 +51,14 @@ Release 21 makes crafting application-owned SQLite state. Recipes, ingredient an
 requirements, check targets, campaign modifiers, material consumption, item quality,
 rarity, output, and Crafting XP are deterministic and committed atomically. Unsloth Studio
 does not resolve or modify crafting. Results remain pending until acknowledged. The
-People page uses a saved vertical splitter between a centered one-third-width Trade
+People page uses a saved vertical splitter between a centered half-width Trade
 region and a full-width conversation region.
 
 Release 20 is the first post-workflow gameplay expansion. Merchant stock, prices,
 bartering, item transfers, and currency are application-owned SQLite state. Unsloth Studio
 is limited to existing NPC prose. Trades use explicit confirmation and one atomic
-transaction. Navigation return controls and People responses use centered
-one-third-width footers.
+transaction. Navigation return controls sit in a compact top-right page action bar; People
+responses use a centered half-width footer.
 
 Release 19 completes canonical Workflow Step 19. PyInstaller remains a one-folder
 distribution; only `dist\DnDSimulator\DnDSimulator.exe` is runnable. Startup verifies

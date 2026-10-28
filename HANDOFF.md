@@ -4,11 +4,21 @@ Last updated: 2026-10-28
 
 ## Current state
 
-- **Branch `page-nav-top` (unmerged):** page actions in a top-right `pageActionBar`; Character
-  Sheet and Map restyled as Concept T codex cards via the shared `codex_card()` /
-  `icon_row()` / `plain_label()` helpers in `ui/widgets/codex_cards.py` (QSS:
-  `QFrame[pageCard="true"]`, `pageCard*` labels, `navigationPageTitle/Subtitle`). People,
-  Journal, Settings and Crafting still use the old section frames (part 2).
+- **UI fixes (branch `integration-ui-fixes`):**
+  - Music and ambience play on a perceptual volume curve (`audio.output_gain`); defaults
+    music 35, ambience 30.
+  - Hover cards no longer pop an empty native window (the subtitle label was shown before
+    it had a parent); native tooltips are suppressed while a card is open.
+  - Inventory card: whole square rows clear of the real scrollbar width, rows fit to the
+    card height, well art spread to just inside each slot's outer edge, icons refit on
+    theme change.
+  - Every page's Return to Adventure / Crafting / Back buttons sit in one compact top-right
+    `pageActionBar` (`navigation_pages.page_action_bar`).
+  - Character Sheet, Map, People, Journal, Settings and Crafting restyled as Concept T codex
+    cards (`codex_card()`, `make_codex_card()`, `icon_row()`, `plain_label()` in
+    `ui/widgets/codex_cards.py`). People Trade and Your Reply are half the page width;
+    suggested replies wrap (`WrappingButton`).
+  - `--smoke-test-release21` fixed (it measured a Trade panel queued for deletion).
 
 - **Release 28 + Phases 31-32** merged into `main` (`412212e`) and pushed to
   `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.28.0`, database
@@ -25,14 +35,9 @@ Last updated: 2026-10-28
   Studio (primary external server)**, **LM Studio (secondary)**. All share
   `dd_simulator.local_model.LocalModelClient`, selected by `provider=`
   (`"openai"` for llama.cpp, `"unsloth"`, `"lm_studio"`).
-- **Page action bar** (branch `page-nav-top`): Return to Adventure, Crafting and Back
-  sit in one compact top-right `pageActionBar` row on Map, People, Character Sheet,
-  Journal, Crafting and Settings (`navigation_pages.page_action_bar`). The old
-  `navigationFooter`, `settingsCenteredFooter`, `craftingCenteredFooter` and
-  `characterSheetCraftingFooter` hosts are gone; full suite not yet rerun on it.
-- **Tests:** 465 passed, 0 failed (full suite, offscreen, 2026-10-28).
-- **Packaged build** (`dist/DnDSimulator`, 592 MB) rebuilt from the merged tree. These
-  smoke switches exit 0: `--smoke-test`, `--smoke-test-release27`,
+- **Tests:** 479 passed, 0 failed (full suite, offscreen, 2026-10-28, `integration-ui-fixes`).
+- **Packaged build** (`dist/DnDSimulator`) rebuilt from `integration-ui-fixes`. These smoke
+  switches exit 0: `--smoke-test`, `--smoke-test-release21`, `--smoke-test-release27`,
   `--smoke-test-release28`, `--smoke-test-preset-campaign`,
   `--smoke-test-character-creation`, `--smoke-test-combat`.
 

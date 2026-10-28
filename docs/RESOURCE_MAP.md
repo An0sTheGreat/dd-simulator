@@ -69,7 +69,7 @@ structurally inspected before implementation.
 - Release 21 adds persistent application-owned crafting recipes, ingredients, tools,
   deterministic checks, atomic outputs, Crafting XP, Event Log/audit coverage, and a
   durable themed result acknowledgement. It also adds a saved People-page splitter
-  without changing the centered one-third-width Trade region.
+  without changing the centered Trade region (half width since the Concept T page restyle).
 - Release 22 consolidates duplicate navigation in accordance with the approved dense
   dashboard: skill XP appears on the shared Adventurer Tools cards, Quests remains on
   the adventure dashboard, disabled footer placeholders preserve alignment, and the
