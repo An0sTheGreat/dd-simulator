@@ -1,7 +1,7 @@
 """Focused in-application pages opened by bottom navigation."""
 
 from PySide6.QtCore import QEvent, QRect, Qt, Signal
-from PySide6.QtGui import QCursor
+from PySide6.QtGui import Qt as GuiQt, QCursor
 from PySide6.QtWidgets import (
     QApplication,
     QFrame,
@@ -656,7 +656,7 @@ class NpcNavigationPage(NavigationPage):
         for index, response in enumerate(conversation.suggested_responses):
             button = WrappingButton(response, role="secondary", object_name="npcSuggestedResponse")
             button.setEnabled(npc.available)
-            button.setToolTip(response)
+            button.setToolTip(GuiQt.convertFromPlainText(response))
             button.clicked.connect(
                 lambda _checked=False, text=response: self.dialogue_requested.emit(self.selected_id, text)
             )

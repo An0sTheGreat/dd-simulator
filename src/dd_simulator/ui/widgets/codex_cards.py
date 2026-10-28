@@ -47,6 +47,7 @@ def _heading(title: str, count: int | None = None) -> QWidget:
     layout.setSpacing(8)
     label = QLabel(title.upper())
     label.setObjectName("codexCardHeading")
+    label.setTextFormat(Qt.TextFormat.PlainText)
     layout.addWidget(label)
     divider = QFrame()
     divider.setObjectName("codexCardDivider")
@@ -55,6 +56,7 @@ def _heading(title: str, count: int | None = None) -> QWidget:
     if count is not None:
         number = QLabel(str(count))
         number.setObjectName("codexCardCount")
+        number.setTextFormat(Qt.TextFormat.PlainText)
         number.setAccessibleName(f"{count} {title.casefold()}")
         layout.addWidget(number)
     return row

@@ -19,6 +19,7 @@ from dd_simulator.ui.widgets.codex_cards import (
     CodexCardRow,
     InventoryCard,
     PowersCard,
+    codex_card,
 )
 from dd_simulator.ui.widgets.inventory_grid import INVENTORY_SLOT_MIME, well_inset
 
@@ -226,6 +227,42 @@ def test_codex_card_row_keeps_both_cards_at_equal_height() -> None:
     QApplication.processEvents()
     assert row.inventory_card.height() == row.powers_card.height() == 390
     assert CARD_COLUMNS == 5
+
+
+def test_codex_card_heading_and_count_are_plain_text() -> None:
+    app()
+    card, _layout = codex_card("<b>x</b>", "someCard", count=3)
+    heading = card.findChild(QLabel, "codexCardHeading")
+    count = card.findChild(QLabel, "codexCardCount")
+    assert heading.textFormat() == Qt.TextFormat.PlainText
+    assert count.textFormat() == Qt.TextFormat.PlainText
+
+
+def test_inventory_icons_refit_when_the_theme_changes(tmp_path: Path) -> None:
+    application = app()
+    manager = ThemeManager(
+        themes_root=THEMES_ROOT, preferences_path=tmp_path / "prefs.json",
+        default_theme_id="high_fantasy",
+    )
+    try:
+        for first, second in (("high_fantasy", "modern_proof"), ("modern_proof", "high_fantasy")):
+            manager.apply_loaded_theme(application, manager.load_theme(first), persist=False)
+            card = shown_card(bag(3))
+            manager.apply_loaded_theme(application, manager.load_theme(second), persist=False)
+            QApplication.processEvents()
+            slots = [slot for slot in card.grid.slots if not slot.item.is_empty]
+            assert slots
+            for slot in slots:
+                inner = slot.contentsRect()
+                side = min(inner.width(), inner.height())
+                icon = slot.icon_label.geometry()
+                where = f"{first}->{second}"
+                assert abs(icon.width() - side * 7 // 8) <= 1, where
+                assert inner.contains(icon), where
+            card.close()
+            card.deleteLater()
+    finally:
+        application.setStyleSheet("")
 
 
 def _rect_in(widget, ancestor) -> QRect:  # type: ignore[no-untyped-def]

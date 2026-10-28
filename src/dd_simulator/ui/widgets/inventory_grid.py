@@ -481,6 +481,13 @@ class InventorySlotWidget(QFrame):
         super().resizeEvent(event)
         self._place_well()
 
+    def changeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().changeEvent(event)
+        # slots are fixed-size, so a theme switch (new frame width) never resizes the well
+        if event.type() == QEvent.Type.StyleChange:
+            self._place_well()
+            self._fit_to_frame()
+
     def _fit_to_frame(self) -> None:
         # the icon keeps to the frame's inside, so it never covers the bronze rim
         inner = self.contentsRect()
