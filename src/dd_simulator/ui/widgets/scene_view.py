@@ -8,6 +8,7 @@ import re
 from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, Qt, Property, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
+    QScrollArea,
     QApplication,
     QButtonGroup,
     QFrame,
@@ -138,6 +139,10 @@ def _clear_layout(layout) -> None:  # type: ignore[no-untyped-def]
             _clear_layout(item.layout())
 
 
+CONVERSATION_MIN_HEIGHT = 150
+SCENE_CARD_WIDTH = 340
+
+
 class NavTabs(QWidget):
     """Adventure / Map / People / Character Sheet / Settings / Journal, plus the clock label."""
 
@@ -260,7 +265,7 @@ class _SceneCard(QFrame):
         super().__init__()
         self.setObjectName(object_name)
         self.setProperty("sceneCard", True)
-        self.setFixedWidth(340)
+        self.setMaximumWidth(SCENE_CARD_WIDTH)
         self.body = QVBoxLayout(self)
         self.body.setContentsMargins(12, 10, 12, 10)
         self.body.setSpacing(4)
@@ -719,7 +724,8 @@ class SceneView(QWidget):
         location_row.setSpacing(16)
         heading = QVBoxLayout()
         heading.setSpacing(2)
-        self.title = _shadowed(_label("", "sceneLocationTitle"), 14)
+        # Wraps rather than clipping long names when the column is narrow.
+        self.title = _shadowed(_label("", "sceneLocationTitle", wrap=True), 14)
         self.subtitle = _shadowed(_label("", "sceneLocationSubtitle", wrap=True), 8)
         heading.addWidget(self.title)
         heading.addWidget(self.subtitle)
@@ -738,10 +744,24 @@ class SceneView(QWidget):
         location_row.addLayout(heading, 1)
         self.quest_card = QuestProgressCard(quest, reward_chips(quest_list))
         self.encounter_card: EncounterCard | None = None
-        self.card_slot = QVBoxLayout()
+        # The card scrolls rather than squeezing the conversation on short windows.
+        self.card_scroll = QScrollArea()
+        self.card_scroll.setObjectName("sceneCardScroll")
+        self.card_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.card_scroll.setWidgetResizable(True)
+        self.card_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.card_scroll.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        self.card_scroll.setFixedWidth(SCENE_CARD_WIDTH)
+        self.card_scroll.viewport().setAutoFillBackground(False)
+        cards = QWidget()
+        cards.setObjectName("sceneCardHost")
+        cards.setAutoFillBackground(False)
+        self.card_slot = QVBoxLayout(cards)
         self.card_slot.setContentsMargins(0, 0, 0, 0)
         self.card_slot.addWidget(self.quest_card)
-        location_row.addLayout(self.card_slot)
+        self.card_slot.addStretch(1)
+        self.card_scroll.setWidget(cards)
+        location_row.addWidget(self.card_scroll)
         layout.addLayout(location_row)
 
         self.conversation_slot = QVBoxLayout()
@@ -813,7 +833,7 @@ class SceneView(QWidget):
             if self.encounter_card is None:
                 self.encounter_card = EncounterCard(encounter, self.choice_grid.target_id)
                 self.encounter_card.target_selected.connect(self.select_target)
-                self.card_slot.addWidget(self.encounter_card)
+                self.card_slot.insertWidget(0, self.encounter_card)
             else:
                 self.encounter_card.set_encounter(encounter, self.choice_grid.target_id)
             self.encounter_card.show()
@@ -849,7 +869,14 @@ class SceneView(QWidget):
         self.conversation_slot.removeWidget(self.conversation_placeholder)
         self.conversation_placeholder.deleteLater()
         self.conversation_placeholder = widget
+        widget.setMinimumHeight(CONVERSATION_MIN_HEIGHT)
         self.conversation_slot.addWidget(widget)
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        # Narrow scene (1280 px window): the card yields width to the location heading.
+        width = round(0.45 * (self.width() - 40))
+        self.card_scroll.setFixedWidth(max(240, min(SCENE_CARD_WIDTH, width)))
 
     def paintEvent(self, _event) -> None:  # type: ignore[no-untyped-def]
         painter = QPainter(self)

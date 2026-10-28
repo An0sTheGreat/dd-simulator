@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from dataclasses import replace
 import ctypes
 from pathlib import Path
+import math
 import re
 import sys
 import zipfile
@@ -95,8 +96,16 @@ from dd_simulator.ui.services.local_ai_worker import (
 )
 from dd_simulator.ui.themes.theme_schema import ThemeDefinition
 from dd_simulator.ui.widgets.inventory_grid import EquipmentGrid, InventoryGrid
-from dd_simulator.ui.widgets.codex_cards import CodexCardRow, InventoryCard, PowersCard
+from dd_simulator.ui.widgets.codex_cards import (
+    CARD_SLOT_SIZE,
+    CARD_SLOT_SPACING,
+    CARD_VISIBLE_ROWS,
+    CodexCardRow,
+    InventoryCard,
+    PowersCard,
+)
 from dd_simulator.ui.widgets.codex_character import (
+    PAPERDOLL_HEIGHT,
     CharacterStrip,
     PaperdollPanel,
     SkillDetailList,
@@ -129,6 +138,40 @@ WS_SYSMENU = 0x00080000
 NATIVE_SNAP_STYLE = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU
 # Concept T: codex column about 724 px beside the scene at the 1600 px design width.
 CONCEPT_T_SIZES = (724, 876)
+
+
+class CodexColumn(QWidget):
+    """Left column; scales the paperdoll and bag slots together to fit its height."""
+
+    def bind(self, strip, paperdoll, inventory) -> None:  # type: ignore[no-untyped-def]
+        self._parts = (strip, paperdoll, inventory)
+
+    def fit(self) -> None:
+        parts = getattr(self, "_parts", None)
+        if parts is None:
+            return
+        strip, paperdoll, inventory = parts
+        margins = self.layout().contentsMargins()
+        spacing = self.layout().spacing()
+        card_chrome = inventory.sizeHint().height() - inventory.scroll.height()
+        free = (
+            self.height() - margins.top() - margins.bottom() - 2 * spacing
+            - strip.sizeHint().height() - card_chrome
+        )
+        # paperdoll height plus five bag rows, both linear in the scale
+        rows = CARD_VISIBLE_ROWS * CARD_SLOT_SIZE
+        fixed = CARD_VISIBLE_ROWS * CARD_SLOT_SPACING - CARD_SLOT_SPACING
+        scale = math.floor(20 * (free - fixed) / (PAPERDOLL_HEIGHT + rows)) / 20
+        paperdoll.set_scale(scale)
+        inventory.set_scale(scale)
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        self.fit()
+
+    def showEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().showEvent(event)
+        self.fit()
 
 
 class SkillCheckPopup(QDialog):
@@ -818,7 +861,7 @@ class MainWindow(QMainWindow):
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setObjectName("conceptTSplitter")
         splitter.setChildrenCollapsible(False)
-        codex = QWidget()
+        codex = CodexColumn()
         codex.setObjectName("conceptTCodex")
         layout = QVBoxLayout(codex)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -842,6 +885,7 @@ class MainWindow(QMainWindow):
         self.powers_card = PowersCard(dashboard.abilities, dashboard.spells)
         self.codex_card_row = CodexCardRow(self.inventory_card, self.powers_card)
         layout.addWidget(self.codex_card_row, 1)
+        codex.bind(self.character_strip, self.paperdoll_panel, self.inventory_card)
 
         self.scene_view = SceneView(
             dashboard.location,

@@ -14,6 +14,7 @@ from dd_simulator.app import build_application
 from dd_simulator.state import GameStateDatabase, GameStateService, ProposedStateChange
 from dd_simulator.state.combat import CombatService, EnemySpec
 from dd_simulator.ui.main_window import MainWindow
+from dd_simulator.ui.widgets.scene_view import CONVERSATION_MIN_HEIGHT
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
 from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
 from dd_simulator.ui.themes.theme_manager import ThemeManager
@@ -243,3 +244,43 @@ def test_concept_splitter_sizes_persist_across_windows(tmp_path: Path) -> None:
     for got, want in zip(restored.concept_splitter.sizes(), expected, strict=True):
         assert abs(got - want) <= 4
     close(app, restored)
+
+
+def test_dashboard_fits_1280x720_at_150_percent_font(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.font_size_requested.emit(150)
+    window.resize(1280, 720)
+    window.show()
+    window.controller.navigate("dashboard")
+    for _ in range(3):
+        app.processEvents()
+
+    def rect(widget, ancestor):  # type: ignore[no-untyped-def]
+        return widget.rect().translated(widget.mapTo(ancestor, widget.rect().topLeft()))
+
+    # A layout whose minimum exceeds 1280x720 grows the window instead of fitting it.
+    assert (window.width(), window.height()) == (1280, 720)
+    codex, scene = window.concept_splitter.widget(0), window.scene_view
+    for widget, column in (
+        (window.character_strip, codex), (window.paperdoll_panel, codex),
+        (window.skill_detail_list, codex), (window.codex_card_row, codex),
+        (scene.tabs, scene), (scene.card_scroll, scene),
+        (window.conversation_view, scene), (scene.choice_grid, scene),
+    ):
+        assert widget.width() > 0 and widget.height() > 0, widget.objectName()
+        assert column.rect().contains(rect(widget, column)), widget.objectName()
+    stacked = [
+        rect(w, codex) for w in (window.character_strip, window.paperdoll_panel, window.codex_card_row)
+    ]
+    for upper, lower in zip(stacked, stacked[1:]):
+        assert upper.bottom() < lower.top()
+    assert rect(window.skill_detail_list, codex).bottom() < stacked[2].top()
+    # Rows keep their natural height (the list scrolls) instead of being squeezed together.
+    assert all(r.height() >= r.minimumSizeHint().height() for r in window.skill_detail_list.rows)
+    assert window.paperdoll_panel.scale < 1.0
+    assert window.inventory_card.scroll.height() < 5 * 50
+    assert window.conversation_view.height() >= CONVERSATION_MIN_HEIGHT
+    assert rect(scene.card_scroll, scene).bottom() < rect(window.conversation_view, scene).top()
+    assert rect(window.conversation_view, scene).bottom() < rect(scene.choice_grid, scene).top()
+    window.font_size_requested.emit(100)
+    close(app, window)
