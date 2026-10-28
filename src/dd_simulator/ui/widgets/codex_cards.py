@@ -79,6 +79,12 @@ def codex_card(
 
     card = QFrame()
     card.setObjectName(object_name)
+    return card, make_codex_card(card, title, count=count)
+
+
+def make_codex_card(card: QFrame, title: str, *, count: int | None = None) -> QVBoxLayout:
+    """Turn an existing frame (a panel subclass) into a page card; returns its layout."""
+
     card.setProperty("codexCard", True)
     card.setProperty("pageCard", True)
     card.setAccessibleName(title)
@@ -87,7 +93,7 @@ def codex_card(
     layout.setSpacing(5)
     layout.setAlignment(Qt.AlignmentFlag.AlignTop)
     layout.addWidget(_heading(title, count))
-    return card, layout
+    return layout
 
 
 def icon_row(icon: QWidget, name: str, meta: str, *, rarity: str = "") -> QWidget:

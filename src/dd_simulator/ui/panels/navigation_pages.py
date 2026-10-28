@@ -23,7 +23,7 @@ from dd_simulator.ui.models.presentation import (
 )
 from dd_simulator.ui.item_icons import item_icon_label
 from dd_simulator.ui.panels.activity_panels import EventLogPanel, RecentEventsPanel
-from dd_simulator.ui.panels.common import DashboardPanel, highlight_recent_turn, semantic_label
+from dd_simulator.ui.panels.common import highlight_recent_turn, semantic_label
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.state.progression import saving_throw_proficiencies
@@ -37,15 +37,18 @@ from dd_simulator.ui.widgets.world_map import WorldMapPanel
 class NavigationPage(ThemedFrame):
     back_requested = Signal()
 
-    def __init__(self, object_name: str, title: str, description: str) -> None:
+    def __init__(
+        self, object_name: str, title: str, description: str, *, back: QPushButton | None = None
+    ) -> None:
         super().__init__(object_name, role="content")
         self.setAccessibleName(title)
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(14, 12, 14, 12)
         self.layout.setSpacing(8)
-        back = SemanticButton("Return to Adventure", role="secondary")
-        back.setObjectName("navigationBackButton")
-        back.clicked.connect(self.back_requested)
+        if back is None:  # Settings brings its own back button and signal
+            back = SemanticButton("Return to Adventure", role="secondary")
+            back.setObjectName("navigationBackButton")
+            back.clicked.connect(self.back_requested)
         self.back_button = back
         self.action_bar = page_action_bar(back)
         header = QHBoxLayout()
@@ -722,8 +725,11 @@ class JournalPage(NavigationPage):
         # The tall Journal columns start their entries at the top (same order and scrolling).
         for panel in (self.event_log, self.recent_events):
             panel.scroll_area.widget().layout().setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.quest_panel = DashboardPanel("journalQuestPanel", "QUESTS")
-        self.quest_panel.content_layout.addWidget(self.quest_list, 1)
+        self.quest_panel, quest_layout = codex_card(
+            "Quests", "journalQuestPanel", count=len(dashboard.quest_list)
+        )
+        quest_layout.setAlignment(Qt.AlignmentFlag(0))  # the quest list takes the height
+        quest_layout.addWidget(self.quest_list, 1)
         columns = QHBoxLayout()
         columns.setSpacing(8)
         for widget, stretch in ((self.quest_panel, 4), (self.event_log, 5), (self.recent_events, 3)):

@@ -76,7 +76,6 @@ from dd_simulator.ui.panels.navigation_pages import (
     CharacterSheetPage,
     NavigationPage,
     create_navigation_pages,
-    page_action_bar,
 )
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
 from dd_simulator.ui.panels.local_ai_setup_panel import LocalAiSetupPanel
@@ -425,16 +424,16 @@ class MainWindow(QMainWindow):
             )
             self.campaign_browser.load_requested.connect(self._load_campaign)
             self.campaign_browser.delete_requested.connect(self._delete_campaign)
+        # Title row like every page; the two card columns scroll beneath it.
+        settings_navigation = NavigationPage(
+            "settingsNavigationPage", "SETTINGS", "Application, model, and campaign controls.",
+            back=self.settings_panel.back_button,
+        )
         self.settings_page = QWidget()
         self.settings_page.setObjectName("settingsPage")
-        settings_layout = QVBoxLayout(self.settings_page)
-        settings_layout.setContentsMargins(0, 0, 0, 0)
-        settings_layout.addWidget(
-            page_action_bar(self.settings_panel.back_button), 0, Qt.AlignmentFlag.AlignRight
-        )
-        settings_columns = QWidget()
-        settings_columns_layout = QHBoxLayout(settings_columns)
+        settings_columns_layout = QHBoxLayout(self.settings_page)
         settings_columns_layout.setContentsMargins(0, 0, 0, 0)
+        settings_columns_layout.setSpacing(8)
         self.settings_panel.setSizePolicy(
             QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred
         )
@@ -446,13 +445,13 @@ class MainWindow(QMainWindow):
             settings_columns_layout.addWidget(self.campaign_browser, 1)
         else:
             settings_columns_layout.addStretch(1)
-        settings_layout.addWidget(settings_columns, 1)
         self.settings_scroll = QScrollArea()
         self.settings_scroll.setObjectName("settingsScrollArea")
         self.settings_scroll.setWidgetResizable(True)
         self.settings_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         self.settings_scroll.setWidget(self.settings_page)
-        self.page_indices["settings"] = self.content_stack.addWidget(self.settings_scroll)
+        settings_navigation.layout.addWidget(self.settings_scroll, 1)
+        self.page_indices["settings"] = self.content_stack.addWidget(settings_navigation)
 
         if self.game_state_service is not None:
             self.character_creation_panel = CharacterCreationPanel(self.character_randomizer)

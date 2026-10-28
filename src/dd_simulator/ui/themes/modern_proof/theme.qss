@@ -5,15 +5,8 @@ QWidget#applicationRoot {
     font-size: {{typography.size_body}};
 }
 
-QWidget#settingsPage {
-    background-color: {{colors.panel_surface}};
-    border: {{geometry.border_width}} solid {{colors.border_primary}};
-    border-radius: {{geometry.border_radius_medium}};
-}
-
 QScrollArea#settingsScrollArea,
-QScrollArea#settingsScrollArea QWidget#qt_scrollarea_viewport,
-QFrame#settingsPanel {
+QScrollArea#settingsScrollArea QWidget#qt_scrollarea_viewport {
     background-color: transparent;
     border: none;
 }

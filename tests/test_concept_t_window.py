@@ -521,6 +521,26 @@ def test_crafting_recipes_are_page_cards_with_back_on_the_title_row(tmp_path: Pa
     close(app, window)
 
 
+def test_journal_and_settings_sections_are_page_cards(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    journal = window.navigation_pages["journal"]
+    sections = [journal.quest_panel, journal.event_log, journal.recent_events]
+    settings_cards = window.settings_panel.findChildren(QFrame)
+    sections += [card for card in settings_cards if card.property("pageCard")]
+    sections.append(window.campaign_browser)
+    assert len(sections) == 3 + 4 + 1
+    assert all(card.property("pageCard") and card.property("codexCard") for card in sections)
+    window.controller.navigate("settings")
+    app.processEvents()
+    page = window.content_stack.currentWidget()
+    # Settings has a page title row like the other pages, with Back on it.
+    assert page.findChild(QLabel, "navigationPageTitle").text() == "SETTINGS"
+    assert page.findChild(QPushButton, "settingsBackButton") is window.settings_panel.back_button
+    close(app, window)
+
+
 def test_character_sheet_story_cards_put_each_label_beside_its_value(tmp_path: Path) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.resize(1600, 900)

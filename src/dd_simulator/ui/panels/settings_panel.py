@@ -4,16 +4,27 @@ from collections.abc import Iterable
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
-    QCheckBox, QComboBox, QFormLayout, QHBoxLayout, QSlider, QVBoxLayout
+    QCheckBox, QComboBox, QFormLayout, QHBoxLayout, QLabel, QSlider, QVBoxLayout, QWidget
 )
 
 from dd_simulator.local_model import LocalModelModelInfo, ModelEvaluation
-from dd_simulator.ui.panels.common import DashboardPanel, semantic_label
+from dd_simulator.ui.panels.common import semantic_label
 from dd_simulator.ui.themes.theme_schema import ThemeDefinition
+from dd_simulator.ui.widgets.codex_cards import codex_card, plain_label
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 
 
-class SettingsPanel(DashboardPanel):
+def _row_label(text: str) -> QLabel:
+    return plain_label(text.upper(), "pageCardLabel")
+
+
+def _help(text: str) -> QLabel:
+    return plain_label(text, "pageCardMeta", word_wrap=True)
+
+
+class SettingsPanel(QWidget):
+    """Settings grouped into codex page cards in two columns; the page header is the window's."""
+
     theme_requested = Signal(str)
     font_size_requested = Signal(int)
     reduced_motion_requested = Signal(bool)
@@ -32,12 +43,14 @@ class SettingsPanel(DashboardPanel):
     diagnostic_export_requested = Signal()
 
     def __init__(self, themes: Iterable[ThemeDefinition]) -> None:
-        super().__init__("settingsPanel", "SETTINGS")
-        self.content_layout.addWidget(
-            semantic_label(
-                "Application, model, and campaign controls.",
-                text_role="secondary",
-            )
+        super().__init__()
+        self.setObjectName("settingsPanel")
+        self.setAccessibleName("Settings")
+        model_card, model_layout = codex_card("Local AI Model", "settingsModelCard")
+        display_card, display_layout = codex_card("Display & Accessibility", "settingsDisplayCard")
+        audio_card, audio_layout = codex_card("Audio", "settingsAudioCard")
+        reliability_card, reliability_layout = codex_card(
+            "Campaign Reliability", "settingsReliabilityCard"
         )
         self.startup_status = semantic_label(
             "Startup checks pending.",
@@ -46,22 +59,17 @@ class SettingsPanel(DashboardPanel):
             word_wrap=True,
         )
         self.startup_status.setAccessibleName("Application startup readiness")
-        self.content_layout.addWidget(self.startup_status)
-
-        self.content_layout.addWidget(
-            semantic_label("LOCAL AI MODEL", text_role="heading")
-        )
-        self.content_layout.addWidget(
-            semantic_label(
-                "Review the model provided by llama.cpp, Unsloth Studio, or LM Studio before evaluation or play.",
-                text_role="secondary",
-                word_wrap=True,
-            )
-        )
+        model_layout.addWidget(_help(
+            "Review the model provided by llama.cpp, Unsloth Studio, or LM Studio before evaluation or play."
+        ))
         model_controls = QVBoxLayout()
         self.model_selector = QComboBox()
         self.model_selector.setObjectName("localModelSelector")
         self.model_selector.setAccessibleName("Local AI model")
+        # Long model names elide instead of widening the card's column.
+        self.model_selector.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
         self.model_selector.addItem("Refresh to discover models", "")
         self.model_selector.currentIndexChanged.connect(self._model_changed)
         model_controls.addWidget(self.model_selector)
@@ -79,7 +87,7 @@ class SettingsPanel(DashboardPanel):
         model_controls.addWidget(self.model_refresh_button)
         model_controls.addWidget(self.model_load_button)
         model_controls.addWidget(self.model_evaluate_button)
-        self.content_layout.addLayout(model_controls)
+        model_layout.addLayout(model_controls)
         self.model_status = semantic_label(
             "The local AI provider has not been scanned in this session.",
             object_name="localModelStatus",
@@ -87,21 +95,21 @@ class SettingsPanel(DashboardPanel):
             word_wrap=True,
         )
         self.model_status.setAccessibleName("Local AI model status")
-        self.content_layout.addWidget(self.model_status)
+        model_layout.addWidget(self.model_status)
         configure_local_ai = SemanticButton("Change Local AI Setup", role="secondary")
         configure_local_ai.setObjectName("changeLocalAiSetupButton")
         configure_local_ai.clicked.connect(self.local_ai_setup_requested)
-        self.content_layout.addWidget(configure_local_ai)
-        self.content_layout.addWidget(semantic_label(
+        model_layout.addWidget(configure_local_ai)
+        model_layout.addWidget(_help(
             "Troubleshooting: load exactly one model, refresh the list, then run the "
             "3-sample evaluation. If generation still fails, reload the model and export "
-            "diagnostic logs below.",
-            text_role="secondary", word_wrap=True,
+            "diagnostic logs from Campaign Reliability."
         ))
 
         form = QFormLayout()
         form.setHorizontalSpacing(18)
         form.setVerticalSpacing(10)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)  # narrow column
 
         self.theme_selector = QComboBox()
         self.theme_selector.setObjectName("settingsThemeSelector")
@@ -109,7 +117,7 @@ class SettingsPanel(DashboardPanel):
         for theme in themes:
             self.theme_selector.addItem(theme.name, theme.theme_id)
         self.theme_selector.currentIndexChanged.connect(self._theme_changed)
-        form.addRow(semantic_label("Theme", text_role="body"), self.theme_selector)
+        form.addRow(_row_label("Theme"), self.theme_selector)
 
         font_controls = QHBoxLayout()
         font_controls.setContentsMargins(0, 0, 0, 0)
@@ -130,10 +138,7 @@ class SettingsPanel(DashboardPanel):
         font_controls.addWidget(self.font_size_value)
         font_controls.addStretch(1)
         self._font_size_percent = 100
-        form.addRow(
-            semantic_label("Font size", text_role="body"),
-            font_controls,
-        )
+        form.addRow(_row_label("Font size"), font_controls)
 
         self.reduced_motion_checkbox = QCheckBox("Reduce interface motion")
         self.reduced_motion_checkbox.setObjectName("reducedMotionPreference")
@@ -142,10 +147,7 @@ class SettingsPanel(DashboardPanel):
             "Show resource changes immediately instead of animating them"
         )
         self.reduced_motion_checkbox.toggled.connect(self.reduced_motion_requested)
-        form.addRow(
-            semantic_label("Motion", text_role="body"),
-            self.reduced_motion_checkbox,
-        )
+        form.addRow(_row_label("Motion"), self.reduced_motion_checkbox)
 
         self.high_contrast_checkbox = QCheckBox("Increase interface contrast")
         self.high_contrast_checkbox.setObjectName("highContrastPreference")
@@ -154,44 +156,36 @@ class SettingsPanel(DashboardPanel):
         self.high_contrast_checkbox.setToolTip(
             "High-contrast mode is planned for theme validation"
         )
-        form.addRow(
-            semantic_label("Contrast", text_role="body"), self.high_contrast_checkbox
-        )
+        form.addRow(_row_label("Contrast"), self.high_contrast_checkbox)
+        display_layout.addLayout(form)
+        display_layout.addWidget(_help(
+            "Splitter positions, selected tabs, theme, and font size are restored "
+            "when the application starts."
+        ))
+
+        audio_form = QFormLayout()
+        audio_form.setHorizontalSpacing(18)
+        audio_form.setVerticalSpacing(10)
+        audio_form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)  # narrow column
 
         self.music_volume_slider = self._volume_slider("musicVolumeSlider", "Music volume")
-        form.addRow(semantic_label("Music volume", text_role="body"), self.music_volume_slider)
+        audio_form.addRow(_row_label("Music volume"), self.music_volume_slider)
         self.ambience_volume_slider = self._volume_slider(
             "ambienceVolumeSlider", "Ambience volume"
         )
-        form.addRow(
-            semantic_label("Ambience volume", text_role="body"), self.ambience_volume_slider
-        )
+        audio_form.addRow(_row_label("Ambience volume"), self.ambience_volume_slider)
         self.mute_checkbox = QCheckBox("Mute music and ambience")
         self.mute_checkbox.setObjectName("muteAudioPreference")
         self.mute_checkbox.setAccessibleName("Mute music and ambience")
         self.mute_checkbox.toggled.connect(self._audio_changed)
-        form.addRow(semantic_label("Audio", text_role="body"), self.mute_checkbox)
+        audio_form.addRow(_row_label("Mute"), self.mute_checkbox)
+        audio_layout.addLayout(audio_form)
 
-        self.content_layout.addLayout(form)
-        self.content_layout.addWidget(
-            semantic_label(
-                "Splitter positions, selected tabs, theme, and font size are restored "
-                "when the application starts.",
-                text_role="secondary",
-            )
-        )
-
-        self.content_layout.addWidget(
-            semantic_label("CAMPAIGN RELIABILITY", text_role="heading")
-        )
-        self.content_layout.addWidget(
-            semantic_label(
-                "Campaign state is continuously persisted. Named checkpoints provide "
-                "verified rollback points; repair and replay operate without the local model.",
-                text_role="secondary",
-                word_wrap=True,
-            )
-        )
+        reliability_layout.addWidget(self.startup_status)
+        reliability_layout.addWidget(_help(
+            "Campaign state is continuously persisted. Named checkpoints provide "
+            "verified rollback points; repair and replay operate without the local model."
+        ))
         reliability = QVBoxLayout()
         checkpoint = SemanticButton("Create Checkpoint", role="primary")
         checkpoint.setObjectName("createCheckpointButton")
@@ -217,7 +211,7 @@ class SettingsPanel(DashboardPanel):
         )
         self.export_logs_button.clicked.connect(self.diagnostic_export_requested)
         reliability.addWidget(self.export_logs_button)
-        self.content_layout.addLayout(reliability)
+        reliability_layout.addLayout(reliability)
         self.reliability_status = semantic_label(
             "No reliability operation has run in this session.",
             object_name="reliabilityStatus",
@@ -225,8 +219,7 @@ class SettingsPanel(DashboardPanel):
             word_wrap=True,
         )
         self.reliability_status.setAccessibleName("Campaign reliability status")
-        self.content_layout.addWidget(self.reliability_status)
-        self.content_layout.addStretch(1)
+        reliability_layout.addWidget(self.reliability_status)
 
         self.back_button = SemanticButton("Return to Adventure", role="secondary")
         self.back_button.setObjectName("settingsBackButton")
@@ -235,7 +228,18 @@ class SettingsPanel(DashboardPanel):
         reset.setObjectName("resetUiButton")
         reset.setToolTip("Reset splitters, tabs, navigation, theme, and font size")
         reset.clicked.connect(self.reset_requested)
-        self.content_layout.addWidget(reset)
+        display_layout.addWidget(reset)
+
+        columns = QHBoxLayout(self)
+        columns.setContentsMargins(0, 0, 0, 0)
+        columns.setSpacing(8)
+        for cards in ((model_card, reliability_card), (display_card, audio_card)):
+            column = QVBoxLayout()
+            column.setSpacing(8)
+            for card in cards:
+                column.addWidget(card)
+            column.setStretch(len(cards) - 1, 1)  # columns end level with the Campaigns card
+            columns.addLayout(column, 1)
 
     def _volume_slider(self, object_name: str, accessible_name: str) -> QSlider:
         slider = QSlider(Qt.Orientation.Horizontal)

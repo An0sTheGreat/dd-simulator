@@ -2,6 +2,7 @@
 
 from PySide6.QtCore import QTimer, Qt, Signal
 from PySide6.QtWidgets import (
+    QFrame,
     QLayout,
     QScrollArea,
     QSizePolicy,
@@ -11,14 +12,18 @@ from PySide6.QtWidgets import (
 )
 
 from dd_simulator.ui.models.presentation import EventView
-from dd_simulator.ui.panels.common import DashboardPanel, semantic_label
+from dd_simulator.ui.panels.common import semantic_label
+from dd_simulator.ui.widgets.codex_cards import make_codex_card
 
 
-class EventLogPanel(DashboardPanel):
+class EventLogPanel(QFrame):
     filter_changed = Signal(int)
 
     def __init__(self, events: tuple[EventView, ...]) -> None:
-        super().__init__("eventLogPanel", "EVENT LOG")
+        super().__init__()
+        self.setObjectName("eventLogPanel")
+        self.content_layout = make_codex_card(self, "Event Log")
+        self.content_layout.setAlignment(Qt.AlignmentFlag(0))  # the log scroll takes the height
         self.events = events
         self.filter_names = ("All", "Combat", "System", "Quests", "NPCs")
         tabs = QTabBar()
@@ -109,9 +114,12 @@ class EventLogPanel(DashboardPanel):
         bar.setValue(bar.maximum())
 
 
-class RecentEventsPanel(DashboardPanel):
+class RecentEventsPanel(QFrame):
     def __init__(self, events: tuple[EventView, ...]) -> None:
-        super().__init__("recentEventsPanel", "RECENT EVENTS")
+        super().__init__()
+        self.setObjectName("recentEventsPanel")
+        self.content_layout = make_codex_card(self, "Recent Events", count=len(events))
+        self.content_layout.setAlignment(Qt.AlignmentFlag(0))
         entries_widget = QWidget()
         entries_widget.setObjectName("recentEventEntries")
         entries_widget.setSizePolicy(
