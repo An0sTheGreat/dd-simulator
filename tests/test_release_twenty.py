@@ -122,7 +122,7 @@ def test_people_trade_ui_and_centered_footers(tmp_path: Path) -> None:
     footer = window.findChild(QWidget, "npcCenteredFooter")
     controls = window.findChild(QWidget, "npcBottomControls")
     assert footer is not None and controls is not None
-    assert abs(controls.width() * 3 - footer.width()) < 40
+    assert abs(controls.width() * 2 - footer.width()) < 40
 
     for target in ("map",):
         window.controller.navigate(target)

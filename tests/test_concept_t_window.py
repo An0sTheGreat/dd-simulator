@@ -560,6 +560,34 @@ def test_people_sections_are_page_cards(tmp_path: Path) -> None:
     close(app, window)
 
 
+def test_people_replies_and_trade_fit_at_small_window(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1280, 720)
+    window.show()
+    window.controller.navigate("people")
+    for _ in range(3):
+        app.processEvents()
+    page = window.navigation_pages["people"]
+    replies = page.findChildren(QPushButton, "npcSuggestedResponse")
+    assert len(replies) == 6
+    for button in replies:
+        option = QStyleOptionButton()
+        button.initStyleOption(option)
+        room = button.style().subElementRect(QStyle.SubElement.SE_PushButtonContents, option, button)
+        metrics = button.fontMetrics()
+        fits_one_line = metrics.horizontalAdvance(button.text()) <= room.width()
+        # Or it wraps: every word fits the width and the button is tall enough for its lines.
+        wraps = (
+            button.hasHeightForWidth()
+            and button.height() >= button.heightForWidth(button.width())
+            and all(metrics.horizontalAdvance(word) <= room.width() for word in button.text().split())
+        )
+        assert fits_one_line or wraps, button.text()
+    scroll = page.findChild(QAbstractScrollArea, "merchantTradeScroll")
+    assert scroll is not None and not scroll.horizontalScrollBar().isVisible()
+    close(app, window)
+
+
 def test_character_sheet_story_cards_put_each_label_beside_its_value(tmp_path: Path) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.resize(1600, 900)

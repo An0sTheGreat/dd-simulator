@@ -1,6 +1,6 @@
 """Focused in-application pages opened by bottom navigation."""
 
-from PySide6.QtCore import QEvent, Qt, Signal
+from PySide6.QtCore import QEvent, QRect, Qt, Signal
 from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import (
     QApplication,
@@ -13,6 +13,9 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSplitter,
+    QStyle,
+    QStyleOptionButton,
+    QStylePainter,
     QVBoxLayout,
     QWidget,
 )
@@ -314,8 +317,8 @@ class CharacterSheetPage(NavigationPage):
         self.action_bar.layout().insertWidget(0, crafting)
 
 
-def centered_third(content: QWidget, object_name: str = "centeredThird") -> QWidget:
-    """Center a responsive control block at approximately one third page width."""
+def centered_third(content: QWidget, object_name: str = "centeredThird", *, share: int = 1) -> QWidget:
+    """Center a responsive control block at one third page width (``share=2``: one half)."""
 
     host = QWidget()
     host.setObjectName(object_name)
@@ -326,8 +329,51 @@ def centered_third(content: QWidget, object_name: str = "centeredThird") -> QWid
     content.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
     layout.addWidget(content, 0, 1)
     for column in range(3):
-        layout.setColumnStretch(column, 1)
+        layout.setColumnStretch(column, share if column == 1 else 1)
     return host
+
+
+class WrappingButton(SemanticButton):
+    """Button whose text wraps onto more lines instead of clipping at both ends."""
+
+    def __init__(self, text: str, *, role: str, object_name: str) -> None:
+        super().__init__(text, role=role, object_name=object_name)
+        policy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        policy.setHeightForWidth(True)
+        self.setSizePolicy(policy)
+
+    def _text_width(self, width: int) -> int:
+        option = QStyleOptionButton()
+        self.initStyleOption(option)
+        option.rect = QRect(0, 0, width, self.height())
+        return self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents, option, self).width()
+
+    def _wrapped(self, width: int) -> str:
+        metrics = self.fontMetrics()
+        lines: list[str] = []
+        for word in self.text().split():
+            if lines and metrics.horizontalAdvance(f"{lines[-1]} {word}") <= width:
+                lines[-1] += f" {word}"
+            else:
+                lines.append(word)
+        return "\n".join(lines)
+
+    def minimumSizeHint(self):  # type: ignore[no-untyped-def]  # noqa: N802
+        hint = super().sizeHint()
+        metrics = self.fontMetrics()
+        longest = max((metrics.horizontalAdvance(word) for word in self.text().split()), default=0)
+        hint.setWidth(hint.width() - metrics.horizontalAdvance(self.text()) + longest)
+        return hint
+
+    def heightForWidth(self, width: int) -> int:  # noqa: N802
+        lines = self._wrapped(self._text_width(width)).count("\n")
+        return super().sizeHint().height() + lines * self.fontMetrics().lineSpacing()
+
+    def paintEvent(self, _event) -> None:  # type: ignore[no-untyped-def]  # noqa: N802
+        option = QStyleOptionButton()
+        self.initStyleOption(option)
+        option.text = self._wrapped(self._text_width(self.width()))
+        QStylePainter(self).drawControl(QStyle.ControlElement.CE_PushButton, option)
 
 
 def _commerce_tooltip(item: CommerceItemView) -> str:
@@ -505,7 +551,7 @@ class NpcNavigationPage(NavigationPage):
         self.people_splitter.addWidget(body_host)
         self.people_splitter.setStretchFactor(0, 2)
         self.people_splitter.setStretchFactor(1, 5)
-        self.people_splitter.setSizes([210, 500])
+        self.people_splitter.setSizes([300, 400])  # trade shows several stock rows at 720p
         self.layout.addWidget(self.people_splitter, 1)
         self.action_host, card = codex_card("Your reply", "npcBottomControls")
         replies = QWidget()
@@ -513,7 +559,7 @@ class NpcNavigationPage(NavigationPage):
         self.action_layout.setContentsMargins(0, 0, 0, 0)
         card.addWidget(replies)
         self.action_layout.setSpacing(4)
-        self.layout.addWidget(centered_third(self.action_host, "npcCenteredFooter"))
+        self.layout.addWidget(centered_third(self.action_host, "npcCenteredFooter", share=2))
         self._render_selected()
 
     def _select_npc(self, npc_id: str) -> None:
@@ -572,7 +618,7 @@ class NpcNavigationPage(NavigationPage):
         if conversation.merchant is not None:
             self.trade_host.setVisible(True)
             self.trade_layout.addWidget(centered_third(
-                self._merchant_panel(conversation), "merchantCenteredContainer"
+                self._merchant_panel(conversation), "merchantCenteredContainer", share=2
             ))
         else:
             self.trade_host.setVisible(False)
@@ -606,8 +652,9 @@ class NpcNavigationPage(NavigationPage):
                 plain_label(conversation.last_check, "pageCardNotice", word_wrap=True)
             )
         choices = QGridLayout()
+        choices.setContentsMargins(0, 0, 0, 0)  # the card's padding is enough; 720p needs the height
         for index, response in enumerate(conversation.suggested_responses):
-            button = SemanticButton(response, role="secondary", object_name="npcSuggestedResponse")
+            button = WrappingButton(response, role="secondary", object_name="npcSuggestedResponse")
             button.setEnabled(npc.available)
             button.setToolTip(response)
             button.clicked.connect(
@@ -618,6 +665,7 @@ class NpcNavigationPage(NavigationPage):
         choices_host.setLayout(choices)
         self.action_layout.addWidget(choices_host)
         row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
         entry = QLineEdit()
         entry.setObjectName("npcCustomResponseInput")
         entry.setPlaceholderText("Write a response...")
