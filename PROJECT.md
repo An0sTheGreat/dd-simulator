@@ -104,7 +104,37 @@ Required behavior:
   still loads as LM Studio; full suite green; rebuild and pass `--smoke-test-release27`
   from `dist`.
 
-### Phase 30 — Target hardware profile and final model selection
+### Phase 30 — Concept T dashboard
+
+Rebuild the Adventure dashboard as the approved Concept T, following `docs/UI_REDESIGN_PLAN.md` (plan Phases 1–7b).
+
+Required behavior:
+
+- Left column: vitals strip, paperdoll with nine equipment slots, skill list with descriptions, a 5×5 Inventory card scrolling through up to 320 positions, and one Abilities & Spells card in two columns, equal in height to the Inventory card.
+- Right column: navigation tabs, location art with title and condition chips, quest-progress card, scrollable conversation fading into the art (Concept I message styles, per-turn update tags), 2×3 choice grid with input.
+- Journal tab (event log, recent events, quest list); combat through an Encounter card and a combat action grid; crafting on the Character Sheet.
+- One shared tooltip style for items (with comparison), abilities, spells and skills.
+- Schema 22 for message speakers; full suite green; captures at 1600×900 and 1280×720 in both themes; `--smoke-test-release28`; README screenshots pushed.
+
+### Phase 31 — RPG Mega item icons
+
+Replace the SVG item icons with RPG Mega painted icons for every item category (plan Phase 8).
+
+Required behavior:
+
+- A manifest maps every item catalog record to an RPG Mega icon, respecting rarity tiers.
+- Every catalog and preset item resolves to an existing icon; tests prove it.
+
+### Phase 32 — Music
+
+Add context-driven music and ambience (plan Phase 9).
+
+Required behavior:
+
+- Every supplied track is installed under a per-context folder (battle, boss, travel_road, forest_wilderness, town, tavern_inn, exploration_cave, menu) listed in a replaceable manifest.
+- The controller picks music from combat state, biome and time of day, with crossfades; volume and mute live in Settings; audio failures are silent.
+
+### Phase 33 — Target hardware profile and final model selection
 
 Resolve the open decision on target hardware and the preferred model/quantization.
 
@@ -116,7 +146,7 @@ Required behavior:
 - Choose the recommended models from the evaluation acceptance rules in
   `docs/RECOMMENDED_UNSLOTH_SETTINGS.md` and update setup recommendations accordingly.
 
-### Phase 31 — Content catalog expansion
+### Phase 34 — Content catalog expansion
 
 Expand the deterministic content catalogs beyond the Phase 11 starter set.
 
@@ -127,7 +157,7 @@ Required behavior:
 - Catalog validation tests in the style of the existing preset validation.
 - No new model-authored mechanics.
 
-### Phase 32 — User data location and backup retention
+### Phase 35 — User data location and backup retention
 
 Resolve the open decision on campaign data location and backup retention.
 
