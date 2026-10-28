@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QLabel,
     QMenu,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -350,6 +351,12 @@ def _quantity_badge(value: int) -> QLabel:
     return badge
 
 
+def well_inset(slot_side: int) -> int:
+    """Gap between the slot's outer edge and its well art: 2 px at the 50 px card slot."""
+
+    return max(1, slot_side // 25)
+
+
 class InventorySlotWidget(QFrame):
     activated = Signal(int)
     navigation_requested = Signal(int, str)
@@ -391,13 +398,17 @@ class InventorySlotWidget(QFrame):
 
         layout = QGridLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
+        # The well art spreads over the themed slot frame to just inside its outer
+        # edge (see _place_well); the icon stays centred on the slot.
         self.artwork_label = QLabel(self)
         self.artwork_label.setObjectName("inventorySlotArtwork")
         self.artwork_label.setAttribute(
             Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
         )
-        self.artwork_label.setFixedSize(slot_size, slot_size)
-        layout.addWidget(self.artwork_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
+        self.artwork_label.setSizePolicy(
+            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored
+        )
+        self._place_well()
         self._refresh_artwork()
         self.icon_label = item_icon_label(
             item.name or "",
@@ -409,6 +420,7 @@ class InventorySlotWidget(QFrame):
         if item.is_empty:
             self.icon_label.hide()
         layout.addWidget(self.icon_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
+        self.artwork_label.installEventFilter(self)
         if item.durability is not None and item.maximum_durability:
             durability_state = "low" if item.durability <= 25 else "normal"
             self.setProperty("durabilityState", durability_state)
@@ -454,10 +466,27 @@ class InventorySlotWidget(QFrame):
         self.artwork_label.setPixmap(
             _themed_artwork(
                 "Inventory_Slot_1.png",
-                self.artwork_label.width(),
+                max(1, self.artwork_label.width()),
                 _current_theme_id(),
+                max(1, self.artwork_label.height()),
             )
         )
+
+    def _place_well(self) -> None:
+        inset = well_inset(self.width())
+        self.artwork_label.setGeometry(self.rect().adjusted(inset, inset, -inset, -inset))
+        self.artwork_label.lower()
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        self._place_well()
+
+    def _fit_to_frame(self) -> None:
+        # the icon keeps to the frame's inside, so it never covers the bronze rim
+        inner = self.contentsRect()
+        side = min(inner.width(), inner.height())
+        self.icon_label.setFixedSize(max(12, side * 7 // 8), max(12, side * 7 // 8))
+        self.refresh_theme_icon()
 
     def enterEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         # A repeated enter while our card is up (showing or closing a card can
@@ -514,7 +543,9 @@ class InventorySlotWidget(QFrame):
         self.comparison_hover_card.show_beside(self.hover_card)
 
     def eventFilter(self, watched, event) -> bool:  # type: ignore[no-untyped-def]
-        if self.offhand_comparison_item is not None and event.type() in {
+        if watched is self.artwork_label and event.type() == QEvent.Type.Resize:
+            self._fit_to_frame()
+        elif self.offhand_comparison_item is not None and event.type() in {
             QEvent.Type.KeyPress, QEvent.Type.KeyRelease,
         } and event.key() == Qt.Key.Key_Control:
             use_offhand = event.type() == QEvent.Type.KeyPress

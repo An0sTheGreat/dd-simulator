@@ -31,6 +31,7 @@ CARD_COLUMNS = 5
 CARD_VISIBLE_ROWS = 5
 CARD_SLOT_SIZE = 50
 CARD_SLOT_SPACING = 3
+CARD_SCROLLBAR_GAP = 5  # between the fifth column and the scrollbar, as in the mockup
 CARD_SCROLLBAR_GUTTER = 10  # 5 px gap + 5 px themed scrollbar, as in the mockup
 DRAG_SCROLL_ZONE = 24
 DRAG_SCROLL_STEP = 12
@@ -120,10 +121,13 @@ class InventoryCard(QFrame):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.scroll.setWidget(self.grid)
+        self.visible_rows = CARD_VISIBLE_ROWS
         self._fit_scroll()
         bar = self.scroll.verticalScrollBar()
         bar.valueChanged.connect(self._refresh_footer)
-        layout.addWidget(self.scroll)
+        # Whole rows only, centred between heading and footer when the card is taller.
+        layout.addStretch(1)
+        layout.addWidget(self.scroll, 0, Qt.AlignmentFlag.AlignHCenter)
         layout.addStretch(1)
 
         footer = QHBoxLayout()
@@ -146,6 +150,7 @@ class InventoryCard(QFrame):
         self.auto_sort_button.setMenu(menu)
         footer.addWidget(self.auto_sort_button)
         layout.addLayout(footer)
+        self._fit_scroll()  # again, now the minimum height can count the footer
 
         self._drag_y = 0
         self._drag_timer = QTimer(self)
@@ -154,12 +159,39 @@ class InventoryCard(QFrame):
         self.set_inventory(items, capacity=capacity)
 
     def _fit_scroll(self) -> None:
+        # The gutter is sized from the scrollbar the active style really draws, so a
+        # wider bar (no theme, another style) never covers the fifth column.
+        bar = self.scroll.verticalScrollBar()
+        bar.ensurePolished()
         self.scroll.setFixedSize(
-            CARD_COLUMNS * self.pitch - CARD_SLOT_SPACING + CARD_SCROLLBAR_GUTTER,
-            CARD_VISIBLE_ROWS * self.pitch - CARD_SLOT_SPACING,  # scroll area has no frame
+            CARD_COLUMNS * self.pitch - CARD_SLOT_SPACING + CARD_SCROLLBAR_GAP
+            + bar.sizeHint().width(),
+            self.visible_rows * self.pitch - CARD_SLOT_SPACING,  # scroll area has no frame
         )
         # one wheel notch (3 steps) is about one row
-        self.scroll.verticalScrollBar().setSingleStep(self.pitch // 3)
+        bar.setSingleStep(self.pitch // 3)
+        # Let a short card show fewer whole rows instead of clipping the bottom one.
+        chrome = self.sizeHint().height() - self.scroll.height()
+        self.setMinimumHeight(chrome + self.pitch - CARD_SLOT_SPACING)
+
+    def _fit_rows(self) -> None:
+        chrome = self.sizeHint().height() - self.scroll.height()
+        rows = (self.height() - chrome + CARD_SLOT_SPACING) // self.pitch
+        rows = max(1, min(CARD_VISIBLE_ROWS, rows))
+        if rows != self.visible_rows:
+            self.visible_rows = rows
+            self._fit_scroll()
+            self._refresh_footer()
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        self._fit_rows()
+
+    def changeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.StyleChange:
+            self._fit_scroll()
+            self._fit_rows()
 
     def set_scale(self, scale: float) -> None:
         """Shrink the bag slots (keeping 5x5 visible) when the codex column is short."""
@@ -195,8 +227,8 @@ class InventoryCard(QFrame):
     def below_count(self) -> int:
         """Occupied slots whose row starts below the bottom edge of the viewport."""
 
-        viewport = CARD_VISIBLE_ROWS * self.pitch - CARD_SLOT_SPACING
-        bottom = self.scroll.verticalScrollBar().value() + viewport
+        # the scroll area has no frame, so its fixed height is the viewport's
+        bottom = self.scroll.verticalScrollBar().value() + self.scroll.height()
         return sum(
             1 for slot in self.grid.slots
             if not slot.item.is_empty and (slot.index // CARD_COLUMNS) * self.pitch >= bottom
