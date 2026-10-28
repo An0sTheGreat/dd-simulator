@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import os
 from pathlib import Path
 import sqlite3
@@ -205,7 +206,8 @@ def test_demo_seed_is_idempotent_and_projection_matches_phase_four(tmp_path: Pat
 
     service = GameStateService(database)
     dashboard = service.load_active_dashboard()
-    assert dashboard.player == build_phase_three_dashboard().player
+    # The mock has no codex portrait; portrait_path is pinned in test_phase_two_character_data.
+    assert replace(dashboard.player, portrait_path="") == build_phase_three_dashboard().player
     assert len(dashboard.inventory_preview) == 36
     assert all(item.name != "Iron Dagger" for item in dashboard.inventory_preview)
     with database.connect() as connection:
@@ -263,7 +265,10 @@ def test_application_bootstrap_creates_and_uses_game_state_ledger(tmp_path: Path
     app, window, _theme_manager = build_application([], config_dir=tmp_path)
 
     assert (tmp_path / "game_state.db").is_file()
-    assert window.dashboard.player == build_phase_three_dashboard().player
+    assert (
+        replace(window.dashboard.player, portrait_path="")
+        == build_phase_three_dashboard().player
+    )
     assert len(window.dashboard.inventory_preview) == 36
     assert window.game_state_service.database.schema_version() == LATEST_SCHEMA_VERSION
 

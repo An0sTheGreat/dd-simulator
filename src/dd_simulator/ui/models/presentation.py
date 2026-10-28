@@ -65,6 +65,8 @@ class PlayerSummaryView:
     backstory: str = ""
     proficiency_bonus: int = 2
     pending_ability_points: int = 0
+    # Confirmed Visual Registry portrait, else a codex fallback; empty means initials.
+    portrait_path: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -188,6 +190,7 @@ class SkillView:
     bonus: int = 0
     locked: bool = False
     recently_increased: bool = False
+    description: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -285,6 +288,7 @@ class CombatActionOptionView:
     available: bool
     unavailable_reason: str = ""
     stats: tuple[tuple[str, str], ...] = ()
+    status_label: str = ""  # Ready, Cooldown n, n/m uses, or a short reason
 
 
 @dataclass(frozen=True, slots=True)
@@ -496,3 +500,8 @@ class DashboardView:
     pending_crafting_result: CraftingResultView | None = None
     campaign_name: str = "D&D SIMULATOR"
     is_preset_campaign: bool = False
+    abilities: tuple[CombatActionOptionView, ...] = ()
+    spells: tuple[CombatActionOptionView, ...] = ()
+    # Every occupied bag position in position order (no empty slots), up to the cap.
+    inventory: tuple[InventorySlotView, ...] = ()
+    inventory_capacity: int = 320

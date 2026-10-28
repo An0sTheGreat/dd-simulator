@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -11,7 +12,7 @@ from dd_simulator.state.abilities import (
     CombatAbilityDefinition,
     scaled_definition,
 )
-from dd_simulator.state.character_creation import plain_name
+from dd_simulator.state.character_creation import SKILL_DESCRIPTIONS, plain_name
 from dd_simulator.state.database import GameStateDatabase
 from dd_simulator.state.commerce import merchant_price
 from dd_simulator.state.dialogue import SUGGESTED_RESPONSES
@@ -62,6 +63,32 @@ from dd_simulator.state.visuals import (
     location_state_signature,
     resolve_visual_record,
 )
+
+
+CODEX_PORTRAIT_ROOT = Path(__file__).parents[1] / "ui" / "assets" / "codex" / "portraits"
+_PORTRAIT_PACKS = (
+    ("dwarf", ("dwarf",)),
+    ("goblin", ("goblin",)),
+    ("fairy", ("fairy", "fey")),
+    ("demon", ("tiefling", "infernal", "demon", "devil")),
+    ("undead", ("undead",)),
+)
+
+
+def fallback_portrait(character_id: str, ancestry: str) -> str:
+    """Pick a codex portrait from the ancestry's pack, stable per character id."""
+
+    lowered = ancestry.casefold()
+    pack = next(
+        (name for name, words in _PORTRAIT_PACKS if any(word in lowered for word in words)),
+        "fantasy",
+    )
+    count = len(list((CODEX_PORTRAIT_ROOT / pack).glob("*.png")))
+    if not count:
+        return ""
+    number = int(hashlib.sha256(character_id.encode()).hexdigest(), 16) % count + 1
+    path = CODEX_PORTRAIT_ROOT / pack / f"{number}.png"
+    return str(path) if path.is_file() else ""
 
 
 def _required(row: sqlite3.Row | None, label: str) -> sqlite3.Row:
@@ -417,6 +444,21 @@ class DashboardProjection:
                     camera_style=camera_style,
                 ),
             )
+            player_portrait = _visual_view(player_visual)
+            portrait_path = "" if player_portrait is None else player_portrait.path
+            if not portrait_path:
+                canonical_portrait = _visual_view(resolve_visual_record(
+                    connection,
+                    self.assets_root,
+                    campaign_id=campaign_id,
+                    asset_kind="portrait",
+                    subject_type="character",
+                    subject_id=character_id,
+                    signature="",
+                ))
+                portrait_path = (
+                    canonical_portrait.path if canonical_portrait is not None else ""
+                ) or fallback_portrait(character_id, str(character["species"]))
             location_visual = resolve_visual_record(
                 connection,
                 self.assets_root,
@@ -744,8 +786,14 @@ class DashboardProjection:
                 continue
             definition = scaled_definition(definition, int(character["level"]))
             reason = ""
+            uses = (
+                "" if row["current_uses"] is None
+                else f"{row['current_uses']}/{row['maximum_uses']} uses"
+            )
+            status = uses or "Ready"
             if int(row["cooldown_remaining"]) > 0:
                 reason = f"Cooldown: {row['cooldown_remaining']} round(s)"
+                status = f"Cooldown {row['cooldown_remaining']}"
             elif row["current_uses"] is not None and int(row["current_uses"]) <= 0:
                 reason = "No uses remaining before rest"
             elif definition.resource_cost and (
@@ -753,6 +801,7 @@ class DashboardProjection:
                 or int(by_type[definition.resource_type]["current_value"]) < definition.resource_cost
             ):
                 reason = f"Requires {definition.resource_cost} {definition.resource_type.replace('_', ' ')}"
+                status = f"Needs {definition.resource_cost} {definition.resource_type.replace('_', ' ')}"
             costs: list[str] = []
             if definition.is_cantrip:
                 costs.append("Cantrip; no spell slot")
@@ -769,6 +818,7 @@ class DashboardProjection:
                 resource_label=" | ".join(costs), available=not reason,
                 unavailable_reason=reason,
                 stats=_ability_stats(definition, row),
+                status_label=status,
             ))
         combat_view = None
         if combat_encounter is not None:
@@ -1245,6 +1295,7 @@ class DashboardProjection:
                 backstory=str(character["backstory"] or ""),
                 proficiency_bonus=proficiency_bonus(int(character["level"])),
                 pending_ability_points=int(character["pending_ability_points"]),
+                portrait_path=portrait_path,
             ),
             location=LocationSummaryView(
                 name=str(location["name"]),
@@ -1306,6 +1357,7 @@ class DashboardProjection:
                     bonus=int(row["bonus"]),
                     locked=bool(row["locked"]),
                     recently_increased=bool(row["recently_increased"]),
+                    description=SKILL_DESCRIPTIONS.get(str(row["name"]), ""),
                 )
                 for row in skill_rows
             ),
@@ -1383,4 +1435,10 @@ class DashboardProjection:
             pending_crafting_result=crafting_result_view,
             campaign_name=plain_name(str(campaign["name"])),
             is_preset_campaign=preset_flag is not None,
+            abilities=tuple(skill for skill in combat_skills if skill.kind == "ability"),
+            spells=tuple(skill for skill in combat_skills if skill.kind == "spell"),
+            inventory=tuple(slot for slot in inventory if not slot.is_empty)[
+                : int(character["inventory_capacity"])
+            ],
+            inventory_capacity=int(character["inventory_capacity"]),
         )

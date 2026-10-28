@@ -66,6 +66,14 @@ are discarded. The dashboard projection returns the newest whole turns up to 40
 messages plus `has_older_messages`, attaching each turn's notes to its last message;
 `GameStateService.older_messages(campaign_id, before_turn, limit=40)` pages back.
 
+Without a schema change, the dashboard projection also carries the Concept T character
+data: skill descriptions from `SKILL_DESCRIPTIONS`, unlocked powers split into
+`abilities` and `spells` by `action_kind` with a short `status_label`, every occupied
+bag position in order (`inventory`, up to `inventory_capacity`, 320) beside the paged
+`inventory_preview`, and `portrait_path`: the confirmed Visual Registry portrait, else
+a codex portrait picked from the ancestry's pack by a hash of the character id, else
+empty so the initials show.
+
 Version 12 adds nullable visible inventory positions while retaining stable
 legacy item keys, migrates equipped items out of the bag, doubles existing
 capacity with a 40-slot minimum, and adds NPC status, availability, personality,
