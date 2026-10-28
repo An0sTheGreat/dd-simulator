@@ -351,6 +351,12 @@ def _quantity_badge(value: int) -> QLabel:
     return badge
 
 
+def well_inset(slot_side: int) -> int:
+    """Gap between the slot's outer edge and its well art: 2 px at the 50 px card slot."""
+
+    return max(1, slot_side // 25)
+
+
 class InventorySlotWidget(QFrame):
     activated = Signal(int)
     navigation_requested = Signal(int, str)
@@ -392,8 +398,8 @@ class InventorySlotWidget(QFrame):
 
         layout = QGridLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        # The well art and the icon fill the area inside the themed slot frame (the QSS
-        # border shrinks contentsRect), so they track it instead of the outer slot size.
+        # The well art spreads over the themed slot frame to just inside its outer
+        # edge (see _place_well); the icon stays centred on the slot.
         self.artwork_label = QLabel(self)
         self.artwork_label.setObjectName("inventorySlotArtwork")
         self.artwork_label.setAttribute(
@@ -402,7 +408,7 @@ class InventorySlotWidget(QFrame):
         self.artwork_label.setSizePolicy(
             QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored
         )
-        layout.addWidget(self.artwork_label, 0, 0)
+        self._place_well()
         self._refresh_artwork()
         self.icon_label = item_icon_label(
             item.name or "",
@@ -466,8 +472,19 @@ class InventorySlotWidget(QFrame):
             )
         )
 
+    def _place_well(self) -> None:
+        inset = well_inset(self.width())
+        self.artwork_label.setGeometry(self.rect().adjusted(inset, inset, -inset, -inset))
+        self.artwork_label.lower()
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        self._place_well()
+
     def _fit_to_frame(self) -> None:
-        side = min(self.artwork_label.width(), self.artwork_label.height())
+        # the icon keeps to the frame's inside, so it never covers the bronze rim
+        inner = self.contentsRect()
+        side = min(inner.width(), inner.height())
         self.icon_label.setFixedSize(max(12, side * 7 // 8), max(12, side * 7 // 8))
         self.refresh_theme_icon()
 

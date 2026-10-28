@@ -20,7 +20,7 @@ from dd_simulator.ui.widgets.codex_cards import (
     InventoryCard,
     PowersCard,
 )
-from dd_simulator.ui.widgets.inventory_grid import INVENTORY_SLOT_MIME
+from dd_simulator.ui.widgets.inventory_grid import INVENTORY_SLOT_MIME, well_inset
 
 
 THEMES_ROOT = Path(__file__).resolve().parents[1] / "src" / "dd_simulator" / "ui" / "themes"
@@ -270,8 +270,10 @@ def test_inventory_card_lays_out_whole_square_rows_clear_of_the_scrollbar(tmp_pa
                     assert viewport.contains(rect), f"{where} slot {slot.index} cut"
                     assert not rect.intersects(bar), f"{where} slot {slot.index} under bar"
                     assert not any(rect.intersects(other) for _o, other in visible[index + 1:]), where
-                    # well art fills the frame's inside; the icon is centred on the slot
-                    frame = slot.contentsRect()
+                    # well art spreads to just inside the slot's outer edge, over the
+                    # frame border; the icon is centred on the slot
+                    inset = well_inset(slot.width())
+                    frame = slot.rect().adjusted(inset, inset, -inset, -inset)
                     assert slot.artwork_label.geometry() == frame, where
                     if not slot.item.is_empty:
                         icon = slot.icon_label.geometry()
