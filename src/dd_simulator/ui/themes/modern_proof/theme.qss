@@ -1273,6 +1273,15 @@ QLabel#powersCardEmpty {
     font-style: italic;
     background: transparent;
 }
+QToolButton#powersCardRest {
+    font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 1.4px;
+    padding: 6px 14px; color: {{codex.ink}}; background-color: rgba(19, 19, 20, 214);
+    border: 1px solid {{colors.border_primary}}; border-radius: {{geometry.border_radius_small}};
+}
+QToolButton#powersCardRest:hover, QToolButton#powersCardRest:focus {
+    border-color: {{colors.border_highlight}}; background-color: {{colors.hover}};
+}
+QToolButton#powersCardRest:disabled { color: {{colors.text_muted}}; }
 
 /* Concept T: conversation */
 QScrollArea#conversationView, QScrollArea#conversationView > QWidget#qt_scrollarea_viewport,

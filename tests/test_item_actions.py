@@ -246,16 +246,31 @@ def test_item_mutation_persists_after_database_reopen(tmp_path: Path) -> None:
 def test_state_backed_ui_action_refreshes_inventory_and_preserves_page(tmp_path: Path) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.controller.navigate("dashboard")
-    window.utility_panel.set_current_tab(2)
+    window.resize(1600, 900)
+    window.show()
+    card = window.inventory_card
+    messages: list[str] = []
+    window.statusBar().messageChanged.connect(messages.append)
 
     torch_slot = visible_slot(window.game_state_service, "Torch")
+    card.grid.select_index(torch_slot)
+    bar = card.scroll.verticalScrollBar()
+    # Park the viewport on the torch's row so the selection stays in view after the reload.
+    bar.setValue((torch_slot // 5) * card.pitch)
+    scrolled = bar.value()
+    app.processEvents()
     window.controller.request_context_action("inventory", torch_slot, "use")
+    app.processEvents()
     app.processEvents()
 
     assert window.current_page == "dashboard"
-    assert window.utility_panel.current_tab() == 2
+    assert window.inventory_card is not card  # the dashboard really was reloaded
+    card = window.inventory_card
+    assert card.scroll.verticalScrollBar().value() == scrolled
+    assert bool(card.grid.slots[torch_slot].property("selected"))
     assert window.dashboard.inventory_preview[torch_slot].quantity == 3
-    assert "Lit a Torch" in window.statusBar().currentMessage()
+    # The reload re-selects the item afterwards, so the result summary is no longer the last message.
+    assert any("Lit a Torch" in message for message in messages)
     assert any("Lit a Torch" in event.summary for event in window.dashboard.recent_events)
     window.close()
     window.deleteLater()

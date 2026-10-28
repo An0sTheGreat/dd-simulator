@@ -1281,6 +1281,23 @@ QLabel#powersCardEmpty {
     font-style: italic;
     background: transparent;
 }
+QToolButton#powersCardRest {
+    font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 1.4px;
+    padding: 2px 12px; color: {{codex.gold}}; background: transparent;
+    border-width: 9px; border-style: solid; border-radius: 0;
+    border-image: url("../../assets/{{codex.frame_button_normal}}") 18 18 18 18 stretch stretch;
+}
+QToolButton#powersCardRest:hover, QToolButton#powersCardRest:focus {
+    color: {{codex.ink}};
+    border-image: url("../../assets/{{codex.frame_button_hover}}") 18 18 18 18 stretch stretch;
+}
+QToolButton#powersCardRest:pressed {
+    border-image: url("../../assets/{{codex.frame_button_pressed}}") 18 18 18 18 stretch stretch;
+}
+QToolButton#powersCardRest:disabled {
+    color: {{colors.text_muted}};
+    border-image: url("../../assets/{{codex.frame_button_disabled}}") 18 18 18 18 stretch stretch;
+}
 
 /* Concept T: conversation */
 QScrollArea#conversationView, QScrollArea#conversationView > QWidget#qt_scrollarea_viewport,

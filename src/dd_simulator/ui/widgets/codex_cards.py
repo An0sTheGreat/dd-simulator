@@ -305,6 +305,7 @@ class PowersCard(QFrame):
 
     # Emits the catalog key; the receiver checks availability (Phase 6 wires it to combat).
     action_activated = Signal(str)
+    rest_requested = Signal()
 
     def __init__(
         self,
@@ -315,9 +316,13 @@ class PowersCard(QFrame):
         self.setObjectName("powersCard")
         self.setProperty("codexCard", True)
         self.setAccessibleName("Abilities and spells")
-        layout = QHBoxLayout(self)
-        layout.setContentsMargins(8, 2, 8, 2)
+        root = QVBoxLayout(self)
+        root.setContentsMargins(8, 2, 8, 2)
+        root.setSpacing(6)
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
+        root.addLayout(layout, 1)
         self.ability_column = self._column("Abilities", abilities)
         self.spell_column = self._column("Spells", spells)
         layout.addWidget(self.ability_column, 1)
@@ -329,6 +334,15 @@ class PowersCard(QFrame):
         self.ability_column.setVisible(bool(abilities))
         self.spell_column.setVisible(bool(spells))
         self.empty_label.setVisible(not abilities and not spells)
+        # Outside combat only; the main window hides it while an encounter is active.
+        self.rest_button = QToolButton()
+        self.rest_button.setObjectName("powersCardRest")
+        self.rest_button.setText("SHORT REST")
+        self.rest_button.setAccessibleName("Take a short rest")
+        self.rest_button.setToolTip("Take a short rest to recover outside combat")
+        self.rest_button.clicked.connect(self.rest_requested)
+        # Own footer row beneath both columns, so it never narrows them.
+        root.addWidget(self.rest_button, 0, Qt.AlignmentFlag.AlignRight)
 
     def _column(self, title: str, actions: tuple[CombatActionOptionView, ...]) -> QWidget:
         column = QWidget()

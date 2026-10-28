@@ -574,8 +574,8 @@ def test_state_backed_ui_resolves_and_refreshes_narration(tmp_path) -> None:  # 
 
     window.action_resolver = BlockingProvider(outcome())
     window.controller.navigate("dashboard")
-    window.narrative_panel.action_input.setText("study the road")
-    window.narrative_panel._request_submission()
+    window.scene_view.choice_grid.action_input.setText("study the road")
+    window.scene_view.choice_grid._request_submission()
     task = window._action_task
     assert task is not None
     release.set()
@@ -587,14 +587,13 @@ def test_state_backed_ui_resolves_and_refreshes_narration(tmp_path) -> None:  # 
         "The merchant nods as the moment unfolds.",
     )
     assert window.dashboard.narrative.player_action == "study the road"
-    assert window.findChild(object, "playerActionHistory").text() == (
-        "You: study the road"
+    # The conversation shows the player's line and the narration as this turn's rows.
+    recent = window.conversation_view.recent_rows
+    assert len(recent) >= 2
+    assert any(
+        row.role == "player" and "study the road" in row.text_label.text() for row in recent
     )
-    assert len(window.narrative_panel.latest_turn_widgets) >= 2
-    assert all(
-        widget.property("recentTurn") is True
-        for widget in window.narrative_panel.latest_turn_widgets
-    )
+    assert all(row.property("recentTurn") is True for row in recent)
     assert "Turn committed" in window.statusBar().currentMessage()
     window.close()
     window.deleteLater()
@@ -612,8 +611,9 @@ def test_state_backed_ui_failure_keeps_action_and_offers_retry(tmp_path) -> None
 
     window.action_resolver = BlockingFailure()
     window.controller.navigate("dashboard")
-    window.narrative_panel.action_input.setText("inspect the cart")
-    window.narrative_panel._request_submission()
+    grid = window.scene_view.choice_grid
+    grid.action_input.setText("inspect the cart")
+    grid._request_submission()
     task = window._action_task
     assert task is not None
     release.set()
@@ -621,9 +621,9 @@ def test_state_backed_ui_failure_keeps_action_and_offers_retry(tmp_path) -> None
     app.processEvents()
 
     assert window._action_task is None
-    assert window.narrative_panel.action_input.text() == "inspect the cart"
-    assert window.narrative_panel.retry_button.isVisibleTo(window.narrative_panel)
-    assert "malformed" in window.narrative_panel.feedback.text()
+    assert grid.action_input.text() == "inspect the cart"
+    assert grid.retry_button.isVisibleTo(grid)
+    assert "malformed" in grid.feedback.text()
     window.close()
     window.deleteLater()
     app.processEvents()

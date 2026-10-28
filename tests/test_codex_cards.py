@@ -174,11 +174,21 @@ def test_powers_card_splits_hides_and_shows_empty_state() -> None:
     assert keys == ["ember"]
     detail = card.ability_column.entries[0].findChild(QLabel, "powerEntryDetail")
     assert detail.text() == "3 stamina · 60 ft"
+    # Short Rest sits in its own footer row beneath both columns.
+    assert card.rest_button.isVisible()
+    assert card.rest_button.geometry().top() > card.spell_column.geometry().bottom()
+    assert card.rest_button.geometry().top() > card.ability_column.geometry().bottom()
 
     only_spells = PowersCard((), (action("ember", "spell"),))
     only_spells.show()
     assert not only_spells.ability_column.isVisible()
     assert only_spells.spell_column.width() > only_spells.width() // 2
+    assert only_spells.spell_column.width() == only_spells.layout().contentsRect().width()
+
+    only_abilities = PowersCard((action("quick_shot", "ability"),), ())
+    only_abilities.show()
+    assert not only_abilities.spell_column.isVisible()
+    assert only_abilities.ability_column.width() == only_abilities.layout().contentsRect().width()
 
     empty = PowersCard((), ())
     empty.show()
