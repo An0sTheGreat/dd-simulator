@@ -23,6 +23,7 @@ from dd_simulator.ui.models.presentation import (
 )
 from dd_simulator.ui.power_icons import action_icon_path
 from dd_simulator.ui.widgets.inventory_grid import InventoryGrid
+from dd_simulator.ui.widgets.scene_view import ElidedLabel
 from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
 
 
@@ -276,9 +277,8 @@ class PowerEntry(QFrame):
             ("powerEntryDetail", _power_detail(action)),
             ("powerEntryStatus", status),
         ):
-            label = QLabel(value)
-            label.setObjectName(object_name)
-            label.setTextFormat(Qt.TextFormat.PlainText)
+            # Elides to the column's scroll viewport instead of running past its edge.
+            label = ElidedLabel(value, object_name, tooltip_on_self=True)
             text.addWidget(label)
         self.status_label = label
         self.status_label.setProperty("ready", status.casefold() == "ready")

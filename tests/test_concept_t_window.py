@@ -7,8 +7,16 @@ from threading import Event
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
-from PySide6.QtCore import QThreadPool, Qt
-from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QStyle, QStyleOptionButton
+from PySide6.QtCore import QPoint, QThreadPool, Qt
+from PySide6.QtWidgets import (
+    QAbstractScrollArea,
+    QApplication,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QStyle,
+    QStyleOptionButton,
+)
 
 from dd_simulator.app import build_application
 from dd_simulator.state import (
@@ -342,6 +350,14 @@ def _clipped_texts(window: MainWindow) -> list[str]:
             option = QStyleOptionButton()
             widget.initStyleOption(option)
             room = widget.style().subElementRect(QStyle.SubElement.SE_PushButtonContents, option, widget).width()
+        # A label wider than the scroll viewport it sits in is cut off by the viewport edge.
+        ancestor = widget.parentWidget()
+        while ancestor is not None:
+            if isinstance(ancestor, QAbstractScrollArea) and ancestor.viewport().isAncestorOf(widget):
+                viewport = ancestor.viewport()
+                left = widget.mapTo(viewport, QPoint(0, 0)).x() + widget.contentsRect().left()
+                room = min(room, viewport.width() - left)
+            ancestor = ancestor.parentWidget()
         if widget.fontMetrics().horizontalAdvance(text) <= room:
             continue
         full = getattr(widget, "full_text", "")
