@@ -137,5 +137,9 @@ def test_skill_rows_show_description_value_and_xp_fraction() -> None:
         assert (row.xp_bar.value(), row.xp_bar.maximum()) == (
             skill.current_xp, skill.next_level_xp,
         )
-        assert f"XP: {skill.current_xp} / {skill.next_level_xp}" in row.toolTip()
+        card = row.build_hover_card()
+        assert card.rows["Next level"].text() == (
+            f"{skill.current_xp:,} / {skill.next_level_xp:,} XP"
+        )
+        card.deleteLater()
         assert not row.icon_label.pixmap().isNull()

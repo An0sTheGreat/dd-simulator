@@ -396,7 +396,9 @@ class CommerceHoverEntry(QWidget):
 
     def enterEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         hint = "Hold Left Ctrl: Compare Off Hand" if self.offhand_comparison else ""
-        self.hover_card = ItemHoverCard(self.item, self, comparison_hint=hint)
+        self.hover_card = ItemHoverCard(
+            self.item, self, comparison_hint=hint, compared_with=self.default_comparison,
+        )
         self.hover_card.show_near(QCursor.pos())
         self._show_comparison(False)
         app = QApplication.instance()

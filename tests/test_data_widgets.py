@@ -80,7 +80,11 @@ def test_phase_three_window_binds_counts_selection_and_tooltips(tmp_path: Path) 
         for widget in (*inventory, *equipment)
         if not bool(widget.property("empty"))
     )
-    assert all(widget.toolTip() for widget in (*skills, *quests))
+    assert all(widget.toolTip() for widget in quests)
+    for skill in skills:
+        skill_card = skill.build_hover_card()
+        assert skill.skill.name in skill_card.text_content()
+        skill_card.deleteLater()
 
     window.close()
     window.deleteLater()
@@ -162,7 +166,13 @@ def test_item_hover_card_uses_two_columns_and_dismisses_on_interaction() -> None
     card.show_near(slot.mapToGlobal(QPoint(slot.width(), 0)))
     app.processEvents()
     assert card.isVisible()
-    assert len(card.detail_labels) == 8
+    assert {name: label.text() for name, label in card.rows.items()} == {
+        "Damage": "1d4 piercing",
+        "Durability": "82 / 100",
+        "Weight": "1.0 lb",
+        "Value": "4 gold",
+    }
+    assert card.subtitle_label.text() == "Uncommon · Weapon · Main Hand or Off Hand"
     assert card.description_label.font().italic()
 
     QTest.mouseClick(slot, Qt.MouseButton.LeftButton)
@@ -203,12 +213,7 @@ def test_inventory_hover_compares_matching_equipped_item() -> None:
     slot.comparison_hover_card = ItemHoverCard(
         slot.comparison_item, slot, equipped_comparison=True
     )
-    labels = [
-        label.text()
-        for label in slot.comparison_hover_card.findChildren(QLabel)
-    ]
-    assert "EQUIPPED" in labels
-    assert "Status: Equipped" in labels
+    assert "Equipped" in slot.comparison_hover_card.subtitle_label.text().split(" · ")
     slot.hide_hover_card()
     grid.deleteLater()
     app.processEvents()

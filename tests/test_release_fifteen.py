@@ -142,10 +142,8 @@ def test_item_hover_text_contains_mechanics_or_fallback_description() -> None:
 
     dagger.enterEvent(QEnterEvent(QPointF(), QPointF(), QPointF()))
     charm.enterEvent(QEnterEvent(QPointF(), QPointF(), QPointF()))
-    dagger_details = [label.text() for label in dagger.hover_card.detail_labels]
-    charm_details = [label.text() for label in charm.hover_card.detail_labels]
-    assert "Damage: 1d4 piercing" in dagger_details
-    assert "Compatible slots: Main Hand, Off Hand" in dagger_details
-    assert "Name: Greenstone Charm" in charm_details
+    assert dagger.hover_card.rows["Damage"].text() == "1d4 piercing"
+    assert "Main Hand or Off Hand" in dagger.hover_card.subtitle_label.text()
+    assert charm.hover_card.title_label.text() == "Greenstone Charm"
     assert dagger.hover_card.description_label.font().italic()
     assert charm.slot.item is not None and charm.slot.item.description

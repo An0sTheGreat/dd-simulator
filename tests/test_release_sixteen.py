@@ -255,7 +255,7 @@ def test_equipped_slots_keep_durability_in_hover_and_ammunition_badge() -> None:
         columns=2,
     )
     dagger_card = ItemHoverCard(dagger, grid)
-    assert "Durability: 82/100" in [label.text() for label in dagger_card.detail_labels]
+    assert dagger_card.rows["Durability"].text() == "82 / 100"
     assert "20" in [label.text() for label in grid.findChildren(QLabel, "itemQuantityBadge")]
     dagger_card.deleteLater()
     grid.deleteLater()

@@ -25,46 +25,24 @@ from dd_simulator.ui.panels.common import (
     semantic_label,
 )
 from dd_simulator.ui.widgets.quest_list import QuestListWidget
+from dd_simulator.ui.widgets.hover_card import TooltipCard
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 
 
-class ResponseHoverCard(QFrame):
-    """Persistent themed card for a clipped generated response."""
+class ResponseHoverCard(TooltipCard):
+    """Full text of a clipped suggested response, on the shared card frame."""
 
     def __init__(self, text: str, parent: QWidget) -> None:
-        super().__init__(parent, Qt.WindowType.ToolTip | Qt.WindowType.FramelessWindowHint)
-        self.setObjectName("responseHoverCard")
-        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
-        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 9, 10, 9)
-        self.message_label = QLabel(text)
-        self.message_label.setObjectName("responseHoverText")
-        self.message_label.setWordWrap(True)
-        layout.addWidget(self.message_label)
-
-    def show_near(self, global_position: QPoint) -> None:
-        screen = QApplication.screenAt(global_position) or QApplication.primaryScreen()
-        maximum_width = 640
-        if screen is not None:
-            maximum_width = min(maximum_width, screen.availableGeometry().width() // 2)
-        natural_width = self.message_label.fontMetrics().horizontalAdvance(
-            self.message_label.text()
-        ) + 20
-        self.setFixedWidth(max(120, min(natural_width, maximum_width)))
-        self.adjustSize()
-        position = global_position + QPoint(14, 18)
-        if screen is not None:
-            bounds = screen.availableGeometry()
-            position.setX(
-                max(bounds.left(), min(position.x(), bounds.right() - self.width() + 1))
-            )
-            position.setY(
-                max(bounds.top(), min(position.y(), bounds.bottom() - self.height() + 1))
-            )
-        self.move(position)
-        self.show()
-        self.raise_()
+        super().__init__(
+            parent,
+            object_name="responseHoverCard",
+            card_kind="response",
+            title="Suggested response",
+            tone="response",
+            description=text,
+            width=360,
+        )
+        self.message_label = self.description_label
 
 
 class ResponseOptionButton(SemanticButton):

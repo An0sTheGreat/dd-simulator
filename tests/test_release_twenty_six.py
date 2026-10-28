@@ -129,17 +129,18 @@ def test_release_26_6_hover_cards_are_semantic(
     item_text = " ".join(label.text() for label in item_card.findChildren(QLabel))
     assert item_card.property("rarity") == "uncommon"
     assert "{" not in item_text and "remove_statuses" not in item_text
-    assert item_card.icon_label.width() == 88
-    surface = item_card.findChild(QWidget, "itemHoverSurface")
-    assert surface is not None and surface.isAncestorOf(item_card.description_label)
-    assert surface.property("rarity") == "uncommon"
+    assert item_card.icon_label.width() == 46
+    # The card is its own framed surface now; the rarity tone sits on the name.
+    assert item_card.findChild(QWidget, "itemHoverSurface") is None
+    assert item_card.isAncestorOf(item_card.description_label)
+    assert item_card.title_label.property("tone") == "uncommon"
 
     action = window.dashboard.combat_skills[0]
     assert action.stats
     ability_card = AbilityHoverCard(action, window)
-    ability_text = " ".join(label.text() for label in ability_card.findChildren(QLabel))
-    for required in ("Type:", "Cost:", "Effect:", "Range:"):
-        assert required in ability_text
+    assert dict(action.stats)["Type"] in ability_card.subtitle_label.text()
+    for required in ("Cost", "Effect", "Range"):
+        assert ability_card.rows[required].text()
 
     item_card.deleteLater()
     ability_card.deleteLater()

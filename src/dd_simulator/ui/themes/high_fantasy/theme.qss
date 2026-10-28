@@ -1417,3 +1417,40 @@ QPushButton#sceneActButton {
 }
 QPushButton#sceneActButton:hover, QPushButton#sceneActButton:focus { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f0d08c, stop:1 #c49a55); }
 QPushButton#sceneActButton:disabled { color: {{colors.text_muted}}; background: #3a2e1d; }
+
+/* Concept T: tooltip cards */
+QFrame#itemHoverCard, QFrame#abilityHoverCard, QFrame#skillHoverCard, QFrame#responseHoverCard {
+    border-width: 16px; border-style: solid; border-radius: 0; background: transparent; padding: 0 4px;
+    border-image: url("../../assets/{{codex.frame_tooltip}}") 24 24 24 24 stretch stretch;
+}
+QLabel#tooltipName { font-family: "Georgia"; font-size: 16px; color: {{codex.ink}}; background: transparent; }
+QLabel#tooltipName[tone="common"] { color: {{codex.rarity_common}}; }
+QLabel#tooltipName[tone="uncommon"] { color: {{codex.rarity_uncommon}}; }
+QLabel#tooltipName[tone="rare"] { color: {{codex.rarity_rare}}; }
+QLabel#tooltipName[tone="epic"], QLabel#tooltipName[tone="spell"] { color: {{codex.rarity_epic}}; }
+QLabel#tooltipName[tone="legendary"] { color: {{codex.rarity_legendary}}; }
+QLabel#tooltipName[tone="ability"], QLabel#tooltipName[tone="skill"], QLabel#tooltipName[tone="response"] { color: {{codex.gold}}; }
+QLabel#tooltipSubtitle { font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 0.6px; color: {{codex.muted}}; background: transparent; }
+QLabel#tooltipIcon { border: 1px solid {{codex.gold_dark}}; border-radius: 5px; background: #15110c; }
+QLabel#tooltipIcon[tone="uncommon"] { border-color: {{codex.rarity_uncommon}}; }
+QLabel#tooltipIcon[tone="rare"] { border-color: {{codex.rarity_rare}}; }
+QLabel#tooltipIcon[tone="epic"], QLabel#tooltipIcon[tone="spell"] { border-color: {{codex.rarity_epic}}; }
+QLabel#tooltipIcon[tone="legendary"] { border-color: {{codex.rarity_legendary}}; }
+QLabel#tooltipBadge {
+    font-family: "Oxanium"; font-size: 9px; font-weight: 600; padding: 1px 5px; border-radius: 0;
+    color: {{codex.gold}}; border: 1px solid {{codex.gold_dark}}; background: transparent;
+}
+QLabel#tooltipBadge[badgeTone="ready"] { color: {{codex.success}}; border-color: {{codex.success}}; }
+QLabel#tooltipBadge[badgeTone="cooldown"] { color: {{colors.warning}}; border-color: {{colors.warning}}; }
+QFrame#tooltipDivider { background: #3d3020; border: none; min-height: 1px; max-height: 1px; }
+QLabel#tooltipStatName { font-family: "Oxanium"; font-size: 10px; font-weight: 600; color: {{codex.muted}}; background: transparent; }
+QLabel#tooltipStatValue { font-family: "Georgia"; font-size: 12px; color: {{codex.ink}}; background: transparent; }
+QLabel#tooltipDescription { font-family: "Georgia"; font-size: 13px; font-style: italic; color: {{codex.ink}}; background: transparent; padding-top: 4px; }
+QLabel#tooltipFooter { font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 0.4px; color: {{codex.muted}}; background: transparent; padding-top: 4px; }
+QFrame#tooltipComparison { background: transparent; border: none; border-top: 1px dashed #3d3020; }
+QLabel#tooltipComparisonTitle { font-family: "Oxanium"; font-size: 10px; font-weight: 600; color: {{codex.muted}}; background: transparent; }
+QLabel#tooltipDelta { font-family: "Oxanium"; font-size: 10px; font-weight: 600; color: {{codex.muted}}; background: transparent; }
+QLabel#tooltipDelta[better="true"] { color: {{codex.success}}; }
+QLabel#tooltipDelta[better="false"] { color: {{colors.danger}}; }
+QProgressBar#tooltipXpBar { min-height: 4px; max-height: 4px; border: none; border-radius: 0; background: #2a2116; }
+QProgressBar#tooltipXpBar::chunk { border-radius: 0; background: {{codex.gold}}; }

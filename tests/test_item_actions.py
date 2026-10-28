@@ -276,7 +276,7 @@ def test_inventory_menu_disables_actions_that_rules_reject() -> None:
     assert quest_actions["Use"] is False
     flint = grid.slots[visible_slot(service, "Flint & Steel")].item
     hover = ItemHoverCard(flint, grid)
-    assert "Uses: 20/20" in [label.text() for label in hover.detail_labels]
+    assert hover.rows["Charges"].text() == "20 / 20"
     hover.deleteLater()
 
     grid.deleteLater()

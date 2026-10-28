@@ -15,90 +15,76 @@ from PySide6.QtWidgets import (
 
 from dd_simulator.ui.models.presentation import CombatActionOptionView, SkillView
 from dd_simulator.ui.item_icons import item_icon_label, refresh_item_icon
-from dd_simulator.ui.widgets.hover_card import PositionedHoverCard
+from dd_simulator.ui.power_icons import action_icon_path, skill_icon_path
+from dd_simulator.ui.widgets.hover_card import HoverCardHost, TooltipCard, card_icon
 
 
-class AbilityHoverCard(PositionedHoverCard):
+class AbilityHoverCard(TooltipCard):
+    """Ability or spell card built from the action's stats; the badge is its status."""
+
     def __init__(self, action: CombatActionOptionView, parent: QWidget) -> None:
-        super().__init__(parent, object_name="abilityHoverCard", card_kind=action.kind)
-        self.setProperty("available", action.available)
-        self.setMinimumWidth(460)
-        self.setMaximumWidth(600)
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(22, 18, 22, 18)
-        layout.setSpacing(7)
-
-        title = QLabel(action.name)
-        title.setObjectName("hoverCardTitle")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title)
-        classification = QLabel(action.kind.upper())
-        classification.setObjectName("hoverCardClassification")
-        classification.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(classification)
-
-        divider = QFrame()
-        divider.setObjectName("hoverCardDivider")
-        divider.setFrameShape(QFrame.Shape.HLine)
-        layout.addWidget(divider)
-
-        body = QHBoxLayout()
-        icon = item_icon_label(
-            action.name,
-            category="spell" if action.kind.casefold() == "spell" else "skill",
-            context=f"{action.kind} {action.description}",
-            size=82,
-            object_name="abilityHoverIcon",
+        stats = dict(action.stats)
+        kind = action.kind.casefold()
+        status = action.status_label or ("Ready" if action.available else "")
+        super().__init__(
+            parent,
+            object_name="abilityHoverCard",
+            card_kind=action.kind,
+            title=action.name,
+            tone="spell" if "spell" in kind else "ability",
+            subtitle=" · ".join(dict.fromkeys(
+                part for part in (action.kind.title(), stats.get("Type", "")) if part
+            )),
+            icon=card_icon(action_icon_path(action.key)),
+            badge=status,
+            badge_tone="ready" if action.available else "cooldown",
+            rows=[(name, value) for name, value in action.stats if name != "Type"],
+            description=action.description or "No description is available.",
+            footer=f"Unavailable: {action.unavailable_reason}" if action.unavailable_reason else "",
         )
-        body.addWidget(icon, alignment=Qt.AlignmentFlag.AlignTop)
-        stats = QGridLayout()
-        stats.setHorizontalSpacing(16)
-        stats.setVerticalSpacing(3)
-        for index, (name, value) in enumerate(action.stats):
-            row, column = index % 5, (index // 5) * 2
-            label = QLabel(f"{name}:")
-            label.setObjectName("abilityHoverStatName")
-            detail = QLabel(value or "None")
-            detail.setObjectName("abilityHoverStatValue")
-            detail.setWordWrap(True)
-            stats.addWidget(label, row, column)
-            stats.addWidget(detail, row, column + 1)
-        body.addLayout(stats, 1)
-        layout.addLayout(body)
-
-        if action.unavailable_reason:
-            unavailable = QLabel(f"Unavailable: {action.unavailable_reason}")
-            unavailable.setObjectName("abilityHoverUnavailable")
-            unavailable.setWordWrap(True)
-            layout.addWidget(unavailable)
-
-        divider = QFrame()
-        divider.setObjectName("hoverCardDivider")
-        divider.setFrameShape(QFrame.Shape.HLine)
-        layout.addWidget(divider)
-        description = QLabel(action.description or "No description is available.")
-        description.setObjectName("abilityHoverDescription")
-        description.setWordWrap(True)
-        font = description.font(); font.setItalic(True); description.setFont(font)
-        layout.addWidget(description)
+        self.setProperty("available", action.available)
 
 
-def skill_tooltip(skill: SkillView) -> str:
-    tooltip = [f"{skill.name}: level {skill.level}"]
-    if skill.next_level_xp:
-        tooltip.append(f"XP: {skill.current_xp} / {skill.next_level_xp}")
-    if skill.bonus:
-        tooltip.append(f"Temporary bonus: +{skill.bonus}")
-    if skill.locked:
-        tooltip.append("Locked")
-    if skill.recently_increased:
-        tooltip.append("Recently increased")
-    return "\n".join(tooltip)
+class SkillHoverCard(TooltipCard):
+    """Skill card: value, progress to the next level, XP bar, description, bonus."""
+
+    def __init__(self, skill: SkillView, parent: QWidget) -> None:
+        rows: list[tuple[str, str]] = []
+        extras: list[QWidget] = []
+        if skill.next_level_xp:
+            percent = min(100, skill.current_xp * 100 // skill.next_level_xp)
+            rows.append(("Progress", f"{percent}% to {skill.level + 1}"))
+            rows.append(("Next level", f"{skill.current_xp:,} / {skill.next_level_xp:,} XP"))
+            bar = QProgressBar()
+            bar.setObjectName("tooltipXpBar")
+            bar.setTextVisible(False)
+            bar.setRange(0, skill.next_level_xp)
+            bar.setValue(min(skill.current_xp, skill.next_level_xp))
+            bar.setAccessibleName(f"{skill.name} experience {percent}%")
+            extras.append(bar)
+        if skill.bonus:
+            rows.append(("Bonus", f"{skill.bonus:+d} temporary"))
+        if skill.recently_increased:
+            rows.append(("Status", "Recently increased"))
+        super().__init__(
+            parent,
+            object_name="skillHoverCard",
+            card_kind="skill",
+            title=f"{skill.name} · {skill.level}",
+            tone="skill",
+            subtitle="Skill · Locked" if skill.locked else "Skill",
+            icon=card_icon(skill_icon_path(skill.name)),
+            rows=rows,
+            extras=extras,
+            description=skill.description,
+        )
+        self.skill = skill
 
 
-class SkillGridItem(QFrame):
+class SkillGridItem(HoverCardHost, QFrame):
     def __init__(self, skill: SkillView) -> None:
         super().__init__()
+        self.skill = skill
         self.setObjectName("skillGridItem")
         self.setProperty("locked", skill.locked)
         self.setProperty("recentlyIncreased", skill.recently_increased)
@@ -140,8 +126,10 @@ class SkillGridItem(QFrame):
         )
         layout.addWidget(progress)
 
-        self.setToolTip(skill_tooltip(skill))
         self._icon_name = skill.name
+
+    def build_hover_card(self) -> SkillHoverCard:
+        return SkillHoverCard(self.skill, self)
 
     def refresh_theme_icon(self) -> None:
         refresh_item_icon(

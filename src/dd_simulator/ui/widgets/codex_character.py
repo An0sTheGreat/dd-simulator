@@ -24,7 +24,8 @@ from dd_simulator.ui.models.presentation import (
 from dd_simulator.ui.power_icons import skill_icon_path
 from dd_simulator.ui.widgets.inventory_grid import EquipmentGrid
 from dd_simulator.ui.widgets.resource_bar import ResourceBar
-from dd_simulator.ui.widgets.skills_grid import skill_tooltip
+from dd_simulator.ui.widgets.hover_card import HoverCardHost
+from dd_simulator.ui.widgets.skills_grid import SkillHoverCard
 
 
 def _label(text: str, object_name: str) -> QLabel:
@@ -233,14 +234,14 @@ class PaperdollPanel(EquipmentGrid):
             min(candidates, key=lambda value: value[:2])[2].setFocus()
 
 
-class SkillDetailRow(QFrame):
+class SkillDetailRow(HoverCardHost, QFrame):
     def __init__(self, skill: SkillView) -> None:
         super().__init__()
+        self.skill = skill
         self.setObjectName("skillDetailRow")
         self.setProperty("locked", skill.locked)
         self.setProperty("recentlyIncreased", skill.recently_increased)
         self.setAccessibleName(f"{skill.name}, level {skill.level}")
-        self.setToolTip(skill_tooltip(skill))
         self.icon_label = QLabel()
         self.icon_label.setObjectName("skillDetailIcon")
         self.icon_label.setFixedSize(30, 30)
@@ -282,6 +283,9 @@ class SkillDetailRow(QFrame):
         layout.setSpacing(9)
         layout.addWidget(self.icon_label)
         layout.addLayout(details, 1)
+
+    def build_hover_card(self) -> SkillHoverCard:
+        return SkillHoverCard(self.skill, self)
 
 
 class SkillDetailList(QWidget):
