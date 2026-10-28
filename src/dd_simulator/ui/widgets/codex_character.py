@@ -5,6 +5,8 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
+    QScrollArea,
+    QSizePolicy,
     QFrame,
     QGridLayout,
     QHBoxLayout,
@@ -24,6 +26,7 @@ from dd_simulator.ui.models.presentation import (
 from dd_simulator.ui.power_icons import skill_icon_path
 from dd_simulator.ui.widgets.inventory_grid import EquipmentGrid
 from dd_simulator.ui.widgets.resource_bar import ResourceBar
+from dd_simulator.ui.widgets.scene_view import ElidedLabel
 from dd_simulator.ui.widgets.hover_card import HoverCardHost
 from dd_simulator.ui.widgets.skills_grid import SkillHoverCard
 
@@ -78,8 +81,8 @@ class CharacterStrip(QFrame):
             cell = QGridLayout()
             cell.setContentsMargins(0, 0, 0, 0)
             cell.setVerticalSpacing(2)
-            cell.addWidget(_label(resource.name, "codexResourceName"), 0, 0)
-            value = _label(_amount(resource), "codexResourceValue")
+            cell.addWidget(ElidedLabel(resource.name, "codexResourceName", tooltip_on_self=True), 0, 0)
+            value = ElidedLabel(_amount(resource), "codexResourceValue", tooltip_on_self=True)
             value.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             cell.addWidget(value, 0, 1)
             bar = ResourceBar(resource)
@@ -103,6 +106,7 @@ PAPERDOLL_SLOT_SIZE = 58
 PAPERDOLL_ICON_SIZE = 34
 PORTRAIT_GEOMETRY = (76, 76, 168, 228)
 PORTRAIT_FRAME = 12
+PAPERDOLL_MIN_SCALE = 0.6
 # name, caption, (x, y), (column, row) for keyboard navigation
 PAPERDOLL_LAYOUT = (
     ("Ring", "Ring", (4, 4), (0, 0)),
@@ -140,32 +144,45 @@ class PaperdollPanel(EquipmentGrid):
             slot_size=PAPERDOLL_SLOT_SIZE,
         )
         self.setObjectName("paperdollPanel")
-        self.setFixedSize(PAPERDOLL_WIDTH, PAPERDOLL_HEIGHT)
         self.portrait = QLabel(self)
         self.portrait.setObjectName("paperdollPortrait")
-        self.portrait.setGeometry(*PORTRAIT_GEOMETRY)
         self.portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.portrait.lower()
         stats = [f"AC {player.armor_class}"]
         if attack_bonus is not None:
             stats.append(f"ATK {attack_bonus:+d}")
         stats.append(f"PROF +{player.proficiency_bonus}")
-        inner = PORTRAIT_GEOMETRY[2] - 2 * PORTRAIT_FRAME
-        inner_height = PORTRAIT_GEOMETRY[3] - 2 * PORTRAIT_FRAME
         self.stats_label = QLabel(" · ".join(stats), self.portrait)
         self.stats_label.setObjectName("paperdollStats")
         self.stats_label.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom
         )
-        shade = round(inner_height * 0.4)
-        self.stats_label.setGeometry(
-            PORTRAIT_FRAME, PORTRAIT_FRAME + inner_height - shade, inner, shade
-        )
+        self.stats_label.setWordWrap(True)
+        self.set_scale(1.0)
         self.set_portrait(player)
 
+    def _px(self, value: int) -> int:
+        return round(value * self.scale)
+
+    def set_scale(self, scale: float) -> None:
+        """Shrink slots, captions and portrait together; 1.0 is the mockup geometry."""
+
+        self.scale = max(PAPERDOLL_MIN_SCALE, min(1.0, scale))
+        self.setFixedSize(self._px(PAPERDOLL_WIDTH), self._px(PAPERDOLL_HEIGHT))
+        self.portrait.setGeometry(*(self._px(value) for value in PORTRAIT_GEOMETRY))
+        frame = self._px(PORTRAIT_FRAME)
+        inner = self.portrait.width() - 2 * frame
+        inner_height = self.portrait.height() - 2 * frame
+        shade = round(inner_height * 0.4)
+        self.stats_label.setGeometry(frame, frame + inner_height - shade, inner, shade)
+        self._place_slots()
+        if getattr(self, "player", None) is not None:
+            self.set_portrait(self.player)
+
     def set_portrait(self, player: PlayerSummaryView) -> None:
-        width = PORTRAIT_GEOMETRY[2] - 2 * PORTRAIT_FRAME
-        height = PORTRAIT_GEOMETRY[3] - 2 * PORTRAIT_FRAME
+        self.player = player
+        width = self.portrait.width() - 2 * self._px(PORTRAIT_FRAME)
+        height = self.portrait.height() - 2 * self._px(PORTRAIT_FRAME)
         source = QPixmap(player.portrait_path) if player.portrait_path else QPixmap()
         has_portrait = not source.isNull()
         self.portrait.setProperty("hasPortrait", has_portrait)
@@ -198,24 +215,34 @@ class PaperdollPanel(EquipmentGrid):
         for caption in getattr(self, "captions", ()):
             caption.deleteLater()
         self.captions: list[QLabel] = []
-        placement = {name.casefold(): (text, pos) for name, text, pos, _cell in PAPERDOLL_LAYOUT}
+        placement = {name.casefold(): text for name, text, _pos, _cell in PAPERDOLL_LAYOUT}
         for widget in self.slots:
             self.grid.removeWidget(widget)
-            text, (x, y) = placement[widget.slot.slot_name.casefold()]
-            widget.move(x, y)
             # Codex art comes from the theme's frame, not the legacy well artwork.
             widget.artwork_label.hide()
             widget.occupied_artwork_label.hide()
-            widget.icon_label.setFixedSize(PAPERDOLL_ICON_SIZE, PAPERDOLL_ICON_SIZE)
-            widget.refresh_theme_icon()
-            caption = QLabel(text.upper(), self)
+            caption = QLabel(placement[widget.slot.slot_name.casefold()].upper(), self)
             caption.setObjectName("paperdollSlotCaption")
             caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            caption.setGeometry(x - 12, y + PAPERDOLL_SLOT_SIZE, PAPERDOLL_SLOT_SIZE + 24, 14)
             caption.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
             self.captions.append(caption)
-        if self.slots:
-            self.setFixedSize(PAPERDOLL_WIDTH, PAPERDOLL_HEIGHT)
+        if hasattr(self, "scale"):
+            self.set_scale(self.scale)
+
+    def _place_slots(self) -> None:
+        origins = {name.casefold(): pos for name, _text, pos, _cell in PAPERDOLL_LAYOUT}
+        size = self._px(PAPERDOLL_SLOT_SIZE)
+        icon = self._px(PAPERDOLL_ICON_SIZE)
+        for widget, caption in zip(self.slots, self.captions):
+            x, y = (self._px(value) for value in origins[widget.slot.slot_name.casefold()])
+            widget.move(x, y)
+            widget.set_display_size(size)
+            widget.icon_label.setFixedSize(icon, icon)
+            widget.refresh_theme_icon()
+            # Centred under the slot, never past the panel edge, wide enough for large fonts.
+            width = max(size + 24, caption.sizeHint().width())
+            left = max(0, min(x + (size - width) // 2, self.width() - width))
+            caption.setGeometry(left, y + size, width, caption.sizeHint().height())
 
     def _move_focus(self, index: int, direction: str) -> None:
         cells = {name.casefold(): cell for name, _text, _pos, cell in PAPERDOLL_LAYOUT}
@@ -289,13 +316,25 @@ class SkillDetailRow(HoverCardHost, QFrame):
         return SkillHoverCard(self.skill, self)
 
 
-class SkillDetailList(QWidget):
-    """One row per skill: icon, name, value, one-line description and XP bar."""
+class SkillDetailList(QScrollArea):
+    """One row per skill: icon, name, value, one-line description and XP bar.
+
+    Takes the paperdoll's height and scrolls when the rows do not fit (1280x720, large fonts).
+    """
 
     def __init__(self, skills: tuple[SkillView, ...]) -> None:
         super().__init__()
         self.setObjectName("skillDetailList")
-        layout = QVBoxLayout(self)
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        self.setWidgetResizable(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Ignored)
+        self.viewport().setAutoFillBackground(False)
+        body = QWidget()
+        body.setObjectName("skillDetailListBody")
+        body.setAutoFillBackground(False)
+        self.setWidget(body)
+        layout = QVBoxLayout(body)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(5)
         self.rows = [SkillDetailRow(skill) for skill in skills]

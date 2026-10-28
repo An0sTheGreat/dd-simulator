@@ -119,12 +119,8 @@ class InventoryCard(QFrame):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.scroll.setWidget(self.grid)
-        self.scroll.setFixedSize(
-            CARD_COLUMNS * self.pitch - CARD_SLOT_SPACING + CARD_SCROLLBAR_GUTTER,
-            CARD_VISIBLE_ROWS * self.pitch - CARD_SLOT_SPACING,  # scroll area has no frame
-        )
+        self._fit_scroll()
         bar = self.scroll.verticalScrollBar()
-        bar.setSingleStep(self.pitch // 3)  # one wheel notch (3 steps) is about one row
         bar.valueChanged.connect(self._refresh_footer)
         layout.addWidget(self.scroll)
         layout.addStretch(1)
@@ -156,6 +152,25 @@ class InventoryCard(QFrame):
         self._drag_timer.timeout.connect(self._drag_scroll_tick)
         self.set_inventory(items, capacity=capacity)
 
+    def _fit_scroll(self) -> None:
+        self.scroll.setFixedSize(
+            CARD_COLUMNS * self.pitch - CARD_SLOT_SPACING + CARD_SCROLLBAR_GUTTER,
+            CARD_VISIBLE_ROWS * self.pitch - CARD_SLOT_SPACING,  # scroll area has no frame
+        )
+        # one wheel notch (3 steps) is about one row
+        self.scroll.verticalScrollBar().setSingleStep(self.pitch // 3)
+
+    def set_scale(self, scale: float) -> None:
+        """Shrink the bag slots (keeping 5x5 visible) when the codex column is short."""
+
+        size = round(CARD_SLOT_SIZE * max(0.6, min(1.0, scale)))
+        if size == self.grid.slot_size:
+            return
+        self.grid.slot_size = size
+        self.pitch = size + CARD_SLOT_SPACING
+        self._fit_scroll()
+        self.set_inventory(self.items, capacity=self.capacity)
+
     def set_inventory(
         self,
         items: tuple[InventorySlotView, ...],
@@ -166,6 +181,7 @@ class InventoryCard(QFrame):
         """Rebind from presentation data; the scroll position survives the rebind."""
 
         self.items = items
+        self.capacity = capacity
         if equipment is not None:
             self.grid.equipment = equipment
         slots = bag_slots(items, capacity)

@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from dataclasses import replace
 import ctypes
 from pathlib import Path
+import math
 import re
 import sys
 import zipfile
@@ -95,15 +96,23 @@ from dd_simulator.ui.services.local_ai_worker import (
 )
 from dd_simulator.ui.themes.theme_schema import ThemeDefinition
 from dd_simulator.ui.widgets.inventory_grid import EquipmentGrid, InventoryGrid
-from dd_simulator.ui.widgets.codex_cards import CodexCardRow, InventoryCard, PowersCard
+from dd_simulator.ui.widgets.codex_cards import (
+    CARD_SLOT_SIZE,
+    CARD_SLOT_SPACING,
+    CARD_VISIBLE_ROWS,
+    CodexCardRow,
+    InventoryCard,
+    PowersCard,
+)
 from dd_simulator.ui.widgets.codex_character import (
+    PAPERDOLL_HEIGHT,
     CharacterStrip,
     PaperdollPanel,
     SkillDetailList,
 )
 from dd_simulator.ui.widgets.conversation_view import ConversationView
 from dd_simulator.ui.widgets.crafting_page import CraftingPage
-from dd_simulator.ui.widgets.scene_view import SceneView
+from dd_simulator.ui.widgets.scene_view import ElidedLabel, SceneView
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.ui.widgets.combat_rewards_dialog import CombatRewardsDialog
@@ -129,6 +138,40 @@ WS_SYSMENU = 0x00080000
 NATIVE_SNAP_STYLE = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU
 # Concept T: codex column about 724 px beside the scene at the 1600 px design width.
 CONCEPT_T_SIZES = (724, 876)
+
+
+class CodexColumn(QWidget):
+    """Left column; scales the paperdoll and bag slots together to fit its height."""
+
+    def bind(self, strip, paperdoll, inventory) -> None:  # type: ignore[no-untyped-def]
+        self._parts = (strip, paperdoll, inventory)
+
+    def fit(self) -> None:
+        parts = getattr(self, "_parts", None)
+        if parts is None:
+            return
+        strip, paperdoll, inventory = parts
+        margins = self.layout().contentsMargins()
+        spacing = self.layout().spacing()
+        card_chrome = inventory.sizeHint().height() - inventory.scroll.height()
+        free = (
+            self.height() - margins.top() - margins.bottom() - 2 * spacing
+            - strip.sizeHint().height() - card_chrome
+        )
+        # paperdoll height plus five bag rows, both linear in the scale
+        rows = CARD_VISIBLE_ROWS * CARD_SLOT_SIZE
+        fixed = CARD_VISIBLE_ROWS * CARD_SLOT_SPACING - CARD_SLOT_SPACING
+        scale = math.floor(20 * (free - fixed) / (PAPERDOLL_HEIGHT + rows)) / 20
+        paperdoll.set_scale(scale)
+        inventory.set_scale(scale)
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        self.fit()
+
+    def showEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().showEvent(event)
+        self.fit()
 
 
 class SkillCheckPopup(QDialog):
@@ -661,16 +704,15 @@ class MainWindow(QMainWindow):
         title_layout = QHBoxLayout(title_center)
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_layout.setSpacing(8)
+        # The ornaments give up their 150 px before the title starts to elide.
         title_ornament_left = QLabel()
         title_ornament_left.setObjectName("titleOrnamentLeft")
-        title_ornament_left.setFixedSize(150, 24)
-        title_layout.addWidget(title_ornament_left)
-        self.application_title = QLabel()
-        self.application_title.setObjectName("applicationTitle")
+        title_ornament_left.setFixedHeight(24)
+        title_ornament_left.setMaximumWidth(150)
+        title_ornament_left.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        title_layout.addWidget(title_ornament_left, 1)
+        self.application_title = ElidedLabel("", "applicationTitle", tooltip_on_self=True)
         self.application_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.application_title.setSizePolicy(
-            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
-        )
         self.preset_campaign_badge = QLabel("- PRESET CAMPAIGN")
         self.preset_campaign_badge.setObjectName("presetCampaignBadge")
         self.preset_campaign_badge.setProperty("textRole", "muted")
@@ -684,11 +726,13 @@ class MainWindow(QMainWindow):
         title_group_layout.addWidget(self.application_title)
         title_group_layout.addWidget(self.preset_campaign_badge)
         title_group_layout.addStretch(1)
-        title_layout.addWidget(title_group, 1)
+        title_layout.addWidget(title_group)
         title_ornament_right = QLabel()
         title_ornament_right.setObjectName("titleOrnamentRight")
-        title_ornament_right.setFixedSize(150, 24)
-        title_layout.addWidget(title_ornament_right)
+        title_ornament_right.setFixedHeight(24)
+        title_ornament_right.setMaximumWidth(150)
+        title_ornament_right.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        title_layout.addWidget(title_ornament_right, 1)
 
         right = QWidget()
         right.setObjectName("titleBarRight")
@@ -723,7 +767,7 @@ class MainWindow(QMainWindow):
     def _update_application_title(self) -> None:
         campaign_name = self.dashboard.campaign_name.strip()
         visible_title = campaign_name or "D&D SIMULATOR"
-        self.application_title.setText(visible_title)
+        self.application_title.set_full_text(visible_title)
         self.preset_campaign_badge.setVisible(False)
         self.setWindowTitle(campaign_name or "D&D Simulator")
 
@@ -818,7 +862,7 @@ class MainWindow(QMainWindow):
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setObjectName("conceptTSplitter")
         splitter.setChildrenCollapsible(False)
-        codex = QWidget()
+        codex = CodexColumn()
         codex.setObjectName("conceptTCodex")
         layout = QVBoxLayout(codex)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -842,6 +886,7 @@ class MainWindow(QMainWindow):
         self.powers_card = PowersCard(dashboard.abilities, dashboard.spells)
         self.codex_card_row = CodexCardRow(self.inventory_card, self.powers_card)
         layout.addWidget(self.codex_card_row, 1)
+        codex.bind(self.character_strip, self.paperdoll_panel, self.inventory_card)
 
         self.scene_view = SceneView(
             dashboard.location,

@@ -152,7 +152,7 @@ QLabel#phaseLabel, QLabel#themeLabel {
 
 QLabel#themeLabel, QComboBox#themeSelector,
 QPushButton#windowMinimizeButton, QPushButton#windowMaximizeButton,
-QPushButton#windowCloseButton { font-size: 12px; /* font-scale-fixed */ }
+QPushButton#windowCloseButton { font-size: 12px; /* font-scale-fixed */ padding: 0; }
 
 QLabel#placeholderLabel {
     color: {{colors.text_secondary}};
@@ -1465,3 +1465,9 @@ QLabel#tooltipDelta[better="true"] { color: {{codex.success}}; }
 QLabel#tooltipDelta[better="false"] { color: {{colors.danger}}; }
 QProgressBar#tooltipXpBar { min-height: 4px; max-height: 4px; border: none; border-radius: 0; background: #2a2116; }
 QProgressBar#tooltipXpBar::chunk { border-radius: 0; background: {{codex.gold}}; }
+
+/* Concept T: 1280x720 scroll hosts stay see-through */
+QScrollArea#skillDetailList, QWidget#skillDetailListBody,
+QScrollArea#sceneCardScroll, QWidget#sceneCardHost {
+    background: transparent;
+}
