@@ -8,8 +8,6 @@ from PySide6.QtWidgets import QApplication
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-# Brightest conversation bands of the 95 location images (scripts/check_scene_contrast.py).
-BRIGHTEST = ("castle/castle_daylight", "mountain/mountain_snow", "cave/cave_sunset", "road/road_snow", "village/village_snow")
 
 
 def _import_script():  # type: ignore[no-untyped-def]
@@ -21,13 +19,20 @@ def _import_script():  # type: ignore[no-untyped-def]
     return module
 
 
-def test_narration_keeps_4_5_contrast_over_the_brightest_location_art() -> None:
+def test_narration_keeps_4_5_contrast_over_every_location_image() -> None:
     _app = QApplication.instance() or QApplication([])
     script = _import_script()
     colors = script.theme_colors()
     assert {"high_fantasy", "modern_proof"} <= set(colors)
+    paths = script.image_paths()
+    assert len(paths) >= 90  # every packaged location image (about 11 s for both themes)
     for theme_id, (overlay, narrator) in colors.items():
-        for name in BRIGHTEST:
-            path = script.UI / "assets" / "location" / f"{name}.png"
+        for path in paths:
             ratio = script.contrast(script.luminance(narrator), script.band_luminance(path, overlay))
-            assert ratio >= script.MINIMUM, f"{theme_id} {name}: {ratio:.2f}:1"
+            assert ratio >= script.MINIMUM, f"{theme_id} {path.parent.name}/{path.name}: {ratio:.2f}:1"
+
+
+def test_narrator_colour_regex_skips_background_color() -> None:
+    script = _import_script()
+    qss = "QLabel#conversationNarrator { background-color: #ffffff; color: #123456; }"
+    assert script.NARRATOR_COLOR.search(qss).group(1) == "#123456"
