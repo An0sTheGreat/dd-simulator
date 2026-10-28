@@ -7,8 +7,8 @@ from threading import Event
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
-from PySide6.QtCore import QThreadPool
-from PySide6.QtWidgets import QApplication, QLineEdit, QPushButton
+from PySide6.QtCore import QThreadPool, Qt
+from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QPushButton, QStyle, QStyleOptionButton
 
 from dd_simulator.app import build_application
 from dd_simulator.state import GameStateDatabase, GameStateService, ProposedStateChange
@@ -282,5 +282,46 @@ def test_dashboard_fits_1280x720_at_150_percent_font(tmp_path: Path) -> None:
     assert window.conversation_view.height() >= CONVERSATION_MIN_HEIGHT
     assert rect(scene.card_scroll, scene).bottom() < rect(window.conversation_view, scene).top()
     assert rect(window.conversation_view, scene).bottom() < rect(scene.choice_grid, scene).top()
+    window.font_size_requested.emit(100)
+    close(app, window)
+
+
+def _clipped_texts(window: MainWindow) -> list[str]:
+    """Visible single-line labels and buttons whose text overflows without an ellipsis and tooltip."""
+
+    clipped = []
+    for widget in (*window.findChildren(QLabel), *window.findChildren(QPushButton)):
+        text = widget.text()
+        if not widget.isVisible() or not text:
+            continue
+        if isinstance(widget, QLabel):
+            if widget.wordWrap() or (widget.textFormat() != Qt.TextFormat.PlainText and "<" in text):
+                continue
+            room = widget.contentsRect().width()
+        else:
+            option = QStyleOptionButton()
+            widget.initStyleOption(option)
+            room = widget.style().subElementRect(QStyle.SubElement.SE_PushButtonContents, option, widget).width()
+        if widget.fontMetrics().horizontalAdvance(text) <= room:
+            continue
+        full = getattr(widget, "full_text", "")
+        tips = f"{widget.toolTip()} {widget.parentWidget().toolTip()}".casefold()
+        if not (full and text.endswith("…") and full.casefold() in tips):
+            clipped.append(f"{widget.objectName()}: {text!r}")
+    return clipped
+
+
+def test_no_dashboard_text_is_cut_off_at_1280x720_and_150_percent(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.font_size_requested.emit(150)
+    window.resize(1280, 720)
+    window.show()
+    window.controller.navigate("dashboard")
+    for _ in range(3):
+        app.processEvents()
+    assert _clipped_texts(window) == []
+    # The long tab label is elided, not dropped: its full name stays in the tooltip.
+    tab = window.scene_view.tabs.buttons["character_sheet"]
+    assert tab.text() != tab.full_text and "Character Sheet" in tab.toolTip()
     window.font_size_requested.emit(100)
     close(app, window)

@@ -112,7 +112,7 @@ from dd_simulator.ui.widgets.codex_character import (
 )
 from dd_simulator.ui.widgets.conversation_view import ConversationView
 from dd_simulator.ui.widgets.crafting_page import CraftingPage
-from dd_simulator.ui.widgets.scene_view import SceneView
+from dd_simulator.ui.widgets.scene_view import ElidedLabel, SceneView
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.ui.widgets.combat_rewards_dialog import CombatRewardsDialog
@@ -704,16 +704,15 @@ class MainWindow(QMainWindow):
         title_layout = QHBoxLayout(title_center)
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_layout.setSpacing(8)
+        # The ornaments give up their 150 px before the title starts to elide.
         title_ornament_left = QLabel()
         title_ornament_left.setObjectName("titleOrnamentLeft")
-        title_ornament_left.setFixedSize(150, 24)
-        title_layout.addWidget(title_ornament_left)
-        self.application_title = QLabel()
-        self.application_title.setObjectName("applicationTitle")
+        title_ornament_left.setFixedHeight(24)
+        title_ornament_left.setMaximumWidth(150)
+        title_ornament_left.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        title_layout.addWidget(title_ornament_left, 1)
+        self.application_title = ElidedLabel("", "applicationTitle", tooltip_on_self=True)
         self.application_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.application_title.setSizePolicy(
-            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Preferred
-        )
         self.preset_campaign_badge = QLabel("- PRESET CAMPAIGN")
         self.preset_campaign_badge.setObjectName("presetCampaignBadge")
         self.preset_campaign_badge.setProperty("textRole", "muted")
@@ -727,11 +726,13 @@ class MainWindow(QMainWindow):
         title_group_layout.addWidget(self.application_title)
         title_group_layout.addWidget(self.preset_campaign_badge)
         title_group_layout.addStretch(1)
-        title_layout.addWidget(title_group, 1)
+        title_layout.addWidget(title_group)
         title_ornament_right = QLabel()
         title_ornament_right.setObjectName("titleOrnamentRight")
-        title_ornament_right.setFixedSize(150, 24)
-        title_layout.addWidget(title_ornament_right)
+        title_ornament_right.setFixedHeight(24)
+        title_ornament_right.setMaximumWidth(150)
+        title_ornament_right.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+        title_layout.addWidget(title_ornament_right, 1)
 
         right = QWidget()
         right.setObjectName("titleBarRight")
@@ -766,7 +767,7 @@ class MainWindow(QMainWindow):
     def _update_application_title(self) -> None:
         campaign_name = self.dashboard.campaign_name.strip()
         visible_title = campaign_name or "D&D SIMULATOR"
-        self.application_title.setText(visible_title)
+        self.application_title.set_full_text(visible_title)
         self.preset_campaign_badge.setVisible(False)
         self.setWindowTitle(campaign_name or "D&D Simulator")
 

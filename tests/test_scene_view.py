@@ -211,7 +211,9 @@ def test_action_placeholder_names_the_actor_or_falls_back() -> None:
 
 def test_long_choice_text_is_never_silently_truncated() -> None:
     view = scene()
-    view.resize(560, 876)
+    # Wide enough for the short choices: the nav tabs now elide, so 560 px no longer
+    # forces the scene to ~850 px and every choice would elide.
+    view.resize(860, 876)
     QApplication.processEvents()
     button = view.choice_grid.choice_buttons[4]
     assert button.text_label.text() != SUGGESTIONS[4]

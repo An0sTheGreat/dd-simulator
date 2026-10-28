@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import re
 
-from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, Qt, Property, Signal
+from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, QSize, Qt, Property, Signal
 from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QScrollArea,
@@ -21,6 +21,8 @@ from PySide6.QtWidgets import (
     QProgressBar,
     QPushButton,
     QSizePolicy,
+    QStyle,
+    QStyleOptionButton,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -156,9 +158,9 @@ class NavTabs(QWidget):
         layout.setSpacing(4)
         self.group = QButtonGroup(self)
         self.group.setExclusive(True)
-        self.buttons: dict[str, QPushButton] = {}
+        self.buttons: dict[str, ElidedButton] = {}
         for title, target in NAV_TABS:
-            button = QPushButton(title.upper())
+            button = ElidedButton(title.upper())
             button.setObjectName("sceneNavTab")
             button.setCheckable(True)
             button.setProperty("navigationTarget", target)
@@ -170,7 +172,7 @@ class NavTabs(QWidget):
             self.buttons[target] = button
             layout.addWidget(button)
         layout.addStretch(1)
-        self.clock_label = _label("", "sceneClockLabel")
+        self.clock_label = ElidedLabel("", "sceneClockLabel", tooltip_on_self=True)
         self.clock_label.setAccessibleName("Day and turn")
         layout.addWidget(self.clock_label)
         self.set_current("dashboard")
@@ -427,12 +429,17 @@ class EncounterCard(_SceneCard):
 
 
 class ElidedLabel(QLabel):
-    """Single-line label that elides to its width and exposes the full text as a tooltip."""
+    """Single-line label that elides to its width and exposes the full text as a tooltip.
 
-    def __init__(self, text: str, object_name: str) -> None:
+    The tooltip goes on the parent (for labels inside a button) unless ``tooltip_on_self``.
+    Its size hint is the full text, so layouts give it room before it elides.
+    """
+
+    def __init__(self, text: str, object_name: str, *, tooltip_on_self: bool = False) -> None:
         super().__init__()
         self.setObjectName(object_name)
-        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self.tooltip_on_self = tooltip_on_self
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.full_text = text
         self._refresh()
 
@@ -440,16 +447,73 @@ class ElidedLabel(QLabel):
         self.full_text = text
         self._refresh()
 
+    def sizeHint(self) -> QSize:  # noqa: N802
+        return _with_text_width(self, super().sizeHint(), self.full_text)
+
+    def minimumSizeHint(self) -> QSize:  # noqa: N802
+        return _with_text_width(self, super().minimumSizeHint(), ELLIPSIS)
+
     def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         super().resizeEvent(event)
         self._refresh()
 
+    def changeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().changeEvent(event)
+        if event.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
+            self._refresh()
+
     def _refresh(self) -> None:
-        shown = self.fontMetrics().elidedText(self.full_text, Qt.TextElideMode.ElideRight, self.width())
-        self.setText(shown)
-        owner = self.parentWidget()
+        width = self.contentsRect().width()
+        shown = self.fontMetrics().elidedText(self.full_text, Qt.TextElideMode.ElideRight, width)
+        if shown != self.text():
+            self.setText(shown)
+        owner = None if self.tooltip_on_self else self.parentWidget()
         tip = self.full_text if shown != self.full_text else ""
         (owner if owner is not None else self).setToolTip(tip)
+
+
+class ElidedButton(QPushButton):
+    """Push button that elides its own text to the space inside its padding."""
+
+    def __init__(self, text: str) -> None:
+        super().__init__()
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        self.full_text = text
+        self._refresh()
+
+    def sizeHint(self) -> QSize:  # noqa: N802
+        return _with_text_width(self, super().sizeHint(), self.full_text)
+
+    def minimumSizeHint(self) -> QSize:  # noqa: N802
+        return _with_text_width(self, super().minimumSizeHint(), ELLIPSIS)
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        self._refresh()
+
+    def changeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().changeEvent(event)
+        if event.type() in (QEvent.Type.FontChange, QEvent.Type.StyleChange):
+            self._refresh()
+
+    def _refresh(self) -> None:
+        option = QStyleOptionButton()
+        self.initStyleOption(option)
+        width = self.style().subElementRect(QStyle.SubElement.SE_PushButtonContents, option, self).width()
+        shown = self.fontMetrics().elidedText(self.full_text, Qt.TextElideMode.ElideRight, width)
+        if shown != self.text():
+            self.setText(shown)
+
+
+ELLIPSIS = "…"
+
+
+def _with_text_width(widget: QWidget, hint: QSize, text: str) -> QSize:
+    """``hint`` with the width of the shown text swapped for the width of ``text``."""
+
+    metrics = widget.fontMetrics()
+    width = hint.width() - metrics.horizontalAdvance(widget.text()) + metrics.horizontalAdvance(text)
+    return QSize(max(0, width), hint.height())
 
 
 class ChoiceButton(QPushButton):
@@ -466,6 +530,8 @@ class ChoiceButton(QPushButton):
         self.icon_label.setObjectName("sceneChoiceIcon")
         self.icon_label.setFixedSize(CHOICE_ICON_SIZE, CHOICE_ICON_SIZE)
         self.text_label = ElidedLabel("", "sceneChoiceText")
+        # Two equal columns: a long choice must not take width from its neighbour.
+        self.text_label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self.key_label = _label(str(number), "sceneChoiceKey")
         for child in (self.icon_label, self.text_label, self.key_label):
             child.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
@@ -732,9 +798,9 @@ class SceneView(QWidget):
         chips = QHBoxLayout()
         chips.setContentsMargins(0, 6, 0, 0)
         chips.setSpacing(6)
-        self.time_chip = _label("", "sceneChip")
-        self.weather_chip = _label("", "sceneChip")
-        self.danger_chip = _label("", "sceneChip")
+        self.time_chip = ElidedLabel("", "sceneChip", tooltip_on_self=True)
+        self.weather_chip = ElidedLabel("", "sceneChip", tooltip_on_self=True)
+        self.danger_chip = ElidedLabel("", "sceneChip", tooltip_on_self=True)
         for kind, chip in (("time", self.time_chip), ("weather", self.weather_chip), ("danger", self.danger_chip)):
             chip.setProperty("chipKind", kind)
             chips.addWidget(chip)
@@ -796,14 +862,14 @@ class SceneView(QWidget):
         self.title.setText(location.name)
         self.title.setAccessibleName(f"Location: {location.name}")
         self.subtitle.setText(" · ".join(part for part in (location.region, location.route_status) if part).upper())
-        self.time_chip.setText(time_chip_text(location.time_label))
-        self.weather_chip.setText(location.weather.upper())
-        self.danger_chip.setText(danger_chip_text(location.danger))
+        self.time_chip.set_full_text(time_chip_text(location.time_label))
+        self.weather_chip.set_full_text(location.weather.upper())
+        self.danger_chip.set_full_text(danger_chip_text(location.danger))
         self.danger_chip.setProperty("dangerLevel", "low" if "low" in location.danger.casefold() else "elevated")
         _repolish(self.danger_chip)
         day = re.search(r"Day\s+\d+", location.time_label, re.IGNORECASE)
-        if not self.tabs.clock_label.text() and day:
-            self.tabs.clock_label.setText(day.group(0).upper())
+        if not self.tabs.clock_label.full_text and day:
+            self.tabs.clock_label.set_full_text(day.group(0).upper())
         path = location_art(location)
         if path != self.image_path:
             self.image_path = path
@@ -813,7 +879,7 @@ class SceneView(QWidget):
         self.setAccessibleName(f"Scene: {location.name}")
 
     def set_clock(self, day: int, turn: int) -> None:
-        self.tabs.clock_label.setText(f"DAY {day} · TURN {turn}")
+        self.tabs.clock_label.set_full_text(f"DAY {day} · TURN {turn}")
 
     def set_quest(self, quest: QuestView, quest_list: tuple[QuestListItemView, ...] = ()) -> None:
         self.quest_card.set_quest(quest, reward_chips(quest_list))

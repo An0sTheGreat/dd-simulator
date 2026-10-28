@@ -26,6 +26,7 @@ from dd_simulator.ui.models.presentation import (
 from dd_simulator.ui.power_icons import skill_icon_path
 from dd_simulator.ui.widgets.inventory_grid import EquipmentGrid
 from dd_simulator.ui.widgets.resource_bar import ResourceBar
+from dd_simulator.ui.widgets.scene_view import ElidedLabel
 from dd_simulator.ui.widgets.hover_card import HoverCardHost
 from dd_simulator.ui.widgets.skills_grid import SkillHoverCard
 
@@ -79,8 +80,8 @@ class CharacterStrip(QFrame):
             cell = QGridLayout()
             cell.setContentsMargins(0, 0, 0, 0)
             cell.setVerticalSpacing(2)
-            cell.addWidget(_label(resource.name, "codexResourceName"), 0, 0)
-            value = _label(_amount(resource), "codexResourceValue")
+            cell.addWidget(ElidedLabel(resource.name, "codexResourceName", tooltip_on_self=True), 0, 0)
+            value = ElidedLabel(_amount(resource), "codexResourceValue", tooltip_on_self=True)
             value.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             cell.addWidget(value, 0, 1)
             bar = ResourceBar(resource)

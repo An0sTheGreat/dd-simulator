@@ -152,7 +152,7 @@ QLabel#phaseLabel, QLabel#themeLabel {
 
 QLabel#themeLabel, QComboBox#themeSelector,
 QPushButton#windowMinimizeButton, QPushButton#windowMaximizeButton,
-QPushButton#windowCloseButton { font-size: 12px; /* font-scale-fixed */ }
+QPushButton#windowCloseButton { font-size: 12px; /* font-scale-fixed */ padding: 0; }
 
 QLabel#placeholderLabel {
     color: {{colors.text_secondary}};
