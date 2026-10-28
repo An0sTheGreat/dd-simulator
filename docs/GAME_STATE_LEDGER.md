@@ -48,6 +48,14 @@ inventory rows are discarded or renumbered. Default, rarity, type, and value sor
 reassign only visible bag positions in a single audited transaction; equipped rows are
 excluded and stable source order resolves equal keys.
 
+Version 22 adds nullable `narrative_messages.speaker_npc_id`, a foreign key to
+`npcs(id)` with `ON DELETE SET NULL`. Existing transcript rows keep a NULL speaker.
+People dialogue stores its NPC on the spoken line. Free-form turns may propose an
+optional `speaker_id` on spoken segments; the application keeps it only when it names
+an available NPC at the current location and otherwise stores NULL without rejecting
+the turn. The dashboard projection exposes each message's turn number, speaker id,
+speaker name, and the speaker's confirmed canonical Visual Registry portrait path.
+
 Version 12 adds nullable visible inventory positions while retaining stable
 legacy item keys, migrates equipped items out of the bag, doubles existing
 capacity with a 40-slot minimum, and adds NPC status, availability, personality,

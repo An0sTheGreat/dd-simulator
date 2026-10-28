@@ -24,7 +24,7 @@ from dd_simulator.ui.widgets.semantic_button import SemanticButton
 def _service(tmp_path: Path) -> tuple[GameStateDatabase, GameStateService]:
     database = GameStateDatabase(tmp_path / "game-state.db")
     service = GameStateService(database)
-    assert service.initialize() == LATEST_SCHEMA_VERSION == 21
+    assert service.initialize() == LATEST_SCHEMA_VERSION == 22
     service.ensure_demo_campaign()
     return database, service
 
@@ -217,7 +217,7 @@ def test_schema_upgrade_creates_pre_migration_backup(tmp_path: Path) -> None:
     connection.close()
 
     database = GameStateDatabase(path)
-    assert database.initialize() == 21
+    assert database.initialize() == 22
     backups = tuple((tmp_path / "backups" / "migrations").glob("pre-migration-v14-*.db"))
     assert len(backups) == 1
     with sqlite3.connect(backups[0]) as backup:

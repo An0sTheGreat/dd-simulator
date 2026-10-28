@@ -345,26 +345,26 @@ class DialogueService:
         transcript = [
             (
                 f"{conversation_id}-player", context["campaign_id"], turn_number,
-                next_sequence, "player", context["player_text"],
+                next_sequence, "player", context["player_text"], None,
             )
         ]
         if monologue.strip():
             transcript.append(
                 (
                     f"{conversation_id}-monologue", context["campaign_id"], turn_number,
-                    next_sequence + len(transcript), "monologue", monologue,
+                    next_sequence + len(transcript), "monologue", monologue, None,
                 )
             )
         transcript.append(
             (
                 f"{conversation_id}-spoken", context["campaign_id"], turn_number,
-                next_sequence + len(transcript), "spoken", npc_text,
+                next_sequence + len(transcript), "spoken", npc_text, npc["id"],
             )
         )
         connection.executemany(
             "INSERT INTO narrative_messages("
-            "id, campaign_id, turn_number, sequence, kind, text"
-            ") VALUES (?, ?, ?, ?, ?, ?)",
+            "id, campaign_id, turn_number, sequence, kind, text, speaker_npc_id"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?)",
             transcript,
         )
         sequence = int(connection.execute(

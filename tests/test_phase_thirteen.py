@@ -21,7 +21,7 @@ from dd_simulator.ui.widgets.world_map import (
 
 def travel_service(tmp_path: Path) -> tuple[GameStateDatabase, GameStateService]:
     database = GameStateDatabase(tmp_path / "phase-thirteen.db")
-    assert database.initialize() == LATEST_SCHEMA_VERSION == 21
+    assert database.initialize() == LATEST_SCHEMA_VERSION == 22
     seed_demo_campaign(database)
     return database, GameStateService(database)
 

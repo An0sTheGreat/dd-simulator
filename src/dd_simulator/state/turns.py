@@ -21,6 +21,7 @@ class ProposedStateChange:
 class NarrativeSegment:
     kind: str
     text: str
+    speaker_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,7 +71,7 @@ def limit_narrative_segments(
         if remaining <= 0:
             break
         text = limit_words(segment.text, remaining)
-        bounded.append(NarrativeSegment(segment.kind, text))
+        bounded.append(NarrativeSegment(segment.kind, text, segment.speaker_id))
         remaining -= len(text.split())
     return tuple(bounded)
 
@@ -78,10 +79,11 @@ def limit_narrative_segments(
 def normalize_narrative_segment(
     kind: str,
     text: str,
+    speaker_id: str | None = None,
 ) -> tuple[NarrativeSegment, ...]:
     """Preserve model-authored prose while removing transport wrappers."""
 
-    return (NarrativeSegment(kind, sanitize_model_text(text)),)
+    return (NarrativeSegment(kind, sanitize_model_text(text), speaker_id),)
 
 
 @dataclass(frozen=True, slots=True)

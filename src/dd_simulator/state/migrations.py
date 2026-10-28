@@ -1500,6 +1500,14 @@ MIGRATIONS: tuple[tuple[int, str], ...] = (
         WHERE resource_type = 'experience';
         """,
     ),
+    (
+        22,
+        """
+        ALTER TABLE narrative_messages
+            ADD COLUMN speaker_npc_id TEXT REFERENCES npcs(id) ON DELETE SET NULL;
+        CREATE INDEX narrative_message_speaker ON narrative_messages(speaker_npc_id);
+        """,
+    ),
 )
 
 

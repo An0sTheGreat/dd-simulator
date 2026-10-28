@@ -199,9 +199,18 @@ def _narrative_segments(row: sqlite3.Row) -> tuple[NarrativeSegmentView, ...]:
 def _narrative_messages(
     narrative: sqlite3.Row,
     rows: list[sqlite3.Row],
+    portraits: dict[str, str] | None = None,
 ) -> tuple[NarrativeMessageView, ...]:
+    portraits = portraits or {}
     messages = tuple(
-        NarrativeMessageView(str(row["kind"]), str(row["text"]))
+        NarrativeMessageView(
+            str(row["kind"]),
+            str(row["text"]),
+            turn_number=int(row["turn_number"]),
+            speaker_id=None if row["speaker_npc_id"] is None else str(row["speaker_npc_id"]),
+            speaker_name=str(row["speaker_name"] or ""),
+            speaker_portrait=portraits.get(str(row["speaker_npc_id"]), ""),
+        )
         for row in rows
     )
     if messages:
@@ -365,16 +374,35 @@ class DashboardProjection:
             )
             message_rows = connection.execute(
                 """
-                SELECT * FROM (
+                SELECT recent.*, npcs.name AS speaker_name FROM (
                     SELECT * FROM narrative_messages
                     WHERE campaign_id = ?
                     ORDER BY turn_number DESC, sequence DESC
                     LIMIT 20
-                )
-                ORDER BY turn_number, sequence
+                ) AS recent
+                LEFT JOIN npcs ON npcs.id = recent.speaker_npc_id
+                ORDER BY recent.turn_number, recent.sequence
                 """,
                 (campaign_id,),
             ).fetchall()
+            speaker_portraits: dict[str, str] = {}
+            for speaker_id in {
+                str(row["speaker_npc_id"]) for row in message_rows
+                if row["speaker_npc_id"] is not None
+            }:
+                # NPC portraits are keyed like character portraits; only a confirmed
+                # canonical record (signature "" never matches exactly) yields a path.
+                speaker_view = _visual_view(resolve_visual_record(
+                    connection,
+                    self.assets_root,
+                    campaign_id=campaign_id,
+                    asset_kind="portrait",
+                    subject_type="character",
+                    subject_id=speaker_id,
+                    signature="",
+                ))
+                if speaker_view is not None and speaker_view.path:
+                    speaker_portraits[speaker_id] = speaker_view.path
             selected_quest = _required(
                 connection.execute(
                     "SELECT * FROM quests WHERE campaign_id = ? ORDER BY selected DESC, "
@@ -1176,7 +1204,7 @@ class DashboardProjection:
                 ),
                 player_action=str(narrative["player_action"]),
                 response_segments=_narrative_segments(narrative),
-                messages=_narrative_messages(narrative, message_rows),
+                messages=_narrative_messages(narrative, message_rows, speaker_portraits),
             ),
             quest=QuestView(
                 title=str(selected_quest["title"]),

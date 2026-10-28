@@ -131,6 +131,10 @@ class NarrativeSegmentView:
 class NarrativeMessageView:
     kind: str
     text: str
+    turn_number: int = 0
+    speaker_id: str | None = None
+    speaker_name: str = ""
+    speaker_portrait: str = ""
 
 
 @dataclass(frozen=True, slots=True)
