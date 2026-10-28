@@ -1093,7 +1093,6 @@ QProgressBar#resourceBar[resourceType="spell_slots"]::chunk {
     background-color: #b05fd3;
 }
 
-<<<<<<< HEAD
 /* Concept T: character strip, paperdoll, skills */
 QFrame#characterStrip { background: transparent; border: none; }
 QLabel#characterStripName { font-family: "Georgia"; font-size: 22px; color: {{codex.ink}}; }
@@ -1142,7 +1141,6 @@ QFrame#skillDetailRow[recentlyIncreased="true"] QLabel#skillDetailValue { color:
 QFrame#skillDetailRow[locked="true"] QLabel { color: {{codex.muted}}; }
 QProgressBar#skillDetailXpBar { min-height: 3px; max-height: 3px; background: {{colors.background_elevated}}; border: none; border-radius: 0; }
 QProgressBar#skillDetailXpBar::chunk { background: {{colors.experience}}; }
-=======
 /* Concept T: inventory and powers */
 QFrame[codexCard="true"] {
     border: 1px solid {{codex.gold_dark}};
@@ -1275,4 +1273,3 @@ QLabel#powersCardEmpty {
     font-style: italic;
     background: transparent;
 }
->>>>>>> p3c-inventory-powers
