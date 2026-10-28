@@ -221,7 +221,10 @@ class InventoryCard(QFrame):
 
 def _power_detail(action: CombatActionOptionView) -> str:
     distance = next((value for name, value in action.stats if name == "Range"), "")
-    return " · ".join(part for part in (action.resource_label, distance) if part)
+    label = action.resource_label
+    if distance and distance not in label:
+        label = " · ".join(part for part in (label, distance) if part)
+    return label.replace(" | ", " · ")
 
 
 class PowerEntry(QFrame):
