@@ -167,7 +167,7 @@ QLabel#panelTitle, QLabel[textRole="heading"] {
     font-weight: {{typography.weight_bold}};
 }
 
-QLabel[textRole="secondary"] {
+QLabel[textRole="secondary"], QLabel[textRole="system"] {
     color: {{colors.text_secondary}};
 }
 
@@ -676,8 +676,7 @@ QMenu::item:selected {
 }
 
 QWidget#navigationPageContent, QWidget#fullInventoryContent,
-QWidget#inventoryUtilityContent, QScrollArea#fullInventoryScroll,
-QScrollArea#inventoryUtilityPage {
+QWidget#inventoryUtilityContent, QScrollArea#fullInventoryScroll {
     background-color: transparent;
     border: none;
 }
@@ -990,7 +989,6 @@ QLabel[recentTurn="true"] {
 }
 
 /* Release 26.6 shared character-sheet and hover-card structure. */
-QScrollArea#inventoryUtilityScroll, QScrollArea#inventoryUtilityScroll QWidget#qt_scrollarea_viewport,
 QWidget#inventoryGrid, QScrollArea#characterSheetScroll,
 QScrollArea#characterSheetScroll QWidget#qt_scrollarea_viewport,
 QWidget#characterSheetViewport { background: transparent; border: none; }
@@ -1068,11 +1066,6 @@ QFrame#itemHoverSurface[rarity="uncommon"] QLabel#hoverCardTitle { color: {{colo
 QFrame#itemHoverSurface[rarity="rare"] QLabel#hoverCardTitle { color: {{colors.rarity_rare}}; }
 QFrame#itemHoverSurface[rarity="epic"] QLabel#hoverCardTitle { color: {{colors.rarity_epic}}; }
 QFrame#itemHoverSurface[rarity="legendary"] QLabel#hoverCardTitle { color: {{colors.rarity_legendary}}; }
-
-QWidget#inventoryEquipmentSurface {
-    background: transparent;
-    border: none;
-}
 
 QProgressBar#resourceBar[resourceType="health"]::chunk {
     background-color: #c4473a;

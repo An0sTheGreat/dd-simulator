@@ -22,7 +22,7 @@ from dd_simulator.ui.models.presentation import (
 )
 from dd_simulator.ui.item_icons import item_icon_label
 from dd_simulator.ui.panels.activity_panels import EventLogPanel, RecentEventsPanel
-from dd_simulator.ui.panels.common import highlight_recent_turn, semantic_label
+from dd_simulator.ui.panels.common import DashboardPanel, highlight_recent_turn, semantic_label
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.state.progression import saving_throw_proficiencies
@@ -745,9 +745,11 @@ class JournalPage(NavigationPage):
         self.quest_list = QuestListWidget(dashboard.quest_list)
         self.event_log = EventLogPanel(dashboard.event_log)
         self.recent_events = RecentEventsPanel(dashboard.recent_events)
+        self.quest_panel = DashboardPanel("journalQuestPanel", "QUESTS")
+        self.quest_panel.content_layout.addWidget(self.quest_list, 1)
         columns = QHBoxLayout()
         columns.setSpacing(8)
-        for widget, stretch in ((self.quest_list, 4), (self.event_log, 5), (self.recent_events, 3)):
+        for widget, stretch in ((self.quest_panel, 4), (self.event_log, 5), (self.recent_events, 3)):
             columns.addWidget(widget, stretch)
         self.layout.addLayout(columns, 1)
         self.finish()

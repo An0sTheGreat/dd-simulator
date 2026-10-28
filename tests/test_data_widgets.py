@@ -338,6 +338,23 @@ def test_quest_rows_are_compact_and_scroll_after_ten_visible_entries() -> None:
     app.processEvents()
 
 
+def test_a_single_column_of_quest_cards_fills_the_list_width() -> None:
+    app = QApplication.instance() or QApplication([])
+    quests = tuple(QuestListItemView(f"Quest {index}", "active", 1, 3) for index in range(3))
+    quest_list = QuestListWidget(quests)
+    quest_list.resize(900, 560)
+    quest_list.show()
+    app.processEvents()
+
+    rows = quest_list.findChildren(QuestListItem)
+    assert len({row.geometry().left() for row in rows}) == 1
+    assert all(row.width() >= quest_list.viewport().width() - 2 for row in rows)
+
+    quest_list.close()
+    quest_list.deleteLater()
+    app.processEvents()
+
+
 def test_resource_bar_rebinds_from_presentation_data() -> None:
     app = QApplication.instance() or QApplication([])
     bar = ResourceBar(ResourceView("Focus", 4, 10, "focus", "Technique energy"))

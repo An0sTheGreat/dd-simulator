@@ -14,18 +14,16 @@ from dd_simulator.state.item_catalog import TIER_WEIGHTS, catalog_items
 from dd_simulator.state.turns import ActionOutcome, NarrativeSegment, ProposedStateChange
 from dd_simulator.ui.item_icons import item_icon_label, item_icon_pixmap, resolve_icon
 from dd_simulator.ui.models.presentation import EquipmentSlotView, InventorySlotView
-from dd_simulator.ui.panels.narrative_panels import ResponseOptionButton
-from dd_simulator.ui.panels.utility_panels import UtilityContentPanel
 from dd_simulator.ui.widgets.inventory_grid import (
     ART_ROOT,
     EquipmentGrid,
     EquipmentSlotWidget,
-    INVENTORY_PAGE_SIZE,
     InventorySlotWidget,
     _themed_artwork,
 )
-from dd_simulator.ui.widgets.codex_cards import CARD_COLUMNS
+from dd_simulator.ui.widgets.codex_cards import CARD_COLUMNS, InventoryCard, bag_slots
 from dd_simulator.ui.widgets.codex_character import PAPERDOLL_SLOT_NAMES
+from dd_simulator.ui.widgets.scene_view import ChoiceGrid
 from dd_simulator.ui.widgets.themed_dialog import ThemedDialog
 
 
@@ -57,35 +55,36 @@ def test_release_26_5_uses_distinct_semantic_skill_and_item_icons() -> None:
     assert resolve_icon("Merchant Letter").index == 1191
 
 
-def test_inventory_pages_are_36_slots_with_top_right_controls() -> None:
+def test_inventory_card_sizes_the_bag_by_capacity_with_scroll_and_sort_controls() -> None:
     app = QApplication.instance() or QApplication([])
     inventory = tuple(
         InventorySlotView(f"Item {index}", id=f"item-{index}") for index in range(37)
     )
-    panel = UtilityContentPanel((), inventory, ())
-    panel.show()
-    panel.set_current_tab(2)
+    assert len(bag_slots(inventory, 320)) == 45  # eight occupied rows plus one spare row
+    card = InventoryCard(inventory, capacity=40)
+    card.show()
     app.processEvents()
-    assert panel.inventory_page_count == 2
-    assert INVENTORY_PAGE_SIZE == 36
-    assert len(panel.inventory_grid.slots) == 36
-    assert panel.inventory_previous_button.isVisible()
-    assert panel.inventory_next_button.isVisible()
+    assert card.grid.columns == CARD_COLUMNS == 5
+    assert len(card.grid.slots) == 40  # the capacity stops the bag short of the spare row
+    bar = card.scroll.verticalScrollBar()
+    assert bar.isVisible() and bar.maximum() > 0
+    assert card.count_label.text() == "37 items \u00b7 12 below"
+    card.scroll_to_position(36)
+    app.processEvents()
+    assert bar.value() == bar.maximum()
+    assert card.count_label.text() == "37 items \u00b7 0 below"
+    assert card.grid.slots[36].index == 36
+    assert card.grid.slots[36].item.name == "Item 36"
     sort_modes: list[str] = []
-    panel.inventory_auto_sort_requested.connect(sort_modes.append)
+    card.auto_sort_requested.connect(sort_modes.append)
     value_action = next(
-        action for action in panel.auto_sort_menu.actions()
+        action for action in card.auto_sort_button.menu().actions()
         if action.text() == "Value"
     )
     value_action.trigger()
     assert sort_modes == ["value"]
-    panel.inventory_next_button.click()
-    assert panel.current_inventory_page() == 1
-    assert panel.inventory_grid.slots[0].index == 36
-    assert panel.inventory_previous_button.isEnabled()
-    assert not panel.inventory_next_button.isEnabled()
-    panel.close()
-    panel.deleteLater()
+    card.close()
+    card.deleteLater()
     app.processEvents()
 
 
@@ -97,10 +96,24 @@ def test_item_slots_are_icon_only_artwork_with_lazy_hover_details() -> None:
     equipment = EquipmentSlotWidget(
         EquipmentSlotView("Body", "Warden Coat", "91/100", item=item), 0
     )
-    response = ResponseOptionButton("A generated response long enough to be clipped")
+    long_text = "A generated response long enough to be clipped in a narrow choice grid"
+    choices = ChoiceGrid(("Wait", long_text))
+    short, long = choices.choice_buttons[:2]
     assert inventory.hover_card is None
     assert equipment.hover_card is None
-    assert response.hover_card is None
+    assert getattr(long, "hover_card", None) is None
+    choices.resize(2400, 200)
+    choices.show()
+    app.processEvents()
+    # The full text is only offered as a tooltip once the label has to clip it.
+    assert short.toolTip() == "" and long.toolTip() == ""
+    assert long.text_label.text() == long_text
+    choices.resize(260, 200)
+    app.processEvents()
+    assert long.text_label.text() != long_text
+    assert long.toolTip() == long_text
+    assert short.accessibleName() == "Choice 1: Wait"
+    assert long.accessibleName() == f"Choice 2: {long_text}"
     assert inventory.size().width() == inventory.size().height() == 96
     assert equipment.size().width() == equipment.size().height() == 100
     assert inventory.findChild(QLabel, "inventorySlotName") is None
@@ -111,7 +124,8 @@ def test_item_slots_are_icon_only_artwork_with_lazy_hover_details() -> None:
     assert inventory.findChild(QLabel, "itemQuantityBadge").text() == "3"
     inventory.deleteLater()
     equipment.deleteLater()
-    response.deleteLater()
+    choices.close()
+    choices.deleteLater()
     app.processEvents()
 
 

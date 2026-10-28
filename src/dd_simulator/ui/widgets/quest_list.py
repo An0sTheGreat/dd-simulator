@@ -181,8 +181,6 @@ class QuestListWidget(QScrollArea):
         self.grid.setHorizontalSpacing(4)
         self.grid.setVerticalSpacing(6)
         self.grid.setAlignment(Qt.AlignmentFlag.AlignTop)
-        for column in range(self.MAX_COLUMNS):
-            self.grid.setColumnStretch(column, 1)
         self.setWidget(self.content)
         self._populate(max(1, len(quests)))
 
@@ -194,6 +192,10 @@ class QuestListWidget(QScrollArea):
                 widget.setParent(None)
                 widget.deleteLater()
         self._row_capacity = max(1, row_capacity)
+        # Only occupied columns stretch, so one column of quests fills the width.
+        used = min(self.MAX_COLUMNS, max(1, -(-len(self.quests) // self._row_capacity)))
+        for column in range(self.MAX_COLUMNS):
+            self.grid.setColumnStretch(column, 1 if column < used else 0)
         if not self.quests:
             empty = QLabel("No known quests")
             empty.setObjectName("questListEmptyState")

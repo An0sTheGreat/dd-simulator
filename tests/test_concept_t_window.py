@@ -45,3 +45,9 @@ def test_journal_page_keeps_its_event_filter_across_a_dashboard_reload(tmp_path:
     window.close()
     window.deleteLater()
     app.processEvents()
+
+
+def test_system_events_such_as_inventory_additions_have_a_themed_colour() -> None:
+    for theme in ("high_fantasy", "modern_proof"):
+        qss = (THEMES_ROOT / theme / "theme.qss").read_text(encoding="utf-8")
+        assert 'QLabel[textRole="system"]' in qss, theme
