@@ -1273,3 +1273,72 @@ QLabel#powersCardEmpty {
     font-style: italic;
     background: transparent;
 }
+
+/* Concept T: conversation */
+QScrollArea#conversationView, QScrollArea#conversationView > QWidget#qt_scrollarea_viewport,
+QWidget#conversationThread, QWidget#conversationNarratorRow, QWidget#conversationPlayerRow,
+QWidget#conversationNpcRow, QWidget#conversationNotes {
+    background: transparent;
+    border: none;
+}
+QScrollArea#conversationView {
+    qproperty-shadowColor: #000000;
+    qproperty-highlightColor: {{colors.accent_primary}};
+}
+QLabel#conversationNarrator {
+    font-family: "Segoe UI"; font-size: 15px; color: {{codex.ink}};
+    background: transparent; border: none; padding: 0 2px;
+}
+QLabel#conversationNarrator[messageKind="monologue"] { font-style: italic; }
+QFrame#conversationPlayer {
+    background: {{codex.bubble_player}}; border: 1px solid {{codex.bubble_player_border}};
+    border-top-left-radius: 12px; border-top-right-radius: 12px;
+    border-bottom-right-radius: 3px; border-bottom-left-radius: 12px;
+}
+QLabel#conversationPlayerText {
+    font-family: "Segoe UI"; font-size: 14px; font-style: normal; color: {{colors.text_primary}};
+    background: transparent; border: none;
+}
+QLabel#conversationPortrait {
+    border: 2px solid {{colors.border_primary}}; border-radius: 6px; background: {{colors.background_elevated}};
+    font-family: "Georgia"; font-size: 18px; color: {{codex.gold}};
+}
+QFrame#conversationNpc {
+    background: {{codex.bubble_npc}}; border: 1px solid {{colors.border_primary}};
+    border-top-left-radius: 3px; border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px; border-bottom-left-radius: 12px;
+}
+QLabel#conversationSpeaker {
+    font-family: "Oxanium"; font-size: 11px; font-weight: 600; color: {{codex.gold}};
+    background: transparent; border: none;
+}
+QLabel#conversationNpcText {
+    font-family: "Segoe UI"; font-size: 15px; font-style: italic; color: {{colors.text_primary}};
+    background: transparent; border: none;
+}
+QFrame#conversationPlayer[recentTurn="true"], QFrame#conversationNpc[recentTurn="true"] {
+    border-color: {{colors.accent_primary}};
+}
+QLabel#conversationNote {
+    font-family: "Oxanium"; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: {{colors.background_primary}};
+    border: 1px solid {{colors.border_primary}}; color: {{colors.text_muted}};
+}
+QLabel#conversationNote[noteKind="xp"] { color: {{colors.success}}; border-color: {{colors.border_primary}}; }
+QLabel#conversationNote[noteKind="item"] { color: {{colors.loot}}; border-color: {{colors.border_primary}}; }
+QLabel#conversationNote[noteKind="quest"] { color: {{colors.quest}}; border-color: {{colors.border_primary}}; }
+QLabel#conversationNote[noteKind="relationship"] { color: {{colors.dialogue}}; border-color: {{colors.border_primary}}; }
+QScrollArea#conversationView QScrollBar:vertical {
+    background: rgba(255, 255, 255, 20); width: 17px; margin: 20px 12px 6px 0; border: none; border-radius: 2px;
+}
+QScrollArea#conversationView QScrollBar::handle:vertical {
+    background: {{colors.border_highlight}}; border-radius: 2px; min-height: 24px;
+}
+QScrollArea#conversationView QScrollBar::add-line:vertical,
+QScrollArea#conversationView QScrollBar::sub-line:vertical {
+    height: 0; border: none; background: transparent;
+}
+QScrollArea#conversationView QScrollBar::add-page:vertical,
+QScrollArea#conversationView QScrollBar::sub-page:vertical {
+    background: transparent;
+}
