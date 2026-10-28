@@ -317,10 +317,17 @@ class DialogueService:
         if discovered:
             quest_updates.append(discovered)
         if npc.get("offers_quest_id"):
-            connection.execute(
+            started = connection.execute(
                 "UPDATE quests SET status = 'active', started_day = COALESCE(started_day, 1) "
                 "WHERE id = ? AND status = 'rumored'", (npc["offers_quest_id"],),
             )
+            if started.rowcount:
+                title = connection.execute(
+                    "SELECT title FROM quests WHERE id = ?", (npc["offers_quest_id"],)
+                ).fetchone()["title"]
+                record_turn_note(
+                    connection, context["campaign_id"], "quest", f"Quest started · {title}"
+                )
         if success and npc.get("reveals_location_id"):
             connection.execute(
                 "UPDATE locations SET discovered = 1, first_discovered_at = COALESCE(first_discovered_at, CURRENT_TIMESTAMP) "
@@ -494,4 +501,5 @@ class DialogueService:
             "VALUES (?, ?, 'activated', ?)",
             (f"quest-update-{uuid4().hex}", quest_id, f"Quest discovered: {title}"),
         )
+        record_turn_note(connection, str(context["campaign_id"]), "quest", f"Quest started · {title}")
         return f"Quest discovered: {title}."
