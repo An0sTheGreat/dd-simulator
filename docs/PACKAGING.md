@@ -13,7 +13,8 @@ To use Unsloth Studio, start it on a fixed localhost port (for example
 `unsloth studio -p 8888`) and create an API key under **Settings → API**. Enter the port
 and key in Local AI Setup, press Refresh Models, select a model, then press Load Selected
 Model (or load it manually in Unsloth Studio). Selection, loading, and evaluation never
-mutate campaign state. See `UNSLOTH.md`.
+mutate campaign state. LM Studio remains available as a secondary server on port 1234
+(see `UNSLOTH.md`).
 
 Package verification:
 

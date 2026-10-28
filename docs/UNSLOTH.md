@@ -1,9 +1,10 @@
 # Unsloth Studio Integration
 
-> **Implementation status:** this document specifies the Unsloth Studio API boundary.
-> The shipped client code (`src/dd_simulator/lm_studio/`, `LMStudioClient`) still targets
-> the previous external-server integration and has not yet been migrated to the
-> authentication, port, and model-loading behavior described here.
+> **Providers:** Unsloth Studio is the primary external model server and LM Studio the
+> secondary one (see [LM Studio (secondary provider)](#lm-studio-secondary-provider)).
+> The bundled llama.cpp runtime uses the same `LocalModelClient`
+> (`src/dd_simulator/local_model/`) without authentication or model loading. Every
+> request contract and trust boundary below applies to all three.
 
 Release and canonical workflow numbering are tracked separately in
 `WORKFLOW_STATUS.md`. Release 23 adds no model-authored mechanics: item statistics
@@ -162,6 +163,23 @@ Dropdown selection alone never loads a model. If the management routes are unava
 load the model manually in Unsloth Studio (its **Select model** dropdown or
 `unsloth run`) and press **Refresh Models**. The saved explicit selection is used by all
 generation paths and survives Restore UI Defaults.
+
+## LM Studio (secondary provider)
+
+LM Studio remains supported for existing setups and as an alternative server. Saved
+`lm_studio` configurations keep loading unchanged.
+
+- **Base URL:** `http://localhost:1234/v1`; no API key.
+- **Discovery:** LM Studio's native `GET /api/v1/models` (its `loaded_instances` metadata
+  identifies loaded models), falling back to `GET /v1/models`.
+- **Loading:** **Load Selected Model** unloads other active instances through
+  `POST /api/v1/models/unload`, then calls `POST /api/v1/models/load` and waits for
+  `loaded` status. Native loading requires LM Studio 0.4 or newer; manual loading in
+  LM Studio plus **Refresh Models** also works.
+- **Setup:** start LM Studio's local server on port 1234 and choose **Connect to LM Studio**
+  (listed after Unsloth Studio) in Local AI Setup.
+- Some models route strict `response_format` output through an unsupported tool-call
+  channel and LM Studio returns `Channel Error`; the compatibility retry below handles it.
 
 ## Release 26.8 structured-output compatibility
 

@@ -75,16 +75,20 @@ Required behavior:
 - Commit the cleaned Release 27 tree as the baseline before Phase 29 code changes land.
 - Record the passing test count and packaged smoke result in `HANDOFF.md`.
 
-### Phase 29 — Unsloth Studio client migration
+### Phase 29 — Unsloth Studio primary provider, LM Studio secondary
 
-Replace the former external local-server client with an Unsloth Studio client so the code
-matches `docs/UNSLOTH.md`.
+Add Unsloth Studio as the primary external model server while keeping LM Studio working
+as the secondary one, so the code matches `docs/UNSLOTH.md`.
 
 Required behavior:
 
-- Rename the `dd_simulator.lm_studio` package, `LMStudioClient`, `LMStudio*Error`
-  classes, the `lm_studio` setup mode, and user-facing strings to Unsloth equivalents;
-  migrate a saved `lm_studio` mode preference to the Unsloth mode instead of resetting it.
+- Rename the `dd_simulator.lm_studio` package and `LMStudio*` classes to provider-neutral
+  `dd_simulator.local_model` / `LocalModel*` (shared with the bundled llama.cpp runtime).
+- Add an `unsloth` setup mode listed before LM Studio in Local AI Setup. Keep the
+  `lm_studio` mode and its preferences working unchanged; saved `lm_studio` setups keep
+  loading as LM Studio.
+- Provider-specific wording only where text is specific to one provider; shared paths
+  use neutral wording.
 - Default base URL `http://localhost:8888/v1`, port editable in Local AI Setup/Settings,
   non-localhost hosts still rejected.
 - Send `Authorization: Bearer <key>` on every request; collect the `sk-unsloth-…` key in
@@ -96,8 +100,9 @@ Required behavior:
 - Keep the strict-schema-then-plain-JSON compatibility retry and all trust boundaries
   unchanged; read model metadata from `GET /v1/models/{id}` / `GET /v1/props`.
 - Update `tests/test_lm_studio.py` and every affected test for the new client, add tests
-  for the auth header, 401 handling, key redaction, and preference migration; full suite
-  green; rebuild and pass `--smoke-test-release27` from `dist`.
+  for the auth header, 401 handling, key redaction, and that a saved `lm_studio` setup
+  still loads as LM Studio; full suite green; rebuild and pass `--smoke-test-release27`
+  from `dist`.
 
 ### Phase 30 — Target hardware profile and final model selection
 

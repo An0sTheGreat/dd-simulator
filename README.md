@@ -30,12 +30,13 @@ Local AI options:
    (2.5 GB, SHA-256 verified, resumable) and runs it on a hidden CPU or Vulkan
    `llama-server`.
 2. **Existing GGUF** — uses a model already on disk with the bundled runtime.
-3. **Unsloth Studio** — connects to models loaded in Unsloth Studio through its
-   authenticated OpenAI-compatible API (suggested for larger models such as Gemma 4 E4B
-   Uncensored HauhauCS Aggressive Q8 K P). See [`docs/UNSLOTH.md`](docs/UNSLOTH.md).
-
-> The Unsloth Studio connection is documented but the client code still uses the
-> previous external-server integration; see [`HANDOFF.md`](HANDOFF.md).
+3. **Unsloth Studio** (primary external server) — connects to models loaded in Unsloth
+   Studio through its authenticated OpenAI-compatible API (suggested for larger models
+   such as Gemma 4 E4B Uncensored HauhauCS Aggressive Q8 K P). See
+   [`docs/UNSLOTH.md`](docs/UNSLOTH.md).
+4. **LM Studio** (secondary external server) — the earlier integration, kept for
+   compatibility: local server on port 1234, no API key, native model loading on
+   LM Studio 0.4+. See [`docs/UNSLOTH.md`](docs/UNSLOTH.md#lm-studio-secondary-provider).
 
 **Requirements:** Windows 10/11, Python 3.12+ (development), roughly 4 GB free disk for
 the recommended model, and a GPU with Vulkan support for fast local inference (CPU works,
@@ -86,6 +87,9 @@ To use Unsloth Studio instead:
    and are shown once).
 3. In Local AI Setup choose **Connect to Unsloth Studio** and enter the port and key.
 4. In Settings press **Refresh Models**, select a model, then **Load Selected Model**.
+
+To use LM Studio instead, start its local server on port 1234, choose **Connect to
+LM Studio** in Local AI Setup, then use the same Settings controls.
 
 ## Packaged smoke tests
 

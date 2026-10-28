@@ -15,6 +15,9 @@ Date: 2026-07-22
   `http://localhost:<PORT>/v1` (default `8888`, `Authorization: Bearer sk-unsloth-…`),
   with the application owning all persistent state. Explicit model loading uses the
   installed build's `/api/inference/load` management route. See `UNSLOTH.md`.
+- LM Studio: retained as the secondary external server (`http://localhost:1234/v1`, no
+  key, native `/api/v1/models` loading on LM Studio 0.4+). Saved LM Studio setups keep
+  working. Decided 2026-10-27.
 - Testing: pytest for nonvisual logic and Qt offscreen smoke tests.
 - Packaging: PyInstaller one-folder Windows distribution for the initial build.
 - Rules scope: custom fantasy rules inspired by tabletop role-playing games,
