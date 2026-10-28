@@ -153,8 +153,8 @@ def test_crafting_ui_popup_and_people_splitter_layout(tmp_path: Path) -> None:
     assert splitter is not None and trade is not None and conversation is not None
     assert splitter.orientation().name == "Vertical"
     assert splitter.handleWidth() == window.concept_splitter.handleWidth()
-    assert abs(trade.width() * 3 - window.navigation_pages["people"].width()) < 45
-    assert conversation.width() > trade.width() * 2
+    assert abs(trade.width() * 2 - window.navigation_pages["people"].width()) < 45
+    assert conversation.width() > trade.width() * 3 // 2
 
     splitter.setSizes([260, 300])
     expected = splitter.sizes()

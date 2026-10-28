@@ -11,6 +11,7 @@ from PySide6.QtCore import QPoint, QThreadPool, Qt
 from PySide6.QtWidgets import (
     QAbstractScrollArea,
     QApplication,
+    QFrame,
     QLabel,
     QLineEdit,
     QPushButton,
@@ -266,6 +267,37 @@ def test_back_from_crafting_returns_to_the_character_sheet(tmp_path: Path) -> No
     close(app, window)
 
 
+PAGE_ACTIONS = {
+    "map": ("navigationBackButton",),
+    "people": ("navigationBackButton",),
+    "character_sheet": ("characterSheetCraftingButton", "navigationBackButton"),
+    "journal": ("navigationBackButton",),
+    "settings": ("settingsBackButton",),
+    "crafting": ("craftingBackButton",),
+}
+
+
+def test_page_action_buttons_sit_compact_in_one_top_row(tmp_path: Path) -> None:
+    app, window = build_window(tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    for page, names in PAGE_ACTIONS.items():
+        window.controller.navigate(page)
+        app.processEvents()
+        host = window.content_stack.currentWidget()
+        buttons = [host.findChild(QPushButton, name) for name in names]
+        assert all(button is not None and button.isVisible() for button in buttons), page
+        tops = {button.mapTo(host, QPoint(0, 0)).y() for button in buttons}
+        assert len(tops) == 1, (page, tops)
+        assert max(tops) + buttons[0].height() <= host.height() * 0.2, (page, tops)
+        # Sized to the text, never stretched: about 220 px with Segoe UI, but the offscreen
+        # fallback font draws text about twice as wide, so allow text width plus padding.
+        for button in buttons:
+            limit = max(220, button.fontMetrics().horizontalAdvance(button.text()) + 48)
+            assert button.width() <= limit, (page, button.objectName(), button.width())
+    close(app, window)
+
+
 def _persisting_window(tmp_path: Path) -> MainWindow:
     app = QApplication.instance() or QApplication([])
     path = tmp_path / "preferences.json"
@@ -446,6 +478,132 @@ def test_elided_text_keeps_its_full_text_as_the_accessible_name(large_font_windo
     assert scene.tabs.buttons["character_sheet"].accessibleName() == "Character Sheet tab"
     scene.time_chip.set_full_text("DAY 18 · EVENING")
     assert scene.time_chip.accessibleName() == "DAY 18 · EVENING"
+
+
+def test_character_sheet_and_map_use_the_shared_page_card(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.show()
+    app.processEvents()
+    sheet = window.navigation_pages["character_sheet"]
+    sheet_cards = [frame for frame in sheet.findChildren(QFrame) if frame.property("pageCard")]
+    assert {card.accessibleName() for card in sheet_cards} >= {
+        "Identity", "Ability Scores", "Combat Summary", "Skills", "Equipment",
+        "Abilities & Spells", "Possessions & Currency",
+    }
+    map_cards = {
+        frame.objectName()
+        for frame in window.navigation_pages["map"].findChildren(QFrame)
+        if frame.property("pageCard")
+    }
+    assert {"worldMapCanvas", "travelDetailsPanel", "mapCampCard"} <= map_cards
+    assert all(card.property("codexCard") for card in sheet_cards)
+    close(app, window)
+
+
+def test_crafting_recipes_are_page_cards_with_back_on_the_title_row(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("crafting")
+    app.processEvents()
+    page = window.content_stack.currentWidget()
+    cards = [card for card in page.findChildren(QFrame, "craftingRecipeCard") if card.property("pageCard")]
+    assert len(cards) == len(window.dashboard.crafting_recipes) > 0
+    assert all(card.property("codexCard") for card in cards)
+    title = page.findChild(QLabel, "navigationPageTitle")
+    back = page.findChild(QPushButton, "craftingBackButton")
+    assert title.text() == "CRAFTING RECIPES"
+    # Back shares the title row and the Return buttons' secondary role.
+    title_middle = title.mapTo(page, QPoint(0, title.height() // 2)).y()
+    back_top = back.mapTo(page, QPoint(0, 0)).y()
+    assert back_top <= title_middle <= back_top + back.height() + title.height()
+    assert back.property("buttonRole") == "secondary"
+    close(app, window)
+
+
+def test_journal_and_settings_sections_are_page_cards(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    journal = window.navigation_pages["journal"]
+    sections = [journal.quest_panel, journal.event_log, journal.recent_events]
+    settings_cards = window.settings_panel.findChildren(QFrame)
+    sections += [card for card in settings_cards if card.property("pageCard")]
+    sections.append(window.campaign_browser)
+    assert len(sections) == 3 + 4 + 1
+    assert all(card.property("pageCard") and card.property("codexCard") for card in sections)
+    window.controller.navigate("settings")
+    app.processEvents()
+    page = window.content_stack.currentWidget()
+    # Settings has a page title row like the other pages, with Back on it.
+    assert page.findChild(QLabel, "navigationPageTitle").text() == "SETTINGS"
+    assert page.findChild(QPushButton, "settingsBackButton") is window.settings_panel.back_button
+    close(app, window)
+
+
+def test_people_sections_are_page_cards(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("people")
+    app.processEvents()
+    page = window.navigation_pages["people"]
+    names = (
+        "npcSelectorCard", "npcIdentityCard", "npcConversationCard",
+        "merchantTradePanel", "npcBottomControls",
+    )
+    sections = [page.findChild(QFrame, name) for name in names]
+    assert all(card is not None and card.property("pageCard") and card.property("codexCard") for card in sections)
+    # The NPC exchange uses the Adventure conversation's thread; replies keep their heading.
+    assert page.thread.objectName() == "conversationView"
+    assert page.action_host.findChild(QLabel, "codexCardHeading").text() == "YOUR REPLY"
+    close(app, window)
+
+
+def test_people_replies_and_trade_fit_at_small_window(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1280, 720)
+    window.show()
+    window.controller.navigate("people")
+    for _ in range(3):
+        app.processEvents()
+    page = window.navigation_pages["people"]
+    replies = page.findChildren(QPushButton, "npcSuggestedResponse")
+    assert len(replies) == 6
+    for button in replies:
+        option = QStyleOptionButton()
+        button.initStyleOption(option)
+        room = button.style().subElementRect(QStyle.SubElement.SE_PushButtonContents, option, button)
+        metrics = button.fontMetrics()
+        fits_one_line = metrics.horizontalAdvance(button.text()) <= room.width()
+        # Or it wraps: every word fits the width and the button is tall enough for its lines.
+        wraps = (
+            button.hasHeightForWidth()
+            and button.height() >= button.heightForWidth(button.width())
+            and all(metrics.horizontalAdvance(word) <= room.width() for word in button.text().split())
+        )
+        assert fits_one_line or wraps, button.text()
+    scroll = page.findChild(QAbstractScrollArea, "merchantTradeScroll")
+    assert scroll is not None and not scroll.horizontalScrollBar().isVisible()
+    close(app, window)
+
+
+def test_character_sheet_story_cards_put_each_label_beside_its_value(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("character_sheet")
+    app.processEvents()
+    sheet = window.navigation_pages["character_sheet"]
+    for title in ("Appearance & Biography", "Role & Character"):
+        card = next(frame for frame in sheet.findChildren(QFrame) if frame.accessibleName() == title)
+        labels = card.findChildren(QLabel, "pageCardLabel")
+        values = card.findChildren(QLabel, "pageCardValue")
+        assert labels and len(labels) == len(values)
+        for label, value in zip(labels, values):
+            assert label.mapTo(card, QPoint(0, 0)).y() == value.mapTo(card, QPoint(0, 0)).y(), title
+            assert label.mapTo(card, QPoint(0, 0)).x() < value.mapTo(card, QPoint(0, 0)).x(), title
+    close(app, window)
 
 
 @pytest.mark.parametrize("size", [(1280, 720), (1600, 900)])

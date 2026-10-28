@@ -4,6 +4,12 @@ Last updated: 2026-10-28
 
 ## Current state
 
+- **Branch `page-nav-top` (unmerged):** page actions in a top-right `pageActionBar`; Character
+  Sheet and Map restyled as Concept T codex cards via the shared `codex_card()` /
+  `icon_row()` / `plain_label()` helpers in `ui/widgets/codex_cards.py` (QSS:
+  `QFrame[pageCard="true"]`, `pageCard*` labels, `navigationPageTitle/Subtitle`). People,
+  Journal, Settings and Crafting still use the old section frames (part 2).
+
 - **Release 28 + Phases 31-32** merged into `main` (`412212e`) and pushed to
   `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.28.0`, database
   schema **24**. No other branches or worktrees remain.
@@ -19,6 +25,11 @@ Last updated: 2026-10-28
   Studio (primary external server)**, **LM Studio (secondary)**. All share
   `dd_simulator.local_model.LocalModelClient`, selected by `provider=`
   (`"openai"` for llama.cpp, `"unsloth"`, `"lm_studio"`).
+- **Page action bar** (branch `page-nav-top`): Return to Adventure, Crafting and Back
+  sit in one compact top-right `pageActionBar` row on Map, People, Character Sheet,
+  Journal, Crafting and Settings (`navigation_pages.page_action_bar`). The old
+  `navigationFooter`, `settingsCenteredFooter`, `craftingCenteredFooter` and
+  `characterSheetCraftingFooter` hosts are gone; full suite not yet rerun on it.
 - **Tests:** 465 passed, 0 failed (full suite, offscreen, 2026-10-28).
 - **Packaged build** (`dist/DnDSimulator`, 592 MB) rebuilt from the merged tree. These
   smoke switches exit 0: `--smoke-test`, `--smoke-test-release27`,

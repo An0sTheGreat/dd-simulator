@@ -39,7 +39,8 @@ def test_release_26_6_character_sheet_is_centered_and_complete(tmp_path: Path) -
     surface = window.findChild(QWidget, "characterSheetSurface")
     viewport = window.findChild(QWidget, "characterSheetViewport")
     assert surface is not None and viewport is not None
-    assert surface.width() * 5 <= viewport.width() * 3 + 10
+    # The sheet is a full-width grid of codex cards (was a centred 60 % column).
+    assert surface.width() >= viewport.width() - 4
     assert len(surface.findChildren(QWidget, "characterSheetAttribute")) == 6
     assert surface.findChild(QWidget, "characterSheetIdentity") is not None
 

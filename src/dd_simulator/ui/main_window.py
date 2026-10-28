@@ -74,7 +74,7 @@ from dd_simulator.ui.panels.campaign_panels import (
 )
 from dd_simulator.ui.panels.navigation_pages import (
     CharacterSheetPage,
-    centered_third,
+    NavigationPage,
     create_navigation_pages,
 )
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
@@ -424,13 +424,16 @@ class MainWindow(QMainWindow):
             )
             self.campaign_browser.load_requested.connect(self._load_campaign)
             self.campaign_browser.delete_requested.connect(self._delete_campaign)
+        # Title row like every page; the two card columns scroll beneath it.
+        settings_navigation = NavigationPage(
+            "settingsNavigationPage", "SETTINGS", "Application, model, and campaign controls.",
+            back=self.settings_panel.back_button,
+        )
         self.settings_page = QWidget()
         self.settings_page.setObjectName("settingsPage")
-        settings_layout = QVBoxLayout(self.settings_page)
-        settings_layout.setContentsMargins(0, 0, 0, 0)
-        settings_columns = QWidget()
-        settings_columns_layout = QHBoxLayout(settings_columns)
+        settings_columns_layout = QHBoxLayout(self.settings_page)
         settings_columns_layout.setContentsMargins(0, 0, 0, 0)
+        settings_columns_layout.setSpacing(8)
         self.settings_panel.setSizePolicy(
             QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred
         )
@@ -442,16 +445,13 @@ class MainWindow(QMainWindow):
             settings_columns_layout.addWidget(self.campaign_browser, 1)
         else:
             settings_columns_layout.addStretch(1)
-        settings_layout.addWidget(settings_columns, 1)
-        settings_layout.addWidget(
-            centered_third(self.settings_panel.back_button, "settingsCenteredFooter")
-        )
         self.settings_scroll = QScrollArea()
         self.settings_scroll.setObjectName("settingsScrollArea")
         self.settings_scroll.setWidgetResizable(True)
         self.settings_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         self.settings_scroll.setWidget(self.settings_page)
-        self.page_indices["settings"] = self.content_stack.addWidget(self.settings_scroll)
+        settings_navigation.layout.addWidget(self.settings_scroll, 1)
+        self.page_indices["settings"] = self.content_stack.addWidget(settings_navigation)
 
         if self.game_state_service is not None:
             self.character_creation_panel = CharacterCreationPanel(self.character_randomizer)
@@ -960,17 +960,20 @@ class MainWindow(QMainWindow):
 
     def _build_crafting_page(self) -> QWidget:
         # Temporary home until the crafting move into the Character Sheet.
-        page = QWidget()
-        page.setObjectName("craftingNavigationPage")
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(8, 8, 8, 8)
+        page = NavigationPage(
+            "craftingNavigationPage",
+            "CRAFTING RECIPES",
+            "Ingredients and tool uses are consumed only after a successful deterministic attempt.",
+        )
+        # The page's own secondary back button, on the title row, returns to the sheet.
+        back = page.back_button
+        back.setText("Back")
+        back.setObjectName("craftingBackButton")
+        back.setToolTip("Return to the character sheet")
+        page.back_requested.connect(lambda: self.controller.navigate("character_sheet"))
         self.crafting_page = CraftingPage(self.dashboard.crafting_recipes)
         self.crafting_page.craft_requested.connect(self._request_crafting)
-        layout.addWidget(self.crafting_page, 1)
-        back = SemanticButton("Back", role="navigation", object_name="craftingBackButton")
-        back.setToolTip("Return to the character sheet")
-        back.clicked.connect(lambda: self.controller.navigate("character_sheet"))
-        layout.addWidget(centered_third(back, "craftingCenteredFooter"))
+        page.layout.addWidget(self.crafting_page, 1)
         return page
 
     def _activate_power(self, key: str) -> None:
@@ -2340,7 +2343,7 @@ class MainWindow(QMainWindow):
                     "people": (
                         self.findChild(QSplitter, "peopleTradeConversationSplitter").sizes()
                         if self.findChild(QSplitter, "peopleTradeConversationSplitter")
-                        is not None else [210, 500]
+                        is not None else [300, 400]
                     ),
                 },
                 "page": self.current_page,
@@ -2476,7 +2479,7 @@ class MainWindow(QMainWindow):
         self.concept_splitter.setSizes(list(CONCEPT_T_SIZES))
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
-            people_splitter.setSizes([210, 500])
+            people_splitter.setSizes([300, 400])
         if self.preferences_store is not None:
             self.preferences_store.reset_ui()
         self.select_font_size(100)

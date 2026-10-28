@@ -575,8 +575,8 @@ def _run_release_twenty_one_smoke(app: QApplication, window: MainWindow) -> None
                 raise RuntimeError(f"Packaged Release 21 control is missing: {object_name}")
         trade = window.findChild(QWidget, "merchantTradePanel")
         people = window.navigation_pages["people"]
-        if trade is None or abs(trade.width() * 3 - people.width()) >= 60:
-            raise RuntimeError("Packaged Trade panel is not one-third People-page width")
+        if trade is None or abs(trade.width() * 2 - people.width()) >= 60:
+            raise RuntimeError("Packaged Trade panel is not one-half People-page width")
         service.acknowledge_crafting_result(result.id)
         dialog = window.findChild(QWidget, "craftingResultsDialog")
         if dialog is not None:
@@ -613,8 +613,7 @@ def _run_release_twenty_smoke(app: QApplication, window: MainWindow) -> None:
         window._reload_dashboard(dashboard, target_page="people")  # noqa: SLF001
         app.processEvents()
         for object_name in (
-            "merchantTradePanel", "npcCenteredFooter", "navigationFooter",
-            "settingsCenteredFooter",
+            "merchantTradePanel", "npcCenteredFooter", "pageActionBar",
         ):
             if window.findChild(QWidget, object_name) is None:
                 raise RuntimeError(f"Packaged Release 20 control is missing: {object_name}")

@@ -9,6 +9,7 @@ from PySide6.QtGui import QTextCursor
 from PySide6.QtWidgets import (
     QCheckBox,
     QFormLayout,
+    QFrame,
     QGridLayout,
     QHBoxLayout,
     QLabel,
@@ -72,6 +73,7 @@ from dd_simulator.ui.services.randomization_worker import (
 )
 from dd_simulator.ui.widgets.full_click_combo import FullClickComboBox
 from dd_simulator.ui.widgets.option_dialog import OptionSelectionDialog
+from dd_simulator.ui.widgets.codex_cards import make_codex_card, plain_label
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 
@@ -166,22 +168,21 @@ def _text_area(name: str, placeholder: str, maximum_height: int = 92) -> QPlainT
     return field
 
 
-class CampaignBrowserPanel(DashboardPanel):
+class CampaignBrowserPanel(QFrame):
     new_requested = Signal()
     preset_requested = Signal(str)
     load_requested = Signal(str)
     delete_requested = Signal(str)
 
     def __init__(self, campaigns: tuple[CampaignRecord, ...]) -> None:
-        super().__init__("campaignBrowserPanel", "CAMPAIGNS")
-        intro = semantic_label(
-            "Load a completed campaign or begin a new character.",
-            text_role="secondary",
-        )
-        self.content_layout.addWidget(intro)
-        self.content_layout.addWidget(
-            semantic_label("PRESET CAMPAIGNS", text_role="accent")
-        )
+        super().__init__()
+        self.setObjectName("campaignBrowserPanel")
+        self.content_layout = make_codex_card(self, "Campaigns")
+        self.content_layout.setAlignment(Qt.AlignmentFlag(0))  # the two lists share the height
+        self.content_layout.addWidget(plain_label(
+            "Load a completed campaign or begin a new character.", "pageCardMeta", word_wrap=True
+        ))
+        self.content_layout.addWidget(plain_label("PRESET CAMPAIGNS", "pageCardLabel"))
         self.preset_list = QListWidget()
         self.preset_list.setObjectName("presetCampaignList")
         self.preset_list.setAccessibleName("Preset campaigns")
@@ -193,9 +194,7 @@ class CampaignBrowserPanel(DashboardPanel):
         self.preset_list.itemClicked.connect(self._select_preset)
         self.content_layout.addWidget(self.preset_list, 1)
 
-        self.content_layout.addWidget(
-            semantic_label("CUSTOM CAMPAIGNS", text_role="secondary")
-        )
+        self.content_layout.addWidget(plain_label("CUSTOM CAMPAIGNS", "pageCardLabel"))
         self.campaign_list = QListWidget()
         self.campaign_list.setObjectName("campaignList")
         self.campaign_list.setAccessibleName("Custom campaigns")
