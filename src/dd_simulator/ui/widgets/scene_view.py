@@ -67,7 +67,9 @@ CHOICE_KEYS = {getattr(Qt.Key, f"Key_{number}"): number for number in range(1, 7
 TEXT_ENTRY_WIDGETS = (QLineEdit, QTextEdit, QPlainTextEdit)
 CHOICE_ICON_SIZE = 22
 # Concept T overlay: (position, opacity) of the overlay colour down the art; solid from 82%.
-OVERLAY_STOPS = ((0.0, 0.35), (0.12, 0.0), (0.36, 0.25), (0.62, 0.86), (0.82, 1.0))
+# The 45% stop darkens the top of the conversation band so narration on the brightest art
+# stays above 4.5:1 (scripts/check_scene_contrast.py); the art above it is unchanged.
+OVERLAY_STOPS = ((0.0, 0.35), (0.12, 0.0), (0.36, 0.25), (0.45, 0.6), (0.62, 0.88), (0.82, 1.0))
 ART_FOCUS_Y = 0.3  # crop near the top: CSS background-position center 30%
 
 
@@ -947,18 +949,22 @@ class SceneView(QWidget):
         self.card_scroll.setFixedWidth(max(240, min(SCENE_CARD_WIDTH, width)))
 
     def paintEvent(self, _event) -> None:  # type: ignore[no-untyped-def]
-        painter = QPainter(self)
-        rect = self.rect()
-        if self._art is not None:
-            scaled = self._art.size().scaled(rect.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
-            x = (scaled.width() - rect.width()) / 2
-            y = (scaled.height() - rect.height()) * ART_FOCUS_Y
-            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
-            painter.drawPixmap(QRectF(-x, -y, scaled.width(), scaled.height()), self._art, QRectF(self._art.rect()))
-        gradient = QLinearGradient(QPointF(0, 0), QPointF(0, rect.height()))
-        for position, alpha in OVERLAY_STOPS:
-            color = QColor(self._overlay)
-            color.setAlphaF(alpha)
-            gradient.setColorAt(position, color)
-        gradient.setColorAt(1.0, self._overlay)
-        painter.fillRect(rect, gradient)
+        paint_backdrop(QPainter(self), self.rect(), self._art, self._overlay)
+
+
+def paint_backdrop(painter: QPainter, rect, art: QPixmap | None, overlay: QColor) -> None:  # type: ignore[no-untyped-def]
+    """Cover-fit ``art`` into ``rect`` under the overlay gradient (also used by check_scene_contrast)."""
+
+    if art is not None:
+        scaled = art.size().scaled(rect.size(), Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        x = (scaled.width() - rect.width()) / 2
+        y = (scaled.height() - rect.height()) * ART_FOCUS_Y
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        painter.drawPixmap(QRectF(-x, -y, scaled.width(), scaled.height()), art, QRectF(art.rect()))
+    gradient = QLinearGradient(QPointF(0, 0), QPointF(0, rect.height()))
+    for position, alpha in OVERLAY_STOPS:
+        color = QColor(overlay)
+        color.setAlphaF(alpha)
+        gradient.setColorAt(position, color)
+    gradient.setColorAt(1.0, overlay)
+    painter.fillRect(rect, gradient)
