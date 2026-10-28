@@ -158,29 +158,23 @@ class CharacterSheetPage(NavigationPage):
             ),
             None,
         )
+        # One row per value (label left, value right): five columns do not fit the narrow
+        # left column, where the values ran together.
         vitals_grid = QGridLayout()
-        vitals_grid.addWidget(semantic_label("Hit Points", text_role="muted"), 0, 0)
-        vitals_grid.addWidget(
-            semantic_label(
-                f"{health.current} / {health.maximum}" if health else "—",
-                object_name="characterSheetVitalValue",
-                text_role="heading",
-            ),
-            1,
-            0,
-        )
-        for index, (label, value) in enumerate((
+        vitals_grid.setHorizontalSpacing(12)
+        vitals_grid.setVerticalSpacing(1)
+        vitals_grid.setColumnStretch(0, 1)
+        for row, (label, value) in enumerate((
+            ("Hit Points", f"{health.current} / {health.maximum}" if health else "—"),
             ("Armor", str(dashboard.player.armor_class)),
             ("Initiative", f"{dashboard.player.initiative_modifier:+d}"),
             ("Speed", f"{dashboard.player.movement_feet} ft"),
             ("Proficiency", f"+{dashboard.player.proficiency_bonus}"),
-        ), start=1):
-            vitals_grid.addWidget(semantic_label(label, text_role="muted"), 0, index)
-            vitals_grid.addWidget(
-                semantic_label(value, object_name="characterSheetVitalValue", text_role="heading"),
-                1,
-                index,
-            )
+        )):
+            vitals_grid.addWidget(semantic_label(label, text_role="muted"), row, 0)
+            value_label = semantic_label(value, object_name="characterSheetVitalValue", text_role="heading")
+            value_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            vitals_grid.addWidget(value_label, row, 1)
         vitals_layout.addLayout(vitals_grid)
         left.addWidget(vitals)
 
@@ -745,6 +739,9 @@ class JournalPage(NavigationPage):
         self.quest_list = QuestListWidget(dashboard.quest_list)
         self.event_log = EventLogPanel(dashboard.event_log)
         self.recent_events = RecentEventsPanel(dashboard.recent_events)
+        # The tall Journal columns start their entries at the top (same order and scrolling).
+        for panel in (self.event_log, self.recent_events):
+            panel.scroll_area.widget().layout().setAlignment(Qt.AlignmentFlag.AlignTop)
         self.quest_panel = DashboardPanel("journalQuestPanel", "QUESTS")
         self.quest_panel.content_layout.addWidget(self.quest_list, 1)
         columns = QHBoxLayout()

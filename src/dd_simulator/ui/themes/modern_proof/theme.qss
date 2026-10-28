@@ -419,9 +419,11 @@ QWidget#questObjectiveDropdown {
 }
 
 QLabel#questListState, QLabel#questExpandedSummary,
-QLabel#questObjectiveEntry, QLabel#questObjectiveEmpty {
+QLabel#questObjectiveEntry, QLabel#questObjectiveEmpty, QLabel#questProgressLabel {
     color: {{colors.text_secondary}};
 }
+
+QLabel#questProgressLabel { font-size: {{typography.size_small}}; }
 
 QLabel#questObjectiveTitle, QLabel#questRewardPreview {
     color: {{colors.accent_primary}};

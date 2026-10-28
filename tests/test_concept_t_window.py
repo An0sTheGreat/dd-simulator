@@ -16,10 +16,12 @@ from PySide6.QtWidgets import (
     QPushButton,
     QStyle,
     QStyleOptionButton,
+    QWidget,
 )
 
 from dd_simulator.app import build_application
 from dd_simulator.state import (
+    GameStateError,
     GameStateDatabase,
     GameStateService,
     ItemAction,
@@ -28,6 +30,7 @@ from dd_simulator.state import (
 )
 from dd_simulator.state.combat import CombatService, EnemySpec
 from dd_simulator.ui.main_window import MainWindow
+from dd_simulator.ui.widgets.quest_list import QuestListItem
 from dd_simulator.ui.widgets.scene_view import CONVERSATION_MIN_HEIGHT, ElidedButton, ElidedLabel
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
 from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
@@ -179,6 +182,43 @@ def test_older_requested_prepends_earlier_messages_in_order(tmp_path: Path) -> N
     close(app, window)
 
 
+@pytest.mark.parametrize("failure", ["error", "no_campaign"])
+def test_scrolling_to_the_top_again_retries_a_failed_older_load(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    service = window.game_state_service
+    for index in range(45):
+        service.resolve_player_action(f"Action {index}", FixedProvider(outcome()))
+    window._reload_dashboard(service.load_active_dashboard())
+    window.resize(1280, 720)
+    window.show()
+    app.processEvents()
+    view = window.conversation_view
+    bar = view.verticalScrollBar()
+    assert bar.maximum() > bar.minimum() and view.has_older
+    requests: list[int] = []
+    view.older_requested.connect(requests.append)
+
+    def fail(*_args):  # type: ignore[no-untyped-def]
+        raise GameStateError("ledger busy")
+
+    if failure == "error":
+        monkeypatch.setattr(service, "older_messages", fail)
+    else:
+        monkeypatch.setattr(service.campaigns, "active_campaign_id", lambda: None)
+    bar.setValue(bar.maximum())
+    bar.setValue(bar.minimum())
+    assert len(requests) == 1 and len(view.messages) == 40
+    monkeypatch.undo()
+
+    bar.setValue(bar.maximum())
+    bar.setValue(bar.minimum())
+    assert len(requests) == 2
+    assert len(view.messages) > 40
+    close(app, window)
+
+
 def test_combat_swaps_in_the_encounter_card_and_locks_free_text(tmp_path: Path) -> None:
     app, window, database = combat_window(tmp_path)
     scene = window.scene_view
@@ -294,14 +334,26 @@ def test_item_refresh_keeps_the_paperdoll_attack_bonus(tmp_path: Path, action: s
     database.close()
 
 
-def test_dashboard_fits_1280x720_at_150_percent_font(tmp_path: Path) -> None:
+@pytest.fixture
+def large_font_window(tmp_path: Path):  # type: ignore[no-untyped-def]
+    """Dashboard at 1280x720 and 150% font; the app font is reset even when the test fails."""
+
     app, window, _manager = build_application([], config_dir=tmp_path)
-    window.font_size_requested.emit(150)
-    window.resize(1280, 720)
-    window.show()
-    window.controller.navigate("dashboard")
-    for _ in range(3):
-        app.processEvents()
+    try:
+        window.font_size_requested.emit(150)
+        window.resize(1280, 720)
+        window.show()
+        window.controller.navigate("dashboard")
+        for _ in range(3):
+            app.processEvents()
+        yield app, window
+    finally:
+        window.font_size_requested.emit(100)
+        close(app, window)
+
+
+def test_dashboard_fits_1280x720_at_150_percent_font(large_font_window) -> None:
+    app, window = large_font_window
 
     def rect(widget, ancestor):  # type: ignore[no-untyped-def]
         return widget.rect().translated(widget.mapTo(ancestor, widget.rect().topLeft()))
@@ -330,8 +382,6 @@ def test_dashboard_fits_1280x720_at_150_percent_font(tmp_path: Path) -> None:
     assert window.conversation_view.height() >= CONVERSATION_MIN_HEIGHT
     assert rect(scene.card_scroll, scene).bottom() < rect(window.conversation_view, scene).top()
     assert rect(window.conversation_view, scene).bottom() < rect(scene.choice_grid, scene).top()
-    window.font_size_requested.emit(100)
-    close(app, window)
 
 
 def _clipped_texts(window: MainWindow) -> list[str]:
@@ -367,14 +417,8 @@ def _clipped_texts(window: MainWindow) -> list[str]:
     return clipped
 
 
-def test_no_dashboard_text_is_cut_off_at_1280x720_and_150_percent(tmp_path: Path) -> None:
-    app, window, _manager = build_application([], config_dir=tmp_path)
-    window.font_size_requested.emit(150)
-    window.resize(1280, 720)
-    window.show()
-    window.controller.navigate("dashboard")
-    for _ in range(3):
-        app.processEvents()
+def test_no_dashboard_text_is_cut_off_at_1280x720_and_150_percent(large_font_window) -> None:
+    app, window = large_font_window
     assert _clipped_texts(window) == []
     # The long tab label is elided, not dropped: its full name stays in the tooltip.
     tab = window.scene_view.tabs.buttons["character_sheet"]
@@ -384,18 +428,10 @@ def test_no_dashboard_text_is_cut_off_at_1280x720_and_150_percent(tmp_path: Path
         assert button.text() == button.full_text or len(button.text().rstrip("…")) >= 3, button.full_text
     assert window.scene_view.tabs.buttons["map"].text() == "MAP"
     assert len(window.scene_view.tabs.clock_label.text().rstrip("…")) >= 3  # the clock row shares the room
-    window.font_size_requested.emit(100)
-    close(app, window)
 
 
-def test_elided_text_keeps_its_full_text_as_the_accessible_name(tmp_path: Path) -> None:
-    app, window, _manager = build_application([], config_dir=tmp_path)
-    window.font_size_requested.emit(150)
-    window.resize(1280, 720)
-    window.show()
-    window.controller.navigate("dashboard")
-    for _ in range(3):
-        app.processEvents()
+def test_elided_text_keeps_its_full_text_as_the_accessible_name(large_font_window) -> None:
+    app, window = large_font_window
     scene = window.scene_view
     elided = [
         widget for widget in (*window.findChildren(ElidedLabel), *window.findChildren(ElidedButton))
@@ -410,5 +446,56 @@ def test_elided_text_keeps_its_full_text_as_the_accessible_name(tmp_path: Path) 
     assert scene.tabs.buttons["character_sheet"].accessibleName() == "Character Sheet tab"
     scene.time_chip.set_full_text("DAY 18 · EVENING")
     assert scene.time_chip.accessibleName() == "DAY 18 · EVENING"
-    window.font_size_requested.emit(100)
+
+
+@pytest.mark.parametrize("size", [(1280, 720), (1600, 900)])
+def test_character_sheet_combat_summary_values_keep_apart(tmp_path: Path, size) -> None:  # type: ignore[no-untyped-def]
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(*size)
+    window.show()
+    window.controller.navigate("character_sheet")
+    for _ in range(3):
+        app.processEvents()
+    page = window.navigation_pages["character_sheet"]
+    values = page.findChildren(QLabel, "characterSheetVitalValue")
+    assert len(values) == 5
+    rects = [label.geometry().translated(label.parentWidget().mapTo(page, QPoint(0, 0))) for label in values]
+    for index, (label, rect) in enumerate(zip(values, rects)):
+        text_width = label.fontMetrics().horizontalAdvance(label.text())
+        assert text_width <= rect.width(), label.text()
+        for other, neighbour in zip(values[index + 1:], rects[index + 1:]):
+            # Values on one line need a readable gutter, not 2 px ("42 / 4215 +2").
+            assert not rect.adjusted(-4, 0, 4, 0).intersects(neighbour), (label.text(), other.text())
+    close(app, window)
+
+
+@pytest.mark.parametrize("theme", ["high_fantasy", "modern_proof"])
+def test_journal_entries_start_at_the_top_and_quest_counts_sit_beside_the_bar(
+    tmp_path: Path, theme: str
+) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.theme_requested.emit(theme)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("journal")
+    for _ in range(3):
+        app.processEvents()
+    journal = window.navigation_pages["journal"]
+    for panel, name in ((journal.event_log, "eventLogEntry"), (journal.recent_events, "recentEventEntry")):
+        viewport = panel.scroll_area.viewport()
+        entries = [w for w in panel.findChildren(QLabel, name) if w.isVisible()]
+        assert entries, name
+        tops = sorted(w.mapTo(viewport, QPoint(0, 0)).y() for w in entries)
+        assert tops[-1] + entries[0].height() <= viewport.height()  # short list: no scrolling
+        assert tops[0] < 30, (name, tops[0], viewport.height())  # not bottom-anchored
+    cards = [c for c in journal.quest_list.findChildren(QuestListItem) if not c.completed]
+    assert cards
+    for card in cards:
+        bar = card.findChild(QWidget, "questProgress")
+        label = card.progress_label
+        quest = card.quest
+        assert not bar.isTextVisible()
+        assert label.isVisible() and label.text().endswith(f"{quest.progress_current} / {quest.progress_maximum}")
+        assert label.fontMetrics().horizontalAdvance(label.text()) <= label.contentsRect().width()
+        assert not label.geometry().intersects(bar.geometry()), label.text()
     close(app, window)

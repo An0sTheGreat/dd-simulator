@@ -927,16 +927,19 @@ class MainWindow(QMainWindow):
         self._last_turn_shown = max((m.turn_number for m in messages), default=0)
 
     def _load_older_messages(self, before_turn: int) -> None:
-        if self.game_state_service is None:
-            return
-        campaign_id = self.game_state_service.campaigns.active_campaign_id()
+        service = self.game_state_service
+        campaign_id = service.campaigns.active_campaign_id() if service is not None else None
         if not campaign_id:
+            self.conversation_view.older_load_failed()
             return
-        older = self.game_state_service.older_messages(campaign_id, before_turn)
-        first = min((m.turn_number for m in older), default=before_turn)
-        has_older = bool(older) and bool(
-            self.game_state_service.older_messages(campaign_id, first, 1)
-        )
+        try:
+            older = service.older_messages(campaign_id, before_turn)
+            first = min((m.turn_number for m in older), default=before_turn)
+            has_older = bool(older) and bool(service.older_messages(campaign_id, first, 1))
+        except GameStateError as exc:
+            self.conversation_view.older_load_failed()
+            self._show_status_message(str(exc))
+            return
         self.conversation_view.prepend_messages(older, has_older)
 
     def _build_crafting_page(self) -> QWidget:

@@ -301,6 +301,11 @@ class ConversationView(QScrollArea):
         bar.setValue(bar.maximum() - self._keep_from_bottom)
         self._older_pending = False
 
+    def older_load_failed(self) -> None:
+        """A page of older messages was not loaded; scrolling to the top asks again."""
+
+        self._older_pending = False
+
     @property
     def has_older(self) -> bool:
         return self._has_older
