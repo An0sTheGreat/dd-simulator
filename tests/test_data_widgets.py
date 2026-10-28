@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
+from dataclasses import replace
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import QEvent, QPoint, Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication, QLabel, QScrollArea, QWidget
+from PySide6.QtWidgets import QApplication, QLabel, QScrollArea, QSplitter, QWidget
 
 from dd_simulator.ui.main_window import MainWindow
 from dd_simulator.ui.models.presentation import (
@@ -30,6 +31,7 @@ from dd_simulator.ui.widgets.inventory_grid import (
 )
 from dd_simulator.ui.widgets.quest_list import QuestListItem, QuestListWidget
 from dd_simulator.ui.widgets.resource_bar import ResourceBar
+from dd_simulator.ui.widgets.codex_character import SkillDetailRow
 from dd_simulator.ui.widgets.skills_grid import SkillGridItem
 from dd_simulator.ui.widgets.skills_grid import SkillsGrid
 
@@ -61,26 +63,29 @@ def test_phase_three_window_binds_counts_selection_and_tooltips(tmp_path: Path) 
         preferences_path=tmp_path / "preferences.json",
         default_theme_id="high_fantasy",
     )
-    window = MainWindow(manager.available_themes(), build_phase_three_dashboard())
+    mock = build_phase_three_dashboard()
+    occupied = tuple(item for item in mock.inventory_preview if not item.is_empty)
+    window = MainWindow(manager.available_themes(), replace(mock, inventory=occupied))
 
-    inventory = window.utility_panel.inventory_grid.findChildren(InventorySlotWidget)
-    equipment = window.utility_panel.findChildren(EquipmentSlotWidget)
-    skills = window.utility_panel.findChildren(SkillGridItem)
-    quests = window.quest_panel.findChildren(QuestListItem)
-    resources = window.main_splitter.findChildren(ResourceBar)
+    inventory = window.inventory_card.grid.findChildren(InventorySlotWidget)
+    equipment = window.paperdoll_panel.findChildren(EquipmentSlotWidget)
+    skills = window.skill_detail_list.findChildren(SkillDetailRow)
+    resources = window.character_strip.findChildren(ResourceBar)
 
-    assert len(inventory) == 36
+    # The card lays the bag out at real positions: a 5x5 viewport, not a fixed 36-slot preview.
+    assert len(inventory) == window.inventory_card.grid.slot_count == 25
+    assert sum(not bool(slot.property("empty")) for slot in inventory) == len(occupied)
     assert len(equipment) == 9
     assert len(skills) == 8
-    assert len(quests) == 3
     assert len(resources) == 5
+    # The quest list is gone from the window; the scene's quest card carries the quest.
+    assert window.findChildren(QuestListItem) == []
     assert sum(bool(slot.property("selected")) for slot in inventory) == 1
     assert all(
         widget.hover_card is None
         for widget in (*inventory, *equipment)
         if not bool(widget.property("empty"))
     )
-    assert all(widget.toolTip() for widget in quests)
     for skill in skills:
         skill_card = skill.build_hover_card()
         assert skill.skill.name in skill_card.text_content()
@@ -100,14 +105,22 @@ def test_dashboard_resize_handles_match_the_summary_divider(tmp_path: Path) -> N
     )
     window = MainWindow(manager.available_themes(), build_phase_three_dashboard())
 
-    reference_width = window.summary_splitter.handleWidth()
-    assert window.narrative_splitter.handleWidth() == reference_width
-    assert window.dashboard_rows_splitter.handleWidth() == reference_width
+    # Only the concept splitter and the people splitter remain; their handles must match.
+    window.resize(1600, 900)
+    window.show()
+    app.processEvents()
+    reference_width = window.concept_splitter.handleWidth()
+    people = window.findChild(QSplitter, "peopleTradeConversationSplitter")
+    assert people is not None and people.handleWidth() == reference_width
+    assert {s.objectName() for s in window.findChildren(QSplitter)} == {
+        "conceptTSplitter", "peopleTradeConversationSplitter"
+    }
 
     for theme_id in ("high_fantasy", "modern_proof"):
         stylesheet = manager.load_theme(theme_id).stylesheet
         assert "QSplitter#narrativeQuestSplitter::handle" not in stylesheet
         assert "QSplitter#dashboardRowsSplitter::handle" not in stylesheet
+        assert "QSplitter#summarySplitter::handle" not in stylesheet
 
     window.close()
     window.deleteLater()

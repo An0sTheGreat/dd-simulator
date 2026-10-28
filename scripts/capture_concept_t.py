@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import sys
 import tempfile
 import time
@@ -19,19 +20,23 @@ def main() -> int:
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "artifacts" / "previews"
     out.mkdir(parents=True, exist_ok=True)
     config = Path(tempfile.mkdtemp(prefix="ddsim-capture-"))
-    app, window, _manager = build_application([], config_dir=config)
-    window.resize(1600, 900)
-    window.show()
-    window._show_navigation("dashboard")
-    for theme in ("high_fantasy", "modern_proof"):
-        window.theme_selector.setCurrentIndex(window.theme_selector.findData(theme))
-        end = time.monotonic() + 1.5
-        while time.monotonic() < end:
-            app.processEvents()
-        path = out / f"window-{theme}.png"
-        window.grab().save(str(path))
-        print(path)
-    window.close()
+    try:
+        app, window, _manager = build_application([], config_dir=config)
+        window.resize(1600, 900)
+        window.show()
+        window._show_navigation("dashboard")
+        for theme in ("high_fantasy", "modern_proof"):
+            window.theme_selector.setCurrentIndex(window.theme_selector.findData(theme))
+            end = time.monotonic() + 1.5
+            while time.monotonic() < end:
+                app.processEvents()
+            path = out / f"window-{theme}.png"
+            window.grab().save(str(path))
+            print(path)
+        window.close()
+        app.processEvents()
+    finally:
+        shutil.rmtree(config, ignore_errors=True)
     return 0
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 import os
 from pathlib import Path
 
@@ -27,7 +28,9 @@ from dd_simulator.ui.themes.theme_manager import ThemeManager
 THEMES_ROOT = Path(__file__).parents[1] / "src" / "dd_simulator" / "ui" / "themes"
 
 
-def build_window(tmp_path: Path) -> tuple[QApplication, MainWindow, Path]:
+def build_window(
+    tmp_path: Path, dashboard=None
+) -> tuple[QApplication, MainWindow, Path]:
     app = QApplication.instance() or QApplication([])
     preferences_path = tmp_path / "preferences.json"
     manager = ThemeManager(
@@ -37,7 +40,7 @@ def build_window(tmp_path: Path) -> tuple[QApplication, MainWindow, Path]:
     )
     window = MainWindow(
         manager.available_themes(),
-        build_phase_three_dashboard(),
+        dashboard or build_phase_three_dashboard(),
         preferences_store=UiPreferencesStore(preferences_path),
     )
     return app, window, preferences_path
@@ -184,31 +187,32 @@ def test_narrative_panel_scrolls_latest_twenty_messages_to_bottom() -> None:
 def test_navigation_and_tabs_switch_real_content(tmp_path: Path) -> None:
     app, window, _ = build_window(tmp_path)
 
-    assert set(window.navigation_buttons) == {
-        "map", "people", "character_sheet", "settings"
-    }
+    # The bottom navigation bar (and its placeholders) is gone; the scene tabs navigate.
+    assert not hasattr(window, "navigation_buttons")
+    assert window.findChildren(object, "navigationPlaceholderButton") == []
     assert not {"profile", "inventory", "journal", "skills", "quests"} & set(
+        window.page_indices
+    )
+    assert {"map", "people", "character_sheet", "settings", "crafting"} <= set(
         window.page_indices
     )
     window.resize(1600, 900)
     window.show()
-    placeholders = window.findChildren(object, "navigationPlaceholderButton")
-    assert len(placeholders) == 2
-    assert all(not button.isEnabled() and not button.text() for button in placeholders)
+    tabs = window.scene_view.tabs.buttons
 
-    window.controller.navigate("map")
+    tabs["map"].click()
     app.processEvents()
     assert window.current_page == "map"
     assert window.content_stack.currentIndex() == window.page_indices["map"]
-    assert bool(window.navigation_buttons["map"].property("selected"))
 
-    window.utility_panel.set_current_tab(2)
-    window.quest_panel.set_current_tab(1)
-    window.event_panel.set_current_filter(1)
-    assert window.utility_panel.stack.currentIndex() == 2
-    assert window.quest_panel.stack.currentIndex() == 1
-    assert window.event_panel.current_filter() == 1
-    assert window.event_panel.findChild(object, "eventLogEntry") is not None
+    window.controller.navigate("people")
+    app.processEvents()
+    assert window.current_page == "people"
+    assert window.content_stack.currentIndex() == window.page_indices["people"]
+
+    # The retired utility tabs, quest panel and event panel are gone from the window.
+    for retired in ("utility_panel", "quest_panel", "event_panel", "narrative_panel"):
+        assert not hasattr(window, retired), retired
 
     close_window(app, window)
 
@@ -225,16 +229,19 @@ def test_header_theme_selection_synchronizes_settings(tmp_path: Path) -> None:
 
 
 def test_inventory_selection_keyboard_and_context_actions(tmp_path: Path) -> None:
-    app, window, _ = build_window(tmp_path)
-    grid = window.utility_panel.inventory_grid
-    selected = QSignalSpy(grid.selection_changed)
-    requested = QSignalSpy(grid.context_action_requested)
+    # InventoryCard slot indices are real bag positions, so give the bag occupied positions.
+    mock = build_phase_three_dashboard()
+    occupied = tuple(item for item in mock.inventory_preview if not item.is_empty)
+    app, window, _ = build_window(tmp_path, replace(mock, inventory=occupied))
+    card = window.inventory_card
+    grid = card.grid
+    selected = QSignalSpy(card.selection_changed)
+    requested = QSignalSpy(card.context_action_requested)
 
     grid.select_index(1)
     assert selected.count() == 1
     assert bool(grid.slots[1].property("selected"))
 
-    window.utility_panel.set_current_tab(2)
     window.show()
     grid.slots[1].setFocus()
     QTest.keyClick(grid.slots[1], Qt.Key.Key_Right)
@@ -254,7 +261,7 @@ def test_inventory_selection_keyboard_and_context_actions(tmp_path: Path) -> Non
 
 def test_player_action_requires_configured_ai_and_preserves_input(tmp_path: Path) -> None:
     app, window, _ = build_window(tmp_path)
-    panel = window.narrative_panel
+    panel = window.scene_view.choice_grid
 
     panel.action_input.setText("  Look   beneath the bridge ")
     QTest.keyClick(panel.action_input, Qt.Key.Key_Return)
@@ -267,7 +274,7 @@ def test_player_action_requires_configured_ai_and_preserves_input(tmp_path: Path
 
 def test_action_resolution_feedback_preserves_input_for_retry(tmp_path: Path) -> None:
     app, window, _ = build_window(tmp_path)
-    panel = window.narrative_panel
+    panel = window.scene_view.choice_grid
     retried = QSignalSpy(panel.retry_requested)
 
     panel.show_resolution_pending("inspect the sealed door")
@@ -291,38 +298,43 @@ def test_action_resolution_feedback_preserves_input_for_retry(tmp_path: Path) ->
 
 def test_ui_preferences_round_trip_and_reset(tmp_path: Path) -> None:
     app, window, preferences_path = build_window(tmp_path)
-    window.dashboard_rows_splitter.setSizes([610, 190])
-    expected_rows = window.dashboard_rows_splitter.sizes()
-    window.utility_panel.set_current_tab(2)
-    window.quest_panel.set_current_tab(1)
-    window.event_panel.set_current_filter(3)
+    window.resize(1600, 900)
+    window.show()
+    current = window.concept_splitter.sizes()
+    window.concept_splitter.setSizes([current[0] + 60, current[1] - 60])
+    expected_split = window.concept_splitter.sizes()
     window.controller.navigate("map")
     window.settings_panel.select_font_size(125)
     window.settings_panel.font_size_requested.emit(125)
     window.save_ui_preferences()
 
     saved = json.loads(preferences_path.read_text(encoding="utf-8"))
-    assert saved["ui"]["utility_tab"] == 2
-    assert saved["ui"]["quest_tab"] == 1
-    assert saved["ui"]["event_filter"] == 3
     assert saved["ui"]["page"] == "map"
     assert saved["ui"]["font_size"] == 125
-    assert saved["ui"]["splitters"]["rows"] == expected_rows
+    assert saved["ui"]["splitters"]["concept_t"] == expected_split
+    # The retired tab/filter and splitter keys are no longer written.
+    assert not {"utility_tab", "quest_tab", "event_filter"} & set(saved["ui"])
+    assert set(saved["ui"]["splitters"]) == {"concept_t", "people"}
     close_window(app, window)
 
+    # Old keys left in an existing preferences file are ignored on load.
+    saved["ui"].update({"utility_tab": 2, "quest_tab": 1, "event_filter": 3})
+    saved["ui"]["splitters"].update(
+        {"rows": [610, 190], "summary": [300, 500], "narrative": [400, 400]}
+    )
+    preferences_path.write_text(json.dumps(saved), encoding="utf-8")
+
     app, restored, _ = build_window(tmp_path)
-    assert restored.utility_panel.current_tab() == 2
-    assert restored.quest_panel.current_tab() == 1
-    assert restored.event_panel.current_filter() == 3
+    restored.resize(1600, 900)
+    restored.show()
     assert restored.current_page == "map"
     assert restored.font_size_preference == 125
     assert restored.settings_panel.font_size_value.text() == "125%"
-    restored_rows = restored.dashboard_rows_splitter.sizes()
-    assert abs(restored_rows[0] / sum(restored_rows) - expected_rows[0] / sum(expected_rows)) < 0.02
+    restored_split = restored.concept_splitter.sizes()
+    assert abs(restored_split[0] / sum(restored_split) - expected_split[0] / sum(expected_split)) < 0.02
 
     restored._reset_ui_preferences()
     assert restored.current_page == "dashboard"
-    assert restored.utility_panel.current_tab() == 1
     assert restored.font_size_preference == 100
     assert "ui" not in json.loads(preferences_path.read_text(encoding="utf-8"))
     close_window(app, restored)
