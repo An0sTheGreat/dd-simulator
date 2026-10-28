@@ -2366,7 +2366,7 @@ class MainWindow(QMainWindow):
                 self.concept_splitter.set_ratio(ratio, user_set=True)
             people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
             if people_splitter is not None:
-                sizes = self._valid_sizes(splitters.get("people"), people_splitter.count())
+                sizes = self._valid_sizes(splitters.get("people_row"), people_splitter.count())
                 if sizes:
                     people_splitter.setSizes(sizes)
         page = ui.get("page")
@@ -2397,11 +2397,13 @@ class MainWindow(QMainWindow):
     def save_ui_preferences(self) -> None:
         if self.preferences_store is None:
             return
+        # "people_row" replaced "people" when the People splitter turned horizontal, so
+        # an old vertical [trade, conversation] value is never read as a row split.
         splitters = {
-            "people": (
+            "people_row": (
                 self.findChild(QSplitter, "peopleTradeConversationSplitter").sizes()
                 if self.findChild(QSplitter, "peopleTradeConversationSplitter")
-                is not None else [300, 400]
+                is not None else [500, 400]
             ),
         }
         if self.concept_splitter.user_set:
@@ -2542,7 +2544,7 @@ class MainWindow(QMainWindow):
         self.concept_splitter.set_ratio(0.5, user_set=False)
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
-            people_splitter.setSizes([300, 400])
+            people_splitter.setSizes([500, 400])  # [conversation, trade]
         if self.preferences_store is not None:
             self.preferences_store.reset_ui()
         self.select_font_size(100)

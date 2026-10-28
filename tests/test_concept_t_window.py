@@ -10,6 +10,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtCore import QPoint, QRect, QThreadPool, Qt
 from PySide6.QtWidgets import (
+    QSplitter,
     QAbstractScrollArea,
     QApplication,
     QFrame,
@@ -419,6 +420,11 @@ def test_old_saved_concept_sizes_are_ignored_for_the_even_default(tmp_path: Path
     )
     window = _persisting_window(tmp_path)
     _assert_even(window)
+    # The old vertical People sizes ([trade, conversation]) must not land on the row split.
+    window.controller.navigate("people")
+    app.processEvents()
+    conversation, trade = window.findChild(QSplitter, "peopleTradeConversationSplitter").sizes()
+    assert conversation > trade
     close(app, window)
 
 
@@ -667,6 +673,35 @@ def test_people_sections_are_page_cards(tmp_path: Path) -> None:
     close(app, window)
 
 
+def test_people_page_runs_conversation_trade_then_people_column(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("people")
+    app.processEvents()
+    page = window.navigation_pages["people"]
+
+    def rect(card):  # type: ignore[no-untyped-def]
+        return card.geometry().translated(card.parentWidget().mapTo(page, card.geometry().topLeft()) - card.geometry().topLeft())
+
+    trade_card = page.findChild(QFrame, "merchantTradePanel")
+    assert trade_card is not None
+    people, identity, conversation, trade = (
+        rect(page.selector_card), rect(page.identity_card), rect(page.conversation_card),
+        rect(trade_card),
+    )
+    # Left to right: Conversation, Trade, then People above Speaking with.
+    assert conversation.right() < trade.left() < trade.right() < people.left()
+    assert abs(people.left() - identity.left()) <= 1
+    assert identity.top() > people.bottom()
+    # The row's full height: Trade and the column run from the Conversation's top to the bottom.
+    assert conversation.top() == trade.top() == people.top()
+    assert abs(trade.bottom() - identity.bottom()) <= 1
+    # HEAD 83240e2 gave the Conversation 291 px at a 14 px line (about 21 lines); now about 1.8x.
+    assert conversation.height() >= 36 * page.fontMetrics().height()
+    close(app, window)
+
+
 def test_people_replies_and_trade_fit_at_small_window(tmp_path: Path) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.resize(1280, 720)
@@ -692,6 +727,11 @@ def test_people_replies_and_trade_fit_at_small_window(tmp_path: Path) -> None:
         assert fits_one_line or wraps, button.text()
     scroll = page.findChild(QAbstractScrollArea, "merchantTradeScroll")
     assert scroll is not None and not scroll.horizontalScrollBar().isVisible()
+    # Stock and sell rows keep their item text on one line.
+    entries = [label for label in scroll.widget().findChildren(QLabel) if label.wordWrap() and label.text()]
+    assert entries
+    for label in entries:
+        assert label.fontMetrics().horizontalAdvance(label.text()) <= label.contentsRect().width(), label.text()
     close(app, window)
 
 
