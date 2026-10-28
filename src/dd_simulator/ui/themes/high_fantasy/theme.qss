@@ -690,6 +690,10 @@ QLabel#navigationPageTitle {
     font-weight: {{typography.weight_bold}};
 }
 
+QWidget#pageActionBar QPushButton {
+    padding: {{spacing.space_xs}} {{spacing.space_md}};
+}
+
 QLineEdit, QPlainTextEdit, QListWidget, QSpinBox {
     background-color: {{colors.background_primary}};
     color: {{colors.text_primary}};

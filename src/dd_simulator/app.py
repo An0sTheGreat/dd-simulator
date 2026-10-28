@@ -613,8 +613,7 @@ def _run_release_twenty_smoke(app: QApplication, window: MainWindow) -> None:
         window._reload_dashboard(dashboard, target_page="people")  # noqa: SLF001
         app.processEvents()
         for object_name in (
-            "merchantTradePanel", "npcCenteredFooter", "navigationFooter",
-            "settingsCenteredFooter",
+            "merchantTradePanel", "npcCenteredFooter", "pageActionBar",
         ):
             if window.findChild(QWidget, object_name) is None:
                 raise RuntimeError(f"Packaged Release 20 control is missing: {object_name}")

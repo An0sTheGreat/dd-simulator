@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QPushButton,
     QScrollArea,
     QSizePolicy,
     QSplitter,
@@ -40,18 +41,34 @@ class NavigationPage(ThemedFrame):
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(14, 12, 14, 12)
         self.layout.setSpacing(8)
-        self.layout.addWidget(
-            semantic_label(title, object_name="navigationPageTitle", text_role="heading")
+        back = SemanticButton("Return to Adventure", role="secondary")
+        back.setObjectName("navigationBackButton")
+        back.clicked.connect(self.back_requested)
+        self.action_bar = page_action_bar(back)
+        header = QHBoxLayout()
+        header.addWidget(
+            semantic_label(title, object_name="navigationPageTitle", text_role="heading"), 1
         )
+        header.addWidget(self.action_bar)
+        self.layout.addLayout(header)
         self.layout.addWidget(
             semantic_label(description, text_role="secondary", word_wrap=True)
         )
 
-    def finish(self) -> None:
-        back = SemanticButton("Return to Adventure", role="secondary")
-        back.setObjectName("navigationBackButton")
-        back.clicked.connect(self.back_requested)
-        self.layout.addWidget(centered_third(back, "navigationFooter"))
+
+def page_action_bar(*buttons: QPushButton) -> QWidget:
+    """One compact row of page actions, each button sized to its text."""
+
+    bar = QWidget()
+    bar.setObjectName("pageActionBar")
+    # A fixed-size bar holds every button, including ones inserted later, at its text width.
+    bar.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+    row = QHBoxLayout(bar)
+    row.setContentsMargins(0, 0, 0, 0)
+    row.setSpacing(6)
+    for button in buttons:
+        row.addWidget(button)
+    return bar
 
 
 def _sheet_section(title: str) -> tuple[ThemedFrame, QVBoxLayout]:
@@ -324,8 +341,8 @@ class CharacterSheetPage(NavigationPage):
         crafting.setAccessibleName("Open crafting")
         crafting.setToolTip("Craft items from known recipes")
         crafting.clicked.connect(self.crafting_requested)
-        self.layout.addWidget(centered_third(crafting, "characterSheetCraftingFooter"))
-        self.finish()
+        # Return to Adventure keeps the right edge on every page.
+        self.action_bar.layout().insertWidget(0, crafting)
 
 
 def centered_third(content: QWidget, object_name: str = "centeredThird") -> QWidget:
@@ -637,10 +654,6 @@ class NpcNavigationPage(NavigationPage):
         row_host = QWidget()
         row_host.setLayout(row)
         self.action_layout.addWidget(row_host)
-        back = SemanticButton("Return to Adventure", role="secondary")
-        back.setObjectName("navigationBackButton")
-        back.clicked.connect(self.back_requested)
-        self.action_layout.addWidget(back)
 
     def highlight_latest_turn(self, *, reduced_motion: bool) -> None:
         highlight_recent_turn(
@@ -751,7 +764,6 @@ class JournalPage(NavigationPage):
         for widget, stretch in ((self.quest_panel, 4), (self.event_log, 5), (self.recent_events, 3)):
             columns.addWidget(widget, stretch)
         self.layout.addLayout(columns, 1)
-        self.finish()
 
 
 def create_navigation_pages(dashboard: DashboardView) -> dict[str, NavigationPage]:
@@ -763,7 +775,6 @@ def create_navigation_pages(dashboard: DashboardView) -> dict[str, NavigationPag
         "Known locations and the current route; undiscovered locations remain hidden.",
     )
     map_page.layout.addWidget(WorldMapPanel(dashboard.world_map), 1)
-    map_page.finish()
     pages["map"] = map_page
 
     people = NpcNavigationPage(dashboard.npc_conversations)

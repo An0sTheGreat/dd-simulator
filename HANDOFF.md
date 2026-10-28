@@ -19,6 +19,11 @@ Last updated: 2026-10-28
   Studio (primary external server)**, **LM Studio (secondary)**. All share
   `dd_simulator.local_model.LocalModelClient`, selected by `provider=`
   (`"openai"` for llama.cpp, `"unsloth"`, `"lm_studio"`).
+- **Page action bar** (branch `page-nav-top`): Return to Adventure, Crafting and Back
+  sit in one compact top-right `pageActionBar` row on Map, People, Character Sheet,
+  Journal, Crafting and Settings (`navigation_pages.page_action_bar`). The old
+  `navigationFooter`, `settingsCenteredFooter`, `craftingCenteredFooter` and
+  `characterSheetCraftingFooter` hosts are gone; full suite not yet rerun on it.
 - **Tests:** 465 passed, 0 failed (full suite, offscreen, 2026-10-28).
 - **Packaged build** (`dist/DnDSimulator`, 592 MB) rebuilt from the merged tree. These
   smoke switches exit 0: `--smoke-test`, `--smoke-test-release27`,

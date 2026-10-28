@@ -74,8 +74,8 @@ from dd_simulator.ui.panels.campaign_panels import (
 )
 from dd_simulator.ui.panels.navigation_pages import (
     CharacterSheetPage,
-    centered_third,
     create_navigation_pages,
+    page_action_bar,
 )
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
 from dd_simulator.ui.panels.local_ai_setup_panel import LocalAiSetupPanel
@@ -428,6 +428,9 @@ class MainWindow(QMainWindow):
         self.settings_page.setObjectName("settingsPage")
         settings_layout = QVBoxLayout(self.settings_page)
         settings_layout.setContentsMargins(0, 0, 0, 0)
+        settings_layout.addWidget(
+            page_action_bar(self.settings_panel.back_button), 0, Qt.AlignmentFlag.AlignRight
+        )
         settings_columns = QWidget()
         settings_columns_layout = QHBoxLayout(settings_columns)
         settings_columns_layout.setContentsMargins(0, 0, 0, 0)
@@ -443,9 +446,6 @@ class MainWindow(QMainWindow):
         else:
             settings_columns_layout.addStretch(1)
         settings_layout.addWidget(settings_columns, 1)
-        settings_layout.addWidget(
-            centered_third(self.settings_panel.back_button, "settingsCenteredFooter")
-        )
         self.settings_scroll = QScrollArea()
         self.settings_scroll.setObjectName("settingsScrollArea")
         self.settings_scroll.setWidgetResizable(True)
@@ -964,13 +964,13 @@ class MainWindow(QMainWindow):
         page.setObjectName("craftingNavigationPage")
         layout = QVBoxLayout(page)
         layout.setContentsMargins(8, 8, 8, 8)
-        self.crafting_page = CraftingPage(self.dashboard.crafting_recipes)
-        self.crafting_page.craft_requested.connect(self._request_crafting)
-        layout.addWidget(self.crafting_page, 1)
         back = SemanticButton("Back", role="navigation", object_name="craftingBackButton")
         back.setToolTip("Return to the character sheet")
         back.clicked.connect(lambda: self.controller.navigate("character_sheet"))
-        layout.addWidget(centered_third(back, "craftingCenteredFooter"))
+        layout.addWidget(page_action_bar(back), 0, Qt.AlignmentFlag.AlignRight)
+        self.crafting_page = CraftingPage(self.dashboard.crafting_recipes)
+        self.crafting_page.craft_requested.connect(self._request_crafting)
+        layout.addWidget(self.crafting_page, 1)
         return page
 
     def _activate_power(self, key: str) -> None:

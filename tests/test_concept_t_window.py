@@ -266,6 +266,37 @@ def test_back_from_crafting_returns_to_the_character_sheet(tmp_path: Path) -> No
     close(app, window)
 
 
+PAGE_ACTIONS = {
+    "map": ("navigationBackButton",),
+    "people": ("navigationBackButton",),
+    "character_sheet": ("characterSheetCraftingButton", "navigationBackButton"),
+    "journal": ("navigationBackButton",),
+    "settings": ("settingsBackButton",),
+    "crafting": ("craftingBackButton",),
+}
+
+
+def test_page_action_buttons_sit_compact_in_one_top_row(tmp_path: Path) -> None:
+    app, window = build_window(tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    for page, names in PAGE_ACTIONS.items():
+        window.controller.navigate(page)
+        app.processEvents()
+        host = window.content_stack.currentWidget()
+        buttons = [host.findChild(QPushButton, name) for name in names]
+        assert all(button is not None and button.isVisible() for button in buttons), page
+        tops = {button.mapTo(host, QPoint(0, 0)).y() for button in buttons}
+        assert len(tops) == 1, (page, tops)
+        assert max(tops) + buttons[0].height() <= host.height() * 0.2, (page, tops)
+        # Sized to the text, never stretched: about 220 px with Segoe UI, but the offscreen
+        # fallback font draws text about twice as wide, so allow text width plus padding.
+        for button in buttons:
+            limit = max(220, button.fontMetrics().horizontalAdvance(button.text()) + 48)
+            assert button.width() <= limit, (page, button.objectName(), button.width())
+    close(app, window)
+
+
 def _persisting_window(tmp_path: Path) -> MainWindow:
     app = QApplication.instance() or QApplication([])
     path = tmp_path / "preferences.json"
