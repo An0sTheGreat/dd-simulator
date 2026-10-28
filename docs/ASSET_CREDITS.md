@@ -18,6 +18,15 @@ Release 24 uses only assets currently present under
 - The application packages and resolves the 1,686 numbered SVGs as integrated game
   assets rather than redistributing them as a standalone pack.
 
+## CraftPix skill, ability and spell icons
+
+- Source: the owner's CraftPix icon library under `Project Resources/assets/skills/<class>/`.
+- Runtime copies: the 52 icons mapped in `power_icon_manifest.json`, downscaled to 128 px
+  PNGs beneath `src/dd_simulator/ui/assets/icons/powers` by `scripts/import_power_icons.py`.
+- Supplied terms: CraftPix free license (https://craftpix.net/file-licenses/); use in the
+  game is permitted; do not redistribute, resell, or reupload the files as a standalone pack.
+- The application packages them only as integrated in-game icons.
+
 ## UI Pack 3
 
 - Creator: Kibyra.
