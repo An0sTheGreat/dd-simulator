@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
+from PySide6.QtGui import Qt as GuiQt, QKeyEvent, QMouseEvent, QResizeEvent
 from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
@@ -55,6 +55,7 @@ class QuestListItem(QFrame):
         header = QHBoxLayout()
         title = QLabel(quest.title)
         title.setObjectName("questListTitle")
+        title.setTextFormat(Qt.TextFormat.PlainText)
         header.addWidget(title, 1)
         state = "Completed" if self.completed else quest.status.title()
         self.state_label = QLabel(f"{state}  {'›' if not self.completed else ''}".rstrip())
@@ -78,6 +79,7 @@ class QuestListItem(QFrame):
         if quest.summary:
             summary = QLabel(quest.summary)
             summary.setObjectName("questExpandedSummary")
+            summary.setTextFormat(Qt.TextFormat.PlainText)
             summary.setWordWrap(True)
             detail_layout.addWidget(summary)
         objective_title = QLabel("OBJECTIVES")
@@ -89,6 +91,7 @@ class QuestListItem(QFrame):
                 optional = " Optional:" if objective.optional else ""
                 label = QLabel(f"{marker}{optional} {objective.text}")
                 label.setObjectName("questObjectiveEntry")
+                label.setTextFormat(Qt.TextFormat.PlainText)
                 label.setProperty("objectiveComplete", objective.completed)
                 label.setWordWrap(True)
                 detail_layout.addWidget(label)
@@ -99,10 +102,12 @@ class QuestListItem(QFrame):
         if quest.deadline:
             deadline = QLabel(f"Deadline: {quest.deadline}")
             deadline.setObjectName("questDeadline")
+            deadline.setTextFormat(Qt.TextFormat.PlainText)
             detail_layout.addWidget(deadline)
         if quest.reward_summary:
             reward = QLabel(f"Reward: {quest.reward_summary}")
             reward.setObjectName("questRewardPreview")
+            reward.setTextFormat(Qt.TextFormat.PlainText)
             detail_layout.addWidget(reward)
         self.details.setVisible(False)
         layout.addWidget(self.details)
@@ -112,7 +117,7 @@ class QuestListItem(QFrame):
             tooltip.append(f"Deadline: {quest.deadline}")
         if not self.completed:
             tooltip.append("Click to view objectives")
-        self.setToolTip("\n".join(tooltip))
+        self.setToolTip(GuiQt.convertFromPlainText("\n".join(tooltip)))
         self._set_expanded(expanded and not self.completed, emit=False)
 
     def _set_expanded(self, expanded: bool, *, emit: bool = True) -> None:

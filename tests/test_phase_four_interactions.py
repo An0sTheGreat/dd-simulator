@@ -313,12 +313,12 @@ def test_ui_preferences_round_trip_and_reset(tmp_path: Path) -> None:
     assert saved["ui"]["font_size"] == 125
     assert saved["ui"]["splitters"]["concept_t"] == expected_split
     # The retired tab/filter and splitter keys are no longer written.
-    assert not {"utility_tab", "quest_tab", "event_filter"} & set(saved["ui"])
+    assert not {"utility_tab", "quest_tab"} & set(saved["ui"])
     assert set(saved["ui"]["splitters"]) == {"concept_t", "people"}
     close_window(app, window)
 
     # Old keys left in an existing preferences file are ignored on load.
-    saved["ui"].update({"utility_tab": 2, "quest_tab": 1, "event_filter": 3})
+    saved["ui"].update({"utility_tab": 2, "quest_tab": 1})
     saved["ui"]["splitters"].update(
         {"rows": [610, 190], "summary": [300, 500], "narrative": [400, 400]}
     )

@@ -26,7 +26,6 @@ import re
 
 INVENTORY_SLOT_MIME = "application/x-dd-inventory-slot"
 EQUIPMENT_SLOT_MIME = "application/x-dd-equipment-slot"
-INVENTORY_PAGE_SIZE = 36
 INVENTORY_SLOT_SIZE = 96
 EQUIPMENT_BOARD_SIZE = 735
 EQUIPMENT_SLOT_SIZE = 100

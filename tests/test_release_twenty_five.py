@@ -6,7 +6,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import QEvent, QObject, Qt
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QTextDocument
 from PySide6.QtWidgets import QApplication, QFrame, QHBoxLayout, QLabel, QScrollArea, QWidget
 
 from dd_simulator.app import build_application
@@ -111,7 +111,9 @@ def test_item_slots_are_icon_only_artwork_with_lazy_hover_details() -> None:
     choices.resize(260, 200)
     app.processEvents()
     assert long.text_label.text() != long_text
-    assert long.toolTip() == long_text
+    document = QTextDocument()
+    document.setHtml(long.toolTip())
+    assert document.toPlainText() == long_text
     assert short.accessibleName() == "Choice 1: Wait"
     assert long.accessibleName() == f"Choice 2: {long_text}"
     assert inventory.size().width() == inventory.size().height() == 96

@@ -11,7 +11,13 @@ from PySide6.QtCore import QThreadPool
 from PySide6.QtWidgets import QApplication, QLineEdit, QPushButton
 
 from dd_simulator.app import build_application
-from dd_simulator.state import GameStateDatabase, GameStateService, ProposedStateChange
+from dd_simulator.state import (
+    GameStateDatabase,
+    GameStateService,
+    ItemAction,
+    ItemCommand,
+    ProposedStateChange,
+)
 from dd_simulator.state.combat import CombatService, EnemySpec
 from dd_simulator.ui.main_window import MainWindow
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
@@ -243,3 +249,37 @@ def test_concept_splitter_sizes_persist_across_windows(tmp_path: Path) -> None:
     for got, want in zip(restored.concept_splitter.sizes(), expected, strict=True):
         assert abs(got - want) <= 4
     close(app, restored)
+
+
+def test_journal_event_filter_persists_and_resets(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = _persisting_window(tmp_path)
+    window.navigation_pages["journal"].event_log.set_current_filter(2)
+    window.save_ui_preferences()
+    close(app, window)
+
+    restored = _persisting_window(tmp_path)
+    log = restored.navigation_pages["journal"].event_log
+    assert log.current_filter() == 2
+    restored._reset_ui_preferences()
+    assert log.current_filter() == 0
+    close(app, restored)
+
+
+@pytest.mark.parametrize("action", ["sort", "equip"])
+def test_item_refresh_keeps_the_paperdoll_attack_bonus(tmp_path: Path, action: str) -> None:
+    app, window, database = combat_window(tmp_path)
+    assert "ATK" in window.paperdoll_panel.stats_label.text()
+    if action == "sort":
+        window._auto_sort_inventory()
+    else:
+        service = window.game_state_service
+        service.execute_item_command(ItemCommand(ItemAction.UNEQUIP, 7))
+        bag = service.load_active_dashboard().inventory_preview
+        window._equip_inventory_to_equipment(
+            next(i for i, item in enumerate(bag) if item.name == "Silver Ring"), 7
+        )
+        assert window.dashboard.equipment[7].item_name == "Silver Ring"
+    assert "ATK" in window.paperdoll_panel.stats_label.text()
+    close(app, window)
+    database.close()

@@ -31,6 +31,7 @@ from dd_simulator.ui.widgets.skills_grid import SkillHoverCard
 def _label(text: str, object_name: str) -> QLabel:
     label = QLabel(text)
     label.setObjectName(object_name)
+    label.setTextFormat(Qt.TextFormat.PlainText)
     return label
 
 

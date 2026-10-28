@@ -2082,7 +2082,9 @@ class MainWindow(QMainWindow):
         # Strip (purse, carry, resources) and paperdoll (AC, slots) are rebuilt in place.
         for name, widget in (
             ("character_strip", CharacterStrip(dashboard)),
-            ("paperdoll_panel", PaperdollPanel(dashboard.player, dashboard.equipment)),
+            ("paperdoll_panel", PaperdollPanel(
+                dashboard.player, dashboard.equipment, attack_bonus=dashboard.player.attack_bonus
+            )),
         ):
             old = getattr(self, name)
             old.parentWidget().layout().replaceWidget(old, widget)
@@ -2248,6 +2250,9 @@ class MainWindow(QMainWindow):
         if isinstance(reduced_motion, bool):
             self.reduced_motion_preference = reduced_motion
             self.settings_panel.select_reduced_motion(reduced_motion)
+        event_filter = ui.get("event_filter")
+        if isinstance(event_filter, int):
+            self.navigation_pages["journal"].event_log.set_current_filter(event_filter)
 
     def save_ui_preferences(self) -> None:
         if self.preferences_store is None:
@@ -2265,6 +2270,7 @@ class MainWindow(QMainWindow):
                 "page": self.current_page,
                 "font_size": self.font_size_preference,
                 "reduced_motion": self.reduced_motion_preference,
+                "event_filter": self.navigation_pages["journal"].event_log.current_filter(),
             }
         )
 
@@ -2396,6 +2402,7 @@ class MainWindow(QMainWindow):
         self.select_font_size(100)
         self.reduced_motion_preference = False
         self.settings_panel.select_reduced_motion(False)
+        self.navigation_pages["journal"].event_log.set_current_filter(0)
         self.font_size_requested.emit(100)
         self.theme_requested.emit("high_fantasy")
         self.controller.navigate("dashboard")

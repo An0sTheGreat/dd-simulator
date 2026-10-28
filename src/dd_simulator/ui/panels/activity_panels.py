@@ -68,6 +68,7 @@ class EventLogPanel(DashboardPanel):
             for event in events:
                 label = semantic_label(event.summary, text_role=event.category, word_wrap=True)
                 label.setObjectName("eventLogEntry")
+                label.setTextFormat(Qt.TextFormat.PlainText)
                 label.setToolTip(f"{event.time_label} - {event.category.title()}")
                 label.setSizePolicy(
                     QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum
@@ -133,6 +134,7 @@ class RecentEventsPanel(DashboardPanel):
                 row.addWidget(semantic_label(event.time_label, text_role="muted"))
                 summary = semantic_label(event.summary, text_role="secondary", word_wrap=True)
                 summary.setObjectName("recentEventEntry")
+                summary.setTextFormat(Qt.TextFormat.PlainText)
                 summary.setProperty("eventCategory", event.category)
                 summary.setToolTip(event.category.title())
                 summary.setSizePolicy(

@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 
 from PySide6.QtCore import QEvent, QObject, QPointF, QRectF, Qt, Property, Signal
-from PySide6.QtGui import QColor, QLinearGradient, QPainter, QPen, QPixmap
+from PySide6.QtGui import Qt as GuiQt, QColor, QLinearGradient, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QButtonGroup,
@@ -110,6 +110,7 @@ def location_art(location: LocationSummaryView) -> Path | None:
 def _label(text: str, object_name: str, *, wrap: bool = False) -> QLabel:
     label = QLabel(text)
     label.setObjectName(object_name)
+    label.setTextFormat(Qt.TextFormat.PlainText)  # game and model text
     label.setWordWrap(wrap)
     return label
 
@@ -379,7 +380,7 @@ class EncounterCard(_SceneCard):
             if targetable:
                 row.setCursor(Qt.CursorShape.PointingHandCursor)
                 row.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                row.setToolTip(f"Target {combatant.name}")
+                row.setToolTip(GuiQt.convertFromPlainText(f"Target {combatant.name}"))
                 row.clicked.connect(lambda cid=combatant.id: self.target_selected.emit(cid))
             grid = QGridLayout(row)
             grid.setContentsMargins(0, 0, 0, 0)
@@ -427,6 +428,7 @@ class ElidedLabel(QLabel):
     def __init__(self, text: str, object_name: str) -> None:
         super().__init__()
         self.setObjectName(object_name)
+        self.setTextFormat(Qt.TextFormat.PlainText)
         self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
         self.full_text = text
         self._refresh()
@@ -443,7 +445,7 @@ class ElidedLabel(QLabel):
         shown = self.fontMetrics().elidedText(self.full_text, Qt.TextElideMode.ElideRight, self.width())
         self.setText(shown)
         owner = self.parentWidget()
-        tip = self.full_text if shown != self.full_text else ""
+        tip = GuiQt.convertFromPlainText(self.full_text) if shown != self.full_text else ""
         (owner if owner is not None else self).setToolTip(tip)
 
 

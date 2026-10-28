@@ -163,3 +163,43 @@ def test_schema_23_migration_backs_up_and_preserves_transcript(tmp_path) -> None
     with database.connect() as connection:
         assert connection.execute("SELECT COUNT(*) FROM narrative_messages").fetchone()[0] == before
         assert connection.execute("SELECT COUNT(*) FROM turn_notes").fetchone()[0] == 0
+
+
+def _service(tmp_path):  # type: ignore[no-untyped-def]
+    """File-backed service: unlike in_memory(), connections share no cache."""
+    from dd_simulator.state.database import GameStateDatabase
+    from dd_simulator.state.seed import seed_demo_campaign
+    from dd_simulator.state.service import GameStateService
+
+    database = GameStateDatabase(tmp_path / "notes.db")
+    database.initialize()
+    seed_demo_campaign(database)
+    return database, GameStateService(database)
+
+
+def test_note_from_a_rolled_back_transaction_never_appears(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    from dd_simulator.state.turns import record_turn_note
+
+    database, service = _service(tmp_path)
+    try:
+        with database.transaction() as connection:
+            record_turn_note(connection, DEMO_CAMPAIGN_ID, "other", "ghost note")
+            raise RuntimeError("roll back")
+    except RuntimeError:
+        pass
+    service.resolve_player_action("Wait quietly", FixedProvider(outcome()))
+    _messages, notes = _notes_by_turn(service)
+    assert notes == {}
+
+
+def test_note_from_a_committed_no_transcript_action_does_not_leak(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    from dd_simulator.state.turns import record_turn_note
+
+    database, service = _service(tmp_path)
+    # Panel-style action: records a note, commits, writes no transcript message.
+    # (execute_item_command itself records no note, so the note is recorded directly.)
+    with database.transaction() as connection:
+        record_turn_note(connection, DEMO_CAMPAIGN_ID, "item", "Panel note")
+    service.resolve_player_action("Wait quietly", FixedProvider(outcome()))
+    _messages, notes = _notes_by_turn(service)
+    assert notes == {}

@@ -8,7 +8,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QSignalSpy, QTest
-from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import Qt as GuiQt, QTextDocument
+from PySide6.QtWidgets import QApplication, QLabel
 
 from dd_simulator.state import CombatAction, CombatCommand, GameStateDatabase, GameStateService
 from dd_simulator.ui.location_images import LOCATION_ART_ROOT
@@ -21,9 +22,12 @@ from dd_simulator.ui.models.presentation import (
     QuestView,
 )
 from dd_simulator.ui.themes.theme_manager import ThemeManager
+from dd_simulator.ui.widgets.quest_list import QuestListItem
 from dd_simulator.ui.widgets.scene_view import (
     COMBAT_ACTIONS,
     NAV_TABS,
+    ChoiceGrid,
+    QuestProgressCard,
     SceneView,
     reward_chips,
 )
@@ -215,10 +219,41 @@ def test_long_choice_text_is_never_silently_truncated() -> None:
     QApplication.processEvents()
     button = view.choice_grid.choice_buttons[4]
     assert button.text_label.text() != SUGGESTIONS[4]
-    assert button.toolTip() == SUGGESTIONS[4]
+    assert tooltip_text(button) == SUGGESTIONS[4]
     assert SUGGESTIONS[4] in button.accessibleName()
     short = view.choice_grid.choice_buttons[0]
     assert short.text_label.text() == SUGGESTIONS[0] and short.toolTip() == ""
+
+
+def tooltip_text(widget) -> str:  # type: ignore[no-untyped-def]
+    """What a viewer reads: rich tooltips render as HTML, plain ones as-is."""
+    tip = widget.toolTip()
+    if not GuiQt.mightBeRichText(tip):
+        return tip
+    document = QTextDocument()
+    document.setHtml(tip)
+    return document.toPlainText()
+
+
+def test_model_text_with_markup_renders_literally() -> None:
+    hostile = "<img src='x'>Look at the very long and winding road toward the distant keep"
+    grid = ChoiceGrid((hostile, "Wait"))
+    grid.resize(260, 200)
+    grid.show()
+    QApplication.processEvents()
+    button = grid.choice_buttons[0]
+    assert button.text_label.textFormat() == Qt.TextFormat.PlainText
+    assert button.text_label.text() != hostile  # elided, so a tooltip is offered
+    assert tooltip_text(button) == hostile
+
+    title = "<b>Bold</b>"
+    card = QuestProgressCard(replace(QUEST, title=title), ())
+    assert card.title.text() == title
+    assert card.title.textFormat() == Qt.TextFormat.PlainText
+    item = QuestListItem(QuestListItemView(title, "active", 0, 1))
+    item_label = item.findChild(QLabel, "questListTitle")
+    assert item_label.text() == title
+    assert item_label.textFormat() == Qt.TextFormat.PlainText
 
 
 def test_pending_cancel_and_retry_match_narrative_panel() -> None:
