@@ -15,8 +15,6 @@ import json
 import sys
 from pathlib import Path
 
-from PySide6.QtGui import QGuiApplication
-
 from import_codex_assets import _downscaled_png
 
 
@@ -43,7 +41,6 @@ def import_jobs(source_root: Path) -> list[tuple[Path, Path]]:
 
 def main(argv: list[str]) -> int:
     source_root = Path(argv[1]) if len(argv) > 1 else DEFAULT_SOURCE_ROOT
-    QGuiApplication.instance() or QGuiApplication([])
     jobs = import_jobs(source_root)
     missing = [str(source) for source, _ in jobs if not source.is_file()]
     if missing:
