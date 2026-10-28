@@ -29,15 +29,10 @@ QFrame[role="panel"] {
     border-radius: {{geometry.border_radius_medium}};
 }
 
-QFrame#merchantTradePanel {
-    background-color: {{colors.panel_surface_alt}};
-    border: {{geometry.border_width}} solid {{colors.border_primary}};
-}
-
 QScrollArea#merchantTradeScroll,
 QScrollArea#merchantTradeScroll QWidget#qt_scrollarea_viewport,
 QWidget#merchantTradeContent {
-    background-color: {{colors.background_secondary}};
+    background-color: transparent;
     color: {{colors.text_primary}};
     border: none;
 }
@@ -825,14 +820,8 @@ QFrame#combatSkillItem, QPushButton#npcSelectionButton {
     color: {{colors.text_primary}};
 }
 QFrame#combatSkillItem[available="false"] { color: {{colors.text_muted}}; }
-QLabel#npcConversationTitle, QLabel#combatSkillName { color: {{colors.accent_primary}}; font-weight: 700; }
+QLabel#combatSkillName { color: {{colors.accent_primary}}; font-weight: 700; }
 QLabel#combatSkillCost { color: {{colors.text_secondary}}; }
-QScrollArea#npcConversationScroll,
-QScrollArea#npcConversationScroll QWidget#qt_scrollarea_viewport,
-QWidget#npcConversationHistory {
-    background: {{colors.panel_surface}};
-    color: {{colors.text_primary}};
-}
 QDialog#questRewardsDialog {
     background-color: {{colors.background_secondary}};
     color: {{colors.text_primary}};
@@ -1516,4 +1505,13 @@ QPushButton#mapLocationNode:hover, QPushButton#mapLocationNode:focus, QPushButto
 }
 QPushButton#mapLocationNode[current="true"] {
     border: 2px solid {{codex.gold}}; color: {{codex.gold}};
+}
+
+/* People page: NPC list entries */
+QPushButton#npcSelectionButton {
+    background: {{colors.background_elevated}}; border: 1px solid {{colors.border_primary}}; border-radius: 4px;
+    padding: 6px 10px; text-align: left; font-family: "Oxanium"; font-size: 11px; font-weight: 600; color: {{codex.ink}};
+}
+QPushButton#npcSelectionButton:hover, QPushButton#npcSelectionButton:focus, QPushButton#npcSelectionButton[selected="true"] {
+    border-color: {{codex.gold}}; color: {{codex.gold}};
 }

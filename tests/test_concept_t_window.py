@@ -541,6 +541,25 @@ def test_journal_and_settings_sections_are_page_cards(tmp_path: Path) -> None:
     close(app, window)
 
 
+def test_people_sections_are_page_cards(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("people")
+    app.processEvents()
+    page = window.navigation_pages["people"]
+    names = (
+        "npcSelectorCard", "npcIdentityCard", "npcConversationCard",
+        "merchantTradePanel", "npcBottomControls",
+    )
+    sections = [page.findChild(QFrame, name) for name in names]
+    assert all(card is not None and card.property("pageCard") and card.property("codexCard") for card in sections)
+    # The NPC exchange uses the Adventure conversation's thread; replies keep their heading.
+    assert page.thread.objectName() == "conversationView"
+    assert page.action_host.findChild(QLabel, "codexCardHeading").text() == "YOUR REPLY"
+    close(app, window)
+
+
 def test_character_sheet_story_cards_put_each_label_beside_its_value(tmp_path: Path) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.resize(1600, 900)

@@ -19,17 +19,18 @@ from PySide6.QtWidgets import (
 
 from dd_simulator.ui.models.presentation import (
     CommerceItemView, ConversationView, DashboardView, EquipmentSlotView,
-    InventorySlotView,
+    InventorySlotView, NarrativeMessageView,
 )
 from dd_simulator.ui.item_icons import item_icon_label
 from dd_simulator.ui.panels.activity_panels import EventLogPanel, RecentEventsPanel
-from dd_simulator.ui.panels.common import highlight_recent_turn, semantic_label
+from dd_simulator.ui.panels.common import semantic_label
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.state.progression import saving_throw_proficiencies
 from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard, equipped_comparisons
 from dd_simulator.ui.widgets.codex_cards import PowerEntry, codex_card, icon_row, plain_label
 from dd_simulator.ui.widgets.codex_character import SkillDetailRow
+from dd_simulator.ui.widgets.conversation_view import ConversationView as ConversationThread
 from dd_simulator.ui.widgets.quest_list import QuestListWidget
 from dd_simulator.ui.widgets.world_map import WorldMapPanel
 
@@ -461,7 +462,11 @@ class NpcNavigationPage(NavigationPage):
         body_host.setObjectName("peopleConversationRegion")
         body = QHBoxLayout(body_host)
         body.setContentsMargins(0, 0, 0, 0)
-        selector = QVBoxLayout()
+        body.setSpacing(8)
+        self.selector_card, selector = codex_card(
+            "People", "npcSelectorCard", count=len(conversations)
+        )
+        self.selection_buttons: dict[str, QPushButton] = {}
         for conversation in conversations:
             npc = conversation.npc
             button = SemanticButton(
@@ -476,27 +481,37 @@ class NpcNavigationPage(NavigationPage):
                 lambda _checked=False, npc_id=npc.id: self._select_npc(npc_id)
             )
             selector.addWidget(button)
+            self.selection_buttons[npc.id] = button
         if not conversations:
-            selector.addWidget(semantic_label("No known NPCs are present.", text_role="muted"))
-        selector.addStretch(1)
-        selector_host = QWidget()
-        selector_host.setLayout(selector)
-        selector_host.setMaximumWidth(310)
-        body.addWidget(selector_host)
+            selector.addWidget(plain_label("No known NPCs are present.", "pageCardMeta", word_wrap=True))
+        self.selector_card.setFixedWidth(260)
+        body.addWidget(self.selector_card)
+        # Cards keep their heading; _render_selected refills the inner hosts.
+        self.conversation_card, card = codex_card("Conversation", "npcConversationCard")
+        card.setAlignment(Qt.AlignmentFlag(0))  # the thread takes the height
         self.conversation_host = QWidget()
         self.conversation_layout = QVBoxLayout(self.conversation_host)
         self.conversation_layout.setContentsMargins(0, 0, 0, 0)
-        body.addWidget(self.conversation_host, 1)
+        card.addWidget(self.conversation_host, 1)
+        body.addWidget(self.conversation_card, 1)
+        self.identity_card, card = codex_card("Speaking with", "npcIdentityCard")
+        self.identity_host = QWidget()
+        self.identity_layout = QVBoxLayout(self.identity_host)
+        self.identity_layout.setContentsMargins(0, 0, 0, 0)
+        card.addWidget(self.identity_host)
+        self.identity_card.setFixedWidth(260)
+        body.addWidget(self.identity_card)
         body_host.setMinimumHeight(180)
         self.people_splitter.addWidget(body_host)
         self.people_splitter.setStretchFactor(0, 2)
         self.people_splitter.setStretchFactor(1, 5)
         self.people_splitter.setSizes([210, 500])
         self.layout.addWidget(self.people_splitter, 1)
-        self.action_host = QWidget()
-        self.action_host.setObjectName("npcBottomControls")
-        self.action_layout = QVBoxLayout(self.action_host)
+        self.action_host, card = codex_card("Your reply", "npcBottomControls")
+        replies = QWidget()
+        self.action_layout = QVBoxLayout(replies)
         self.action_layout.setContentsMargins(0, 0, 0, 0)
+        card.addWidget(replies)
         self.action_layout.setSpacing(4)
         self.layout.addWidget(centered_third(self.action_host, "npcCenteredFooter"))
         self._render_selected()
@@ -510,43 +525,42 @@ class NpcNavigationPage(NavigationPage):
             self._select_npc(npc_id)
 
     def _render_selected(self) -> None:
-        self.latest_turn_widgets: list[QWidget] = []
-        while self.conversation_layout.count():
-            item = self.conversation_layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
-        while self.action_layout.count():
-            item = self.action_layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
-        while self.trade_layout.count():
-            item = self.trade_layout.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
+        self.latest_rows: list[QWidget] = []
+        for layout in (
+            self.conversation_layout, self.action_layout, self.trade_layout, self.identity_layout,
+        ):
+            while layout.count():
+                widget = layout.takeAt(0).widget()
+                if widget is not None:
+                    widget.deleteLater()
+        for npc_id, button in self.selection_buttons.items():
+            button.setProperty("selected", npc_id == self.selected_id)
+            button.style().unpolish(button)
+            button.style().polish(button)
         conversation = next(
             (value for value in self.conversations if value.npc.id == self.selected_id), None
         )
         if conversation is None:
             self.conversation_layout.addWidget(
-                semantic_label("Select an available NPC to begin.", text_role="muted")
+                plain_label("Select an available NPC to begin.", "pageCardMeta", word_wrap=True)
             )
             return
         npc = conversation.npc
-        self.conversation_layout.addWidget(
-            semantic_label(
-                f"{npc.portrait_initials or '?'}   {npc.name} — {npc.title or npc.status.title()}",
-                object_name="npcConversationTitle", text_role="heading",
-            )
-        )
-        self.conversation_layout.addWidget(
-            semantic_label(
-                f"Disposition: {npc.status.title()}   Relationship: {npc.relationship_score:+d}",
-                text_role="secondary",
-            )
-        )
+        identity = QWidget()
+        identity_layout = QVBoxLayout(identity)
+        identity_layout.setContentsMargins(0, 0, 0, 0)
+        identity_layout.setSpacing(8)
+        portrait = plain_label(npc.portrait_initials or "?", "conversationPortrait")
+        portrait.setProperty("placeholder", True)
+        portrait.setFixedSize(56, 56)
+        portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        portrait.setAccessibleName(f"{npc.name} portrait")
+        identity_layout.addWidget(icon_row(portrait, npc.name, npc.title or npc.status.title()))
+        _lines(identity_layout, (
+            ("Disposition", npc.status.title()),
+            ("Relationship", f"{npc.relationship_score:+d}"),
+        ))
+        self.identity_layout.addWidget(identity)
         self.dialogue_status = semantic_label(
             "",
             object_name="npcDialogueStatus",
@@ -562,41 +576,34 @@ class NpcNavigationPage(NavigationPage):
             ))
         else:
             self.trade_host.setVisible(False)
-        scroll = QScrollArea()
-        scroll.setObjectName("npcConversationScroll")
-        scroll.setWidgetResizable(True)
-        history = QWidget()
-        history.setObjectName("npcConversationHistory")
-        history_layout = QVBoxLayout(history)
-        latest_player_index = max(
+        # The Adventure conversation's bubbles, without its fade into the scene art.
+        self.thread = ConversationThread()
+        self.thread.setAccessibleName(f"Conversation with {npc.name}")
+        self.thread.viewport().setGraphicsEffect(None)
+        self.conversation_layout.addWidget(self.thread, 1)
+        self.thread.set_messages(
             (
-                index
-                for index, message in enumerate(conversation.messages)
-                if message.kind == "player"
+                NarrativeMessageView(
+                    message.kind, message.text,
+                    speaker_name=npc.name if message.kind == "spoken" else "",
+                )
+                for message in conversation.messages
             ),
+            False,
+        )
+        latest_player_index = max(
+            (index for index, message in enumerate(conversation.messages) if message.kind == "player"),
             default=-1,
         )
-        for index, message in enumerate(conversation.messages):
-            prefix = "You: " if message.kind == "player" else ""
-            label = semantic_label(
-                prefix + message.text,
-                object_name=f"npc{message.kind.title()}Message{index}",
-                text_role="playerAction" if message.kind == "player" else message.kind,
-                word_wrap=True,
-            )
-            history_layout.addWidget(label)
-            if index >= latest_player_index and latest_player_index >= 0:
-                self.latest_turn_widgets.append(label)
+        if latest_player_index >= 0:
+            self.latest_rows = self.thread.rows[latest_player_index:]
         if not conversation.messages:
-            history_layout.addWidget(
-                semantic_label("The conversation has not begun.", text_role="muted")
+            self.conversation_layout.insertWidget(
+                0, plain_label("The conversation has not begun.", "pageCardMeta")
             )
-        history_layout.addStretch(1)
-        scroll.setWidget(history)
-        self.conversation_layout.addWidget(scroll, 1)
         if conversation.last_check:
             self.conversation_layout.addWidget(
-                semantic_label(conversation.last_check, text_role="warning", word_wrap=True)
+                plain_label(conversation.last_check, "pageCardNotice", word_wrap=True)
             )
         choices = QGridLayout()
         for index, response in enumerate(conversation.suggested_responses):
@@ -624,23 +631,18 @@ class NpcNavigationPage(NavigationPage):
         self.action_layout.addWidget(row_host)
 
     def highlight_latest_turn(self, *, reduced_motion: bool) -> None:
-        highlight_recent_turn(
-            self,
-            self.latest_turn_widgets,
-            reduced_motion=reduced_motion,
-        )
+        if self.latest_rows:
+            # The Adventure conversation's own three-second emphasis on the bubbles.
+            self.thread.reduced_motion = reduced_motion
+            self.thread._emphasize(self.latest_rows)  # noqa: SLF001
 
-    def _merchant_panel(self, conversation: ConversationView) -> ThemedFrame:
+    def _merchant_panel(self, conversation: ConversationView) -> QFrame:
         merchant = conversation.merchant
         assert merchant is not None
-        panel = ThemedFrame("merchantTradePanel", role="section")
-        layout = QVBoxLayout(panel)
-        layout.setContentsMargins(8, 7, 8, 7)
-        layout.setSpacing(5)
-        layout.addWidget(semantic_label(
-            f"TRADE — {merchant.player_currency} GOLD",
-            object_name="merchantTradeTitle", text_role="accent",
-        ))
+        panel, layout = codex_card(
+            f"Trade · {merchant.player_currency} gold", "merchantTradePanel"
+        )
+        layout.setAlignment(Qt.AlignmentFlag(0))  # the stock list takes the height
         scroll = QScrollArea()
         scroll.setObjectName("merchantTradeScroll")
         scroll.setWidgetResizable(True)
@@ -650,8 +652,8 @@ class NpcNavigationPage(NavigationPage):
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(4)
-        grid.addWidget(semantic_label("MERCHANT STOCK", text_role="secondary"), 0, 0, 1, 3)
-        grid.addWidget(semantic_label("SELL FROM INVENTORY", text_role="secondary"), 0, 3, 1, 2)
+        grid.addWidget(plain_label("MERCHANT STOCK", "pageCardLabel"), 0, 0, 1, 3)
+        grid.addWidget(plain_label("SELL FROM INVENTORY", "pageCardLabel"), 0, 3, 1, 2)
         for row_index, item in enumerate(merchant.stock, start=1):
             grid.addWidget(
                 _commerce_entry(
@@ -697,7 +699,7 @@ class NpcNavigationPage(NavigationPage):
         grid.setColumnStretch(0, 2)
         grid.setColumnStretch(3, 2)
         scroll.setWidget(content)
-        layout.addWidget(scroll)
+        layout.addWidget(scroll, 1)
         return panel
 
     def show_dialogue_status(self, message: str, *, error: bool = False) -> None:
