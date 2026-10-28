@@ -10,7 +10,7 @@ from dataclasses import dataclass, replace
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from dd_simulator.local_model.errors import (
     LocalModelAuthenticationError,
@@ -25,6 +25,16 @@ from dd_simulator.state.turns import limit_words, sanitize_model_text
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    """Refuse redirects so the API key never leaves the validated localhost URL."""
+
+    def redirect_request(self, *args: Any, **kwargs: Any) -> None:
+        return None
+
+
+urlopen = build_opener(_NoRedirect).open
 
 
 @dataclass(frozen=True, slots=True)
@@ -361,6 +371,7 @@ class LocalModelClient:
         method: str = "GET",
         payload: dict[str, Any] | None = None,
         timeout_seconds: float | None = None,
+        log_errors: bool = True,
     ) -> dict[str, Any]:
         body = None if payload is None else json.dumps(payload).encode("utf-8")
         headers = {"Content-Type": "application/json"}
@@ -385,7 +396,7 @@ class LocalModelClient:
             except OSError:
                 detail = ""
             detail = re.sub(r"\s+", " ", detail).strip()[:600]
-            if detail:
+            if detail and log_errors:
                 LOGGER.warning("%s HTTP %s response body: %s", name, exc.code, detail)
             raise LocalModelConnectionError(
                 f"{name} returned HTTP {exc.code}. Check the loaded model and server log."
@@ -479,7 +490,8 @@ class LocalModelClient:
     def _unsloth_context_length(self, model_id: str) -> int | None:
         try:  # Best effort: older builds may not report status.
             status = self._json_request_url(
-                self._root + "/api/inference/status?" + urlencode({"model": model_id})
+                self._root + "/api/inference/status?" + urlencode({"model": model_id}),
+                log_errors=False,
             )
         except LocalModelError:
             return None

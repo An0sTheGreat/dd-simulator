@@ -79,7 +79,12 @@ class LocalAiActivationTask(QRunnable):
                     endpoint, timeout_seconds=10, api_key=self.configuration.api_key,
                     provider="unsloth",
                 )
-                model_id = client.discover_models()[0]
+                # Unsloth lists installed models too; setup may finish before one is
+                # loaded, because loading happens from Settings.
+                models = client.discover_model_details()
+                if not models:
+                    raise LocalAiError("Unsloth Studio is running but reports no models.")
+                model_id = next((m for m in models if m.loaded), models[0]).model_id
             elif self.configuration.mode == "lm_studio":
                 endpoint = "http://localhost:1234/v1"
                 client = LocalModelClient(endpoint, timeout_seconds=10, provider="lm_studio")

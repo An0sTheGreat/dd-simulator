@@ -112,3 +112,30 @@ def test_setup_recommends_qwen_and_suggests_gemma(tmp_path: Path) -> None:
     window.close()
     window.deleteLater()
     app.processEvents()
+
+
+def test_unsloth_setup_completes_before_any_model_is_loaded(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    import json
+
+    from dd_simulator.ui.services.local_ai_worker import LocalAiActivationTask
+
+    class Response:
+        def __enter__(self):  # type: ignore[no-untyped-def]
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def read(self) -> bytes:
+            return json.dumps({"data": [{"id": "gemma", "loaded": False}]}).encode("utf-8")
+
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", lambda *_a, **_k: Response())
+    configuration = LocalAiConfiguration(mode="unsloth", setup_complete=True, api_key="sk-unsloth-x")
+    task = LocalAiActivationTask(configuration, runtime=None)  # type: ignore[arg-type]
+    succeeded: list[str] = []
+    failed: list[str] = []
+    task.signals.succeeded.connect(lambda _config, _endpoint, model: succeeded.append(model))
+    task.signals.failed.connect(failed.append)
+    task.run()
+    assert failed == []
+    assert succeeded == ["gemma"]

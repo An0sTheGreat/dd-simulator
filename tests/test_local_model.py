@@ -853,3 +853,47 @@ def test_combat_narrator_rejects_mechanical_or_unavailable_intent(monkeypatch) -
             context={},
             allowed_intents={"combatant-goblin": ("attack", "defend")},
         )
+
+
+def test_client_refuses_redirects_so_the_key_stays_on_localhost() -> None:
+    import threading
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+
+    from dd_simulator.local_model.errors import LocalModelConnectionError
+
+    received: list[str | None] = []
+
+    class Target(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:  # noqa: N802
+            received.append(self.headers.get("Authorization"))
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b'{"data": []}')
+
+        def log_message(self, *_args: object) -> None:
+            return None
+
+    target = HTTPServer(("127.0.0.1", 0), Target)
+
+    class Redirector(Target):
+        def do_GET(self) -> None:  # noqa: N802
+            self.send_response(302)
+            self.send_header("Location", f"http://127.0.0.1:{target.server_port}/v1/models")
+            self.end_headers()
+
+    redirector = HTTPServer(("127.0.0.1", 0), Redirector)
+    for server in (target, redirector):
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        client = LocalModelClient(
+            f"http://127.0.0.1:{redirector.server_port}/v1",
+            api_key="sk-unsloth-secret",
+            provider="unsloth",
+        )
+        with pytest.raises(LocalModelConnectionError):
+            client.discover_models()
+    finally:
+        for server in (target, redirector):
+            server.shutdown()
+            server.server_close()
+    assert received == []
