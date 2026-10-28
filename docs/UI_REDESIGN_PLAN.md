@@ -37,8 +37,12 @@ Each has a recommendation; the plan assumes it unless you say otherwise.
   *Recommend:* move it to the Character Sheet page as a section.
 - **D4 — Themes.** *Recommend:* Concept T's bronze look becomes **Modern Fantasy Simple**.
   **Modern Dark Simple** keeps the same layout with its own palette and no bronze textures.
-- **D5 — Icons. Decided:** RPG Mega painted icons for everything: skills, abilities, spells, and
-  every item type (weapons, armor, jewelry, consumables, materials, quest items). Skills, abilities and
+- **D5 — Icons. Decided:** every skill, ability, spell and item icon comes from the owner's icon library at
+  `Project Resources/assets/`, which replaces the current icon sets. It holds 28 supplied CraftPix packs (2026-10-28)
+  plus the RPG Mega packs that cover weapons, armor and jewelry, organized as `skills/<class>/`,
+  `items/<theme>/` (with `items/weapons/`, `items/armor/` and `items/jewelry/`), `portraits/<race>/` and
+  `ui/achievements/`. Like the other Project Resources, it lives outside the repository. An import script copies
+  the mapped icons, downscaled, into the package. Skills, abilities and
   spells are mapped in Phase 3. Items are mapped in Phase 8 through a new RPG Mega item manifest that
   replaces the 1,686-icon SVG mapping.
   *Analysed and rejected:* the Quaternius `RpgItems` models (106 GLB, CC0). Rendered headless with
@@ -149,11 +153,12 @@ full suite green (`scripts/test.ps1`, about 2 minutes) and a 1600×900 capture c
 - Capture the finished build at 1600×900 (both themes, plus combat and tooltip states) into
   `docs/screenshots/`. Embed them in `README.md`, commit, and push `main` to GitHub after merge.
 
-### Phase 8 — RPG Mega item icons (D5)
-- Build `ui/assets/icons/rpgmega_manifest.json`, mapping every item catalog record (category, subtype,
-  rarity tier) to an RPG Mega icon. Sources: weapon, armor, helmet, glove, boot, greaves, belt, shield,
-  jewelry, loot, elixir, food, ingredient, book and achievement packs.
-- Copy the mapped icons, downscaled to 128 px, into `ui/assets/icons/rpgmega/`.
+### Phase 8 — Library item icons (D5)
+- Build `ui/assets/icons/item_icon_manifest.json`, mapping every item catalog record (category, subtype,
+  rarity tier) to an icon in `Project Resources/assets/items/`. Weapons and armor come from `items/weapons` and
+  `items/armor`; consumables, materials and loot come from the themed packs (liquid, fruit, vegetable, flower,
+  elixir, monster, spider, dragon, boss, battle, claw and hunting-trophy loot, among others).
+- Copy the mapped icons, downscaled to 128 px, into `ui/assets/icons/library/`.
 - `item_icons.py` resolves through the new manifest. Rare and higher items prefer the more elaborate
   icons in a pack, as the SVG resolver does today.
 - Remove the SVG set once nothing references it.
