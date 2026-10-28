@@ -4,94 +4,76 @@ Last updated: 2026-10-27
 
 ## Current state
 
-- **Release 27**, package version `0.27.0`, database schema **21** (latest migration in
-  `src/dd_simulator/state/migrations.py`). Packaged build in `dist\DnDSimulator`.
-- Canonical Workflow Steps 1–19 complete; Releases 20–27 are expansions.
-- **Git:** initialized on `main`; baseline commit `27b841f` (Phase 28 complete).
-  `vendor/llama_cpp` binaries (~138 MB, largest file 50 MB) are committed so the build
-  is reproducible from the repository.
-- **Packaged build** rebuilt 2026-10-27; `--smoke-test`, `--smoke-test-release27`,
-  `--smoke-test-preset-campaign`, and `--smoke-test-character-creation` all exit 0.
-- Test suite: 290 tests across 31 modules in `tests/`.
-  Last run (2026-10-27, after the speed fix): **289 passed, 1 failed in 2 min 1 s**.
-  The one failure is pre-existing (Known issue 1).
+- **Release 27 + Phase 29** on branch `phase-29-unsloth` (not merged, not pushed).
+  `main` (pushed to `github.com/An0sTheGreat/dd-simulator`, private) holds the Phase 28
+  baseline. Package version `0.27.0`, database schema **21**.
+- **Local AI providers:** bundled llama.cpp (recommended), existing GGUF, **Unsloth
+  Studio (primary external server)**, **LM Studio (secondary)**. All share
+  `dd_simulator.local_model.LocalModelClient`, selected by `provider=`
+  (`"openai"` for llama.cpp, `"unsloth"`, `"lm_studio"`).
+- **Tests:** 301 passed, 0 failed, about 2 min 20 s (`.\scripts\test.ps1`).
+- **Packaged build** rebuilt from `phase-29-unsloth`. These smoke switches exit 0:
+  `--smoke-test`, `--smoke-test-release27`, `--smoke-test-release19`,
+  `--smoke-test-preset-campaign`, `--smoke-test-character-creation`.
+  `--smoke-test-release18` exits 18 on `main` too (Known issue 2).
 
-## Done this session (2026-10-27)
+## Phase 29 summary (branch `phase-29-unsloth`)
 
-- **Docs: LM Studio replaced with Unsloth Studio.** `docs/LM_STUDIO.md` →
-  `docs/UNSLOTH.md`; `docs/RECOMMENDED_LM_STUDIO_SETTINGS.md` →
-  `docs/RECOMMENDED_UNSLOTH_SETTINGS.md`. All other docs updated: authenticated API
-  (`Authorization: Bearer sk-unsloth-…`), default port 8888, `GET /v1/models` `loaded`
-  field, management routes `/api/inference/{load,unload,status,monitor}`.
-  Sources: Unsloth's public API docs (https://unsloth.ai/docs/basics/api) and the
-  working client in `Y:\Programs\Agent Setup\orchestrator.py` (the management routes
-  are not in Unsloth's public reference).
-- **README rewritten** to the Agent Setup README template; the per-release notes moved
-  verbatim to `docs/RELEASE_HISTORY.md` (plus the smoke-switch list).
-- **Release 27 schema number corrected** from 20 to 21 in `docs/WORKFLOW_STATUS.md` and
-  `docs/RELEASE_HISTORY.md`.
-- **Stale files sent to the Windows Recycle Bin** (restorable from there): all
-  `.pytest*` folders, `test-tmp-no-ai/`, `tmp/`, `artifacts/` (~630 MB of smoke configs,
-  previews, LibreOffice profiles), `build/`, `../preset-smoke-config/`, and 16 one-off
-  scripts (`scripts/capture_phase_*.py`, `scripts/capture_release_*.py`,
-  `scripts/update_release25_resources.py`). Original design-document PDFs/text copies
-  were preserved first in `docs/reference/`. Stale `__pycache__` folders (compiled when
-  the project lived on `X:`) were deleted so tracebacks show source again.
-- **Test suite ~14x faster (28 min 46 s → 2 min 1 s), same pass/fail result.** Cause: no
-  test closed its windows, so the shared `QApplication` kept every earlier test's widget
-  tree alive and each `setStyleSheet` re-polished all of them (a 2 s bootstrap test took
-  35 s late in the run). Fix: autouse fixture in `tests/conftest.py` flushes pending
-  events, then closes and deletes all top-level widgets after each test.
-- `.gitignore` extended with `artifacts/`, `.pytest*/`, `test-tmp*/`, `tmp/`,
-  `api_key.txt`.
-- **New:** `PROJECT.md` (development plan, from the Agent Setup template),
-  `PROJECT_RULES.md`, this file.
+| Commit | Change |
+| --- | --- |
+| `02a04c2` | Pure rename `lm_studio` → `local_model`, `LMStudio*` → `LocalModel*` |
+| `f52b859` | Unsloth Studio mode (superseded in part by the next commit) |
+| `5010fd6` | LM Studio kept as secondary provider; per-provider client behavior |
+| `123c031` | Docs: Unsloth primary, LM Studio secondary |
+| `18aaf8f` | Review fixes: setup without a loaded model, redirects refused, quiet status probe |
+
+- Unsloth: `http://127.0.0.1:<port>/v1` (default 8888), `Authorization: Bearer
+  sk-unsloth-…`, key in `preferences.json` only (`repr=False`; not in logs, errors, or
+  the diagnostics ZIP), 401 → `LocalModelAuthenticationError`, discovery via
+  `GET /v1/models` `loaded`, load and unload via `/api/inference/load|unload`, best-effort
+  `context_length` from `/api/inference/status`.
+- LM Studio: unchanged behavior (port 1234, native `/api/v1/models`, `loaded_instances`,
+  native load and unload). Saved `lm_studio` setups keep loading as LM Studio.
+- Model preference is stored per mode: `"unsloth"` for Unsloth, `"lm_studio"` for
+  LM Studio and llama.cpp (as before).
+- The fresh-context review returned APPROVE. Findings 1–3 were fixed in `18aaf8f`, each
+  with a test that fails without its fix. Findings 4–6 were accepted (see Known issues).
 
 ## Known issues
 
-1. **Pre-existing test failure:**
-   `tests/test_lm_studio.py::test_action_resolver_remembers_plain_json_after_schema_channel_failure`.
-   `action_resolver.py:202` calls `client.is_model_loaded()` (a `GET /models`) after a
-   failed request, but the test's fake `_json_request` asserts every call is `POST`. It
-   fails identically in isolation and was failing before this session's changes. Decide
-   whether the post-failure model check is intended (update the fake) or not (fix the
-   resolver); this code is rewritten in Phase 29 anyway.
-2. **Code still uses the LM Studio client.** `src/dd_simulator/lm_studio/` (client,
-   narrators, evaluation), `local_ai.py` mode `lm_studio`, UI panels, and
-   `tests/test_lm_studio.py` still target `http://localhost:1234/v1`, LM Studio's native
-   `/api/v1/models/load`, and `loaded_instances`, with no API key. Docs describe the
-   Unsloth target. This is PROJECT.md Phase 29.
-3. **Fixed — packaged startup crash** (`FileNotFoundError ... _internal\dd_simulator\ui\
-   assets\icons\item_manifest.json`). The code and spec were correct; the `dist` copy was
-   damaged when the project was copied from `X:` (the packaged `icons` folder had become
-   `svg icons`). A clean rebuild fixed it. After copying the project anywhere, rebuild
-   `dist` rather than copying it.
-4. `docs/reference/` keeps the original architecture guide under its original filename,
-   which still names LM Studio; it is a source document and was not rewritten.
-5. `scripts/capture_previews.py` writes to `artifacts/previews`, which is now disposable
-   and gitignored.
-6. `src/dnd_simulator.egg-info/` is a setuptools by-product left in place (harmless,
-   regenerated by `scripts/setup.ps1`).
-7. If the project is published to GitHub, the 50 MB `ggml-vulkan.dll` triggers a
-   large-file warning (limit 100 MB); consider Git LFS for `vendor/`.
+1. **Manual gate still owed:** load a model and play a turn against a live Unsloth
+   Studio with a real key, and against LM Studio. It is unconfirmed that Unsloth accepts
+   a `/v1/models` id as `model_path`; if not, the server's error detail is shown.
+2. **Pre-existing:** `--smoke-test-release18` exits 18 on a fresh config on `main` as
+   well. It expects a model client although Release 26.9.4 made a configured local AI
+   mandatory. Give the smoke a configured mode or retire it.
+3. If `is_model_loaded()` itself raises while `action_resolver.py` or
+   `dialogue_narrator.py` handles a failed request, that error escapes the `except`
+   block (pre-existing pattern).
+4. An empty `/v1/models` list now yields "0 loaded" in Settings instead of raising
+   "no model is loaded" (llama.cpp and LM Studio fallback paths).
+5. `LocalModelClient`'s default `base_url` for `provider="openai"` uses port 8888; every
+   call site passes an explicit URL, so this is cosmetic.
+6. `tests/test_release_twenty_seven.py` export test only proves the key is absent from
+   the ZIP; the real leak guard is
+   `test_rejected_key_raises_authentication_error_without_the_key`.
+7. `docs/reference/` keeps the original architecture guide under its original filename.
+8. `vendor/llama_cpp` binaries are committed (largest 50 MB); consider Git LFS.
+9. After copying the project anywhere, rebuild `dist` rather than copying it (an earlier
+   copy renamed the packaged `icons` folder and crashed startup).
 
 ## Testing notes
 
-- Several panels call `QTimer.singleShot(0, self.method)` without a context object
-  (`narrative_panels.py`, `activity_panels.py`, `main_window.py`). That is why the
-  cleanup fixture must call `processEvents()` before deleting widgets. The
-  `singleShot(0, self, self.method)` form in production code would remove that hazard.
-- A further speed-up is available with `pytest-xdist` (`-n auto`), at the cost of a new
-  dev dependency; at 2 minutes it was not worth it.
-- To run one module while iterating, set `$env:QT_QPA_PLATFORM = 'offscreen'` and run
-  `.venv\Scripts\python.exe -m pytest tests\test_main_window.py`.
+- `tests/conftest.py` closes leftover top-level widgets after each test; without it the
+  suite took ~29 minutes. It must call `processEvents()` first, because several panels
+  use `QTimer.singleShot(0, self.method)` without a context object.
+- One module while iterating: set `$env:QT_QPA_PLATFORM = 'offscreen'` and run
+  `.venv\Scripts\python.exe -m pytest tests\test_local_model.py`.
+- `scripts\build.ps1` fails under PowerShell 5.1 when its output is redirected with
+  `2>&1` (PyInstaller INFO lines on stderr). Run it plainly, or call
+  `.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean DnDSimulator.spec`.
 
 ## Next steps
 
-1. Phase 29: migrate the client to Unsloth Studio per `docs/UNSLOTH.md` (checklist in
-   PROJECT.md). Start from `src/dd_simulator/lm_studio/client.py` (`LMStudioClient`:
-   `__init__` URL validation, `load_model`, `load_exclusive_model`, model discovery) and
-   `src/dd_simulator/local_ai.py` (`LocalAiConfiguration.mode`). Resolve Known issue 1
-   as part of it.
-2. Rebuild with `.\scripts\build.ps1` and run `--smoke-test-release27` from `dist` with
-   an isolated `DDSIM_CONFIG_DIR`.
+1. Run the manual gate (Known issue 1), then merge `phase-29-unsloth` into `main` and push.
+2. Phase 30: target hardware profile and final model selection (PROJECT.md).
