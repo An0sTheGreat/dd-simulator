@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Dense Silver Ore</title>
+<desc>Atlas index 1060; category material; subtype ore; tags crafting|mining|white; visual tier 0</desc>
+<path fill="#1B0542" d="M10 4h1v1h-1zM11 5h1v1h-1zM12 6h1v3h-1zM6 12h2v1h-2zM13 9h1v4h-1zM12 13h1v1h-1zM9 14h3v1h-3z"/>
+<path fill="#20184F" d="M5 3h5v1h-5zM4 4h1v1h-1zM3 5h1v1h-1zM2 6h1v4h-1zM3 10h1v1h-1zM4 11h2v1h-2zM8 10h1v4h-1z"/>
+<path fill="#45497A" d="M10 8h2v1h-2zM9 9h1v1h-1z"/>
+<path fill="#6F7699" d="M11 6h1v1h-1zM4 7h1v1h-1zM9 7h3v1h-3zM7 8h3v1h-3zM7 9h2v1h-2zM7 10h1v2h-1zM12 11h1v1h-1zM11 12h2v1h-2zM11 13h1v1h-1z"/>
+<path fill="#979DB4" d="M7 4h1v1h-1zM3 6h2v1h-2zM8 6h1v1h-1zM3 7h1v1h-1zM5 7h1v1h-1zM3 8h4v1h-4zM3 9h2v1h-2zM6 9h1v1h-1zM11 9h1v1h-1zM4 10h3v1h-3zM6 11h1v1h-1zM9 12h2v2h-2z"/>
+<path fill="#CED2DD" d="M5 4h2v1h-2zM8 4h2v1h-2zM5 5h4v1h-4zM10 5h1v1h-1zM6 6h2v1h-2zM9 6h2v1h-2zM7 7h1v1h-1zM5 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM9 10h1v1h-1zM11 10h2v1h-2zM9 11h3v1h-3z"/>
+<path fill="#DEE1E7" d="M4 5h1v1h-1zM9 5h1v1h-1zM5 6h1v1h-1zM6 7h1v1h-1zM8 7h1v1h-1z"/>
+<path fill="#E2E6EC" d="M10 10h1v1h-1z"/>
+</svg>

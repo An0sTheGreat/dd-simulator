@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Tempered Flameforged Belt</title>
+<desc>Atlas index 874; category armor; subtype belt; tags orange|belt|accessory|waist|gear|flameforged; visual tier 1</desc>
+<path fill="#20184F" d="M11 12h1v1h-1zM10 13h1v1h-1zM8 14h2v1h-2z"/>
+<path fill="#302867" d="M8 9h2v1h-2zM7 10h1v1h-1zM10 10h1v1h-1zM6 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#3B002B" d="M15 7h1v4h-1zM14 11h1v1h-1zM4 12h2v1h-2zM12 12h2v1h-2z"/>
+<path fill="#520606" d="M6 4h6v1h-6zM4 5h2v1h-2zM12 5h2v1h-2zM3 6h1v1h-1zM14 6h1v1h-1zM6 7h6v1h-6zM4 8h2v1h-2zM12 8h2v1h-2zM5 9h2v1h-2zM11 9h2v1h-2zM2 7h1v4h-1zM3 11h1v1h-1z"/>
+<path fill="#753123" d="M6 6h6v1h-6zM4 7h2v1h-2zM12 7h2v1h-2z"/>
+<path fill="#7A80A0" d="M10 12h1v1h-1zM8 13h2v1h-2z"/>
+<path fill="#8D422D" d="M14 9h1v1h-1zM13 10h2v1h-2zM11 11h3v1h-3z"/>
+<path fill="#A66141" d="M3 9h1v1h-1zM3 10h2v1h-2zM4 11h3v1h-3z"/>
+<path fill="#BA7A51" d="M9 5h3v1h-3zM12 6h2v1h-2zM14 7h1v2h-1zM13 9h1v1h-1zM11 10h2v1h-2z"/>
+<path fill="#BABFD5" d="M9 10h1v1h-1zM10 11h1v1h-1z"/>
+<path fill="#BDC1CC" d="M8 10h1v1h-1zM7 11h1v2h-1zM9 12h1v1h-1z"/>
+<path fill="#CF9F71" d="M6 5h3v1h-3zM4 6h2v1h-2zM3 7h1v2h-1zM4 9h1v1h-1zM5 10h2v1h-2z"/>
+<path fill="#F3F3F3" d="M8 11h2v1h-2zM8 12h1v1h-1z"/>
+</svg>

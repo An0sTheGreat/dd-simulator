@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Runed Gold Greataxe</title>
+<desc>Atlas index 244; category weapon; subtype greataxe; tags yellow|greataxe|metal|melee|two-handed|gold|ornate; visual tier 2</desc>
+<path fill="#4C0600" d="M14 3h1v1h-1zM13 4h1v1h-1zM8 9h1v1h-1zM14 5h1v5h-1zM7 10h1v1h-1zM13 10h1v1h-1zM6 11h1v1h-1zM12 11h1v1h-1zM5 12h1v1h-1zM9 12h3v1h-3zM4 13h1v1h-1zM2 14h2v1h-2z"/>
+<path fill="#5E1400" d="M7 1h5v1h-5zM6 2h1v1h-1zM11 2h1v1h-1zM13 2h2v1h-2zM5 3h1v1h-1zM12 3h1v1h-1zM4 4h1v3h-1zM6 6h2v1h-2zM4 7h2v1h-2zM7 7h1v1h-1zM6 8h1v1h-1zM5 9h1v1h-1zM4 10h1v1h-1zM9 8h1v3h-1zM3 11h1v1h-1zM2 12h1v1h-1zM8 11h1v2h-1zM1 13h1v2h-1z"/>
+<path fill="#962B00" d="M10 3h2v1h-2zM10 4h1v1h-1zM9 5h1v1h-1zM12 5h2v1h-2zM8 6h1v1h-1zM11 6h2v1h-2zM10 7h1v1h-1z"/>
+<path fill="#CF6D1C" d="M7 3h3v1h-3zM6 4h1v1h-1zM9 4h1v1h-1zM7 5h2v1h-2zM5 5h1v2h-1zM10 5h1v2h-1zM9 7h1v1h-1zM11 7h2v1h-2zM8 8h1v1h-1zM7 9h1v1h-1zM10 8h1v2h-1zM12 8h1v2h-1zM6 10h1v1h-1zM11 10h1v1h-1zM5 11h1v1h-1zM9 11h2v1h-2zM4 12h1v1h-1zM3 13h1v1h-1z"/>
+<path fill="#FF0000" d="M12 4h1v1h-1zM11 5h1v1h-1z"/>
+<path fill="#FFD671" d="M9 2h2v1h-2zM13 3h1v1h-1zM7 4h2v1h-2zM6 5h1v1h-1zM9 6h1v1h-1zM8 7h1v1h-1zM13 6h1v2h-1zM11 8h1v2h-1zM10 10h1v1h-1zM4 11h1v1h-1zM3 12h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 2h2v1h-2zM6 3h1v1h-1zM5 4h1v1h-1zM11 4h1v1h-1zM7 8h1v1h-1zM6 9h1v1h-1zM13 8h1v2h-1zM5 10h1v1h-1zM12 10h1v1h-1zM11 11h1v1h-1zM2 13h1v1h-1z"/>
+</svg>

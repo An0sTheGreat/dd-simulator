@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Masterwork Sapphire Mace</title>
+<desc>Atlas index 350; category weapon; subtype mace; tags blue|mace|metal|melee|blunt|sapphire|ornate; visual tier 2</desc>
+<path fill="#1B0542" d="M14 2h1v2h-1zM13 4h1v1h-1zM11 6h1v1h-1zM14 5h1v2h-1zM12 7h3v1h-3z"/>
+<path fill="#20184F" d="M10 1h1v1h-1zM12 1h2v1h-2zM9 2h1v1h-1zM11 2h1v1h-1zM8 3h1v1h-1zM9 4h1v1h-1zM8 5h1v1h-1zM9 6h1v1h-1z"/>
+<path fill="#3B002B" d="M10 7h1v1h-1zM9 8h1v1h-1zM8 9h1v1h-1zM7 10h1v1h-1zM6 11h1v1h-1zM5 12h1v1h-1zM4 13h1v1h-1zM3 14h1v1h-1z"/>
+<path fill="#520606" d="M8 6h1v1h-1zM7 7h1v1h-1zM6 8h1v1h-1zM5 9h1v1h-1zM4 10h1v1h-1zM3 11h1v1h-1zM2 12h1v3h-1z"/>
+<path fill="#524B7A" d="M12 3h1v1h-1zM10 3h1v2h-1zM11 5h2v1h-2z"/>
+<path fill="#7D7CA6" d="M13 2h1v1h-1zM12 4h1v1h-1zM9 5h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1z"/>
+<path fill="#974E36" d="M9 7h1v1h-1zM8 8h1v1h-1zM6 10h1v1h-1zM4 11h2v1h-2zM4 12h1v1h-1zM3 13h1v1h-1z"/>
+<path fill="#9DA7C4" d="M12 2h1v1h-1zM9 3h1v1h-1zM13 3h1v1h-1zM13 5h1v2h-1z"/>
+<path fill="#C5C9D3" d="M10 2h1v1h-1zM11 3h1v2h-1zM10 5h1v1h-1z"/>
+<path fill="#C69055" d="M8 7h1v1h-1zM5 10h1v1h-1zM3 12h1v1h-1z"/>
+<path fill="#CAA77E" d="M7 9h1v1h-1z"/>
+<path fill="#E1D1AE" d="M7 8h1v1h-1zM6 9h1v1h-1z"/>
+</svg>

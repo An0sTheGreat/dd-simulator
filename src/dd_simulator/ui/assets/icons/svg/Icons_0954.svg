@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Frost Bomb</title>
+<desc>Atlas index 954; category potion; subtype elixir; tags consumable|alchemy|blue; visual tier 3</desc>
+<path fill="#16399F" d="M6 4h1v1h-1zM11 4h1v1h-1zM6 5h2v1h-2zM10 5h2v1h-2zM5 6h1v1h-1zM12 6h1v1h-1zM4 7h1v1h-1zM13 7h1v1h-1zM3 8h1v4h-1zM14 8h1v4h-1zM4 12h1v1h-1zM13 12h1v1h-1zM5 13h1v1h-1zM12 13h1v1h-1zM6 14h6v1h-6z"/>
+<path fill="#2A69C4" d="M9 6h1v1h-1z"/>
+<path fill="#3181CE" d="M8 6h1v1h-1z"/>
+<path fill="#3B0612" d="M10 3h1v1h-1z"/>
+<path fill="#4187FF" d="M13 1h1v1h-1zM15 1h1v1h-1zM4 2h1v1h-1zM14 2h1v1h-1zM3 3h1v1h-1zM5 3h1v1h-1zM12 2h1v2h-1zM13 4h1v1h-1zM15 3h1v2h-1zM2 4h1v2h-1zM4 5h1v1h-1zM14 5h1v1h-1zM3 6h1v1h-1zM6 7h1v1h-1zM9 7h2v1h-2zM6 8h2v1h-2zM9 8h1v1h-1zM12 8h1v1h-1zM7 9h1v1h-1zM11 9h1v1h-1zM5 9h1v2h-1zM11 10h2v1h-2zM6 11h2v1h-2zM10 11h1v1h-1zM6 12h1v1h-1zM8 12h2v1h-2zM11 12h1v1h-1z"/>
+<path fill="#531919" d="M8 2h2v1h-2zM7 3h1v1h-1z"/>
+<path fill="#7192B8" d="M10 4h1v1h-1zM9 5h1v1h-1zM13 11h1v1h-1zM12 12h1v1h-1zM10 13h2v1h-2z"/>
+<path fill="#8D422D" d="M8 4h2v1h-2z"/>
+<path fill="#91C7EF" d="M8 7h1v1h-1zM11 8h1v1h-1zM12 9h1v1h-1zM6 10h2v1h-2zM10 9h1v2h-1zM5 11h1v1h-1zM9 11h1v1h-1zM11 11h2v1h-2zM10 12h1v1h-1z"/>
+<path fill="#99B6CE" d="M7 6h1v1h-1zM10 6h1v1h-1zM13 10h1v1h-1zM9 13h1v1h-1z"/>
+<path fill="#B8EBFE" d="M15 2h1v1h-1zM13 2h1v2h-1zM4 3h1v2h-1zM14 4h1v1h-1zM3 5h1v1h-1zM7 7h1v1h-1zM11 7h1v1h-1zM5 8h1v1h-1zM10 8h1v1h-1zM8 11h1v1h-1zM7 12h1v1h-1z"/>
+<path fill="#BFD8E4" d="M8 5h1v1h-1zM6 6h1v1h-1zM11 6h1v1h-1zM12 7h1v1h-1zM4 8h1v1h-1zM13 8h1v2h-1zM4 11h1v1h-1zM5 12h1v1h-1zM6 13h3v1h-3z"/>
+<path fill="#C4845F" d="M8 3h2v1h-2z"/>
+<path fill="#FFFFFF" d="M14 3h1v1h-1zM3 4h1v1h-1zM7 4h1v1h-1zM5 7h1v1h-1zM8 8h1v1h-1zM6 9h1v1h-1zM4 9h1v2h-1zM8 9h2v2h-2z"/>
+</svg>

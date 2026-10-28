@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Avalanche Wave</title>
+<desc>Atlas index 1426; category spell; subtype ice; tags ice|magic|blue; visual tier 3</desc>
+<path fill="#1559DA" d="M2 1h7v1h-7zM10 1h1v1h-1zM1 2h12v1h-12zM1 3h4v1h-4zM13 3h2v1h-2zM1 4h1v1h-1zM14 4h1v1h-1zM1 5h4v1h-4zM1 6h2v1h-2zM1 7h1v1h-1zM1 8h3v1h-3zM1 10h3v1h-3zM1 11h4v1h-4zM14 11h1v1h-1zM1 12h1v1h-1zM3 12h1v1h-1zM13 12h2v1h-2zM1 13h12v1h-12zM2 14h7v1h-7zM10 14h1v1h-1z"/>
+<path fill="#41A0F5" d="M9 1h1v1h-1zM11 1h3v1h-3zM13 2h2v1h-2zM5 3h3v1h-3zM2 4h5v1h-5zM5 5h1v1h-1zM3 6h1v1h-1zM2 7h3v1h-3zM4 8h1v1h-1zM1 9h1v1h-1zM3 9h1v1h-1zM4 10h2v1h-2zM5 11h1v1h-1zM2 12h1v1h-1zM4 12h4v1h-4zM13 13h2v1h-2zM9 14h1v1h-1zM11 14h3v1h-3z"/>
+<path fill="#8EE8F7" d="M14 5h1v1h-1zM5 7h1v2h-1zM14 8h1v2h-1zM6 10h3v1h-3zM13 10h2v1h-2zM11 11h3v1h-3zM8 12h5v1h-5z"/>
+<path fill="#CDFBFF" d="M8 3h5v1h-5zM7 4h1v1h-1zM13 4h1v1h-1zM6 5h2v1h-2zM4 6h3v1h-3zM8 6h1v1h-1zM6 7h2v1h-2zM12 7h1v1h-1zM14 6h1v2h-1zM6 8h1v1h-1zM8 8h2v1h-2zM13 8h1v1h-1zM2 9h1v1h-1zM4 9h5v1h-5zM10 9h1v1h-1zM12 9h2v1h-2zM9 10h4v1h-4zM6 11h5v1h-5z"/>
+<path fill="#FFFFFF" d="M8 4h5v1h-5zM8 5h6v1h-6zM7 6h1v1h-1zM9 6h5v1h-5zM8 7h4v1h-4zM13 7h1v1h-1zM7 8h1v1h-1zM10 8h3v1h-3zM9 9h1v1h-1zM11 9h1v1h-1z"/>
+</svg>

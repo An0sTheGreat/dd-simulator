@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Milk Bottle</title>
+<desc>Atlas index 1007; category food; subtype drink; tags consumable|ingredient|yellow; visual tier 1</desc>
+<path fill="#14183F" d="M11 4h1v2h-1zM10 6h1v1h-1zM11 7h1v1h-1zM12 8h1v5h-1zM11 13h1v1h-1zM5 14h6v1h-6z"/>
+<path fill="#1F2C58" d="M4 4h1v2h-1zM5 6h1v1h-1zM4 7h1v1h-1zM3 8h1v5h-1zM4 13h1v1h-1z"/>
+<path fill="#3D0D09" d="M10 3h1v1h-1z"/>
+<path fill="#5C2419" d="M6 2h4v1h-4zM5 3h1v1h-1z"/>
+<path fill="#7192B8" d="M5 5h1v1h-1zM10 5h1v1h-1zM11 11h1v2h-1zM9 13h2v1h-2z"/>
+<path fill="#975738" d="M6 3h1v1h-1zM9 3h1v1h-1zM6 4h4v1h-4z"/>
+<path fill="#BFD8E4" d="M10 4h1v1h-1zM6 5h1v2h-1zM9 5h1v2h-1zM5 7h1v1h-1zM10 7h1v1h-1zM4 8h1v1h-1zM11 8h1v3h-1zM4 11h1v2h-1zM5 13h4v1h-4z"/>
+<path fill="#DA9F74" d="M7 3h2v1h-2z"/>
+<path fill="#E3C6A4" d="M7 6h2v1h-2zM9 7h1v1h-1zM10 8h1v3h-1zM5 11h1v1h-1zM9 11h2v1h-2zM5 12h6v1h-6z"/>
+<path fill="#FFEBCB" d="M6 7h3v1h-3zM9 8h1v2h-1zM5 8h1v3h-1zM7 10h3v1h-3zM6 11h3v1h-3z"/>
+<path fill="#FFFEF9" d="M6 8h3v2h-3zM6 10h1v1h-1z"/>
+<path fill="#FFFFFF" d="M5 4h1v1h-1zM7 5h2v1h-2zM4 9h1v2h-1z"/>
+</svg>

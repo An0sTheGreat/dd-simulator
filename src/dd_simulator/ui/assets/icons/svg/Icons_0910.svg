@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Enchanted Gold Ring</title>
+<desc>Atlas index 910; category armor; subtype ring; tags yellow|ring|accessory|finger|magic|gold|ornate; visual tier 2</desc>
+<path fill="#3E94FF" d="M5 4h1v2h-1zM3 6h2v1h-2z"/>
+<path fill="#4C0600" d="M6 9h1v1h-1zM9 7h1v3h-1zM7 10h2v1h-2zM13 6h1v5h-1zM12 11h1v1h-1zM11 12h1v1h-1zM5 13h6v1h-6z"/>
+<path fill="#5E1400" d="M4 3h7v1h-7zM3 4h1v1h-1zM11 4h1v1h-1zM12 5h1v1h-1zM8 6h1v1h-1zM7 7h1v1h-1zM6 8h1v1h-1zM2 5h1v6h-1zM3 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#6FDEFF" d="M4 4h1v2h-1z"/>
+<path fill="#B2431B" d="M8 4h1v2h-1zM9 6h2v1h-2zM10 7h2v1h-2zM5 8h1v1h-1zM11 8h1v2h-1zM6 10h1v1h-1zM7 11h3v1h-3z"/>
+<path fill="#CF6D1C" d="M7 5h1v1h-1zM6 6h2v1h-2zM5 7h2v1h-2zM3 8h2v1h-2zM10 8h1v2h-1zM9 10h3v1h-3zM10 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#E9A449" d="M10 4h1v1h-1zM11 6h1v1h-1zM12 7h1v4h-1zM4 11h1v1h-1zM6 12h2v1h-2zM10 12h1v1h-1z"/>
+<path fill="#FFD671" d="M7 4h1v1h-1zM9 4h1v1h-1zM6 5h1v1h-1zM9 5h3v1h-3zM5 6h1v1h-1zM12 6h1v1h-1zM4 7h1v1h-1zM3 9h2v2h-2zM5 11h1v1h-1z"/>
+<path fill="#FFFFFF" d="M6 4h1v1h-1zM3 5h1v1h-1zM3 7h1v1h-1zM5 9h1v2h-1zM6 11h1v1h-1zM11 11h1v1h-1zM8 12h2v1h-2z"/>
+</svg>

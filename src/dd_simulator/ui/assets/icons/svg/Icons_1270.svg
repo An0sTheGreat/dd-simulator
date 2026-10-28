@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Fire Rune</title>
+<desc>Atlas index 1270; category magic_item; subtype rune; tags magic|fire|white; visual tier 2</desc>
+<path fill="#1B0542" d="M11 4h1v1h-1zM12 5h1v2h-1zM13 7h1v4h-1zM12 11h1v2h-1zM11 13h1v1h-1zM4 14h7v1h-7z"/>
+<path fill="#20184F" d="M5 1h3v1h-3zM4 2h1v1h-1zM8 2h2v1h-2zM10 3h1v1h-1zM3 3h1v3h-1zM2 6h1v7h-1zM3 13h1v1h-1z"/>
+<path fill="#69678F" d="M11 5h1v1h-1zM12 7h1v4h-1zM11 11h1v1h-1zM3 12h1v1h-1zM10 12h2v1h-2zM4 13h7v1h-7z"/>
+<path fill="#8E8FAA" d="M7 2h1v1h-1zM9 3h1v1h-1zM10 4h1v1h-1zM11 6h1v1h-1zM11 10h1v1h-1zM3 11h1v1h-1zM4 12h1v1h-1zM9 12h1v1h-1z"/>
+<path fill="#BDC1CC" d="M6 2h1v1h-1zM5 3h4v1h-4zM8 4h2v1h-2zM5 4h2v2h-2zM9 5h2v1h-2zM4 6h2v1h-2zM10 6h1v1h-1zM4 7h1v3h-1zM10 7h2v3h-2zM4 10h2v1h-2zM9 10h2v1h-2zM5 11h6v1h-6zM8 12h1v1h-1z"/>
+<path fill="#E02F01" d="M7 4h1v1h-1zM7 5h2v1h-2zM6 6h1v1h-1zM5 7h1v3h-1zM9 6h1v4h-1zM6 10h3v1h-3z"/>
+<path fill="#E4E5E7" d="M5 2h1v1h-1zM4 3h1v3h-1zM3 6h1v5h-1zM4 11h1v1h-1zM5 12h3v1h-3z"/>
+<path fill="#F26D00" d="M7 6h2v1h-2zM8 7h1v1h-1zM6 7h1v2h-1z"/>
+<path fill="#F5D000" d="M7 7h1v1h-1zM7 8h2v1h-2zM6 9h1v1h-1zM8 9h1v1h-1z"/>
+<path fill="#FFF2DE" d="M7 9h1v1h-1z"/>
+</svg>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Stormbound Scarlet Belt</title>
+<desc>Atlas index 877; category armor; subtype belt; tags red|belt|accessory|waist|gear|scarlet|ornate|magic; visual tier 3</desc>
+<path fill="#3B002B" d="M15 7h1v4h-1zM8 11h2v1h-2zM14 11h1v1h-1zM0 10h1v3h-1zM12 12h2v1h-2z"/>
+<path fill="#4C0600" d="M11 10h1v3h-1zM7 13h4v1h-4z"/>
+<path fill="#520606" d="M6 4h6v1h-6zM4 5h2v1h-2zM12 5h2v1h-2zM3 6h1v1h-1zM14 6h1v1h-1zM6 7h6v1h-6zM4 8h2v1h-2zM12 8h2v1h-2zM5 9h2v1h-2zM11 9h2v1h-2zM2 7h1v4h-1zM3 11h1v1h-1zM4 12h2v1h-2z"/>
+<path fill="#5E1400" d="M7 9h4v1h-4zM4 10h1v1h-1zM13 10h1v1h-1zM6 10h1v3h-1z"/>
+<path fill="#753123" d="M6 6h6v1h-6zM4 7h2v1h-2zM12 7h2v1h-2z"/>
+<path fill="#8D422D" d="M12 11h2v1h-2z"/>
+<path fill="#A66141" d="M4 11h2v1h-2z"/>
+<path fill="#BA7A51" d="M9 5h3v1h-3zM12 6h2v1h-2zM14 7h1v2h-1zM12 10h1v1h-1z"/>
+<path fill="#C6732D" d="M10 11h1v1h-1zM9 12h2v1h-2z"/>
+<path fill="#CF9F71" d="M6 5h3v1h-3zM4 6h2v1h-2zM3 7h1v2h-1zM5 10h1v1h-1z"/>
+<path fill="#E4A54A" d="M3 10h1v1h-1zM14 10h1v1h-1z"/>
+<path fill="#FFD671" d="M4 9h1v1h-1zM13 9h1v1h-1zM10 10h1v1h-1zM7 12h2v1h-2z"/>
+<path fill="#FFFFFF" d="M3 9h1v1h-1zM14 9h1v1h-1zM7 10h3v1h-3zM7 11h1v1h-1z"/>
+</svg>

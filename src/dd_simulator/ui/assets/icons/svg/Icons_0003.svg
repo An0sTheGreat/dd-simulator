@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Masterwork Froststeel Shortsword</title>
+<desc>Atlas index 3; category weapon; subtype shortsword; tags blue|shortsword|metal|melee|one-handed|froststeel|ornate; visual tier 2</desc>
+<path fill="#1B0542" d="M14 2h1v2h-1zM13 4h1v1h-1zM12 5h1v1h-1zM11 6h1v1h-1zM10 7h1v2h-1zM9 9h1v1h-1zM8 10h1v1h-1zM6 12h1v2h-1zM9 12h1v2h-1zM2 14h2v1h-2zM7 14h2v1h-2z"/>
+<path fill="#20184F" d="M11 1h4v1h-4zM10 2h1v1h-1zM9 3h1v1h-1zM8 4h1v1h-1zM7 5h1v1h-1zM2 6h2v1h-2zM6 6h1v1h-1zM1 7h1v2h-1zM2 9h2v1h-2zM6 8h1v2h-1zM1 12h1v2h-1z"/>
+<path fill="#3B002B" d="M4 7h2v1h-2zM7 10h1v1h-1zM2 11h1v1h-1zM8 11h1v1h-1zM4 13h1v1h-1z"/>
+<path fill="#69678F" d="M13 3h1v1h-1zM10 4h3v1h-3zM8 5h1v1h-1zM11 5h1v1h-1zM9 6h2v1h-2zM6 7h1v1h-1zM9 7h1v1h-1zM3 8h1v1h-1zM8 8h2v1h-2zM7 9h2v1h-2zM7 12h1v1h-1z"/>
+<path fill="#742E10" d="M4 8h1v1h-1zM3 11h1v1h-1zM7 11h1v1h-1zM3 12h2v1h-2z"/>
+<path fill="#898FAD" d="M3 7h1v1h-1zM2 8h1v1h-1zM2 12h1v1h-1zM8 12h1v1h-1zM3 13h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#974E36" d="M4 9h1v1h-1zM4 11h1v1h-1zM6 11h1v1h-1z"/>
+<path fill="#BDC1CC" d="M11 2h1v1h-1zM13 2h1v1h-1zM10 3h1v1h-1zM9 4h1v1h-1zM10 5h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM7 8h1v1h-1zM2 13h1v1h-1zM8 13h1v1h-1z"/>
+<path fill="#DDAA6E" d="M5 8h1v1h-1zM3 10h1v1h-1zM6 10h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#E4E5E7" d="M12 2h1v1h-1zM11 3h2v1h-2zM9 5h1v1h-1zM7 6h2v1h-2zM7 7h1v1h-1z"/>
+<path fill="#FEDAA0" d="M5 9h1v1h-1zM4 10h2v1h-2zM5 11h1v1h-1z"/>
+</svg>

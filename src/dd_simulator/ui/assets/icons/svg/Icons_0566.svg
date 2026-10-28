@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Balanced Copper Hammer</title>
+<desc>Atlas index 566; category weapon; subtype hammer; tags orange|hammer|metal|melee|blunt|copper; visual tier 1</desc>
+<path fill="#3C1106" d="M14 5h1v2h-1zM13 7h1v1h-1zM9 8h2v1h-2zM12 8h1v1h-1zM8 9h1v1h-1zM11 9h1v1h-1zM7 10h1v1h-1zM6 11h1v1h-1zM4 12h2v1h-2zM4 13h1v1h-1zM3 14h1v1h-1z"/>
+<path fill="#481E08" d="M9 2h4v1h-4zM8 3h1v1h-1zM13 3h1v1h-1zM7 4h1v1h-1zM14 4h1v1h-1zM6 5h1v1h-1zM6 6h2v1h-2zM7 7h1v1h-1zM6 8h1v1h-1zM5 9h1v1h-1zM4 10h1v1h-1zM2 11h2v1h-2zM1 12h1v1h-1zM2 13h1v1h-1z"/>
+<path fill="#7E3424" d="M5 11h1v1h-1z"/>
+<path fill="#975738" d="M5 10h1v1h-1zM4 11h1v1h-1z"/>
+<path fill="#B38862" d="M8 6h1v1h-1zM10 6h1v1h-1zM9 7h2v1h-2zM8 8h1v1h-1zM7 9h1v1h-1zM6 10h1v1h-1z"/>
+<path fill="#CCB497" d="M9 4h4v1h-4zM8 5h2v1h-2zM11 5h2v1h-2zM11 6h1v1h-1zM3 12h1v1h-1z"/>
+<path fill="#FFF2DE" d="M9 3h4v1h-4zM8 4h1v1h-1zM7 5h1v1h-1zM10 5h1v1h-1zM13 4h1v2h-1zM9 6h1v1h-1zM12 6h2v1h-2zM8 7h1v1h-1zM11 7h2v1h-2zM7 8h1v1h-1zM11 8h1v1h-1zM6 9h1v1h-1zM2 12h1v1h-1zM3 13h1v1h-1z"/>
+</svg>

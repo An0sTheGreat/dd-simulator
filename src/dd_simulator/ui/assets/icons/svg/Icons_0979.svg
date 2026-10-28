@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Red Mushroom</title>
+<desc>Atlas index 979; category food; subtype mushroom; tags consumable|ingredient|red; visual tier 0</desc>
+<path fill="#4D2B00" d="M9 11h1v2h-1zM8 13h1v1h-1zM6 14h2v1h-2z"/>
+<path fill="#583600" d="M6 11h1v1h-1zM5 12h1v2h-1z"/>
+<path fill="#680026" d="M10 4h1v1h-1zM11 5h1v1h-1zM12 6h1v1h-1zM13 7h1v2h-1zM12 9h1v1h-1zM4 10h8v1h-8z"/>
+<path fill="#710021" d="M7 3h3v1h-3zM6 4h1v1h-1zM4 5h2v1h-2zM3 6h1v1h-1zM2 7h1v2h-1zM3 9h1v1h-1z"/>
+<path fill="#D5BD96" d="M7 11h2v1h-2zM6 12h1v1h-1zM8 12h1v1h-1z"/>
+<path fill="#DE2828" d="M9 4h1v1h-1zM10 5h1v2h-1zM9 7h4v1h-4zM8 8h1v1h-1zM11 8h2v1h-2zM6 9h3v1h-3zM11 9h1v1h-1z"/>
+<path fill="#EE8273" d="M11 6h1v1h-1zM10 9h1v1h-1z"/>
+<path fill="#FF5744" d="M6 5h1v1h-1zM9 5h1v1h-1zM4 6h6v1h-6zM6 7h1v1h-1zM8 7h1v1h-1zM3 7h1v2h-1zM6 8h2v1h-2zM4 9h2v1h-2z"/>
+<path fill="#FFAA95" d="M8 5h1v1h-1zM5 8h1v1h-1zM9 8h2v1h-2zM9 9h1v1h-1z"/>
+<path fill="#FFD4BF" d="M7 4h2v1h-2zM7 5h1v1h-1zM4 7h2v1h-2zM7 7h1v1h-1zM4 8h1v1h-1z"/>
+<path fill="#FFF1D0" d="M7 12h1v1h-1zM6 13h2v1h-2z"/>
+</svg>

@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+build/
+dist/
+*.spec.bak
+*.log
+*.egg-info/
+artifacts/
+.pytest*/
+.pytest_tmp/
+test-tmp*/
+tmp/
+api_key.txt

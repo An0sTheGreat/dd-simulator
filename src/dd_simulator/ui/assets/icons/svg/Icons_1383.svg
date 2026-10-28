@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Burning Vortex</title>
+<desc>Atlas index 1383; category spell; subtype fire; tags fire|magic|yellow; visual tier 3</desc>
+<path fill="#6D0025" d="M2 1h1v1h-1zM4 1h3v1h-3zM8 1h2v1h-2zM5 2h3v1h-3zM11 1h1v2h-1zM13 2h2v1h-2zM1 2h1v2h-1zM10 3h4v1h-4zM1 4h2v1h-2zM6 3h1v2h-1zM10 4h3v1h-3zM1 5h6v1h-6zM11 5h1v1h-1zM14 5h1v1h-1zM1 6h2v1h-2zM4 6h2v1h-2zM13 6h2v1h-2zM12 7h1v1h-1zM14 7h1v1h-1zM1 7h1v2h-1zM14 10h1v1h-1z"/>
+<path fill="#9D001A" d="M3 1h1v1h-1zM7 1h1v1h-1zM10 1h1v1h-1zM12 1h2v1h-2zM4 2h1v1h-1zM8 2h3v1h-3zM12 2h1v1h-1zM2 2h1v2h-1zM7 3h1v1h-1zM3 4h1v1h-1zM5 3h1v2h-1zM9 4h1v1h-1zM14 3h1v2h-1zM10 5h1v1h-1zM3 6h1v1h-1zM6 6h2v1h-2zM4 7h3v1h-3zM11 6h1v2h-1zM13 7h1v1h-1zM2 8h1v1h-1zM5 8h1v1h-1zM10 8h3v1h-3zM1 9h1v1h-1zM11 9h1v1h-1zM14 8h1v2h-1zM13 10h1v1h-1zM14 11h1v1h-1z"/>
+<path fill="#E02F01" d="M3 2h1v1h-1zM8 3h2v1h-2zM7 4h1v1h-1zM13 4h1v1h-1zM9 5h1v1h-1zM2 7h2v1h-2zM7 7h1v1h-1zM10 7h1v1h-1zM4 8h1v1h-1zM13 8h1v1h-1zM5 9h1v1h-1zM12 9h1v1h-1zM11 10h1v2h-1z"/>
+<path fill="#F26D00" d="M3 3h2v1h-2zM8 4h1v1h-1zM7 5h1v1h-1zM12 5h2v1h-2zM8 6h1v1h-1zM10 6h1v1h-1zM3 8h1v1h-1zM9 8h1v1h-1zM2 9h1v1h-1zM4 9h1v1h-1zM6 8h1v2h-1zM9 9h2v1h-2zM13 9h1v1h-1zM1 10h2v1h-2zM5 10h1v1h-1zM10 10h1v1h-1zM12 10h1v1h-1zM1 11h1v1h-1zM13 11h1v1h-1zM14 12h1v1h-1z"/>
+<path fill="#F5D000" d="M4 4h1v1h-1zM8 5h1v1h-1zM9 6h1v1h-1zM12 6h1v1h-1zM8 7h2v1h-2zM7 8h2v1h-2zM3 9h1v1h-1zM7 9h1v1h-1zM3 10h2v1h-2zM6 10h1v1h-1zM8 10h2v1h-2zM2 11h4v1h-4zM8 11h3v1h-3zM12 11h1v1h-1zM4 12h1v1h-1zM10 12h4v1h-4zM1 12h2v2h-2zM11 13h1v1h-1zM13 13h2v1h-2zM2 14h2v1h-2zM12 14h2v1h-2z"/>
+<path fill="#FFFFFF" d="M8 9h1v1h-1zM7 10h1v1h-1zM6 11h2v1h-2zM3 12h1v1h-1zM5 12h5v1h-5zM3 13h8v1h-8zM12 13h1v1h-1zM4 14h8v1h-8z"/>
+</svg>

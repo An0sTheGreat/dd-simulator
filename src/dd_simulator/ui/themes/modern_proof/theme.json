@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "theme_id": "modern_proof",
+  "name": "Modern Dark Simple",
+  "description": "A clean, low-texture modern dark interface with high-contrast text.",
+  "author": "D&D Simulator Project",
+  "version": "0.1.0",
+  "tokens": {
+    "colors": {
+      "background_primary": "#0d0d0e",
+      "background_secondary": "#131314",
+      "background_elevated": "#1b1b1d",
+      "panel_surface": "#18181a",
+      "panel_surface_alt": "#212124",
+      "text_primary": "#f2f2f3",
+      "text_secondary": "#cccccf",
+      "text_muted": "#9a9a9f",
+      "accent_primary": "#c0c0c4",
+      "accent_secondary": "#85858b",
+      "border_primary": "#454549",
+      "border_highlight": "#b3b3b8",
+      "success": "#62dda8",
+      "warning": "#f6bd60",
+      "danger": "#ff7b86",
+      "quest": "#c2a8ff",
+      "loot": "#f4d06f",
+      "experience": "#8ab8ff",
+      "dialogue": "#ffffff",
+      "selection": "#444448",
+      "hover": "#303033"
+      ,"rarity_common": "#a7b0be"
+      ,"rarity_uncommon": "#62dda8"
+      ,"rarity_rare": "#79b0ff"
+      ,"rarity_epic": "#c2a8ff"
+      ,"rarity_legendary": "#ffad5c"
+    },
+    "typography": {
+      "font_display": "Bitstream Vera Sans",
+      "font_heading": "Bitstream Vera Sans",
+      "font_body": "Bitstream Vera Sans",
+      "font_monospace": "Cascadia Mono",
+      "size_title": "21px",
+      "size_heading_1": "16px",
+      "size_heading_2": "14px",
+      "size_body": "13px",
+      "size_small": "11px",
+      "weight_normal": "400",
+      "weight_bold": "600"
+    },
+    "spacing": {
+      "space_xs": "4px",
+      "space_sm": "7px",
+      "space_md": "11px",
+      "space_lg": "17px",
+      "space_xl": "25px"
+    },
+    "geometry": {
+      "border_radius_small": "6px",
+      "border_radius_medium": "10px",
+      "border_width": "1px",
+      "panel_padding": "10px",
+      "slot_size": "48px",
+      "icon_size_small": "16px",
+      "icon_size_medium": "24px",
+      "icon_size_large": "36px"
+    },
+    "effects": {
+      "shadow_small": "0",
+      "shadow_medium": "0",
+      "hover_brightness": "1.04",
+      "disabled_opacity": "0.50",
+      "texture_opacity": "0",
+      "animation_fast": "100",
+      "animation_normal": "180"
+    },
+    "assets": {
+      "panel_frame": "assets/panel_frame.png",
+      "header_frame": "assets/header_frame.png",
+      "button_frame": "assets/button_frame.png",
+      "minimap_frame": "assets/minimap_frame.png",
+      "inventory_slot_background": "assets/inventory_slot_background.png",
+      "selected_slot_overlay": "assets/selected_slot_overlay.png",
+      "divider_horizontal": "assets/divider_horizontal.png",
+      "divider_vertical": "assets/divider_vertical.png",
+      "resource_health_icon": "assets/resource_health_icon.png",
+      "resource_mana_icon": "assets/resource_mana_icon.png",
+      "resource_stamina_icon": "assets/resource_stamina_icon.png"
+    }
+  }
+}

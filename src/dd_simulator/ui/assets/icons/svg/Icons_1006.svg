@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Fried Egg</title>
+<desc>Atlas index 1006; category food; subtype prepared; tags consumable|ingredient|white; visual tier 1</desc>
+<path fill="#441C00" d="M12 5h1v1h-1zM13 6h1v4h-1zM12 10h1v1h-1zM11 11h1v1h-1zM6 12h5v1h-5z"/>
+<path fill="#552B00" d="M6 3h5v1h-5zM5 4h1v1h-1zM11 4h1v1h-1zM3 5h2v1h-2zM2 6h1v4h-1zM3 10h1v1h-1zM4 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#E1C29C" d="M3 6h1v1h-1zM12 8h1v1h-1zM3 9h1v1h-1zM10 9h3v1h-3zM4 10h2v1h-2zM8 10h3v1h-3zM5 11h1v1h-1z"/>
+<path fill="#EB921C" d="M9 6h1v1h-1zM6 7h1v2h-1zM10 7h1v2h-1zM7 9h3v1h-3z"/>
+<path fill="#F5BA2A" d="M7 6h2v1h-2zM9 7h1v1h-1zM8 8h1v1h-1z"/>
+<path fill="#FFEA4C" d="M8 7h1v1h-1zM7 8h1v1h-1zM9 8h1v1h-1z"/>
+<path fill="#FFF6E9" d="M6 4h5v1h-5zM5 5h7v1h-7zM4 6h3v1h-3zM10 6h3v1h-3zM11 7h2v1h-2zM3 7h3v2h-3zM11 8h1v1h-1zM4 9h3v1h-3zM6 10h2v1h-2zM11 10h1v1h-1zM6 11h5v1h-5z"/>
+<path fill="#FFFFE9" d="M7 7h1v1h-1z"/>
+</svg>

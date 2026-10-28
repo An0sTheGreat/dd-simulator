@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Thorn Crown</title>
+<desc>Atlas index 1438; category spell; subtype nature; tags nature|magic|green; visual tier 4</desc>
+<path fill="#004456" d="M2 1h2v1h-2zM12 1h2v1h-2zM1 2h1v1h-1zM14 2h1v1h-1z"/>
+<path fill="#005768" d="M7 5h2v2h-2zM5 7h6v2h-6zM7 9h2v2h-2z"/>
+<path fill="#006362" d="M5 1h1v1h-1zM9 1h3v1h-3zM2 2h1v1h-1zM6 2h1v1h-1zM8 2h3v1h-3zM12 2h2v1h-2zM2 3h2v1h-2zM5 3h1v1h-1zM13 3h2v1h-2zM1 4h1v1h-1zM12 4h2v1h-2zM13 5h1v1h-1zM1 6h1v1h-1zM14 6h1v1h-1zM2 11h2v1h-2zM12 11h2v1h-2zM5 12h1v1h-1zM10 12h1v1h-1z"/>
+<path fill="#0C9156" d="M4 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM7 2h1v1h-1zM11 2h1v1h-1zM1 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h3v1h-3zM12 3h1v1h-1zM2 4h2v1h-2zM10 4h2v1h-2zM1 5h1v1h-1zM3 5h1v1h-1zM5 4h1v2h-1zM10 5h1v1h-1zM12 5h1v1h-1zM14 4h1v2h-1zM2 6h2v1h-2zM12 6h2v1h-2zM1 7h1v2h-1zM3 7h1v2h-1zM12 7h1v2h-1zM14 7h1v2h-1zM3 10h3v1h-3zM10 10h3v1h-3zM5 11h1v1h-1zM10 11h1v1h-1zM6 12h4v1h-4zM1 13h1v1h-1zM14 13h1v1h-1zM2 14h2v1h-2zM12 14h2v1h-2z"/>
+<path fill="#3AC64E" d="M1 9h1v1h-1zM14 9h1v1h-1zM2 10h1v1h-1zM13 10h1v1h-1zM2 12h2v1h-2zM12 12h2v1h-2zM5 13h2v1h-2zM8 13h3v1h-3zM4 14h1v1h-1zM11 14h1v1h-1z"/>
+<path fill="#47FF39" d="M7 1h1v1h-1zM4 2h1v1h-1zM7 3h1v1h-1zM11 3h1v1h-1zM8 4h2v1h-2zM2 5h1v1h-1zM4 5h1v1h-1zM9 5h1v1h-1zM11 5h1v1h-1zM6 4h1v3h-1zM9 6h3v1h-3zM2 8h1v1h-1zM4 8h1v1h-1zM11 7h1v2h-1zM13 7h1v2h-1zM2 9h5v1h-5zM9 9h5v1h-5zM1 10h1v1h-1zM6 10h1v1h-1zM9 10h1v1h-1zM6 11h4v1h-4zM4 11h1v2h-1zM11 11h1v2h-1zM14 10h1v3h-1zM3 13h2v1h-2zM7 13h1v1h-1zM11 13h3v1h-3zM5 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1z"/>
+<path fill="#E2FF76" d="M4 4h1v1h-1zM7 4h1v1h-1zM4 6h2v1h-2zM2 7h1v1h-1zM4 7h1v1h-1zM1 11h1v2h-1zM2 13h1v1h-1zM6 14h2v1h-2zM9 14h1v1h-1z"/>
+</svg>

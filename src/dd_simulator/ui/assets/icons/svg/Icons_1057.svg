@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Gold Ore</title>
+<desc>Atlas index 1057; category material; subtype ore; tags crafting|mining|yellow; visual tier 1</desc>
+<path fill="#661600" d="M10 4h1v1h-1zM11 5h1v2h-1zM11 7h2v1h-2zM13 8h1v3h-1zM12 11h1v1h-1zM9 12h3v1h-3zM5 13h4v1h-4z"/>
+<path fill="#6D2700" d="M6 3h4v1h-4zM5 4h1v1h-1zM4 5h1v2h-1zM3 7h1v1h-1zM2 8h1v4h-1zM3 12h1v1h-1zM4 13h1v1h-1z"/>
+<path fill="#C3630A" d="M10 6h1v1h-1zM9 7h2v1h-2zM9 8h1v1h-1zM7 9h2v2h-2zM12 8h1v3h-1zM6 11h3v2h-3z"/>
+<path fill="#E89737" d="M5 6h1v1h-1zM6 7h3v1h-3zM7 8h2v1h-2zM3 10h1v1h-1zM6 10h1v1h-1zM11 10h1v1h-1zM3 11h3v1h-3zM9 11h3v1h-3zM4 12h2v1h-2z"/>
+<path fill="#FFCF59" d="M7 4h3v1h-3zM9 5h2v1h-2zM8 6h2v1h-2zM4 7h2v1h-2zM4 8h3v1h-3zM10 8h2v1h-2zM5 9h2v1h-2zM9 9h1v1h-1z"/>
+<path fill="#FFFFFF" d="M6 4h1v1h-1zM5 5h4v1h-4zM6 6h2v1h-2zM3 8h1v1h-1zM3 9h2v1h-2zM10 9h2v1h-2zM4 10h2v1h-2zM9 10h2v1h-2z"/>
+</svg>

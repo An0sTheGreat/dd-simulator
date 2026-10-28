@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Enchanted Gold Gauntlets</title>
+<desc>Atlas index 751; category armor; subtype gloves; tags yellow|gloves|defense|hands|armor|gold|ornate; visual tier 2</desc>
+<path fill="#4C0600" d="M12 3h1v1h-1zM13 4h1v2h-1zM12 6h1v1h-1zM11 7h1v2h-1zM9 11h2v1h-2zM12 9h1v3h-1zM8 12h1v1h-1zM11 12h1v1h-1zM9 13h1v1h-1zM6 14h3v1h-3z"/>
+<path fill="#5E1400" d="M8 2h4v1h-4zM7 3h1v3h-1zM6 6h1v1h-1zM5 7h1v1h-1zM4 8h1v5h-1zM5 13h1v1h-1z"/>
+<path fill="#B53D01" d="M11 6h1v1h-1z"/>
+<path fill="#CF6D1C" d="M9 4h3v1h-3zM10 5h3v1h-3zM10 7h1v1h-1zM9 10h2v1h-2zM8 11h1v1h-1zM5 12h1v1h-1zM6 13h1v1h-1z"/>
+<path fill="#E9A449" d="M8 4h1v1h-1zM12 4h1v1h-1zM9 5h1v1h-1zM10 6h1v1h-1zM9 7h1v1h-1zM10 9h1v1h-1zM5 11h1v1h-1zM6 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#FFD671" d="M8 3h1v1h-1zM11 3h1v1h-1zM8 5h1v1h-1zM7 6h3v1h-3zM8 7h1v1h-1zM7 8h4v1h-4zM5 9h1v1h-1zM9 9h1v1h-1zM5 10h2v1h-2zM8 10h1v1h-1zM6 11h1v1h-1zM11 9h1v3h-1zM7 12h1v1h-1zM8 13h1v1h-1z"/>
+<path fill="#FFFFFF" d="M9 3h2v1h-2zM6 7h2v1h-2zM5 8h2v1h-2zM6 9h3v1h-3zM7 10h1v2h-1z"/>
+</svg>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Arcane Emerald Dagger</title>
+<desc>Atlas index 339; category weapon; subtype dagger; tags green|dagger|metal|melee|light|emerald|ornate|magic; visual tier 3</desc>
+<path fill="#003D0A" d="M13 3h1v2h-1zM12 5h2v1h-2zM11 6h1v1h-1zM10 7h1v2h-1zM3 13h2v1h-2z"/>
+<path fill="#004800" d="M10 2h4v1h-4zM10 3h1v1h-1zM9 4h1v1h-1zM7 5h2v1h-2zM6 7h2v1h-2zM8 8h1v1h-1zM4 11h1v1h-1zM2 11h1v3h-1z"/>
+<path fill="#3B002B" d="M6 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#520606" d="M3 6h4v1h-4zM3 7h1v1h-1zM3 8h2v1h-2zM4 9h2v1h-2zM8 9h2v1h-2zM3 10h1v1h-1zM6 10h1v1h-1zM7 11h1v1h-1zM9 10h1v2h-1zM7 12h3v1h-3z"/>
+<path fill="#742E10" d="M4 10h1v1h-1zM5 11h1v1h-1z"/>
+<path fill="#8ADF5D" d="M11 4h1v1h-1zM10 5h1v1h-1zM9 6h1v1h-1zM8 7h1v1h-1zM6 8h1v1h-1zM7 9h1v1h-1zM3 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#974E36" d="M5 8h1v1h-1zM6 9h1v1h-1zM7 10h1v1h-1zM8 11h1v1h-1z"/>
+<path fill="#B87741" d="M5 10h1v1h-1z"/>
+<path fill="#C69055" d="M4 7h1v1h-1zM8 10h1v1h-1z"/>
+<path fill="#D8FFA2" d="M7 8h1v1h-1zM9 7h1v2h-1z"/>
+<path fill="#E2BC78" d="M5 7h1v1h-1z"/>
+<path fill="#F1FFDF" d="M11 3h2v1h-2zM10 4h1v1h-1zM12 4h1v1h-1zM9 5h1v1h-1zM11 5h1v1h-1zM7 6h2v1h-2zM10 6h1v1h-1zM3 12h1v1h-1z"/>
+</svg>

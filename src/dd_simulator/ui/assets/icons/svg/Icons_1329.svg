@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Red Requiem</title>
+<desc>Atlas index 1329; category spell; subtype blood; tags blood|magic|pink; visual tier 3</desc>
+<path fill="#50003A" d="M2 1h1v1h-1zM4 1h3v1h-3zM10 1h2v1h-2zM13 1h1v1h-1zM1 2h3v1h-3zM11 2h1v1h-1zM13 2h2v1h-2zM1 3h1v1h-1zM14 3h1v1h-1zM9 5h1v1h-1zM9 6h2v2h-2zM8 8h3v1h-3zM8 9h2v1h-2zM14 7h1v3h-1zM6 10h3v1h-3zM13 10h2v1h-2zM1 7h1v5h-1zM3 11h1v1h-1zM1 12h3v1h-3zM13 11h1v2h-1zM1 13h2v1h-2zM4 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM13 13h2v1h-2zM2 14h1v1h-1zM4 14h4v1h-4zM9 14h3v1h-3zM13 14h1v1h-1z"/>
+<path fill="#85004E" d="M3 1h1v1h-1zM7 1h3v1h-3zM4 2h1v1h-1zM10 2h1v1h-1zM12 1h1v2h-1zM2 3h2v1h-2zM12 3h2v1h-2zM1 4h2v1h-2zM13 4h2v1h-2zM1 5h1v2h-1zM14 5h1v2h-1zM13 9h1v1h-1zM4 12h1v1h-1zM11 12h1v1h-1zM14 11h1v2h-1zM6 13h2v1h-2zM3 13h1v2h-1zM12 13h1v2h-1z"/>
+<path fill="#990041" d="M7 3h2v1h-2zM5 4h5v1h-5zM4 5h1v1h-1zM10 5h1v1h-1zM7 5h2v2h-2zM3 6h2v2h-2zM6 7h3v1h-3zM3 8h5v1h-5zM11 6h1v3h-1zM4 9h4v1h-4zM10 9h1v1h-1zM5 10h1v1h-1zM9 10h2v1h-2zM7 11h2v1h-2z"/>
+<path fill="#B90210" d="M10 4h1v1h-1zM11 5h1v1h-1zM13 5h1v1h-1zM12 7h1v2h-1zM3 9h1v1h-1zM11 9h1v1h-1zM4 10h1v1h-1zM2 10h1v2h-1zM6 11h1v1h-1zM9 11h1v2h-1zM12 11h1v2h-1z"/>
+<path fill="#DE2D31" d="M5 2h1v1h-1zM6 3h1v1h-1zM9 3h1v1h-1zM4 4h1v1h-1zM3 5h1v1h-1zM6 6h1v1h-1zM12 6h1v1h-1zM5 7h1v1h-1zM13 8h1v1h-1zM2 9h1v1h-1zM12 9h1v1h-1zM3 10h1v1h-1zM11 10h2v1h-2zM4 11h2v1h-2zM10 11h2v1h-2zM5 12h4v1h-4zM5 13h1v1h-1zM10 12h1v2h-1zM8 13h1v2h-1z"/>
+<path fill="#FF3D3D" d="M9 2h1v1h-1zM11 3h1v1h-1zM12 4h1v2h-1zM13 6h1v2h-1z"/>
+<path fill="#FF6E65" d="M6 2h3v1h-3zM4 3h2v1h-2zM10 3h1v1h-1zM3 4h1v1h-1zM11 4h1v1h-1zM6 5h1v1h-1zM5 6h1v1h-1zM2 5h1v4h-1z"/>
+<path fill="#FFB29F" d="M5 5h1v1h-1z"/>
+</svg>

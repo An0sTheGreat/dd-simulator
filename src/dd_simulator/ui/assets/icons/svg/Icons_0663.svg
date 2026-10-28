@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Oak Helmet</title>
+<desc>Atlas index 663; category armor; subtype helmet; tags brown|helmet|defense|head|armor|oak|plain; visual tier 0</desc>
+<path fill="#0B0730" d="M9 4h1v1h-1zM10 5h1v2h-1zM11 7h1v2h-1zM12 9h1v1h-1zM12 10h2v1h-2zM14 11h1v1h-1zM13 12h1v1h-1zM11 13h2v1h-2zM5 14h6v1h-6z"/>
+<path fill="#12153C" d="M5 2h3v1h-3zM4 3h1v1h-1zM8 3h1v1h-1zM4 4h2v1h-2zM6 5h1v3h-1zM5 8h1v1h-1zM4 9h1v1h-1zM2 10h2v1h-2zM1 11h1v1h-1zM2 12h1v1h-1zM3 13h2v1h-2z"/>
+<path fill="#32283D" d="M6 4h1v1h-1zM7 5h1v3h-1zM6 9h1v1h-1zM10 7h1v3h-1zM4 10h2v1h-2zM11 10h1v1h-1zM7 11h6v1h-6zM9 12h2v1h-2z"/>
+<path fill="#4D3E56" d="M5 3h1v1h-1zM7 4h1v1h-1zM8 6h1v2h-1zM6 8h4v1h-4zM9 9h1v1h-1zM3 11h4v1h-4zM5 12h4v1h-4z"/>
+<path fill="#575B86" d="M8 10h1v1h-1z"/>
+<path fill="#695A6E" d="M6 3h2v1h-2zM8 4h1v1h-1zM8 5h2v1h-2zM9 6h1v2h-1zM13 11h1v1h-1zM11 12h2v1h-2zM8 13h3v1h-3z"/>
+<path fill="#8D422D" d="M5 9h1v1h-1zM11 9h1v1h-1zM6 10h1v1h-1zM9 10h2v1h-2z"/>
+<path fill="#8E8095" d="M2 11h1v1h-1zM3 12h2v1h-2zM5 13h3v1h-3z"/>
+<path fill="#A9AFC0" d="M8 9h1v1h-1zM7 10h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 9h1v1h-1z"/>
+</svg>

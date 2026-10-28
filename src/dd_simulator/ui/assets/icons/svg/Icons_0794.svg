@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Polished Copper Boots</title>
+<desc>Atlas index 794; category armor; subtype boots; tags orange|boots|defense|feet|armor|copper; visual tier 1</desc>
+<path fill="#003A1F" d="M13 8h1v4h-1z"/>
+<path fill="#004404" d="M4 6h1v2h-1zM8 8h1v2h-1z"/>
+<path fill="#1A5522" d="M11 8h2v1h-2zM12 9h1v1h-1z"/>
+<path fill="#31712A" d="M6 6h1v1h-1zM7 8h1v2h-1zM12 10h1v2h-1z"/>
+<path fill="#3B002B" d="M9 2h1v1h-1zM5 3h4v1h-4zM13 4h1v1h-1zM9 5h4v1h-4zM14 5h1v3h-1zM2 12h3v1h-3zM13 12h1v1h-1zM11 13h2v1h-2zM6 14h5v1h-5z"/>
+<path fill="#520606" d="M5 1h4v1h-4zM4 2h1v1h-1zM10 3h3v1h-3zM3 3h1v3h-1zM3 8h1v1h-1zM2 9h1v1h-1zM7 10h1v1h-1zM1 10h1v2h-1zM6 11h1v1h-1zM5 12h1v2h-1z"/>
+<path fill="#548C43" d="M5 6h1v1h-1zM6 8h1v1h-1zM9 8h2v1h-2zM11 9h1v1h-1z"/>
+<path fill="#6A241C" d="M8 4h1v1h-1zM7 5h1v3h-1zM10 13h1v1h-1z"/>
+<path fill="#80AD63" d="M6 7h1v1h-1zM10 10h2v1h-2z"/>
+<path fill="#8D422D" d="M9 4h1v1h-1zM4 5h1v1h-1zM13 6h1v1h-1zM8 7h1v1h-1zM12 7h2v1h-2zM6 9h1v2h-1zM2 11h1v1h-1zM5 11h1v1h-1zM10 11h2v1h-2zM11 12h2v1h-2zM6 13h1v1h-1zM9 13h1v1h-1z"/>
+<path fill="#A15B3D" d="M4 8h2v1h-2zM8 10h2v1h-2z"/>
+<path fill="#AB6745" d="M5 2h4v1h-4zM9 3h1v1h-1zM10 4h3v1h-3zM13 5h1v1h-1z"/>
+<path fill="#BA7A51" d="M4 4h1v1h-1zM7 4h1v1h-1zM5 5h2v1h-2zM8 6h1v1h-1zM11 6h2v1h-2zM9 7h3v1h-3zM5 9h1v1h-1zM2 10h1v1h-1zM4 10h2v1h-2zM3 11h2v1h-2zM9 11h1v1h-1zM6 12h1v1h-1zM8 12h3v1h-3zM7 13h2v1h-2z"/>
+<path fill="#BED989" d="M5 7h1v1h-1zM9 9h2v1h-2z"/>
+<path fill="#D6A87C" d="M4 3h1v1h-1zM5 4h2v1h-2zM8 5h1v1h-1zM9 6h2v1h-2zM3 9h2v1h-2zM3 10h1v1h-1zM7 11h2v1h-2zM7 12h1v1h-1z"/>
+</svg>

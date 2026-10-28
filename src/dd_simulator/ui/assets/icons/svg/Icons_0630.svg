@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Reinforced Bronze Helmet</title>
+<desc>Atlas index 630; category armor; subtype helmet; tags orange|helmet|defense|head|armor|bronze; visual tier 1</desc>
+<path fill="#320326" d="M5 7h6v4h-6zM4 11h8v2h-8z"/>
+<path fill="#3B002B" d="M11 4h1v1h-1zM12 5h1v1h-1zM13 6h1v6h-1zM14 12h1v1h-1zM2 13h2v1h-2zM12 13h2v1h-2z"/>
+<path fill="#520606" d="M5 3h6v1h-6zM4 4h1v1h-1zM3 5h1v1h-1zM2 6h1v6h-1zM1 12h1v1h-1z"/>
+<path fill="#8F4932" d="M8 4h3v1h-3zM10 5h2v1h-2zM3 6h1v1h-1zM12 6h1v1h-1zM3 7h2v1h-2zM11 7h2v1h-2zM12 8h1v2h-1zM12 12h1v1h-1z"/>
+<path fill="#A36242" d="M5 4h3v1h-3zM4 5h1v1h-1zM9 5h1v1h-1zM8 6h4v1h-4zM3 8h1v3h-1zM12 10h1v1h-1zM3 12h1v1h-1zM13 12h1v1h-1z"/>
+<path fill="#C4845F" d="M5 5h4v1h-4zM4 6h1v1h-1zM7 6h1v1h-1zM11 8h1v3h-1zM12 11h1v1h-1zM2 12h1v1h-1z"/>
+<path fill="#D6A87C" d="M5 6h2v1h-2zM4 8h1v3h-1zM3 11h1v1h-1z"/>
+</svg>

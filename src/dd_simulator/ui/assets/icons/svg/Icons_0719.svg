@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Leather Armor</title>
+<desc>Atlas index 719; category armor; subtype chestpiece; tags brown|chestpiece|defense|body|armor|leather|plain; visual tier 0</desc>
+<path fill="#1B1931" d="M6 1h4v1h-4zM5 2h1v1h-1zM10 2h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM9 3h1v1h-1zM11 3h1v1h-1zM3 4h1v1h-1zM7 4h2v1h-2zM12 4h1v1h-1zM2 5h1v2h-1zM13 5h1v2h-1zM1 7h1v3h-1zM14 7h1v3h-1zM2 10h2v1h-2zM12 10h2v1h-2zM3 11h1v2h-1zM12 11h1v2h-1zM4 13h1v1h-1zM11 13h1v1h-1zM5 14h6v1h-6z"/>
+<path fill="#271D2F" d="M9 5h1v1h-1zM10 7h1v1h-1zM10 8h2v2h-2zM11 10h1v1h-1z"/>
+<path fill="#32283D" d="M7 3h2v1h-2zM6 5h1v1h-1zM7 6h2v1h-2zM5 7h1v1h-1zM4 8h2v2h-2zM4 10h1v1h-1z"/>
+<path fill="#46374E" d="M10 4h2v1h-2zM10 5h1v1h-1zM12 5h1v1h-1zM9 6h3v1h-3zM8 7h2v1h-2zM11 7h1v1h-1zM9 8h1v1h-1zM12 8h1v1h-1zM8 9h2v1h-2zM9 10h2v1h-2zM8 11h4v1h-4zM7 12h4v1h-4z"/>
+<path fill="#4D3E56" d="M4 4h2v1h-2zM3 5h1v1h-1zM5 5h1v1h-1zM4 6h3v1h-3zM4 7h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM5 10h1v1h-1zM4 11h1v1h-1zM5 12h2v1h-2z"/>
+<path fill="#5F4F63" d="M11 5h1v1h-1zM12 6h1v1h-1zM12 7h2v1h-2zM13 8h1v1h-1zM11 12h1v1h-1zM9 13h2v1h-2z"/>
+<path fill="#695A6E" d="M6 2h1v1h-1zM9 2h1v1h-1zM5 3h1v1h-1zM10 3h1v1h-1zM9 4h1v1h-1zM4 5h1v1h-1zM8 5h1v1h-1zM3 6h1v1h-1zM2 7h2v1h-2zM6 7h2v1h-2zM2 8h1v1h-1zM7 8h2v1h-2zM3 9h1v1h-1zM6 9h2v1h-2zM12 9h1v1h-1zM6 10h3v1h-3zM5 11h3v1h-3zM7 13h2v1h-2z"/>
+<path fill="#8E8095" d="M7 2h2v1h-2zM6 4h1v1h-1zM7 5h1v1h-1zM2 9h1v1h-1zM13 9h1v1h-1zM4 12h1v1h-1zM5 13h2v1h-2z"/>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Riposte</title>
+<desc>Atlas index 1622; category skill; subtype melee; tags melee|ability|red; visual tier 3</desc>
+<path fill="#600017" d="M4 1h2v1h-2zM11 1h2v1h-2zM3 2h1v1h-1zM13 2h1v1h-1zM2 3h1v1h-1zM6 3h4v1h-4zM1 4h1v1h-1zM3 4h6v1h-6zM10 4h2v1h-2zM14 3h1v2h-1zM1 5h3v1h-3zM6 5h1v1h-1zM9 5h1v1h-1zM12 5h1v1h-1zM3 6h1v1h-1zM5 6h1v1h-1zM8 6h1v1h-1zM11 6h2v1h-2zM3 7h2v1h-2zM7 7h1v1h-1zM9 7h2v1h-2zM2 8h2v1h-2zM6 8h1v1h-1zM1 9h1v1h-1zM3 9h1v1h-1zM5 9h1v1h-1zM12 7h2v3h-2zM4 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM3 11h1v1h-1zM2 12h1v1h-1zM5 11h1v2h-1zM11 11h1v2h-1zM1 13h1v1h-1zM4 13h1v1h-1zM9 13h2v1h-2zM4 14h5v1h-5z"/>
+<path fill="#860020" d="M2 1h1v1h-1zM1 2h1v1h-1zM10 5h1v1h-1zM1 6h1v2h-1zM14 11h1v1h-1zM3 12h1v1h-1zM2 13h1v1h-1zM13 12h2v2h-2zM2 14h2v1h-2zM11 14h3v1h-3z"/>
+<path fill="#888CA6" d="M5 5h1v1h-1zM4 6h1v1h-1zM8 7h1v1h-1zM7 8h3v1h-3zM6 9h4v1h-4zM5 10h5v1h-5zM6 11h3v1h-3z"/>
+<path fill="#A56129" d="M7 5h1v1h-1zM2 9h1v1h-1zM1 10h1v1h-1zM1 11h2v1h-2zM1 12h1v1h-1z"/>
+<path fill="#B7BBC7" d="M4 5h1v1h-1zM6 6h1v1h-1zM5 7h1v1h-1zM4 8h1v1h-1zM10 8h1v3h-1zM9 11h1v1h-1zM6 12h3v1h-3z"/>
+<path fill="#C41A2B" d="M3 1h1v1h-1zM13 1h1v1h-1zM2 2h1v1h-1zM14 2h1v1h-1zM1 3h1v1h-1zM9 4h1v1h-1zM11 5h1v1h-1zM9 6h2v1h-2zM2 6h1v2h-1zM1 8h1v1h-1zM13 10h1v1h-1zM12 11h2v1h-2zM4 11h1v2h-1zM12 12h1v1h-1zM3 13h1v1h-1zM11 13h2v1h-2zM9 14h2v1h-2z"/>
+<path fill="#D9A154" d="M8 5h1v1h-1zM2 10h2v1h-2z"/>
+<path fill="#E3E3E3" d="M7 6h1v1h-1zM6 7h1v1h-1zM5 8h1v1h-1zM4 9h1v1h-1z"/>
+<path fill="#FFFFFF" d="M6 1h5v1h-5zM4 2h9v1h-9zM3 3h3v1h-3zM10 3h4v1h-4zM2 4h1v1h-1zM12 4h2v1h-2zM13 5h2v2h-2zM14 7h1v3h-1zM11 7h1v4h-1zM10 11h1v1h-1zM9 12h2v1h-2zM5 13h4v1h-4z"/>
+</svg>

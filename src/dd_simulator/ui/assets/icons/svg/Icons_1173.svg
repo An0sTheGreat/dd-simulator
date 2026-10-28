@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Coin Pouch</title>
+<desc>Atlas index 1173; category misc; subtype pouch; tags currency|storage|orange; visual tier 0</desc>
+<path fill="#3B002B" d="M7 4h3v1h-3zM11 3h1v3h-1zM11 7h1v1h-1zM12 8h1v1h-1zM13 9h1v4h-1zM12 13h1v1h-1zM4 14h8v1h-8z"/>
+<path fill="#520606" d="M7 2h4v1h-4zM5 3h2v1h-2zM4 4h1v2h-1zM4 7h1v1h-1zM3 8h1v1h-1zM2 9h1v4h-1zM3 13h1v1h-1z"/>
+<path fill="#60251A" d="M5 6h5v1h-5z"/>
+<path fill="#792F20" d="M5 5h1v1h-1z"/>
+<path fill="#893E29" d="M9 3h2v1h-2zM6 4h1v1h-1zM10 5h1v1h-1zM5 7h1v1h-1zM10 7h1v1h-1zM10 8h2v1h-2zM11 9h2v3h-2zM3 12h1v1h-1zM10 12h3v1h-3zM4 13h8v1h-8z"/>
+<path fill="#9F593B" d="M4 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM3 9h1v1h-1zM9 9h1v1h-1zM8 10h1v1h-1zM3 11h1v1h-1zM9 11h2v1h-2zM4 12h1v1h-1zM8 12h1v1h-1z"/>
+<path fill="#BA7A51" d="M7 3h2v1h-2zM5 4h1v1h-1zM10 4h1v1h-1zM6 5h4v1h-4zM5 8h1v1h-1zM4 9h3v1h-3zM8 9h1v1h-1zM3 10h5v1h-5zM9 10h1v1h-1zM4 11h5v1h-5zM5 12h3v1h-3zM9 12h1v1h-1z"/>
+<path fill="#CA9470" d="M10 6h1v1h-1zM6 7h1v1h-1zM9 7h1v1h-1z"/>
+<path fill="#ECC297" d="M7 7h2v1h-2zM9 8h1v1h-1zM7 8h1v2h-1zM10 9h1v2h-1z"/>
+</svg>

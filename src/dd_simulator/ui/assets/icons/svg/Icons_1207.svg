@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Supply Chest</title>
+<desc>Atlas index 1207; category misc; subtype chest; tags storage|yellow; visual tier 1</desc>
+<path fill="#000000" fill-opacity="0.0156862745" d="M12 3h1v1h-1zM1 6h1v1h-1z"/>
+<path fill="#3B002B" d="M10 2h1v1h-1zM11 3h1v1h-1zM12 4h1v3h-1zM13 7h1v5h-1zM12 12h1v1h-1zM10 13h2v1h-2zM5 14h5v1h-5z"/>
+<path fill="#520606" d="M8 2h2v1h-2zM4 3h4v1h-4zM3 4h1v2h-1zM2 6h2v1h-2zM1 7h1v1h-1zM3 7h2v1h-2zM2 8h2v1h-2zM4 9h1v1h-1zM0 8h1v3h-1zM2 9h1v2h-1zM1 11h2v1h-2zM2 12h1v1h-1zM3 13h2v1h-2z"/>
+<path fill="#6F7699" d="M10 7h1v1h-1z"/>
+<path fill="#7C3815" d="M4 6h1v1h-1zM11 6h1v1h-1zM5 7h1v1h-1zM8 6h1v2h-1zM11 7h2v1h-2zM4 8h1v1h-1zM6 8h5v1h-5zM12 8h1v1h-1zM5 9h1v2h-1zM11 9h2v2h-2zM10 11h3v1h-3zM8 12h4v1h-4zM5 13h5v1h-5z"/>
+<path fill="#814826" d="M5 11h1v2h-1z"/>
+<path fill="#A16737" d="M8 3h1v1h-1zM4 4h1v1h-1zM10 4h2v1h-2zM4 5h3v1h-3zM9 5h3v1h-3zM5 6h3v1h-3zM2 7h1v1h-1zM6 7h2v1h-2zM5 8h1v1h-1zM11 8h1v1h-1zM1 10h1v1h-1zM3 10h1v1h-1zM6 9h5v2h-5zM6 11h4v1h-4zM3 11h2v2h-2zM6 12h2v1h-2z"/>
+<path fill="#A9AFC0" d="M10 6h1v1h-1zM9 7h1v1h-1z"/>
+<path fill="#CD995B" d="M9 3h2v1h-2zM5 4h5v1h-5zM7 5h2v1h-2zM1 8h1v2h-1zM3 9h1v1h-1zM4 10h1v1h-1z"/>
+<path fill="#FFFFFF" d="M9 6h1v1h-1z"/>
+</svg>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Honed Copper Belt</title>
+<desc>Atlas index 878; category armor; subtype belt; tags orange|belt|accessory|waist|gear|copper; visual tier 1</desc>
+<path fill="#20184F" d="M4 9h1v1h-1zM5 10h1v1h-1zM15 9h1v2h-1zM14 11h1v1h-1zM11 12h3v1h-3z"/>
+<path fill="#302867" d="M12 9h2v1h-2zM2 9h1v2h-1zM11 10h1v1h-1zM3 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#3B002B" d="M15 7h1v2h-1z"/>
+<path fill="#3C1106" d="M10 10h1v3h-1zM9 13h1v1h-1zM8 14h1v1h-1z"/>
+<path fill="#481E08" d="M7 9h1v1h-1zM9 9h1v1h-1zM8 10h1v1h-1zM6 10h1v3h-1zM7 13h1v1h-1z"/>
+<path fill="#520606" d="M6 4h6v1h-6zM4 5h2v1h-2zM12 5h2v1h-2zM3 6h1v1h-1zM14 6h1v1h-1zM6 7h6v1h-6zM2 7h1v2h-1zM4 8h2v1h-2zM12 8h2v1h-2zM5 9h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#753123" d="M6 6h6v1h-6zM4 7h2v1h-2zM12 7h2v1h-2z"/>
+<path fill="#828AA6" d="M3 10h1v1h-1zM14 10h1v1h-1zM4 11h1v1h-1zM12 11h2v1h-2z"/>
+<path fill="#B7BCCB" d="M3 9h1v1h-1zM14 9h1v1h-1zM12 10h1v1h-1z"/>
+<path fill="#BA7A51" d="M9 5h3v1h-3zM12 6h1v1h-1zM5 11h1v1h-1zM11 11h1v1h-1z"/>
+<path fill="#C09E7E" d="M7 12h1v1h-1zM9 11h1v2h-1zM8 13h1v1h-1z"/>
+<path fill="#CF9F71" d="M6 5h3v1h-3zM4 6h2v1h-2zM13 6h1v1h-1zM3 7h1v2h-1zM14 7h1v2h-1z"/>
+<path fill="#F8F0D9" d="M9 10h1v1h-1zM8 11h1v1h-1z"/>
+<path fill="#FFFFFF" d="M4 10h1v1h-1zM13 10h1v1h-1zM7 10h1v2h-1zM8 12h1v1h-1z"/>
+</svg>

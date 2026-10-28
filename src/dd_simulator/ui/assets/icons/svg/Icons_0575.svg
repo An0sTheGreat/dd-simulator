@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Stormbound Verdant Scythe</title>
+<desc>Atlas index 575; category weapon; subtype scythe; tags green|scythe|metal|melee|reach|verdant|ornate|magic; visual tier 3</desc>
+<path fill="#003A1F" d="M8 8h1v1h-1zM13 3h1v6h-1zM12 9h1v2h-1zM11 11h1v1h-1zM4 12h1v1h-1zM10 12h1v1h-1zM2 13h2v1h-2z"/>
+<path fill="#004404" d="M11 2h1v1h-1zM10 3h1v1h-1zM8 5h1v1h-1zM11 5h1v4h-1zM4 9h1v1h-1zM3 10h1v1h-1zM10 9h1v2h-1zM2 11h1v1h-1zM9 11h1v1h-1zM1 12h1v2h-1z"/>
+<path fill="#1B1931" d="M7 13h1v1h-1zM9 12h1v2h-1zM7 14h3v1h-3z"/>
+<path fill="#29743B" d="M4 11h1v1h-1z"/>
+<path fill="#358C3A" d="M12 3h1v3h-1zM8 7h1v1h-1zM7 8h1v1h-1zM4 10h1v1h-1zM10 11h1v1h-1zM3 12h1v1h-1z"/>
+<path fill="#3B002B" d="M13 2h1v1h-1zM9 7h2v1h-2zM7 9h1v2h-1zM6 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#520606" d="M12 1h1v1h-1zM9 4h1v1h-1zM6 6h2v1h-2zM5 7h1v2h-1z"/>
+<path fill="#83C45C" d="M11 3h1v1h-1zM8 6h1v1h-1zM12 6h1v3h-1zM11 9h1v2h-1zM2 12h1v1h-1z"/>
+<path fill="#974E36" d="M11 4h1v1h-1zM10 5h1v1h-1zM9 6h1v1h-1zM6 9h1v1h-1z"/>
+<path fill="#B6EA6D" d="M3 11h1v1h-1z"/>
+<path fill="#C69055" d="M12 2h1v1h-1zM10 4h1v1h-1zM9 5h1v1h-1zM10 6h1v1h-1zM7 7h1v1h-1zM6 8h1v1h-1zM5 9h1v1h-1zM5 10h2v1h-2zM5 11h1v1h-1z"/>
+<path fill="#E2BC78" d="M6 7h1v1h-1z"/>
+</svg>

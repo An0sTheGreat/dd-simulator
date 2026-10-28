@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Mystic Eye</title>
+<desc>Atlas index 1515; category spell; subtype arcane; tags arcane|magic|purple; visual tier 4</desc>
+<path fill="#27008D" d="M6 7h1v1h-1zM7 8h1v1h-1zM5 9h1v1h-1zM8 9h2v1h-2zM6 10h1v1h-1zM6 11h2v1h-2zM9 10h1v2h-1zM5 12h1v1h-1zM8 12h1v1h-1zM3 13h2v1h-2z"/>
+<path fill="#3E00A0" d="M2 1h4v1h-4zM1 2h2v1h-2zM11 2h3v1h-3zM9 3h2v1h-2zM13 3h1v1h-1zM1 3h1v2h-1zM8 4h1v1h-1zM7 5h1v1h-1zM4 6h3v1h-3zM3 7h1v1h-1zM4 8h1v2h-1zM3 10h1v1h-1zM2 11h1v2h-1zM14 12h1v1h-1zM13 13h2v1h-2zM12 14h2v1h-2z"/>
+<path fill="#5E19F0" d="M6 1h3v1h-3zM3 2h5v1h-5zM2 3h5v1h-5zM2 4h2v1h-2zM11 4h2v1h-2zM1 5h2v1h-2zM12 5h1v1h-1zM1 6h1v1h-1zM10 5h1v4h-1zM13 8h1v1h-1zM1 9h1v1h-1zM13 9h2v1h-2zM13 10h1v1h-1zM11 11h1v1h-1zM13 11h2v1h-2zM11 12h3v1h-3zM10 13h2v1h-2zM6 14h1v1h-1zM9 14h3v1h-3z"/>
+<path fill="#61566B" d="M7 7h1v1h-1zM9 7h1v1h-1zM8 8h2v1h-2z"/>
+<path fill="#742E10" d="M4 10h1v1h-1zM4 11h2v1h-2z"/>
+<path fill="#8247FF" d="M9 1h2v1h-2zM8 2h1v1h-1zM7 3h1v1h-1zM4 4h3v1h-3zM3 5h1v1h-1zM2 6h1v1h-1zM13 7h1v1h-1zM1 7h1v2h-1zM2 9h1v1h-1zM1 10h1v1h-1zM11 10h1v1h-1zM10 12h1v1h-1zM1 13h1v1h-1zM6 13h1v1h-1zM9 13h1v1h-1zM2 14h1v1h-1zM5 14h1v1h-1zM7 14h2v1h-2z"/>
+<path fill="#A16737" d="M5 10h1v1h-1zM3 12h2v1h-2z"/>
+<path fill="#B3AFB8" d="M11 3h2v1h-2zM9 4h2v1h-2zM8 5h2v1h-2zM7 6h2v1h-2zM5 8h1v1h-1zM6 9h1v1h-1zM7 10h2v1h-2zM8 11h1v1h-1z"/>
+<path fill="#C485FF" d="M11 1h3v1h-3zM9 2h2v1h-2zM8 3h1v1h-1zM14 2h1v2h-1zM4 5h1v1h-1zM11 5h1v1h-1zM13 4h2v2h-2zM3 6h1v1h-1zM11 6h4v1h-4zM2 7h1v1h-1zM2 8h2v1h-2zM11 7h2v2h-2zM14 7h1v2h-1zM3 9h1v1h-1zM10 9h3v1h-3zM2 10h1v1h-1zM14 10h1v1h-1zM10 10h1v2h-1zM12 10h1v2h-1zM1 11h1v2h-1zM6 12h2v1h-2zM9 12h1v1h-1zM2 13h1v1h-1zM5 13h1v1h-1zM7 13h2v1h-2zM12 13h1v1h-1zM3 14h2v1h-2z"/>
+<path fill="#C69055" d="M3 11h1v1h-1z"/>
+<path fill="#DBDBDB" d="M4 7h1v1h-1zM8 7h1v1h-1zM7 9h1v1h-1z"/>
+<path fill="#E7C1FF" d="M7 4h1v1h-1zM5 5h2v1h-2z"/>
+<path fill="#FFFFFF" d="M9 6h1v1h-1zM5 7h1v1h-1zM6 8h1v1h-1z"/>
+</svg>

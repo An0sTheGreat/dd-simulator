@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Runed Gold Hammer</title>
+<desc>Atlas index 550; category weapon; subtype hammer; tags yellow|hammer|metal|melee|blunt|gold|ornate; visual tier 2</desc>
+<path fill="#3B002B" d="M13 7h1v1h-1zM9 8h2v1h-2zM12 8h1v1h-1zM9 9h1v1h-1zM11 9h1v1h-1zM7 10h2v1h-2zM6 11h1v1h-1zM5 12h1v1h-1zM2 13h1v1h-1zM4 13h1v1h-1zM3 14h2v1h-2z"/>
+<path fill="#520606" d="M9 2h4v1h-4zM8 3h1v1h-1zM13 3h1v1h-1zM7 4h1v1h-1zM6 5h1v1h-1zM6 6h2v1h-2zM14 4h1v3h-1zM7 7h1v1h-1zM6 8h1v1h-1zM4 9h2v1h-2zM3 10h1v1h-1zM1 11h3v1h-3zM1 12h1v1h-1z"/>
+<path fill="#974E36" d="M9 4h4v1h-4zM8 5h2v1h-2zM12 5h1v1h-1zM8 6h1v1h-1zM11 6h2v1h-2zM9 7h3v1h-3zM8 8h1v1h-1zM7 9h1v1h-1zM6 10h1v1h-1zM5 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#C69055" d="M9 3h1v1h-1zM8 4h1v1h-1zM7 5h1v1h-1zM10 5h2v1h-2zM9 6h2v1h-2zM13 5h1v2h-1zM8 7h1v1h-1zM12 7h1v1h-1zM7 8h1v1h-1zM11 8h1v1h-1zM8 9h1v1h-1zM5 10h1v1h-1zM4 11h1v1h-1zM2 12h2v1h-2zM3 13h1v1h-1z"/>
+<path fill="#E2BC78" d="M10 3h3v1h-3zM13 4h1v1h-1zM6 9h1v1h-1zM4 10h1v1h-1z"/>
+</svg>

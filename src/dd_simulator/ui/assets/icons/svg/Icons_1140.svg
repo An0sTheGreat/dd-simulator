@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Pink Essence</title>
+<desc>Atlas index 1140; category material; subtype monster_part; tags crafting|ingredient|pink; visual tier 1</desc>
+<path fill="#4A0C29" d="M11 3h1v1h-1zM10 4h1v1h-1zM9 5h1v1h-1zM10 6h1v1h-1zM11 7h1v2h-1zM12 9h1v3h-1zM11 12h1v2h-1zM5 14h6v1h-6z"/>
+<path fill="#5C1543" d="M7 2h4v1h-4zM6 3h1v1h-1zM5 4h1v3h-1zM6 7h1v2h-1zM5 9h1v1h-1zM4 10h1v4h-1z"/>
+<path fill="#863972" d="M8 4h2v1h-2zM8 5h1v1h-1zM9 6h1v1h-1zM10 7h1v2h-1zM11 9h1v1h-1zM10 10h2v2h-2zM5 12h1v1h-1zM9 12h2v1h-2zM5 13h6v1h-6z"/>
+<path fill="#C8507C" d="M7 7h1v1h-1zM9 8h1v1h-1zM7 9h1v1h-1zM9 10h1v1h-1zM6 11h1v1h-1zM8 12h1v1h-1z"/>
+<path fill="#D45994" d="M7 5h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 9h1v1h-1zM5 11h1v1h-1z"/>
+<path fill="#E8D6BF" d="M7 6h1v1h-1zM9 7h1v1h-1zM9 9h1v1h-1z"/>
+<path fill="#F4E5D1" d="M8 11h1v1h-1z"/>
+<path fill="#F573AF" d="M10 3h1v1h-1zM7 4h1v1h-1zM6 5h1v1h-1zM8 10h1v1h-1zM9 11h1v1h-1zM6 12h2v1h-2z"/>
+<path fill="#FFA4E1" d="M7 3h3v1h-3zM6 4h1v1h-1zM6 9h1v1h-1zM8 7h1v3h-1zM5 10h1v1h-1zM7 10h1v2h-1z"/>
+<path fill="#FFF4E1" d="M7 8h1v1h-1zM6 10h1v1h-1z"/>
+</svg>

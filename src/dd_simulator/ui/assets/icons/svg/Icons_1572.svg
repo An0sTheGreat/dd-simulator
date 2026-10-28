@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Astral Step</title>
+<desc>Atlas index 1572; category spell; subtype arcane; tags arcane|magic|purple; visual tier 3</desc>
+<path fill="#4A0092" d="M2 1h3v1h-3zM11 1h3v1h-3zM1 2h5v1h-5zM10 2h5v1h-5zM1 3h2v1h-2zM5 3h2v1h-2zM9 3h2v1h-2zM13 3h2v1h-2zM6 4h4v1h-4zM1 4h1v2h-1zM6 5h1v1h-1zM9 5h1v1h-1zM14 4h1v2h-1zM1 6h2v1h-2zM5 6h1v1h-1zM10 6h1v1h-1zM13 6h2v1h-2zM1 7h1v1h-1zM14 7h1v1h-1zM5 8h2v1h-2zM9 8h2v1h-2zM2 8h1v2h-1zM5 9h1v1h-1zM10 9h1v1h-1zM13 8h1v2h-1zM1 10h2v1h-2zM13 10h2v1h-2zM1 11h1v2h-1zM3 11h2v2h-2zM6 10h1v3h-1zM9 10h1v3h-1zM11 11h2v2h-2zM14 11h1v2h-1zM1 13h5v1h-5zM10 13h5v1h-5zM2 14h4v1h-4zM7 13h2v2h-2zM10 14h4v1h-4z"/>
+<path fill="#6836FF" d="M3 3h2v1h-2zM11 3h2v1h-2zM2 4h4v2h-4zM10 4h4v2h-4zM3 6h2v1h-2zM11 6h2v1h-2zM2 7h4v1h-4zM10 7h4v1h-4zM1 8h1v2h-1zM14 8h1v2h-1zM3 8h2v3h-2zM11 8h2v3h-2zM2 11h1v2h-1zM5 12h1v1h-1zM10 12h1v1h-1zM13 11h1v2h-1z"/>
+<path fill="#E6BEFF" d="M5 1h6v1h-6zM6 2h4v1h-4zM7 3h2v1h-2zM7 5h2v1h-2zM6 6h4v2h-4zM7 8h2v1h-2zM6 9h4v1h-4zM5 10h1v2h-1zM10 10h1v2h-1zM7 10h2v3h-2zM6 13h1v2h-1zM9 13h1v2h-1z"/>
+</svg>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Earth Rune</title>
+<desc>Atlas index 1265; category magic_item; subtype rune; tags magic|earth|white; visual tier 2</desc>
+<path fill="#1B0542" d="M13 5h1v2h-1zM14 7h1v5h-1zM13 12h1v1h-1zM12 13h1v1h-1zM5 14h7v1h-7z"/>
+<path fill="#20184F" d="M5 1h5v1h-5zM4 2h1v1h-1zM10 2h1v1h-1zM3 3h1v1h-1zM11 3h1v1h-1zM12 4h1v1h-1zM2 4h1v2h-1zM1 6h1v6h-1zM2 12h1v1h-1zM3 13h2v1h-2z"/>
+<path fill="#69678F" d="M12 5h1v1h-1zM2 11h1v1h-1zM13 7h1v5h-1zM3 12h2v1h-2zM11 12h2v1h-2zM5 13h7v1h-7z"/>
+<path fill="#8E8FAA" d="M9 2h1v1h-1zM12 6h1v1h-1zM2 10h1v1h-1zM3 11h1v1h-1zM12 11h1v1h-1zM5 12h1v1h-1zM10 12h1v1h-1z"/>
+<path fill="#8F481F" d="M7 3h1v1h-1zM6 4h1v2h-1zM8 4h1v2h-1zM10 5h1v1h-1zM4 6h2v1h-2zM9 6h1v1h-1zM5 7h1v1h-1zM3 7h1v3h-1zM5 9h1v1h-1zM9 9h1v1h-1zM11 6h1v4h-1zM4 10h2v1h-2zM9 10h2v1h-2zM6 11h3v1h-3z"/>
+<path fill="#BA7644" d="M8 6h1v2h-1zM5 8h1v1h-1zM8 8h2v1h-2zM4 9h1v1h-1zM7 9h2v1h-2zM10 9h1v1h-1zM6 10h3v1h-3z"/>
+<path fill="#BDC1CC" d="M8 2h1v1h-1zM5 3h2v1h-2zM8 3h3v1h-3zM9 4h3v1h-3zM4 4h2v2h-2zM9 5h1v1h-1zM11 5h1v1h-1zM3 6h1v1h-1zM12 7h1v3h-1zM11 10h2v1h-2zM5 11h1v1h-1zM9 11h3v1h-3zM9 12h1v1h-1z"/>
+<path fill="#D09755" d="M7 7h1v1h-1zM9 7h1v1h-1zM4 8h1v1h-1zM6 8h2v1h-2zM10 8h1v1h-1zM6 9h1v1h-1z"/>
+<path fill="#E4E5E7" d="M5 2h3v1h-3zM4 3h1v1h-1zM3 4h1v2h-1zM2 6h1v4h-1zM3 10h1v1h-1zM4 11h1v1h-1zM6 12h3v1h-3z"/>
+<path fill="#FFD68E" d="M7 4h1v2h-1zM6 6h2v1h-2zM4 7h1v1h-1zM6 7h1v1h-1zM10 6h1v2h-1z"/>
+</svg>

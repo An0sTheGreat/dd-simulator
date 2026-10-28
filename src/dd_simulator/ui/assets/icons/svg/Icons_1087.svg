@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Diamond</title>
+<desc>Atlas index 1087; category material; subtype gem; tags crafting|jewel|teal; visual tier 0</desc>
+<path fill="#002D51" d="M11 4h1v1h-1zM12 5h1v1h-1zM13 6h1v2h-1zM12 8h1v1h-1zM11 9h1v1h-1zM10 10h1v1h-1zM9 11h1v1h-1zM7 12h2v1h-2z"/>
+<path fill="#004565" d="M5 3h6v1h-6zM4 4h1v1h-1zM3 5h1v1h-1zM2 6h1v2h-1zM3 8h1v1h-1zM4 9h1v1h-1zM5 10h1v1h-1zM6 11h1v1h-1z"/>
+<path fill="#1989C1" d="M12 7h1v1h-1zM11 8h1v1h-1zM10 9h1v1h-1zM9 10h1v1h-1zM8 11h1v1h-1z"/>
+<path fill="#33B1E1" d="M8 4h2v1h-2zM9 5h2v1h-2zM10 6h1v1h-1zM11 7h1v1h-1zM10 8h1v1h-1zM9 9h1v1h-1zM8 10h1v1h-1z"/>
+<path fill="#6BDEFD" d="M6 4h2v1h-2zM10 4h1v1h-1zM5 5h2v1h-2zM11 5h1v1h-1zM11 6h2v1h-2zM3 7h2v1h-2zM4 8h2v1h-2zM6 9h1v1h-1zM7 10h1v1h-1z"/>
+<path fill="#83FFFE" d="M7 5h2v1h-2zM9 6h1v1h-1zM6 7h5v1h-5zM7 8h3v1h-3zM5 9h1v1h-1zM8 9h1v1h-1zM6 10h1v1h-1zM7 11h1v1h-1z"/>
+<path fill="#FFFFFF" d="M5 4h1v1h-1zM4 5h1v1h-1zM3 6h6v1h-6zM5 7h1v1h-1zM6 8h1v1h-1zM7 9h1v1h-1z"/>
+</svg>

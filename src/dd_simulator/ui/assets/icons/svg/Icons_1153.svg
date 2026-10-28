@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Slime Orb</title>
+<desc>Atlas index 1153; category material; subtype monster_part; tags crafting|ingredient|green; visual tier 0</desc>
+<path fill="#003B14" d="M10 5h1v1h-1zM11 6h1v1h-1zM12 7h1v4h-1zM11 11h1v1h-1zM5 12h6v1h-6z"/>
+<path fill="#034903" d="M6 4h4v1h-4zM5 5h1v1h-1zM4 6h1v1h-1zM3 7h1v4h-1zM4 11h1v1h-1z"/>
+<path fill="#4B9E3C" d="M10 6h1v1h-1zM11 7h1v2h-1zM10 9h2v1h-2zM4 10h1v1h-1zM8 10h4v1h-4zM5 11h6v1h-6z"/>
+<path fill="#7FD269" d="M9 5h1v2h-1zM9 7h2v1h-2zM8 8h3v1h-3zM4 9h6v1h-6zM5 10h3v1h-3z"/>
+<path fill="#CDF699" d="M6 5h3v1h-3zM4 7h1v1h-1zM7 6h2v2h-2zM4 8h3v1h-3z"/>
+<path fill="#FFFFFF" d="M5 6h2v2h-2zM7 8h1v1h-1z"/>
+</svg>

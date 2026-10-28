@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Arcane Ingot</title>
+<desc>Atlas index 1081; category material; subtype ingot; tags crafting|metal|purple; visual tier 1</desc>
+<path fill="#340C81" d="M8 3h3v1h-3zM6 4h2v1h-2zM11 4h1v1h-1zM4 5h2v1h-2zM12 5h1v1h-1zM2 6h2v1h-2zM2 7h1v4h-1zM3 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#390565" d="M13 6h1v4h-1zM11 10h2v1h-2zM9 11h2v1h-2zM7 12h2v1h-2zM5 13h2v1h-2z"/>
+<path fill="#7537B9" d="M10 8h2v1h-2zM8 9h3v1h-3zM7 10h3v1h-3zM7 11h2v1h-2z"/>
+<path fill="#7755EA" d="M11 7h2v1h-2zM9 8h1v1h-1zM12 8h1v1h-1zM7 9h1v1h-1zM11 9h2v1h-2zM10 10h1v1h-1z"/>
+<path fill="#8855EA" d="M3 8h1v1h-1zM3 9h2v1h-2zM3 10h1v1h-1z"/>
+<path fill="#9285FF" d="M4 10h2v2h-2zM5 12h1v1h-1z"/>
+<path fill="#A6A1FF" d="M9 4h1v1h-1zM8 5h2v2h-2zM8 7h1v1h-1z"/>
+<path fill="#A785FF" d="M8 4h1v1h-1zM6 5h1v1h-1z"/>
+<path fill="#B4A1FF" d="M5 6h2v1h-2zM10 5h1v2h-1zM4 7h2v1h-2zM5 8h1v1h-1zM6 10h1v1h-1zM6 12h1v1h-1z"/>
+<path fill="#CDD6FF" d="M10 4h1v1h-1zM11 5h1v1h-1zM4 6h1v1h-1zM7 5h1v2h-1zM11 6h2v1h-2zM3 7h1v1h-1zM6 7h2v1h-2zM9 7h2v1h-2zM6 8h3v1h-3zM6 11h1v1h-1z"/>
+<path fill="#F5EFFF" d="M4 8h1v1h-1zM5 9h2v1h-2z"/>
+</svg>

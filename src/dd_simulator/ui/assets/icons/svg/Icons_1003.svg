@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Cheese Wedge</title>
+<desc>Atlas index 1003; category food; subtype prepared; tags consumable|ingredient|yellow; visual tier 1</desc>
+<path fill="#4C2000" d="M13 5h1v3h-1zM12 8h1v1h-1zM8 11h2v1h-2zM13 9h1v3h-1zM4 12h4v1h-4zM9 12h1v1h-1zM12 12h1v1h-1zM10 13h2v1h-2z"/>
+<path fill="#552800" d="M6 2h4v1h-4zM5 3h1v1h-1zM10 3h2v1h-2zM12 4h1v1h-1zM4 4h1v2h-1zM3 6h1v6h-1z"/>
+<path fill="#7E4200" d="M6 10h1v1h-1z"/>
+<path fill="#A46601" d="M12 6h1v1h-1zM8 8h1v1h-1zM10 8h2v1h-2zM7 10h1v1h-1zM9 9h1v2h-1zM6 11h2v1h-2zM11 11h1v1h-1z"/>
+<path fill="#A47120" d="M6 5h1v1h-1z"/>
+<path fill="#DAA736" d="M6 3h1v1h-1zM8 3h1v1h-1zM5 4h1v1h-1zM7 5h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1z"/>
+<path fill="#E39336" d="M12 5h1v1h-1zM11 6h1v1h-1zM9 7h4v1h-4zM7 8h1v1h-1zM9 8h1v1h-1zM4 9h5v1h-5zM8 10h1v1h-1zM4 10h2v2h-2zM10 11h1v1h-1zM12 10h1v2h-1zM10 12h2v1h-2z"/>
+<path fill="#E6C038" d="M9 3h1v1h-1zM7 6h1v1h-1z"/>
+<path fill="#FFED75" d="M7 3h1v1h-1zM6 4h6v1h-6zM8 5h3v1h-3zM5 5h1v2h-1zM8 6h1v1h-1zM4 7h3v2h-3zM10 9h3v1h-3zM10 10h2v1h-2z"/>
+<path fill="#FFF87D" d="M11 5h1v1h-1zM9 6h2v1h-2zM7 7h2v1h-2z"/>
+</svg>

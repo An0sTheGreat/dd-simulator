@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Mud Shield</title>
+<desc>Atlas index 1468; category spell; subtype earth; tags earth|magic|orange; visual tier 4</desc>
+<path fill="#510513" d="M7 4h1v1h-1zM9 4h1v1h-1z"/>
+<path fill="#742C13" d="M10 5h1v2h-1zM8 7h2v1h-2zM12 8h1v1h-1zM12 9h3v1h-3zM12 10h1v1h-1zM9 11h4v1h-4zM11 12h3v1h-3zM11 13h1v1h-1zM13 13h1v1h-1zM8 14h3v1h-3z"/>
+<path fill="#7A3F17" d="M6 5h1v2h-1zM5 7h1v1h-1zM7 7h1v1h-1zM4 8h1v1h-1zM2 9h3v1h-3zM1 10h1v1h-1zM4 10h1v1h-1zM8 8h1v3h-1zM4 11h4v1h-4zM3 12h3v1h-3zM3 13h1v1h-1zM6 14h2v1h-2z"/>
+<path fill="#823616" d="M2 1h4v1h-4zM11 1h3v1h-3zM1 2h2v1h-2zM4 2h1v1h-1zM12 2h1v1h-1zM14 2h1v1h-1zM1 3h1v2h-1z"/>
+<path fill="#AB6530" d="M7 2h3v1h-3zM6 3h1v2h-1zM10 3h1v2h-1zM3 5h2v1h-2zM8 5h1v1h-1zM12 5h2v1h-2zM2 6h1v1h-1zM5 6h1v1h-1zM7 6h3v1h-3zM11 6h1v1h-1zM14 6h1v1h-1zM2 7h3v1h-3zM11 7h4v1h-4zM2 8h2v1h-2zM13 8h2v1h-2zM5 10h3v1h-3zM9 10h3v1h-3zM3 10h1v2h-1zM13 10h1v2h-1zM2 12h1v1h-1zM8 11h1v2h-1zM10 12h1v1h-1zM1 13h2v1h-2zM5 13h6v1h-6zM14 12h1v2h-1zM2 14h1v1h-1zM5 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1z"/>
+<path fill="#C3742A" d="M6 1h1v1h-1zM10 1h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM11 2h1v1h-1zM13 2h1v1h-1zM2 3h3v1h-3zM12 3h3v1h-3zM2 4h1v1h-1zM14 4h1v1h-1zM1 5h1v1h-1z"/>
+<path fill="#E5AF6C" d="M7 3h3v1h-3zM8 4h1v1h-1zM7 5h1v1h-1zM9 5h1v1h-1zM4 6h1v1h-1zM12 6h2v1h-2zM10 7h1v1h-1zM7 8h1v1h-1zM5 9h3v1h-3zM9 8h3v2h-3zM2 10h1v2h-1zM14 10h1v2h-1zM1 12h1v1h-1zM6 12h2v1h-2zM9 12h1v1h-1z"/>
+<path fill="#E6B75E" d="M9 1h1v1h-1zM10 2h1v1h-1zM13 4h1v1h-1zM5 3h1v3h-1zM11 4h1v2h-1zM14 5h1v1h-1zM1 8h1v2h-1zM12 13h1v1h-1zM4 14h1v1h-1z"/>
+<path fill="#F09225" d="M4 13h1v1h-1zM3 14h1v1h-1zM12 14h1v1h-1z"/>
+<path fill="#F7DB7A" d="M7 1h2v1h-2zM6 2h1v1h-1zM11 3h1v1h-1zM3 4h2v1h-2zM12 4h1v1h-1zM2 5h1v1h-1zM1 6h1v2h-1z"/>
+<path fill="#FFD68E" d="M3 6h1v1h-1zM6 7h1v1h-1zM5 8h2v1h-2zM1 11h1v1h-1z"/>
+</svg>

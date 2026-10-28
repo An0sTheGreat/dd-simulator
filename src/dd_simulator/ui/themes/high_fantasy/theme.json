@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "theme_id": "high_fantasy",
+  "name": "Modern Fantasy Simple",
+  "description": "Dark carved surfaces, weathered bronze, parchment, and restrained gold.",
+  "author": "D&D Simulator Project",
+  "version": "0.1.0",
+  "tokens": {
+    "colors": {
+      "background_primary": "#0d0c09",
+      "background_secondary": "rgba(23, 21, 15, 120)",
+      "background_elevated": "rgba(33, 30, 22, 120)",
+      "panel_surface": "rgba(22, 21, 15, 120)",
+      "panel_surface_alt": "rgba(35, 32, 22, 120)",
+      "text_primary": "#eee4c7",
+      "text_secondary": "#c9b98b",
+      "text_muted": "#8f856b",
+      "accent_primary": "#d5a936",
+      "accent_secondary": "#7d5a21",
+      "border_primary": "#6e5830",
+      "border_highlight": "#a8894b",
+      "success": "#75b84d",
+      "warning": "#d99a37",
+      "danger": "#a74332",
+      "quest": "#d5a936",
+      "loot": "#b9a15c",
+      "experience": "#6f9cd1",
+      "dialogue": "#f1e6c9",
+      "selection": "#846421",
+      "hover": "#30291a"
+      ,"rarity_common": "#9a9485"
+      ,"rarity_uncommon": "#75b84d"
+      ,"rarity_rare": "#6f9cd1"
+      ,"rarity_epic": "#a978d4"
+      ,"rarity_legendary": "#e39a32"
+    },
+    "typography": {
+      "font_display": "Georgia",
+      "font_heading": "Georgia",
+      "font_body": "Georgia",
+      "font_monospace": "Cascadia Mono",
+      "size_title": "22px",
+      "size_heading_1": "17px",
+      "size_heading_2": "14px",
+      "size_body": "13px",
+      "size_small": "11px",
+      "weight_normal": "400",
+      "weight_bold": "700"
+    },
+    "spacing": {
+      "space_xs": "3px",
+      "space_sm": "6px",
+      "space_md": "10px",
+      "space_lg": "16px",
+      "space_xl": "24px"
+    },
+    "geometry": {
+      "border_radius_small": "2px",
+      "border_radius_medium": "4px",
+      "border_width": "1px",
+      "panel_padding": "8px",
+      "slot_size": "48px",
+      "icon_size_small": "16px",
+      "icon_size_medium": "24px",
+      "icon_size_large": "36px"
+    },
+    "effects": {
+      "shadow_small": "0",
+      "shadow_medium": "0",
+      "hover_brightness": "1.08",
+      "disabled_opacity": "0.55",
+      "texture_opacity": "0.10",
+      "animation_fast": "100",
+      "animation_normal": "180"
+    },
+    "assets": {
+      "panel_frame": "assets/panel_frame.png",
+      "header_frame": "assets/header_frame.png",
+      "button_frame": "assets/button_frame.png",
+      "minimap_frame": "assets/minimap_frame.png",
+      "inventory_slot_background": "assets/inventory_slot_background.png",
+      "selected_slot_overlay": "assets/selected_slot_overlay.png",
+      "divider_horizontal": "assets/divider_horizontal.png",
+      "divider_vertical": "assets/divider_vertical.png",
+      "resource_health_icon": "assets/resource_health_icon.png",
+      "resource_mana_icon": "assets/resource_mana_icon.png",
+      "resource_stamina_icon": "assets/resource_stamina_icon.png"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Red Apple</title>
+<desc>Atlas index 966; category food; subtype fruit; tags consumable|ingredient|red; visual tier 0</desc>
+<path fill="#003A1F" d="M9 6h1v1h-1zM11 5h1v2h-1zM10 7h1v1h-1z"/>
+<path fill="#004404" d="M8 3h2v1h-2zM10 4h1v1h-1z"/>
+<path fill="#217D38" d="M8 5h1v1h-1z"/>
+<path fill="#44A83D" d="M8 4h1v1h-1zM9 5h1v1h-1z"/>
+<path fill="#4B002D" d="M12 7h1v4h-1zM11 11h1v1h-1zM5 12h1v1h-1zM10 12h1v1h-1zM6 13h4v1h-4z"/>
+<path fill="#520606" d="M6 3h1v1h-1zM7 4h1v2h-1zM7 6h2v1h-2z"/>
+<path fill="#5F002A" d="M5 5h2v1h-2zM4 6h1v1h-1zM3 7h1v4h-1zM4 11h1v1h-1z"/>
+<path fill="#84C95A" d="M10 5h1v2h-1z"/>
+<path fill="#A3E271" d="M9 4h1v1h-1z"/>
+<path fill="#B70E2A" d="M6 6h1v1h-1zM7 7h2v1h-2zM11 7h1v2h-1zM10 9h2v1h-2zM4 10h1v1h-1zM8 10h2v1h-2zM11 10h1v1h-1zM5 11h3v1h-3zM10 11h1v1h-1zM6 12h4v1h-4z"/>
+<path fill="#D22F32" d="M10 10h1v1h-1zM8 11h2v1h-2z"/>
+<path fill="#F0553C" d="M5 6h1v1h-1zM9 7h1v1h-1zM4 7h1v2h-1zM8 8h3v1h-3zM4 9h6v1h-6zM5 10h3v1h-3z"/>
+<path fill="#FF987B" d="M5 7h2v1h-2zM5 8h3v1h-3z"/>
+</svg>

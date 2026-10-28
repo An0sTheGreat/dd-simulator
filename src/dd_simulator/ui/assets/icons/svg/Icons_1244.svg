@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Leather Journal</title>
+<desc>Atlas index 1244; category quest; subtype journal; tags book|document|orange; visual tier 2</desc>
+<path fill="#43180B" d="M13 2h1v12h-1zM3 14h10v1h-10z"/>
+<path fill="#522310" d="M3 1h10v1h-10zM2 2h1v12h-1z"/>
+<path fill="#652914" d="M3 2h1v1h-1zM5 3h3v1h-3zM10 3h2v1h-2zM7 4h2v1h-2zM11 4h1v1h-1zM5 5h2v1h-2zM8 5h3v1h-3zM6 6h2v1h-2zM10 6h1v1h-1zM7 7h1v1h-1zM5 8h1v1h-1zM7 8h2v1h-2zM11 7h1v2h-1zM5 9h2v1h-2zM9 9h3v1h-3zM12 12h1v1h-1zM3 13h1v1h-1z"/>
+<path fill="#828AA6" d="M12 11h1v1h-1z"/>
+<path fill="#8F481F" d="M5 4h2v1h-2zM11 5h1v2h-1zM7 9h2v1h-2zM3 3h1v8h-1zM3 11h9v1h-9zM3 12h1v1h-1zM4 13h1v1h-1z"/>
+<path fill="#A96735" d="M4 12h1v1h-1zM10 13h1v1h-1z"/>
+<path fill="#BA7644" d="M4 2h1v1h-1zM10 2h1v1h-1zM8 3h2v1h-2zM12 4h1v1h-1zM7 5h1v1h-1zM8 6h2v1h-2zM5 6h1v2h-1zM8 7h1v1h-1zM12 8h1v1h-1zM4 10h1v1h-1zM10 10h1v1h-1z"/>
+<path fill="#C08348" d="M5 13h5v1h-5z"/>
+<path fill="#C5C9D3" d="M11 2h1v1h-1zM12 3h1v1h-1zM12 9h1v1h-1zM11 10h1v1h-1zM11 13h1v1h-1z"/>
+<path fill="#CAB169" d="M5 12h1v1h-1zM11 12h1v1h-1z"/>
+<path fill="#D09755" d="M5 2h5v1h-5zM12 5h1v3h-1zM4 3h1v7h-1zM5 10h5v1h-5z"/>
+<path fill="#DDE0E7" d="M12 13h1v1h-1z"/>
+<path fill="#E2D58F" d="M6 12h2v1h-2zM10 12h1v1h-1z"/>
+<path fill="#E5AF6C" d="M9 4h2v1h-2zM6 7h1v2h-1zM9 7h2v2h-2z"/>
+<path fill="#F5EFAC" d="M8 12h2v1h-2z"/>
+<path fill="#FFFFFF" d="M12 2h1v1h-1zM12 10h1v1h-1z"/>
+</svg>

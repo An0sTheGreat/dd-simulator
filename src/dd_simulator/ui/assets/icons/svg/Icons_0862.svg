@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Arcane Mosswoven Belt</title>
+<desc>Atlas index 862; category armor; subtype belt; tags green|belt|accessory|waist|gear|mosswoven|ornate|magic; visual tier 3</desc>
+<path fill="#003B14" d="M5 9h1v1h-1zM2 9h1v2h-1zM15 9h1v2h-1zM3 11h1v1h-1zM14 11h1v1h-1zM11 11h1v2h-1zM7 13h1v1h-1zM10 13h1v1h-1zM8 14h2v1h-2z"/>
+<path fill="#034903" d="M8 9h2v1h-2zM12 9h1v1h-1zM4 10h1v1h-1zM7 10h1v1h-1zM10 10h1v1h-1zM13 10h1v1h-1zM6 11h1v2h-1z"/>
+<path fill="#3B002B" d="M12 5h2v1h-2zM14 6h1v1h-1zM15 7h1v2h-1zM12 12h2v1h-2z"/>
+<path fill="#520606" d="M6 4h6v1h-6zM4 5h2v1h-2zM3 6h1v1h-1zM6 7h6v1h-6zM2 7h1v2h-1zM4 8h2v1h-2zM12 8h2v1h-2zM6 10h1v1h-1zM11 10h1v1h-1zM4 12h2v1h-2z"/>
+<path fill="#52C730" d="M3 10h1v1h-1zM9 10h1v1h-1zM14 10h1v1h-1zM10 11h1v2h-1zM9 13h1v1h-1z"/>
+<path fill="#76311F" d="M6 6h6v1h-6zM4 7h2v1h-2zM12 7h2v1h-2zM12 11h2v1h-2z"/>
+<path fill="#A16737" d="M9 5h3v1h-3zM12 6h1v1h-1zM4 11h2v1h-2z"/>
+<path fill="#BD854F" d="M3 8h1v1h-1zM14 8h1v1h-1z"/>
+<path fill="#BDFD6B" d="M3 9h1v1h-1zM14 9h1v1h-1zM8 10h1v1h-1zM7 11h1v2h-1zM9 12h1v1h-1zM8 13h1v1h-1z"/>
+<path fill="#D59F65" d="M6 5h3v1h-3zM4 6h2v1h-2zM13 6h1v1h-1zM3 7h1v1h-1zM14 7h1v1h-1zM5 10h1v1h-1zM12 10h1v1h-1z"/>
+<path fill="#FFFFFF" d="M4 9h1v1h-1zM13 9h1v1h-1zM8 11h2v1h-2zM8 12h1v1h-1z"/>
+</svg>

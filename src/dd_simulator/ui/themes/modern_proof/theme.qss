@@ -1,0 +1,1094 @@
+QWidget#applicationRoot {
+    background-color: {{colors.background_primary}};
+    color: {{colors.text_primary}};
+    font-family: "{{typography.font_body}}";
+    font-size: {{typography.size_body}};
+}
+
+QWidget#settingsPage {
+    background-color: {{colors.panel_surface}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+
+QScrollArea#settingsScrollArea,
+QScrollArea#settingsScrollArea QWidget#qt_scrollarea_viewport,
+QFrame#settingsPanel {
+    background-color: transparent;
+    border: none;
+}
+
+QFrame[role="header"], QFrame[role="navigation"] {
+    background-color: {{colors.background_elevated}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+
+QFrame[role="content"], QFrame[role="sidebar"] {
+    background-color: {{colors.background_secondary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+
+QFrame[role="panel"] {
+    background-color: {{colors.panel_surface}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+
+QFrame#merchantTradePanel {
+    background-color: {{colors.panel_surface_alt}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+}
+
+QScrollArea#merchantTradeScroll,
+QScrollArea#merchantTradeScroll QWidget#qt_scrollarea_viewport,
+QWidget#merchantTradeContent {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+    border: none;
+}
+
+QFrame#merchantTradePanel QLabel[rarity="common"] { color: {{colors.rarity_common}}; }
+QFrame#merchantTradePanel QLabel[rarity="uncommon"] { color: {{colors.rarity_uncommon}}; }
+QFrame#merchantTradePanel QLabel[rarity="rare"] { color: {{colors.rarity_rare}}; }
+QFrame#merchantTradePanel QLabel[rarity="epic"] { color: {{colors.rarity_epic}}; }
+QFrame#merchantTradePanel QLabel[rarity="legendary"] { color: {{colors.rarity_legendary}}; }
+
+QPushButton#npcSuggestedResponse {
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+QWidget#craftingUtilityPage,
+QScrollArea#craftingRecipeScroll,
+QScrollArea#craftingRecipeScroll QWidget#qt_scrollarea_viewport,
+QWidget#craftingRecipeContent {
+    background-color: transparent;
+    color: {{colors.text_primary}};
+    border: none;
+}
+
+QFrame#craftingRecipeCard {
+    background-color: {{colors.panel_surface_alt}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QFrame#craftingRecipeCard[available="false"] {
+    color: {{colors.text_muted}};
+}
+
+QDialog#craftingResultsDialog {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+}
+
+QDialog#skillCheckPopup {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+    border: 2px solid {{colors.border_highlight}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QLabel#skillCheckTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_heading_2}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#skillCheckOutcome {
+    font-size: {{typography.size_title}};
+    font-weight: {{typography.weight_bold}};
+    padding: 10px;
+}
+
+QLabel#skillCheckOutcome[checkState="success"] { color: {{colors.success}}; }
+QLabel#skillCheckOutcome[checkState="failure"] { color: {{colors.danger}}; }
+
+QLabel#craftingResultsTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_title}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#craftingResultsSummary, QLabel#craftingResultDetail,
+QLabel#craftingResultItemText {
+    color: {{colors.text_primary}};
+}
+
+QFrame#craftingResultTotals, QFrame#craftingResultItem {
+    background-color: {{colors.panel_surface_alt}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QLabel#craftingResultTotal {
+    color: {{colors.loot}};
+    font-size: {{typography.size_heading_2}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QFrame#craftingResultItem[rarity="common"] { border-color: {{colors.rarity_common}}; }
+QFrame#craftingResultItem[rarity="uncommon"] { border-color: {{colors.rarity_uncommon}}; }
+QFrame#craftingResultItem[rarity="rare"] { border-color: {{colors.rarity_rare}}; }
+QFrame#craftingResultItem[rarity="epic"] { border-color: {{colors.rarity_epic}}; }
+QFrame#craftingResultItem[rarity="legendary"] { border-color: {{colors.rarity_legendary}}; }
+
+QLabel#applicationTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_title}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#phaseLabel, QLabel#themeLabel {
+    color: {{colors.text_secondary}};
+    font-family: "{{typography.font_heading}}";
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#themeLabel, QComboBox#themeSelector,
+QPushButton#windowMinimizeButton, QPushButton#windowMaximizeButton,
+QPushButton#windowCloseButton { font-size: 12px; /* font-scale-fixed */ }
+
+QLabel#placeholderLabel {
+    color: {{colors.text_secondary}};
+    font-family: "{{typography.font_heading}}";
+    font-size: {{typography.size_heading_1}};
+}
+
+QLabel#panelTitle, QLabel[textRole="heading"] {
+    color: {{colors.text_primary}};
+    font-family: "{{typography.font_heading}}";
+    font-size: {{typography.size_heading_1}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel[textRole="secondary"] {
+    color: {{colors.text_secondary}};
+}
+
+QLabel[textRole="body"] {
+    color: {{colors.text_primary}};
+}
+
+QLabel[textRole="muted"] {
+    color: {{colors.text_muted}};
+    font-size: {{typography.size_small}};
+}
+
+QLabel[textRole="accent"], QLabel[textRole="quest"] {
+    color: {{colors.accent_primary}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel[textRole="success"], QLabel[textRole="experience"] {
+    color: {{colors.success}};
+}
+
+QLabel[textRole="warning"], QLabel[textRole="loot"], QLabel[textRole="focus"] {
+    color: {{colors.warning}};
+}
+
+QLabel[textRole="health"], QLabel[textRole="danger"] {
+    color: {{colors.danger}};
+}
+
+QLabel[textRole="stamina"], QLabel[textRole="resolve"] {
+    color: {{colors.experience}};
+}
+
+QLabel[textRole="narrative"] {
+    color: {{colors.text_primary}};
+    font-size: {{typography.size_body}};
+    font-style: normal;
+    font-weight: {{typography.weight_normal}};
+}
+
+QLabel[textRole="monologue"] {
+    color: {{colors.text_secondary}};
+    font-size: {{typography.size_body}};
+    font-style: italic;
+    font-weight: {{typography.weight_normal}};
+}
+
+QLabel[textRole="spoken"], QLabel[textRole="dialogue"] {
+    color: {{colors.dialogue}};
+    font-size: {{typography.size_heading_2}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel[textRole="playerAction"] {
+    color: {{colors.accent_primary}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel[textRole="combat"] {
+    color: {{colors.warning}};
+    font-weight: 600;
+}
+
+QScrollArea#combatUtilityPage,
+QScrollArea#combatUtilityPage QWidget#qt_scrollarea_viewport,
+QWidget#combatUtilityContent {
+    background-color: transparent;
+    border: none;
+}
+
+QWidget#combatUtilityContent QLabel#combatantRow[activeTurn="true"] {
+    color: {{colors.accent_primary}};
+    border-left: 3px solid {{colors.accent_primary}};
+    padding-left: 5px;
+}
+
+QWidget#combatUtilityContent QLabel#combatantRow[combatSide="enemy"] {
+    background-color: rgba(255, 123, 134, 0.14);
+    padding: 4px;
+}
+
+QWidget#combatUtilityContent QLabel#combatLogEntry {
+    border-bottom: 1px solid {{colors.border_primary}};
+    padding: 3px 0;
+}
+
+QWidget#combatUtilityContent QLabel#combatActionDetail {
+    color: {{colors.text_secondary}};
+    padding: 2px 4px 4px 4px;
+    font-size: 11px;
+}
+
+QLabel#portraitPlaceholder, QLabel#locationVisualPlaceholder,
+QLabel#minimapCanvas, QLabel#inventoryPreviewSlot {
+    background-color: {{colors.panel_surface_alt}};
+    color: {{colors.text_secondary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_medium}};
+    padding: {{spacing.space_sm}};
+}
+
+QLabel#portraitPlaceholder[visualState="confirmed"],
+QLabel#locationVisualPlaceholder[visualState="confirmed"] {
+    background-color: {{colors.background_primary}};
+    border-color: {{colors.success}};
+}
+
+QLabel#portraitPlaceholder[visualState="pending"],
+QLabel#locationVisualPlaceholder[visualState="pending"] {
+    color: {{colors.warning}};
+    border-color: {{colors.warning}};
+}
+
+QLabel#portraitPlaceholder[visualState="missing"],
+QLabel#locationVisualPlaceholder[visualState="missing"] {
+    color: {{colors.danger}};
+    border-color: {{colors.danger}};
+}
+
+QLabel#portraitPlaceholder, QLabel#minimapCanvas {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_heading_1}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#inventoryPreviewSlot {
+    font-size: {{typography.size_small}};
+}
+
+QScrollArea#narrativeScrollArea, QWidget#narrativeHistory {
+    background-color: transparent;
+    border: none;
+}
+
+QProgressBar#resourceBar {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+    min-height: 15px;
+    text-align: center;
+    font-size: {{typography.size_small}};
+}
+
+QProgressBar#resourceBar::chunk {
+    background-color: {{colors.accent_primary}};
+}
+
+QProgressBar#resourceBar[resourceType="health"]::chunk {
+    background-color: {{colors.danger}};
+}
+
+QProgressBar#resourceBar[resourceType="stamina"]::chunk {
+    background-color: {{colors.experience}};
+}
+
+QProgressBar#resourceBar[resourceType="experience"]::chunk {
+    background-color: {{colors.success}};
+}
+
+QTabBar::tab {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_secondary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    padding: {{spacing.space_sm}} {{spacing.space_md}};
+}
+
+QTabBar::tab:selected {
+    background-color: {{colors.panel_surface}};
+    color: {{colors.accent_primary}};
+    border-color: {{colors.accent_primary}};
+}
+
+QCheckBox#objectiveItem:disabled {
+    color: {{colors.text_secondary}};
+}
+
+QCheckBox {
+    color: {{colors.text_primary}};
+}
+
+QCheckBox:disabled {
+    color: {{colors.text_muted}};
+}
+
+QCheckBox#objectiveItem[objectiveState="complete"]:disabled {
+    color: {{colors.success}};
+}
+
+QLineEdit#playerActionInput {
+    background-color: {{colors.panel_surface_alt}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+    padding: {{spacing.space_sm}};
+}
+
+QScrollArea#utilityContentScroll, QWidget#utilityOverview {
+    background-color: transparent;
+    border: none;
+}
+
+QFrame#playerSkillsRegion, QFrame#combatSkillsRegion {
+    background-color: {{colors.panel_surface}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QFrame#inventorySlot, QFrame#equipmentSlot, QFrame#skillGridItem,
+QFrame#questListItem {
+    background-color: {{colors.panel_surface_alt}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QFrame#questListItem[selected="true"] {
+    border: 2px solid {{colors.accent_primary}};
+    background-color: {{colors.selection}};
+}
+
+QFrame#questListItem:hover[completed="false"],
+QFrame#questListItem:focus[completed="false"] {
+    border: 2px solid {{colors.accent_primary}};
+}
+
+QFrame#questListItem[expanded="true"] {
+    border-color: {{colors.border_highlight}};
+}
+
+QFrame#questListItem[completed="true"] {
+    background-color: {{colors.background_secondary}};
+    border-color: {{colors.text_muted}};
+}
+
+QFrame#questListItem[completed="true"] QLabel,
+QFrame#questListItem[completed="true"] QProgressBar {
+    color: {{colors.text_muted}};
+}
+
+QFrame#questListItem[completed="true"] QProgressBar::chunk {
+    background-color: {{colors.text_muted}};
+}
+
+QWidget#questObjectiveDropdown {
+    background-color: {{colors.background_primary}};
+    border-top: 1px solid {{colors.border_primary}};
+}
+
+QLabel#questListState, QLabel#questExpandedSummary,
+QLabel#questObjectiveEntry, QLabel#questObjectiveEmpty {
+    color: {{colors.text_secondary}};
+}
+
+QLabel#questObjectiveTitle, QLabel#questRewardPreview {
+    color: {{colors.accent_primary}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#questObjectiveEntry[objectiveComplete="true"] {
+    color: {{colors.success}};
+}
+
+QLabel#questDeadline {
+    color: {{colors.warning}};
+}
+
+QFrame#inventorySlot[empty="true"], QFrame#equipmentSlot[empty="true"] {
+    background-color: {{colors.background_secondary}};
+    border-color: {{colors.text_muted}};
+}
+
+QFrame#inventorySlot[rarity="common"], QFrame#equipmentSlot[rarity="common"],
+QFrame#itemHoverCard[rarity="common"] { border-color: {{colors.rarity_common}}; }
+QFrame#inventorySlot[rarity="uncommon"], QFrame#equipmentSlot[rarity="uncommon"],
+QFrame#itemHoverCard[rarity="uncommon"] { border-color: {{colors.rarity_uncommon}}; }
+QFrame#inventorySlot[rarity="rare"], QFrame#equipmentSlot[rarity="rare"],
+QFrame#itemHoverCard[rarity="rare"] { border-color: {{colors.rarity_rare}}; }
+QFrame#inventorySlot[rarity="epic"], QFrame#equipmentSlot[rarity="epic"],
+QFrame#itemHoverCard[rarity="epic"] { border-color: {{colors.rarity_epic}}; }
+QFrame#inventorySlot[rarity="legendary"], QFrame#equipmentSlot[rarity="legendary"],
+QFrame#itemHoverCard[rarity="legendary"] { border-color: {{colors.rarity_legendary}}; }
+
+QFrame#inventorySlot[rarity="common"] QLabel#inventorySlotName,
+QFrame#equipmentSlot[rarity="common"] QLabel#equipmentItemName { color: {{colors.rarity_common}}; }
+QFrame#inventorySlot[rarity="uncommon"] QLabel#inventorySlotName,
+QFrame#equipmentSlot[rarity="uncommon"] QLabel#equipmentItemName { color: {{colors.rarity_uncommon}}; }
+QFrame#inventorySlot[rarity="rare"] QLabel#inventorySlotName,
+QFrame#equipmentSlot[rarity="rare"] QLabel#equipmentItemName { color: {{colors.rarity_rare}}; }
+QFrame#inventorySlot[rarity="epic"] QLabel#inventorySlotName,
+QFrame#equipmentSlot[rarity="epic"] QLabel#equipmentItemName { color: {{colors.rarity_epic}}; }
+QFrame#inventorySlot[rarity="legendary"] QLabel#inventorySlotName,
+QFrame#equipmentSlot[rarity="legendary"] QLabel#equipmentItemName { color: {{colors.rarity_legendary}}; }
+
+QFrame#inventorySlot[questItem="true"] QLabel#inventorySlotName {
+    color: {{colors.quest}};
+}
+
+QFrame#inventorySlot[durabilityState="low"] QLabel#inventorySlotDetails {
+    color: {{colors.danger}};
+}
+
+QLabel#inventorySlotName, QLabel#equipmentItemName, QLabel#skillName,
+QLabel#questListTitle {
+    color: {{colors.text_primary}};
+}
+
+QLabel#inventorySlotDetails, QLabel#equipmentSlotName,
+QLabel#equipmentItemDetails {
+    color: {{colors.text_muted}};
+    font-size: {{typography.size_small}};
+}
+
+QLabel#skillLevel {
+    color: {{colors.accent_primary}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QFrame#skillGridItem[recentlyIncreased="true"] {
+    border-color: {{colors.success}};
+}
+
+QFrame#skillGridItem[locked="true"] {
+    color: {{colors.text_muted}};
+    background-color: {{colors.background_secondary}};
+}
+
+QProgressBar#skillExperienceBar {
+    border: none;
+    background-color: {{colors.background_primary}};
+    min-height: 3px;
+    max-height: 3px;
+}
+
+QProgressBar#skillExperienceBar::chunk {
+    background-color: {{colors.accent_primary}};
+}
+
+QProgressBar#questProgress {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+    min-height: 13px;
+    text-align: center;
+    font-size: {{typography.size_small}};
+}
+
+QProgressBar#questProgress::chunk {
+    background-color: {{colors.success}};
+}
+
+QLabel#questListEmptyState, QLabel#eventLogEmptyState,
+QLabel#recentEventsEmptyState, QLabel#skillsGridEmptyState,
+QLabel#equipmentGridEmptyState {
+    color: {{colors.text_muted}};
+    padding: {{spacing.space_md}};
+}
+QScrollArea#eventLogScrollArea,
+QScrollArea#recentEventsScrollArea,
+QScrollArea#questList,
+QScrollArea#eventLogScrollArea QWidget#qt_scrollarea_viewport,
+QScrollArea#recentEventsScrollArea QWidget#qt_scrollarea_viewport,
+QScrollArea#questList QWidget#qt_scrollarea_viewport,
+QWidget#eventEntries,
+QWidget#recentEventEntries,
+QWidget#questListContent {
+    background-color: transparent;
+    border: none;
+}
+
+
+QScrollBar:vertical {
+    background-color: {{colors.background_secondary}};
+    width: 10px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background-color: {{colors.accent_secondary}};
+    border-radius: {{geometry.border_radius_small}};
+    min-height: 24px;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QComboBox, QPushButton {
+    background-color: {{colors.panel_surface}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+    padding: {{spacing.space_sm}} {{spacing.space_md}};
+}
+
+QComboBox:hover, QPushButton:hover {
+    background-color: {{colors.hover}};
+    border-color: {{colors.accent_primary}};
+}
+
+QComboBox:focus, QPushButton:focus {
+    border: 2px solid {{colors.accent_primary}};
+}
+
+QPushButton:disabled {
+    color: {{colors.text_muted}};
+    background-color: {{colors.background_secondary}};
+}
+
+QComboBox QAbstractItemView {
+    background-color: {{colors.panel_surface}};
+    color: {{colors.text_primary}};
+    selection-background-color: {{colors.selection}};
+    selection-color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_highlight}};
+}
+
+QSplitter::handle {
+    background-color: {{colors.border_primary}};
+    width: 5px;
+    height: 5px;
+}
+
+QSplitter::handle:hover {
+    background-color: {{colors.border_highlight}};
+}
+
+QSplitter::handle:pressed {
+    background-color: {{colors.accent_primary}};
+}
+
+QToolTip {
+    background-color: {{colors.panel_surface}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    padding: {{spacing.space_sm}};
+}
+
+QPushButton[buttonRole="primary"] {
+    background-color: {{colors.accent_primary}};
+    color: {{colors.background_elevated}};
+    border: 2px solid {{colors.accent_primary}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QPushButton[buttonRole="primary"]:disabled {
+    color: {{colors.text_muted}};
+    background-color: {{colors.background_secondary}};
+    border-color: {{colors.border_primary}};
+}
+
+QPushButton[buttonRole="navigation"] {
+    background-color: {{colors.background_elevated}};
+    color: {{colors.text_secondary}};
+    min-width: 82px;
+}
+
+QPushButton[buttonRole="navigation"][selected="true"] {
+    background-color: {{colors.selection}};
+    color: {{colors.accent_primary}};
+    border: 2px solid {{colors.accent_primary}};
+}
+
+QPushButton[buttonRole="destructive"] {
+    color: {{colors.danger}};
+    border-color: {{colors.danger}};
+}
+
+QPushButton:pressed {
+    background-color: {{colors.selection}};
+}
+
+QLineEdit#playerActionInput[validationState="error"] {
+    border: 2px solid {{colors.danger}};
+}
+
+QLineEdit#playerActionInput[validationState="valid"] {
+    border: 2px solid {{colors.success}};
+}
+
+QLabel#actionFeedback[feedbackState="success"] {
+    color: {{colors.success}};
+}
+
+QLabel#actionFeedback[feedbackState="error"] {
+    color: {{colors.danger}};
+}
+
+QLabel#actionFeedback[feedbackState="warning"] {
+    color: {{colors.warning}};
+}
+
+QTabBar:focus {
+    border: 2px solid {{colors.accent_primary}};
+}
+
+QMenu, QStatusBar#applicationStatusBar {
+    background-color: {{colors.background_elevated}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+}
+
+QMenu::item:selected {
+    background-color: {{colors.selection}};
+}
+
+QWidget#navigationPageContent, QWidget#fullInventoryContent,
+QWidget#inventoryUtilityContent, QScrollArea#fullInventoryScroll,
+QScrollArea#inventoryUtilityPage {
+    background-color: transparent;
+    border: none;
+}
+
+QLabel#navigationPageTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_title}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLineEdit, QPlainTextEdit, QListWidget, QSpinBox {
+    background-color: {{colors.panel_surface_alt}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+    padding: {{spacing.space_sm}};
+    selection-background-color: {{colors.selection}};
+}
+
+QLineEdit:focus, QPlainTextEdit:focus, QListWidget:focus, QSpinBox:focus {
+    border: 2px solid {{colors.accent_primary}};
+}
+
+QListWidget::item {
+    padding: {{spacing.space_sm}};
+}
+
+QListWidget::item:selected {
+    background-color: {{colors.selection}};
+    color: {{colors.text_primary}};
+}
+
+QTabWidget::pane {
+    background-color: {{colors.panel_surface}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QWidget[creationSurface="true"], QScrollArea[creationSurface="true"] {
+    background-color: transparent;
+    border: none;
+}
+
+QLabel#characterCreationReview {
+    background-color: {{colors.panel_surface_alt}};
+    color: {{colors.text_primary}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+    padding: {{spacing.space_lg}};
+}
+
+QLabel#characterCreationError {
+    color: {{colors.danger}};
+}
+
+QFrame#characterCreationPanel QLabel {
+    color: {{colors.text_primary}};
+}
+
+QFrame#characterCreationPanel QLabel#characterCreationError {
+    color: {{colors.danger}};
+}
+
+QFrame#characterCreationPanel QLabel#skillAllocationCounter {
+    color: {{colors.warning}};
+}
+
+QFrame#characterCreationPanel QLabel#skillAllocationCounter[textRole="success"] {
+    color: {{colors.success}};
+}
+
+QFrame#characterCreationPanel QLabel#personalityAllocationCounter {
+    color: {{colors.warning}};
+}
+
+QFrame#characterCreationPanel QLabel#personalityAllocationCounter[textRole="success"] {
+    color: {{colors.success}};
+}
+
+QSpinBox#ageCreationSpin {
+    color: {{colors.text_primary}};
+}
+
+QFrame#characterCreationPanel *[validationState="error"] {
+    border: 2px solid {{colors.danger}};
+}
+
+QWidget#randomizableField {
+    background-color: transparent;
+}
+
+QDialog#characterOptionDialog {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+}
+
+QLabel#characterOptionDialogTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_heading}}";
+    font-size: {{typography.size_heading_1}};
+    font-weight: {{typography.weight_bold}};
+}
+QDialog#combatRewardsDialog {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+}
+
+QLabel#combatRewardsTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_title}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#combatRewardsOutcome, QLabel#combatRewardDetail,
+QLabel#combatRewardItemText, QLabel#combatRewardEmpty {
+    color: {{colors.text_primary}};
+}
+
+QLabel#combatRewardSectionTitle {
+    color: {{colors.text_secondary}};
+    font-size: {{typography.size_heading_1}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QFrame#combatRewardTotals, QFrame#combatRewardItem {
+    background-color: {{colors.panel_surface_alt}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QLabel#combatRewardTotal {
+    color: {{colors.loot}};
+    font-size: {{typography.size_heading_2}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QFrame#combatRewardItem[rarity="common"] { border-color: {{colors.rarity_common}}; }
+QFrame#combatRewardItem[rarity="uncommon"] { border-color: {{colors.rarity_uncommon}}; }
+QFrame#combatRewardItem[rarity="rare"] { border-color: {{colors.rarity_rare}}; }
+QFrame#combatRewardItem[rarity="epic"] { border-color: {{colors.rarity_epic}}; }
+QFrame#combatRewardItem[rarity="legendary"] { border-color: {{colors.rarity_legendary}}; }
+
+QScrollArea#combatRewardItemsScroll, QWidget#combatRewardItems {
+    background-color: transparent;
+    border: none;
+}
+
+QLabel#combatRewardFeedback[feedbackState="success"] { color: {{colors.success}}; }
+QLabel#combatRewardFeedback[feedbackState="warning"] { color: {{colors.warning}}; }
+
+QFrame#combatSkillItem, QPushButton#npcSelectionButton {
+    border: 1px solid {{colors.border_primary}};
+    background: {{colors.panel_surface_alt}};
+    color: {{colors.text_primary}};
+}
+QFrame#combatSkillItem[available="false"] { color: {{colors.text_muted}}; }
+QLabel#npcConversationTitle, QLabel#combatSkillName { color: {{colors.accent_primary}}; font-weight: 700; }
+QLabel#combatSkillCost { color: {{colors.text_secondary}}; }
+QScrollArea#npcConversationScroll,
+QScrollArea#npcConversationScroll QWidget#qt_scrollarea_viewport,
+QWidget#npcConversationHistory {
+    background: {{colors.panel_surface}};
+    color: {{colors.text_primary}};
+}
+QDialog#questRewardsDialog {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+}
+
+QLabel#questRewardsTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_title}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#questRewardsQuestTitle, QLabel#questRewardSectionTitle {
+    color: {{colors.text_primary}};
+    font-size: {{typography.size_heading_1}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QFrame#questRewardTotals, QFrame#questRewardItem {
+    background-color: {{colors.panel_surface_alt}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+
+QLabel#questRewardTotal {
+    color: {{colors.loot}};
+    font-size: {{typography.size_heading_2}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#questRewardItemText, QLabel#questRewardEmpty { color: {{colors.text_primary}}; }
+QLabel#questRewardFeedback[feedbackState="success"] { color: {{colors.success}}; }
+QLabel#questRewardFeedback[feedbackState="warning"] { color: {{colors.warning}}; }
+
+QFrame#worldMapPanel, QScrollArea#worldMapScroll, QWidget#worldMapContent {
+    background-color: transparent;
+    border: none;
+}
+
+QFrame#worldMapCanvas, QFrame#travelDetailsPanel {
+    background-color: {{colors.panel_surface}};
+    border: {{geometry.border_width}} solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+
+QLabel#mapCompass, QLabel#travelDetailsTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_heading_1}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QPushButton#mapLocationNode {
+    min-width: 150px;
+    min-height: 72px;
+    background-color: {{colors.panel_surface_alt}};
+    color: {{colors.text_primary}};
+    border: 1px solid {{colors.border_primary}};
+}
+
+QPushButton#mapLocationNode:hover, QPushButton#mapLocationNode[selected="true"] {
+    border: 2px solid {{colors.accent_primary}};
+    background-color: {{colors.selection}};
+}
+
+QPushButton#mapLocationNode[current="true"] {
+    border: 2px solid {{colors.success}};
+    background-color: {{colors.selection}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#travelDestinationName, QLabel#travelConfirmationDestination {
+    color: {{colors.accent_primary}};
+    font-size: {{typography.size_heading_1}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#travelRouteDescription, QLabel#lastJourneyLabel,
+QLabel#travelConfirmationDetail { color: {{colors.text_secondary}}; }
+QLabel#travelRouteStats { color: {{colors.text_primary}}; }
+QLabel#travelRouteRequirement, QLabel#travelConfirmationWarning { color: {{colors.warning}}; }
+
+QDialog#travelConfirmationDialog {
+    background-color: {{colors.background_secondary}};
+    color: {{colors.text_primary}};
+}
+
+QLabel#travelConfirmationTitle {
+    color: {{colors.accent_primary}};
+    font-family: "{{typography.font_display}}";
+    font-size: {{typography.size_title}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QFrame#itemHoverCard, QFrame#responseHoverCard {
+    background-color: {{colors.panel_surface_alt}};
+    border: 1px solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+
+QLabel#itemHoverName {
+    color: {{colors.accent_primary}};
+    font-weight: {{typography.weight_bold}};
+}
+
+QLabel#itemHoverDetail, QLabel#responseHoverText {
+    color: {{colors.text_primary}};
+}
+
+QLabel#itemHoverDescription {
+    color: {{colors.text_secondary}};
+    font-style: italic;
+    padding-top: {{spacing.space_sm}};
+    border-top: 1px solid {{colors.border_primary}};
+}
+
+/* Release 26.3 circular inventory and equipment wells. */
+QFrame#inventorySlot, QFrame#equipmentSlot {
+    background: {{colors.background_primary}};
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 39px;
+    padding: 0;
+}
+QLabel#equipmentSlotName {
+    background: {{colors.background_primary}};
+    color: {{colors.text_muted}};
+    border: none;
+    font-size: 8px;
+    padding: 0;
+}
+QLabel#itemQuantityBadge {
+    background: {{colors.background_primary}};
+    color: {{colors.accent_primary}};
+    border: 1px solid {{colors.border_highlight}};
+    border-radius: 9px;
+    font-weight: {{typography.weight_bold}};
+    font-size: 10px; /* font-scale-fixed */
+    padding: 0;
+}
+
+QLabel[recentTurn="true"] {
+    background-color: {{colors.selection}};
+    border-left: 2px solid {{colors.accent_primary}};
+    padding-left: 5px;
+}
+
+/* Release 26.6 shared character-sheet and hover-card structure. */
+QScrollArea#inventoryUtilityScroll, QScrollArea#inventoryUtilityScroll QWidget#qt_scrollarea_viewport,
+QWidget#inventoryGrid, QScrollArea#characterSheetScroll,
+QScrollArea#characterSheetScroll QWidget#qt_scrollarea_viewport,
+QWidget#characterSheetViewport { background: transparent; border: none; }
+
+QFrame#characterSheetSurface, QFrame#characterCreationSheetSurface, QFrame#characterSheetIdentity,
+QFrame#characterSheetSection, QFrame#characterSheetAttribute {
+    background: {{colors.panel_surface}};
+    border: 1px solid {{colors.border_primary}};
+    border-radius: {{geometry.border_radius_small}};
+}
+QFrame#characterSheetSurface, QFrame#characterCreationSheetSurface { border: 2px solid {{colors.border_highlight}}; }
+QLabel#characterSheetAttributeValue, QLabel#characterSheetVitalValue,
+QLabel#characterSheetModifier { color: {{colors.accent_primary}}; font-weight: {{typography.weight_bold}}; }
+
+QFrame#itemHoverCard, QFrame#abilityHoverCard {
+    background: {{colors.background_elevated}};
+    color: {{colors.text_primary}};
+    border: 2px solid {{colors.border_highlight}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+
+QFrame#itemHoverCard {
+    background: transparent;
+    border: none;
+}
+
+QFrame#itemHoverSurface {
+    background: rgba(27, 27, 29, 255);
+    color: {{colors.text_primary}};
+    border: 2px solid {{colors.border_highlight}};
+    border-radius: {{geometry.border_radius_medium}};
+}
+QLabel#hoverCardTitle { color: {{colors.accent_primary}}; font-size: {{typography.size_heading_1}}; font-weight: {{typography.weight_bold}}; }
+QLabel#equippedComparisonLabel {
+    color: {{colors.success}};
+    font-size: {{typography.size_heading_2}};
+    font-weight: {{typography.weight_bold}};
+}
+QLabel#hoverCardClassification, QLabel#abilityHoverStatName { color: {{colors.text_secondary}}; font-weight: {{typography.weight_bold}}; }
+QLabel#abilityHoverStatValue, QLabel#abilityHoverDescription, QLabel#itemHoverDescription { color: {{colors.text_primary}}; }
+QLabel#abilityHoverUnavailable { color: {{colors.danger}}; font-weight: {{typography.weight_bold}}; }
+QFrame#hoverCardDivider { color: {{colors.border_highlight}}; background: {{colors.border_highlight}}; border: none; min-height: 1px; max-height: 1px; }
+
+/* Square, touching inventory art and the themed 3x3 equipment board. */
+QLabel#inventorySlotArtwork, QLabel#equipmentSlotArtwork, QLabel#equipmentBoardArtwork,
+QLabel#equipmentOccupiedArtwork {
+    background: transparent;
+    border: none;
+}
+QFrame#inventorySlot, QFrame#equipmentSlot {
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 0;
+    padding: 0;
+}
+QFrame#equipmentSlot { border-width: 1px; }
+QFrame#inventorySlot[rarity="common"], QFrame#equipmentSlot[rarity="common"],
+QFrame#inventorySlot[rarity="uncommon"], QFrame#equipmentSlot[rarity="uncommon"],
+QFrame#inventorySlot[rarity="rare"], QFrame#equipmentSlot[rarity="rare"],
+QFrame#inventorySlot[rarity="epic"], QFrame#equipmentSlot[rarity="epic"],
+QFrame#inventorySlot[rarity="legendary"], QFrame#equipmentSlot[rarity="legendary"] {
+    border-color: transparent;
+}
+QFrame#inventorySlot[empty="true"], QFrame#equipmentSlot[empty="true"] {
+    background: transparent;
+    border-color: transparent;
+}
+QFrame#itemHoverSurface[rarity="common"] { border-color: {{colors.rarity_common}}; }
+QFrame#itemHoverSurface[rarity="uncommon"] { border-color: {{colors.rarity_uncommon}}; }
+QFrame#itemHoverSurface[rarity="rare"] { border-color: {{colors.rarity_rare}}; }
+QFrame#itemHoverSurface[rarity="epic"] { border-color: {{colors.rarity_epic}}; }
+QFrame#itemHoverSurface[rarity="legendary"] { border-color: {{colors.rarity_legendary}}; }
+QFrame#itemHoverSurface[rarity="common"] QLabel#hoverCardTitle { color: {{colors.rarity_common}}; }
+QFrame#itemHoverSurface[rarity="uncommon"] QLabel#hoverCardTitle { color: {{colors.rarity_uncommon}}; }
+QFrame#itemHoverSurface[rarity="rare"] QLabel#hoverCardTitle { color: {{colors.rarity_rare}}; }
+QFrame#itemHoverSurface[rarity="epic"] QLabel#hoverCardTitle { color: {{colors.rarity_epic}}; }
+QFrame#itemHoverSurface[rarity="legendary"] QLabel#hoverCardTitle { color: {{colors.rarity_legendary}}; }
+
+QWidget#inventoryEquipmentSurface {
+    background: transparent;
+    border: none;
+}
+
+QProgressBar#resourceBar[resourceType="health"]::chunk {
+    background-color: #c4473a;
+}
+
+QProgressBar#resourceBar[resourceType="stamina"]::chunk {
+    background-color: #4b8fd8;
+}
+
+QProgressBar#resourceBar[resourceType="mana"]::chunk {
+    background-color: #725bd8;
+}
+
+QProgressBar#resourceBar[resourceType="spell_slots"]::chunk {
+    background-color: #b05fd3;
+}

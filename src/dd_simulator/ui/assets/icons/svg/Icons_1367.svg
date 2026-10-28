@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Necrotic Mantle</title>
+<desc>Atlas index 1367; category spell; subtype necromancy; tags necromancy|magic|purple; visual tier 3</desc>
+<path fill="#380080" d="M2 1h6v1h-6zM5 2h1v1h-1zM7 2h1v1h-1zM1 2h1v2h-1zM3 2h1v2h-1zM9 1h3v3h-3zM13 1h1v3h-1zM5 3h3v2h-3zM10 4h2v1h-2zM1 4h2v2h-2zM5 5h2v1h-2zM2 6h2v1h-2zM13 4h2v3h-2zM3 7h1v1h-1zM6 6h1v2h-1zM10 5h1v3h-1zM13 7h1v1h-1zM3 8h2v1h-2zM12 8h2v1h-2zM4 9h1v1h-1zM12 9h1v1h-1zM1 9h1v2h-1zM14 11h1v1h-1zM1 12h1v1h-1zM2 14h1v1h-1z"/>
+<path fill="#5000B5" d="M8 1h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM2 2h1v2h-1zM12 1h1v3h-1zM14 2h1v2h-1zM3 4h1v2h-1zM1 6h1v1h-1zM5 6h1v1h-1zM7 5h1v2h-1zM9 4h1v3h-1zM11 5h1v2h-1zM2 7h1v1h-1zM4 7h1v1h-1zM12 7h1v1h-1zM1 8h2v1h-2zM6 8h1v1h-1zM10 8h1v1h-1zM3 9h1v1h-1zM5 9h2v1h-2zM11 9h1v1h-1zM13 9h1v1h-1zM4 10h2v1h-2zM14 10h1v1h-1zM1 11h2v1h-2zM11 10h2v2h-2zM2 12h2v1h-2zM5 11h1v2h-1zM11 12h1v1h-1zM13 12h2v1h-2zM1 13h4v1h-4zM10 13h1v1h-1zM12 13h3v1h-3zM3 14h3v1h-3zM9 14h1v1h-1zM11 14h3v1h-3z"/>
+<path fill="#6826FF" d="M8 2h1v1h-1zM4 3h1v2h-1zM8 4h1v1h-1zM12 4h1v1h-1zM1 7h1v1h-1zM7 7h1v1h-1zM9 7h1v1h-1zM5 7h1v2h-1zM11 7h1v2h-1zM10 9h1v1h-1zM14 7h1v3h-1zM2 9h1v2h-1zM4 11h1v1h-1zM6 12h1v1h-1zM10 12h1v1h-1zM5 13h3v1h-3zM9 13h1v1h-1zM11 13h1v1h-1zM6 14h3v1h-3zM10 14h1v1h-1z"/>
+<path fill="#CD53FF" d="M8 3h1v1h-1zM4 5h1v1h-1zM8 5h1v2h-1zM12 5h1v2h-1zM7 8h1v2h-1zM9 8h1v2h-1zM6 10h2v1h-2zM6 11h1v1h-1zM10 10h1v2h-1z"/>
+<path fill="#FFA5FF" d="M4 6h1v1h-1zM8 7h1v2h-1zM3 10h1v1h-1zM9 10h1v1h-1zM13 10h1v1h-1zM7 11h1v1h-1zM4 12h1v1h-1zM12 12h1v1h-1z"/>
+<path fill="#FFF5FF" d="M8 9h1v2h-1zM3 11h1v1h-1zM8 11h2v1h-2zM13 11h1v1h-1zM7 12h3v1h-3zM8 13h1v1h-1z"/>
+</svg>

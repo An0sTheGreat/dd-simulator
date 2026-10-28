@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Arcane Voidforged Mace</title>
+<desc>Atlas index 374; category weapon; subtype mace; tags purple|mace|metal|melee|blunt|voidforged|ornate|magic; visual tier 3</desc>
+<path fill="#250940" d="M14 2h1v2h-1zM13 4h1v1h-1zM14 5h1v2h-1zM13 7h1v2h-1zM8 9h1v1h-1zM11 9h3v1h-3zM7 10h1v1h-1zM6 11h1v1h-1zM5 12h1v1h-1zM4 13h1v1h-1zM3 14h1v1h-1z"/>
+<path fill="#250E9C" d="M10 3h2v1h-2zM9 4h1v2h-1zM12 4h1v2h-1zM10 6h2v1h-2z"/>
+<path fill="#2E1550" d="M9 1h2v1h-2zM12 1h3v1h-3zM6 2h3v1h-3zM11 2h1v1h-1zM6 3h1v3h-1zM8 5h1v1h-1zM7 6h2v1h-2zM7 7h1v1h-1zM10 7h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM5 9h1v1h-1zM10 9h1v1h-1zM4 10h1v1h-1zM3 11h1v1h-1zM2 12h1v3h-1z"/>
+<path fill="#59456B" d="M12 3h1v1h-1zM9 7h1v1h-1zM8 8h1v1h-1zM7 9h1v1h-1zM6 10h1v1h-1zM5 11h1v1h-1z"/>
+<path fill="#612CF7" d="M11 5h1v1h-1z"/>
+<path fill="#8F8896" d="M12 2h1v1h-1zM9 3h1v1h-1zM13 3h1v1h-1zM8 4h1v1h-1zM9 6h1v1h-1zM12 6h1v1h-1zM11 7h1v1h-1zM4 12h1v1h-1zM3 13h1v1h-1z"/>
+<path fill="#99929F" d="M8 7h1v1h-1zM5 10h1v1h-1z"/>
+<path fill="#BCB9BE" d="M13 5h1v2h-1zM12 7h1v1h-1zM10 8h3v1h-3z"/>
+<path fill="#BE79FF" d="M11 4h1v1h-1zM10 5h1v1h-1z"/>
+<path fill="#DBDBDB" d="M10 2h1v1h-1zM13 2h1v1h-1zM7 5h1v1h-1zM7 8h1v1h-1zM6 9h1v1h-1zM4 11h1v1h-1zM3 12h1v1h-1z"/>
+<path fill="#F3F3F3" d="M9 2h1v1h-1zM7 3h2v1h-2zM7 4h1v1h-1z"/>
+<path fill="#FFFFFF" d="M10 4h1v1h-1z"/>
+</svg>

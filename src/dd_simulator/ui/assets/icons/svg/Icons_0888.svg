@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Stormbound Violet Belt</title>
+<desc>Atlas index 888; category armor; subtype belt; tags purple|belt|accessory|waist|gear|violet|ornate|magic; visual tier 3</desc>
+<path fill="#1B1931" d="M12 4h2v1h-2zM14 5h1v1h-1zM6 6h6v1h-6zM4 7h2v1h-2zM12 7h2v1h-2zM5 8h2v1h-2zM11 8h2v1h-2zM15 6h1v4h-1zM14 10h1v1h-1zM12 11h2v1h-2z"/>
+<path fill="#2E1550" d="M6 3h6v1h-6zM4 4h2v1h-2zM3 5h1v1h-1zM2 6h1v4h-1zM3 10h1v1h-1zM4 11h2v1h-2z"/>
+<path fill="#3D0054" d="M10 9h1v1h-1zM11 10h1v2h-1zM10 12h1v1h-1zM8 13h2v1h-2z"/>
+<path fill="#4C3865" d="M6 5h6v1h-6zM4 6h2v1h-2zM12 6h2v1h-2zM5 10h1v1h-1zM12 10h1v1h-1z"/>
+<path fill="#51097D" d="M8 7h1v1h-1zM9 8h1v1h-1zM7 8h1v2h-1zM6 10h1v2h-1zM7 12h1v1h-1z"/>
+<path fill="#796C9A" d="M9 4h3v1h-3zM12 5h1v1h-1z"/>
+<path fill="#802FFF" d="M10 11h1v1h-1zM9 12h1v1h-1z"/>
+<path fill="#9A93B8" d="M6 4h3v1h-3zM4 5h2v1h-2zM13 5h1v1h-1zM3 6h1v2h-1zM14 6h1v2h-1zM6 9h1v1h-1zM11 9h1v1h-1z"/>
+<path fill="#B879FF" d="M4 8h1v1h-1zM13 8h1v1h-1zM3 9h1v1h-1zM5 9h1v1h-1zM12 9h1v1h-1zM14 9h1v1h-1zM4 10h1v1h-1zM10 10h1v1h-1zM13 10h1v1h-1zM7 11h1v1h-1zM9 11h1v1h-1zM8 12h1v1h-1z"/>
+<path fill="#CAACFF" d="M3 8h1v1h-1zM8 8h1v1h-1zM14 8h1v1h-1zM9 9h1v1h-1zM7 10h1v1h-1z"/>
+<path fill="#FFFFFF" d="M4 9h1v1h-1zM8 9h1v1h-1zM13 9h1v1h-1zM8 10h2v1h-2zM8 11h1v1h-1z"/>
+</svg>

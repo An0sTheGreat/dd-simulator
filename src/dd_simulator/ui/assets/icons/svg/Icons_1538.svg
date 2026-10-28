@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Tsunami Wall</title>
+<desc>Atlas index 1538; category spell; subtype water; tags water|magic|blue; visual tier 4</desc>
+<path fill="#1B97FF" d="M9 1h1v1h-1zM13 2h1v1h-1zM2 2h1v2h-1zM10 4h1v1h-1zM4 4h1v2h-1zM9 5h1v1h-1zM7 4h1v3h-1zM13 4h1v3h-1zM3 7h1v1h-1zM11 5h1v4h-1zM12 9h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM8 8h1v3h-1zM3 11h1v1h-1zM6 10h1v2h-1zM14 10h1v2h-1zM11 12h1v1h-1zM13 12h1v1h-1zM6 13h1v1h-1zM8 13h1v1h-1zM12 13h1v1h-1zM7 14h1v1h-1z"/>
+<path fill="#252EA9" d="M2 1h1v1h-1zM13 1h1v1h-1zM3 2h1v1h-1zM8 1h1v2h-1zM10 1h1v2h-1zM12 2h1v1h-1zM14 2h1v1h-1zM3 3h2v1h-2zM7 3h2v1h-2zM11 3h1v1h-1zM13 3h1v1h-1zM11 4h2v1h-2zM8 4h1v2h-1zM10 5h1v1h-1zM3 4h1v3h-1zM8 6h3v1h-3zM8 7h1v1h-1zM10 7h1v1h-1zM12 5h1v4h-1zM5 4h2v6h-2zM14 4h1v6h-1zM1 2h1v9h-1zM5 10h1v1h-1zM2 11h1v1h-1zM4 11h2v1h-2zM3 12h1v1h-1zM9 8h2v5h-2zM14 12h1v1h-1zM5 12h1v2h-1zM9 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM6 14h1v1h-1zM8 14h1v1h-1zM12 14h1v1h-1z"/>
+<path fill="#3840CE" d="M3 1h5v1h-5zM11 1h2v1h-2zM4 2h4v1h-4zM11 2h1v1h-1zM5 3h2v1h-2zM12 3h1v1h-1zM14 3h1v1h-1zM9 7h1v1h-1zM1 11h1v1h-1zM1 12h2v1h-2zM4 12h1v1h-1zM1 13h4v1h-4zM10 13h1v1h-1zM14 13h1v1h-1zM2 14h4v1h-4zM9 14h3v1h-3zM13 14h1v1h-1z"/>
+<path fill="#8CE8FF" d="M9 2h1v1h-1zM9 3h2v1h-2zM2 4h1v5h-1zM13 7h1v2h-1zM4 6h1v4h-1zM3 10h1v1h-1zM7 7h1v4h-1zM11 9h1v3h-1zM13 11h1v1h-1zM6 12h1v1h-1zM8 11h1v2h-1zM12 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#FFFFFF" d="M9 4h1v1h-1zM3 8h1v1h-1zM2 9h2v1h-2zM13 9h1v1h-1zM12 10h2v1h-2zM12 11h1v1h-1zM7 11h1v2h-1z"/>
+</svg>

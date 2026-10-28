@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Masterwork Bronze Armor</title>
+<desc>Atlas index 692; category armor; subtype chestpiece; tags orange|chestpiece|defense|body|armor|bronze|ornate; visual tier 2</desc>
+<path fill="#1B0542" d="M12 3h1v1h-1zM13 4h1v1h-1zM14 5h1v2h-1zM11 9h1v2h-1zM12 11h1v1h-1z"/>
+<path fill="#20184F" d="M3 3h1v1h-1zM2 4h1v1h-1zM1 5h1v2h-1zM4 8h1v2h-1zM3 11h1v1h-1z"/>
+<path fill="#320326" d="M6 3h1v1h-1zM9 3h1v1h-1zM7 4h2v1h-2z"/>
+<path fill="#3B002B" d="M11 8h1v1h-1zM14 7h1v2h-1zM12 9h2v1h-2zM12 12h1v1h-1zM7 13h2v1h-2zM11 13h1v1h-1zM5 14h2v1h-2zM9 14h2v1h-2z"/>
+<path fill="#520606" d="M6 1h4v1h-4zM5 2h1v1h-1zM10 2h1v1h-1zM4 3h1v1h-1zM11 3h1v1h-1zM1 7h1v2h-1zM2 9h2v1h-2zM4 10h1v1h-1zM3 12h1v1h-1zM4 13h1v1h-1z"/>
+<path fill="#5C2419" d="M7 3h2v1h-2zM10 4h1v1h-1zM9 5h1v1h-1zM7 7h2v1h-2zM7 9h2v1h-2zM5 10h1v1h-1zM10 10h1v1h-1zM5 11h6v1h-6z"/>
+<path fill="#5D5192" d="M11 4h1v1h-1zM12 5h1v1h-1zM10 6h2v1h-2zM13 6h1v1h-1zM12 7h1v1h-1zM10 9h1v1h-1zM9 10h1v1h-1z"/>
+<path fill="#7474A3" d="M4 4h1v1h-1zM3 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM9 6h1v1h-1zM3 7h1v1h-1zM6 7h1v1h-1zM10 7h1v1h-1zM5 8h1v1h-1zM9 8h1v1h-1zM6 9h1v1h-1zM5 12h1v1h-1zM9 12h1v1h-1z"/>
+<path fill="#7E3424" d="M10 5h1v1h-1zM5 5h1v2h-1zM4 7h1v1h-1zM11 7h1v1h-1zM13 7h1v1h-1zM12 8h1v1h-1z"/>
+<path fill="#8D422D" d="M5 4h1v1h-1zM6 5h1v1h-1zM7 6h1v1h-1zM2 7h1v1h-1zM3 8h1v1h-1zM8 8h1v1h-1zM8 10h1v1h-1zM7 12h2v1h-2zM11 12h1v1h-1zM10 13h1v1h-1z"/>
+<path fill="#989CB8" d="M12 4h1v1h-1zM11 5h1v1h-1zM13 5h1v1h-1zM12 6h1v1h-1zM10 8h1v1h-1zM4 11h1v1h-1zM11 11h1v1h-1z"/>
+<path fill="#A36242" d="M6 2h1v1h-1zM9 2h1v1h-1zM5 3h1v1h-1zM10 3h1v1h-1zM9 4h1v1h-1zM8 6h1v1h-1zM13 8h1v1h-1zM4 12h1v1h-1zM5 13h2v1h-2zM9 13h1v1h-1z"/>
+<path fill="#A9AFC0" d="M9 7h1v1h-1zM7 8h1v1h-1zM5 9h1v1h-1zM9 9h1v1h-1zM6 10h2v1h-2zM10 12h1v1h-1z"/>
+<path fill="#B3754E" d="M2 8h1v1h-1z"/>
+<path fill="#C4845F" d="M7 2h2v1h-2zM8 5h1v1h-1z"/>
+<path fill="#C5C9D3" d="M3 6h1v1h-1zM6 6h1v1h-1zM5 7h1v1h-1zM6 12h1v1h-1z"/>
+<path fill="#D6A87C" d="M6 4h1v1h-1zM7 5h1v1h-1z"/>
+<path fill="#FFFFFF" d="M3 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM6 8h1v1h-1z"/>
+</svg>

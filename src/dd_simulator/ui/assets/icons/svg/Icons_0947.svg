@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Greater Berserker Tonic</title>
+<desc>Atlas index 947; category potion; subtype elixir; tags consumable|alchemy|red; visual tier 2</desc>
+<path fill="#14183F" d="M13 7h1v1h-1zM14 8h1v3h-1zM13 11h1v1h-1zM12 12h1v1h-1zM6 13h1v1h-1zM11 13h1v1h-1zM7 14h4v1h-4z"/>
+<path fill="#1F2C58" d="M4 7h1v1h-1zM3 8h1v3h-1zM4 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#3B0612" d="M10 2h2v1h-2zM10 3h1v1h-1zM12 3h1v1h-1zM13 4h1v2h-1zM12 6h1v1h-1z"/>
+<path fill="#531919" d="M8 1h2v1h-2zM6 2h2v1h-2zM5 3h1v1h-1zM7 3h1v1h-1zM4 4h1v2h-1zM6 5h1v1h-1zM11 5h1v1h-1zM5 6h1v1h-1z"/>
+<path fill="#7192B8" d="M13 10h1v1h-1zM12 11h1v1h-1zM11 12h1v1h-1zM10 13h1v1h-1z"/>
+<path fill="#87001B" d="M10 6h1v1h-1zM11 7h1v1h-1zM12 8h1v1h-1zM11 9h2v1h-2zM8 10h5v1h-5zM8 11h4v1h-4zM8 12h3v1h-3z"/>
+<path fill="#8D422D" d="M7 5h1v1h-1zM10 5h1v1h-1zM8 6h2v1h-2z"/>
+<path fill="#99B6CE" d="M13 8h1v2h-1zM8 13h2v1h-2z"/>
+<path fill="#BFD8E4" d="M6 6h1v1h-1zM11 6h1v1h-1zM12 7h1v1h-1zM5 11h1v1h-1zM6 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#C80C1E" d="M5 8h1v1h-1zM5 9h2v1h-2zM5 10h1v1h-1zM7 10h1v1h-1zM6 11h2v1h-2zM7 12h1v1h-1z"/>
+<path fill="#CF6D1C" d="M8 3h2v1h-2zM6 4h1v1h-1zM10 4h2v1h-2zM8 5h2v1h-2z"/>
+<path fill="#D81528" d="M7 6h1v1h-1zM8 7h3v1h-3zM7 8h5v1h-5zM9 9h2v1h-2z"/>
+<path fill="#E24748" d="M6 10h1v1h-1z"/>
+<path fill="#FF8876" d="M6 7h1v1h-1zM7 9h2v1h-2z"/>
+<path fill="#FFD97F" d="M9 2h1v1h-1zM6 3h1v1h-1zM11 3h1v1h-1zM7 4h3v1h-3zM5 5h1v1h-1zM12 4h1v2h-1z"/>
+<path fill="#FFFFFF" d="M8 2h1v1h-1zM5 4h1v1h-1zM5 7h1v1h-1zM7 7h1v1h-1zM6 8h1v1h-1zM4 8h1v3h-1z"/>
+</svg>

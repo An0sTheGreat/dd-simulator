@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Stone Wall</title>
+<desc>Atlas index 1461; category spell; subtype earth; tags earth|magic|yellow; visual tier 2</desc>
+<path fill="#6A260E" d="M2 1h2v1h-2zM12 1h2v1h-2zM1 2h1v1h-1zM14 2h1v1h-1z"/>
+<path fill="#823616" d="M4 1h4v1h-4zM9 1h1v1h-1zM11 1h1v1h-1zM2 2h3v1h-3zM11 2h3v1h-3zM6 2h2v2h-2zM13 3h2v2h-2zM4 3h1v3h-1zM1 3h2v4h-2zM6 4h1v3h-1zM11 3h1v4h-1zM14 5h1v2h-1zM13 7h1v1h-1zM1 7h1v2h-1zM2 9h1v1h-1zM6 9h1v1h-1zM11 10h1v1h-1zM3 12h1v1h-1zM11 12h1v1h-1zM1 13h2v1h-2zM5 13h1v1h-1zM9 13h1v1h-1zM12 13h1v1h-1zM14 13h1v1h-1zM4 14h3v1h-3zM8 14h2v1h-2zM11 14h3v1h-3z"/>
+<path fill="#C3742A" d="M8 1h1v1h-1zM10 1h1v1h-1zM5 2h1v2h-1zM9 2h2v2h-2zM12 3h1v2h-1zM3 3h1v3h-1zM12 5h2v1h-2zM3 6h2v1h-2zM7 4h1v3h-1zM9 4h1v3h-1zM13 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM14 7h1v1h-1zM2 7h1v2h-1zM11 7h1v2h-1zM13 8h2v1h-2zM13 9h1v1h-1zM1 10h1v1h-1zM1 11h2v2h-2zM5 12h2v1h-2zM10 12h1v1h-1zM13 11h2v2h-2zM3 13h2v1h-2zM6 13h3v1h-3zM10 13h2v1h-2zM13 13h1v1h-1zM2 14h2v1h-2zM7 14h1v1h-1zM10 14h1v1h-1z"/>
+<path fill="#E6B75E" d="M8 2h1v1h-1zM5 4h1v2h-1zM8 5h1v1h-1zM10 4h1v3h-1zM3 7h1v1h-1zM7 7h1v1h-1zM3 8h2v1h-2zM6 8h2v1h-2zM9 7h1v2h-1zM1 9h1v1h-1zM3 9h1v1h-1zM10 9h1v1h-1zM12 6h1v4h-1zM14 9h1v1h-1zM2 10h2v1h-2zM12 10h3v1h-3zM3 11h1v1h-1zM6 11h1v1h-1zM7 12h1v1h-1zM9 11h1v2h-1zM12 11h1v2h-1z"/>
+<path fill="#FDEB9A" d="M8 3h1v2h-1zM5 6h1v3h-1zM8 6h1v3h-1zM10 7h1v2h-1zM4 9h2v1h-2zM7 9h3v1h-3zM11 9h1v1h-1zM4 10h7v1h-7zM4 11h2v1h-2zM7 11h2v1h-2zM10 11h2v1h-2zM4 12h1v1h-1zM8 12h1v1h-1z"/>
+</svg>

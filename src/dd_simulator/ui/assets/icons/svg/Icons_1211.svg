@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Mushroom Bundle</title>
+<desc>Atlas index 1211; category food; subtype mushroom; tags ingredient|orange; visual tier 1</desc>
+<path fill="#3B002B" d="M9 4h1v1h-1zM10 5h1v2h-1zM11 7h1v1h-1zM5 9h1v1h-1zM6 10h1v1h-1z"/>
+<path fill="#3B1B11" fill-opacity="0.0156862745" d="M1 11h1v1h-1z"/>
+<path fill="#520606" d="M5 3h4v1h-4zM4 4h1v1h-1zM3 5h1v1h-1zM2 6h1v2h-1zM3 8h1v1h-1zM4 9h1v1h-1zM7 10h1v1h-1zM7 11h2v1h-2z"/>
+<path fill="#60251A" d="M7 7h2v1h-2zM6 8h2v1h-2zM6 9h1v1h-1zM9 8h2v2h-2zM5 10h1v1h-1zM4 11h2v1h-2z"/>
+<path fill="#661600" d="M14 9h1v2h-1zM12 11h2v1h-2zM11 12h1v2h-1zM9 14h2v1h-2z"/>
+<path fill="#6D2700" d="M12 8h2v1h-2zM11 9h1v2h-1zM9 11h2v1h-2zM8 12h1v2h-1z"/>
+<path fill="#893E29" d="M8 4h1v1h-1zM9 5h1v1h-1zM3 6h1v1h-1zM8 6h2v1h-2zM3 7h2v1h-2zM6 7h1v1h-1zM4 8h2v1h-2zM8 9h1v1h-1z"/>
+<path fill="#BA7A51" d="M5 4h3v1h-3zM4 5h5v1h-5zM4 6h4v1h-4zM5 7h1v1h-1zM11 8h1v1h-1zM7 9h1v1h-1zM8 10h3v1h-3z"/>
+<path fill="#D79235" d="M12 10h2v1h-2zM9 13h2v1h-2z"/>
+<path fill="#E3A579" d="M9 7h2v1h-2zM8 8h1v1h-1z"/>
+<path fill="#FFD671" d="M13 9h1v1h-1zM10 12h1v1h-1z"/>
+<path fill="#FFFFFF" d="M12 9h1v1h-1zM9 12h1v1h-1z"/>
+</svg>

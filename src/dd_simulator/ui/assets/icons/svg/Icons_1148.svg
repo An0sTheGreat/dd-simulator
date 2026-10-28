@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Fish Bones</title>
+<desc>Atlas index 1148; category material; subtype monster_part; tags crafting|ingredient|orange; visual tier 0</desc>
+<path fill="#3C1106" d="M10 3h4v1h-4zM6 4h4v1h-4zM5 5h1v1h-1zM9 5h1v1h-1zM12 5h1v1h-1zM6 6h2v1h-2zM10 6h1v1h-1zM14 4h1v3h-1zM3 7h3v1h-3zM8 7h1v1h-1zM11 7h1v1h-1zM13 7h1v1h-1zM2 8h1v1h-1zM6 8h2v1h-2zM9 8h1v1h-1zM11 8h2v1h-2zM3 9h2v1h-2zM7 9h3v1h-3zM11 9h1v1h-1zM2 10h2v1h-2zM5 10h1v1h-1zM10 10h1v1h-1zM1 11h1v1h-1zM4 11h3v1h-3zM8 10h1v2h-1zM2 12h1v1h-1zM5 12h1v1h-1zM7 12h1v1h-1zM3 13h2v1h-2z"/>
+<path fill="#C89C71" d="M13 6h1v1h-1zM6 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM10 9h1v1h-1zM6 10h1v1h-1zM7 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#E7CFAE" d="M8 5h1v1h-1zM11 6h1v1h-1zM7 7h1v1h-1zM9 6h1v2h-1zM5 8h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM6 9h1v1h-1zM4 10h1v1h-1zM7 10h1v1h-1zM3 12h1v1h-1z"/>
+<path fill="#FFEBCB" d="M11 5h1v1h-1zM13 4h1v2h-1zM8 6h1v1h-1zM12 6h1v1h-1zM3 11h1v1h-1z"/>
+<path fill="#FFF6E3" d="M6 5h2v1h-2zM10 4h1v2h-1zM3 8h2v1h-2zM5 9h1v1h-1zM2 11h1v1h-1z"/>
+<path fill="#FFFFFF" d="M11 4h2v1h-2z"/>
+</svg>

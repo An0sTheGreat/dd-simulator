@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Amethyst Ore</title>
+<desc>Atlas index 1065; category material; subtype ore; tags crafting|mining|blue; visual tier 0</desc>
+<path fill="#1B0542" d="M13 8h1v3h-1zM12 11h1v1h-1zM10 12h2v1h-2zM7 13h3v1h-3z"/>
+<path fill="#20184F" d="M7 3h2v1h-2zM12 5h1v1h-1zM3 5h1v2h-1zM13 6h1v2h-1zM2 7h1v4h-1zM3 11h1v1h-1zM4 12h3v1h-3z"/>
+<path fill="#491CB3" d="M5 2h2v1h-2zM4 3h1v1h-1zM9 3h2v1h-2zM3 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM11 4h1v1h-1zM4 5h2v1h-2zM9 5h2v1h-2zM5 7h1v1h-1zM4 8h1v1h-1zM10 8h2v1h-2zM6 8h1v2h-1zM9 9h1v1h-1zM4 10h2v1h-2zM10 10h1v1h-1zM12 9h1v2h-1zM11 11h1v1h-1z"/>
+<path fill="#5A48C6" d="M5 9h1v1h-1zM11 10h1v1h-1z"/>
+<path fill="#606392" d="M9 7h2v1h-2zM8 8h2v1h-2zM7 9h2v1h-2zM3 9h1v2h-1zM6 10h1v1h-1zM9 10h1v1h-1zM4 11h3v1h-3zM9 11h2v1h-2zM7 12h3v1h-3z"/>
+<path fill="#7984E3" d="M6 3h1v1h-1zM4 4h2v1h-2zM10 4h1v1h-1zM4 9h1v1h-1zM11 9h1v1h-1z"/>
+<path fill="#979DB4" d="M7 4h1v1h-1zM6 5h1v1h-1zM11 5h1v1h-1zM4 6h2v1h-2zM8 6h3v1h-3zM6 7h1v1h-1zM8 7h1v1h-1zM11 7h1v1h-1zM3 7h1v2h-1zM7 8h1v1h-1zM12 8h1v1h-1zM8 10h1v1h-1zM7 11h2v1h-2z"/>
+<path fill="#B0CDFE" d="M5 3h1v1h-1zM9 4h1v1h-1zM5 8h1v1h-1zM10 9h1v1h-1z"/>
+<path fill="#CED2DD" d="M7 5h2v1h-2zM6 6h2v1h-2zM11 6h2v1h-2zM4 7h1v1h-1zM7 7h1v1h-1zM12 7h1v1h-1zM7 10h1v1h-1z"/>
+</svg>

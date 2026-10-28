@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Final Blessing</title>
+<desc>Atlas index 1649; category skill; subtype paladin; tags paladin|ability|red; visual tier 4</desc>
+<path fill="#393355" d="M3 3h3v1h-3zM10 3h3v1h-3zM6 4h2v1h-2zM9 4h1v1h-1zM7 5h3v1h-3zM7 6h2v2h-2zM8 8h1v2h-1zM3 4h1v7h-1zM12 4h1v7h-1zM4 11h1v1h-1zM11 11h1v1h-1zM5 12h2v1h-2zM9 12h2v1h-2zM7 13h2v1h-2z"/>
+<path fill="#7C7F99" d="M5 4h1v1h-1zM6 5h1v2h-1zM10 6h1v1h-1zM7 8h1v1h-1zM9 7h2v3h-2zM8 10h3v1h-3zM8 11h1v2h-1z"/>
+<path fill="#9194AA" d="M11 5h1v6h-1zM9 11h2v1h-2z"/>
+<path fill="#96152A" d="M2 1h2v1h-2zM5 1h3v1h-3zM11 1h3v1h-3zM1 2h2v1h-2zM14 2h1v1h-1zM1 3h1v1h-1zM14 6h1v3h-1zM1 9h1v4h-1zM14 12h1v1h-1zM1 13h2v1h-2zM13 13h2v1h-2zM2 14h3v1h-3zM10 14h4v1h-4z"/>
+<path fill="#A1A3B7" d="M5 6h1v1h-1zM5 7h2v4h-2zM6 11h1v1h-1z"/>
+<path fill="#C31F1F" d="M4 1h1v1h-1zM8 1h3v1h-3zM6 2h4v1h-4zM13 2h1v1h-1zM14 3h1v3h-1zM1 4h1v5h-1zM14 9h1v2h-1zM2 11h1v1h-1zM13 11h2v1h-2zM2 12h2v1h-2zM12 12h2v1h-2zM3 13h2v1h-2zM11 13h2v1h-2zM5 14h2v1h-2zM9 14h1v1h-1z"/>
+<path fill="#C8CBD3" d="M10 4h2v1h-2zM10 5h1v1h-1zM9 6h1v1h-1zM4 5h1v6h-1zM5 11h1v1h-1zM7 9h1v4h-1z"/>
+<path fill="#EEEEEE" d="M4 4h1v1h-1zM5 5h1v1h-1z"/>
+<path fill="#FFB8B0" d="M3 2h3v1h-3zM10 2h3v1h-3zM6 3h4v1h-4zM8 4h1v1h-1zM2 3h1v8h-1zM13 3h1v8h-1zM3 11h1v1h-1zM12 11h1v1h-1zM4 12h1v1h-1zM11 12h1v1h-1zM5 13h2v1h-2zM9 13h2v1h-2zM7 14h2v1h-2z"/>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Slime Chunks</title>
+<desc>Atlas index 1155; category material; subtype monster_part; tags crafting|ingredient|green; visual tier 0</desc>
+<path fill="#003B14" d="M12 5h1v1h-1zM13 6h1v4h-1zM12 10h1v1h-1zM9 11h3v1h-3zM3 12h5v1h-5z"/>
+<path fill="#034903" d="M7 3h4v1h-4zM6 4h1v1h-1zM11 4h1v1h-1zM5 5h1v1h-1zM4 6h1v2h-1zM4 8h3v1h-3zM3 9h1v1h-1zM7 9h1v1h-1zM2 10h1v2h-1zM8 10h1v2h-1z"/>
+<path fill="#4B9E3C" d="M7 8h4v1h-4zM8 9h4v1h-4zM5 11h2v1h-2z"/>
+<path fill="#56BB5D" d="M10 4h1v1h-1zM11 5h1v1h-1zM6 9h1v1h-1zM12 6h1v4h-1zM9 10h3v1h-3zM7 10h1v2h-1z"/>
+<path fill="#7FD269" d="M9 5h2v1h-2zM6 6h1v1h-1zM9 6h3v1h-3zM6 7h3v1h-3zM10 7h2v1h-2zM11 8h1v1h-1zM5 10h2v1h-2zM4 11h1v1h-1z"/>
+<path fill="#CDF699" d="M7 4h3v1h-3zM6 5h1v1h-1zM5 7h1v1h-1zM4 9h2v1h-2zM3 10h1v2h-1z"/>
+<path fill="#FFFFFF" d="M5 6h1v1h-1zM7 5h2v2h-2zM9 7h1v1h-1zM4 10h1v1h-1z"/>
+</svg>

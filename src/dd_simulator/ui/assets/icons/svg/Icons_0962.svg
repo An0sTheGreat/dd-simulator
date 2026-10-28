@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Shadow Elixir</title>
+<desc>Atlas index 962; category potion; subtype elixir; tags consumable|alchemy|blue; visual tier 2</desc>
+<path fill="#14183F" d="M10 5h2v1h-2zM12 6h1v4h-1zM11 10h1v2h-1zM10 12h1v1h-1zM9 13h1v1h-1zM8 14h1v1h-1z"/>
+<path fill="#1F2C58" d="M4 5h2v1h-2zM3 6h1v4h-1zM4 10h1v2h-1zM5 12h1v1h-1zM6 13h1v1h-1zM7 14h1v1h-1z"/>
+<path fill="#32283D" d="M3 3h1v1h-1zM11 2h2v2h-2zM13 4h1v1h-1zM6 6h1v1h-1zM9 6h1v1h-1zM14 6h1v1h-1zM7 7h2v1h-2zM9 8h2v1h-2zM8 9h3v1h-3zM8 10h2v2h-2zM2 12h1v1h-1zM8 12h1v1h-1zM12 12h1v1h-1zM11 13h1v1h-1zM3 13h2v2h-2z"/>
+<path fill="#3B0612" d="M9 4h1v1h-1z"/>
+<path fill="#4D3E56" d="M5 7h1v1h-1zM9 7h2v1h-2zM8 8h1v1h-1zM5 8h2v2h-2zM6 10h1v2h-1zM7 12h1v1h-1z"/>
+<path fill="#531919" d="M7 3h2v1h-2zM6 4h1v1h-1z"/>
+<path fill="#695A6E" d="M6 7h1v1h-1zM7 8h1v1h-1zM7 11h1v1h-1z"/>
+<path fill="#7192B8" d="M9 5h1v1h-1zM11 9h1v1h-1zM10 10h1v2h-1zM9 12h1v1h-1zM8 13h1v1h-1z"/>
+<path fill="#8D422D" d="M7 5h2v1h-2z"/>
+<path fill="#8E8095" d="M7 9h1v2h-1z"/>
+<path fill="#99B6CE" d="M11 7h1v2h-1z"/>
+<path fill="#BFD8E4" d="M7 6h2v1h-2zM10 6h2v1h-2zM4 8h1v2h-1zM5 11h1v1h-1zM6 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#C4845F" d="M7 4h2v1h-2z"/>
+<path fill="#FFFFFF" d="M6 5h1v1h-1zM4 6h2v1h-2zM4 7h1v1h-1zM5 10h1v1h-1z"/>
+</svg>

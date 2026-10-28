@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Polished Flameforged Amulet</title>
+<desc>Atlas index 847; category armor; subtype amulet; tags orange|amulet|accessory|neck|magic|flameforged; visual tier 1</desc>
+<path fill="#008A38" d="M7 9h2v1h-2zM6 10h1v2h-1zM9 10h1v2h-1zM7 12h2v1h-2z"/>
+<path fill="#20B818" d="M8 11h1v1h-1z"/>
+<path fill="#3B002B" d="M11 3h1v1h-1zM12 4h1v1h-1zM13 5h1v2h-1zM12 7h1v2h-1zM11 9h1v1h-1z"/>
+<path fill="#481E08" d="M4 1h3v1h-3zM3 2h1v1h-1zM7 2h4v1h-4zM2 3h1v4h-1zM3 7h1v1h-1zM4 8h1v1h-1z"/>
+<path fill="#4C0600" d="M10 12h1v1h-1zM9 13h1v1h-1zM7 14h2v1h-2z"/>
+<path fill="#520606" d="M5 4h2v1h-2zM7 5h4v1h-4zM4 5h1v2h-1zM11 6h1v1h-1zM5 7h1v1h-1zM7 7h2v1h-2zM10 7h1v1h-1zM6 8h1v1h-1zM9 8h2v1h-2zM5 9h1v1h-1zM4 10h1v2h-1zM11 10h1v2h-1z"/>
+<path fill="#5E1400" d="M5 12h1v1h-1zM6 13h1v1h-1z"/>
+<path fill="#8D422D" d="M4 3h3v1h-3zM4 4h1v1h-1zM7 4h4v1h-4zM11 5h1v1h-1z"/>
+<path fill="#BA7A51" d="M4 2h3v1h-3zM3 3h1v1h-1zM7 3h2v1h-2zM12 5h1v2h-1zM5 8h1v1h-1zM11 7h1v2h-1zM10 9h1v1h-1z"/>
+<path fill="#BDFD6B" d="M8 10h1v1h-1zM7 11h1v1h-1z"/>
+<path fill="#CF9F71" d="M9 3h2v1h-2zM11 4h1v1h-1zM3 4h1v3h-1zM4 7h1v1h-1z"/>
+<path fill="#EF8C1F" d="M10 11h1v1h-1zM9 12h1v1h-1zM8 13h1v1h-1z"/>
+<path fill="#FFD671" d="M9 9h1v1h-1zM10 10h1v1h-1zM5 11h1v1h-1zM6 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 8h2v1h-2zM6 9h1v1h-1zM5 10h1v1h-1zM7 10h1v1h-1z"/>
+</svg>

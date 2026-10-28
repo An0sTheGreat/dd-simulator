@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Evasive Roll</title>
+<desc>Atlas index 1600; category skill; subtype ranger; tags ranger|ability|green; visual tier 2</desc>
+<path fill="#1C3407" d="M7 8h2v1h-2z"/>
+<path fill="#324E06" d="M2 1h3v1h-3zM11 1h3v1h-3zM2 2h1v1h-1zM13 2h1v1h-1zM1 3h1v1h-1zM14 3h1v1h-1zM6 4h4v1h-4zM4 5h2v1h-2zM10 5h2v1h-2zM3 6h1v1h-1zM12 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM13 7h1v1h-1zM1 8h1v1h-1zM14 8h1v1h-1zM2 9h1v1h-1zM13 9h1v1h-1zM3 10h1v1h-1zM12 10h1v1h-1zM4 11h2v1h-2zM10 11h2v1h-2zM6 12h4v1h-4zM1 12h1v2h-1zM14 12h1v2h-1zM2 14h3v1h-3zM11 14h3v1h-3z"/>
+<path fill="#4B7A15" d="M5 1h2v1h-2zM9 1h2v1h-2zM3 2h3v1h-3zM10 2h3v1h-3zM3 3h2v1h-2zM11 3h2v1h-2zM1 4h2v2h-2zM13 4h2v2h-2zM1 6h1v1h-1zM14 6h1v1h-1zM7 7h1v1h-1zM5 9h1v1h-1zM9 7h2v3h-2zM1 10h1v1h-1zM6 10h4v1h-4zM14 9h1v2h-1zM1 11h2v1h-2zM13 11h2v1h-2zM2 12h1v1h-1zM13 12h1v1h-1zM3 13h3v1h-3zM10 13h3v1h-3zM5 14h2v1h-2zM9 14h2v1h-2z"/>
+<path fill="#84AB38" d="M7 1h2v1h-2zM1 2h1v1h-1zM6 2h4v1h-4zM14 2h1v1h-1zM5 3h1v1h-1zM10 3h1v1h-1zM8 6h2v1h-2zM14 7h1v1h-1zM5 7h1v2h-1zM6 9h3v1h-3zM13 10h1v1h-1zM3 11h1v1h-1zM12 11h1v1h-1zM4 12h2v1h-2zM10 12h2v1h-2zM2 13h1v1h-1zM6 13h4v1h-4zM13 13h1v1h-1zM7 14h2v1h-2z"/>
+<path fill="#D0D0D0" d="M4 6h1v1h-1zM11 6h1v1h-1zM3 7h1v1h-1zM12 7h1v1h-1zM2 8h1v1h-1zM13 8h1v1h-1zM3 9h1v1h-1zM12 9h1v1h-1zM4 10h1v1h-1zM10 10h2v1h-2zM6 11h4v1h-4z"/>
+<path fill="#D3E163" d="M2 3h1v1h-1zM6 3h4v1h-4zM13 3h1v1h-1zM3 4h3v1h-3zM10 4h3v1h-3zM3 5h1v1h-1zM12 5h1v1h-1zM2 6h1v1h-1zM6 6h2v1h-2zM13 6h1v1h-1zM1 7h1v1h-1zM6 8h1v1h-1zM1 9h1v1h-1zM2 10h1v1h-1zM3 12h1v1h-1zM12 12h1v1h-1z"/>
+<path fill="#FFFFFF" d="M6 5h4v1h-4zM5 6h1v1h-1zM10 6h1v1h-1zM4 7h1v1h-1zM6 7h1v1h-1zM11 7h1v1h-1zM3 8h2v1h-2zM11 8h2v1h-2zM4 9h1v1h-1zM11 9h1v1h-1zM5 10h1v1h-1z"/>
+</svg>

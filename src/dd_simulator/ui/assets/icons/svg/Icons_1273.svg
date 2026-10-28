@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Blank Runestone</title>
+<desc>Atlas index 1273; category magic_item; subtype rune; tags magic|blank|white; visual tier 0</desc>
+<path fill="#1B0542" d="M5 14h6v1h-6z"/>
+<path fill="#20184F" d="M6 1h4v1h-4zM4 2h2v1h-2zM10 2h2v1h-2zM3 3h1v1h-1zM12 3h1v1h-1zM2 4h1v2h-1zM13 4h1v2h-1zM1 6h1v6h-1zM14 6h1v6h-1zM2 12h1v1h-1zM13 12h1v1h-1zM3 13h2v1h-2zM11 13h2v1h-2z"/>
+<path fill="#69678F" d="M2 11h1v1h-1zM13 11h1v1h-1zM3 12h2v1h-2zM11 12h2v1h-2zM5 13h6v1h-6z"/>
+<path fill="#8E8FAA" d="M2 10h1v1h-1zM13 10h1v1h-1zM3 11h1v1h-1zM12 11h1v1h-1zM5 12h1v1h-1zM10 12h1v1h-1z"/>
+<path fill="#BDC1CC" d="M9 2h1v1h-1zM6 3h6v1h-6zM4 4h9v1h-9zM4 5h1v1h-1zM7 5h6v1h-6zM3 6h2v1h-2zM7 6h7v1h-7zM3 7h4v1h-4zM8 7h6v1h-6zM3 8h11v2h-11zM4 10h9v1h-9zM5 11h7v1h-7z"/>
+<path fill="#E4E5E7" d="M6 2h3v1h-3zM4 3h2v1h-2zM3 4h1v2h-1zM5 5h2v2h-2zM7 7h1v1h-1zM2 6h1v4h-1zM3 10h1v1h-1zM4 11h1v1h-1zM6 12h4v1h-4z"/>
+</svg>

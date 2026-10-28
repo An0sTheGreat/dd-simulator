@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Counterattack</title>
+<desc>Atlas index 1620; category skill; subtype melee; tags melee|ability|red; visual tier 3</desc>
+<path fill="#600017" d="M2 1h2v1h-2zM8 1h2v1h-2zM2 2h1v1h-1zM4 2h2v1h-2zM7 2h1v1h-1zM10 2h1v1h-1zM3 3h1v1h-1zM6 3h2v1h-2zM9 3h1v1h-1zM11 3h4v1h-4zM4 4h1v1h-1zM7 4h4v1h-4zM14 4h1v1h-1zM5 5h1v1h-1zM8 5h2v1h-2zM13 5h1v1h-1zM6 6h1v1h-1zM9 6h2v1h-2zM12 6h1v1h-1zM2 7h2v1h-2zM5 7h1v1h-1zM7 7h1v1h-1zM10 7h4v1h-4zM4 8h1v1h-1zM8 8h1v1h-1zM11 8h1v1h-1zM14 8h1v1h-1zM4 9h3v1h-3zM8 9h2v1h-2zM12 9h2v1h-2zM2 8h1v3h-1zM6 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM2 11h2v1h-2zM6 11h2v1h-2zM11 11h1v1h-1zM13 10h1v2h-1zM4 12h1v1h-1zM8 12h1v1h-1zM12 12h1v1h-1zM14 12h1v1h-1zM1 12h1v2h-1zM4 13h5v1h-5zM13 13h1v1h-1zM2 14h2v1h-2z"/>
+<path fill="#8287A6" d="M3 10h1v1h-1zM4 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#860020" d="M12 1h2v1h-2zM1 2h1v1h-1zM14 2h1v1h-1zM1 10h1v2h-1zM14 13h1v1h-1zM4 14h2v1h-2zM12 14h2v1h-2z"/>
+<path fill="#A16737" d="M3 12h1v1h-1z"/>
+<path fill="#A5A8BF" d="M9 2h1v1h-1zM8 3h1v1h-1zM11 4h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM11 6h1v1h-1zM13 8h1v1h-1zM7 8h1v3h-1z"/>
+<path fill="#B4B9C7" d="M5 11h1v1h-1zM2 12h1v1h-1zM6 12h2v1h-2zM3 13h1v1h-1z"/>
+<path fill="#C41A2B" d="M4 1h4v1h-4zM10 1h2v1h-2zM6 2h1v1h-1zM11 2h3v1h-3zM1 3h2v1h-2zM10 3h1v1h-1zM1 4h3v1h-3zM1 5h4v1h-4zM14 5h1v1h-1zM1 6h5v1h-5zM13 6h2v1h-2zM4 7h1v1h-1zM14 7h1v1h-1zM1 7h1v3h-1zM9 10h1v1h-1zM8 11h3v1h-3zM14 9h1v3h-1zM9 12h3v1h-3zM9 13h4v1h-4zM6 14h6v1h-6z"/>
+<path fill="#FFFFFF" d="M3 2h1v1h-1zM8 2h1v1h-1zM4 3h2v1h-2zM5 4h2v1h-2zM12 4h2v1h-2zM6 5h2v1h-2zM11 5h1v1h-1zM7 6h2v1h-2zM6 7h1v1h-1zM8 7h2v1h-2zM5 8h2v1h-2zM9 8h2v1h-2zM12 8h1v1h-1zM3 8h1v2h-1zM10 9h2v1h-2zM4 10h2v1h-2zM11 10h2v1h-2zM12 11h1v1h-1zM13 12h1v1h-1zM2 13h1v1h-1z"/>
+</svg>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Leather Spellbook</title>
+<desc>Atlas index 1230; category spell; subtype tome; tags book|magic|orange; visual tier 1</desc>
+<path fill="#3E0E08" d="M13 2h1v12h-1zM3 14h10v1h-10z"/>
+<path fill="#4C170C" d="M3 1h10v1h-10zM2 2h1v12h-1z"/>
+<path fill="#561814" d="M3 2h1v1h-1z"/>
+<path fill="#5E1A0F" d="M12 12h1v1h-1zM3 13h1v1h-1z"/>
+<path fill="#828AA6" d="M12 11h1v1h-1z"/>
+<path fill="#853318" d="M5 3h7v1h-7zM5 4h1v5h-1zM11 4h1v5h-1zM5 9h7v1h-7zM3 3h1v8h-1zM3 11h9v1h-9zM3 12h1v1h-1zM4 13h1v1h-1z"/>
+<path fill="#9D502C" d="M4 12h1v1h-1zM10 13h1v1h-1z"/>
+<path fill="#AD5E3A" d="M4 2h1v1h-1zM10 2h1v1h-1zM6 4h5v1h-5zM12 4h1v1h-1zM6 5h1v1h-1zM10 5h1v1h-1zM6 6h5v1h-5zM6 7h1v1h-1zM9 7h2v1h-2zM6 8h5v1h-5zM12 8h1v1h-1zM4 10h1v1h-1zM10 10h1v1h-1z"/>
+<path fill="#B36A3E" d="M5 13h5v1h-5z"/>
+<path fill="#C17C4A" d="M5 2h5v1h-5zM12 5h1v3h-1zM4 3h1v7h-1zM5 10h5v1h-5z"/>
+<path fill="#CA8B34" d="M9 5h1v1h-1z"/>
+<path fill="#CAB169" d="M5 12h1v1h-1zM11 12h1v1h-1z"/>
+<path fill="#D08936" d="M12 13h1v1h-1z"/>
+<path fill="#D9A441" d="M8 5h1v1h-1zM8 7h1v1h-1z"/>
+<path fill="#E2D58F" d="M6 12h2v1h-2zM10 12h1v1h-1z"/>
+<path fill="#E9BF51" d="M7 5h1v1h-1zM7 7h1v1h-1z"/>
+<path fill="#F0BA5B" d="M11 13h1v1h-1z"/>
+<path fill="#F5EFAC" d="M8 12h2v1h-2z"/>
+<path fill="#FFD671" d="M11 2h1v1h-1zM12 3h1v1h-1zM12 9h1v1h-1zM11 10h1v1h-1z"/>
+<path fill="#FFFFFF" d="M12 2h1v1h-1zM12 10h1v1h-1z"/>
+</svg>

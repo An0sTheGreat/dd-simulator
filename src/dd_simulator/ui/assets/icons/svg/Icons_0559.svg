@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Runed Cobalt Hammer</title>
+<desc>Atlas index 559; category weapon; subtype hammer; tags blue|hammer|metal|melee|blunt|cobalt|ornate; visual tier 2</desc>
+<path fill="#001076" d="M9 2h4v1h-4zM8 3h1v1h-1zM13 3h1v1h-1zM7 4h1v1h-1zM14 4h1v1h-1zM6 5h1v1h-1zM6 6h2v1h-2z"/>
+<path fill="#060053" d="M14 5h1v2h-1zM13 7h1v1h-1zM9 8h2v1h-2zM12 8h1v1h-1zM11 9h1v1h-1z"/>
+<path fill="#1C4DA8" d="M8 6h1v1h-1zM9 7h2v1h-2z"/>
+<path fill="#3B002B" d="M8 9h1v1h-1zM7 10h1v1h-1zM6 11h1v1h-1zM5 12h1v1h-1zM4 13h1v1h-1zM3 14h2v1h-2z"/>
+<path fill="#4874C6" d="M9 4h4v1h-4zM8 5h2v1h-2zM11 5h2v1h-2zM10 6h3v1h-3zM11 7h1v1h-1z"/>
+<path fill="#520606" d="M7 7h1v1h-1zM6 8h1v1h-1zM5 9h1v1h-1zM4 10h1v1h-1zM1 11h3v1h-3zM1 12h1v1h-1zM2 13h1v1h-1z"/>
+<path fill="#94CFF9" d="M12 3h1v1h-1zM13 4h1v1h-1zM7 5h1v1h-1zM10 5h1v1h-1zM11 8h1v1h-1z"/>
+<path fill="#974E36" d="M8 8h1v1h-1zM5 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#C69055" d="M8 7h1v1h-1zM7 8h1v1h-1zM4 11h1v1h-1zM2 12h2v1h-2zM3 13h1v1h-1z"/>
+<path fill="#D2F8FF" d="M9 3h3v1h-3zM8 4h1v1h-1zM9 6h1v1h-1zM13 5h1v2h-1zM12 7h1v1h-1z"/>
+<path fill="#DDAA6E" d="M7 9h1v1h-1zM6 10h1v1h-1z"/>
+<path fill="#FEDAA0" d="M6 9h1v1h-1zM5 10h1v1h-1z"/>
+</svg>

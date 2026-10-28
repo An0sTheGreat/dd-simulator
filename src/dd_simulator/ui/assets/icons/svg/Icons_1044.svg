@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>River Shrimp</title>
+<desc>Atlas index 1044; category food; subtype seafood; tags fishing|ingredient|brown; visual tier 1</desc>
+<path fill="#361C05" d="M11 4h1v1h-1zM12 5h1v1h-1zM13 6h1v4h-1zM12 10h1v1h-1zM13 11h1v1h-1zM10 12h4v1h-4zM8 13h2v1h-2zM3 14h5v1h-5z"/>
+<path fill="#442405" d="M1 1h2v1h-2zM3 2h6v1h-6zM1 2h1v2h-1zM9 3h2v1h-2zM2 4h1v1h-1zM1 5h1v1h-1zM3 5h4v1h-4zM1 6h3v1h-3zM7 6h1v1h-1zM6 7h1v1h-1zM5 8h1v1h-1zM6 9h1v1h-1zM4 10h2v1h-2zM3 11h1v1h-1zM5 12h1v1h-1zM2 12h1v2h-1z"/>
+<path fill="#574633" d="M4 3h1v1h-1zM6 3h1v1h-1zM4 4h3v1h-3zM8 4h2v1h-2zM7 5h2v1h-2zM8 6h3v1h-3zM8 7h2v1h-2zM8 8h3v1h-3zM7 9h2v1h-2zM6 10h4v1h-4zM7 11h1v1h-1z"/>
+<path fill="#A17B45" d="M5 3h1v1h-1zM7 3h2v1h-2zM7 4h1v1h-1zM10 4h1v1h-1zM9 5h2v1h-2zM11 6h1v1h-1zM10 7h2v1h-2zM11 8h1v1h-1zM9 9h3v1h-3zM10 10h1v1h-1zM4 11h3v1h-3zM8 11h2v1h-2zM4 12h1v1h-1zM6 12h2v1h-2z"/>
+<path fill="#DE7E68" d="M3 4h1v1h-1zM2 5h1v1h-1zM7 7h1v1h-1zM11 10h1v1h-1zM10 11h2v1h-2z"/>
+<path fill="#F0997B" d="M2 3h2v1h-2zM7 8h1v1h-1zM12 11h1v1h-1z"/>
+<path fill="#FDB38A" d="M11 5h1v1h-1zM12 6h1v2h-1zM9 12h1v1h-1zM6 13h2v1h-2z"/>
+<path fill="#FFC39E" d="M2 2h1v1h-1zM6 8h1v1h-1z"/>
+<path fill="#FFCC9A" d="M12 8h1v2h-1zM3 12h1v1h-1zM8 12h1v1h-1zM3 13h3v1h-3z"/>
+</svg>

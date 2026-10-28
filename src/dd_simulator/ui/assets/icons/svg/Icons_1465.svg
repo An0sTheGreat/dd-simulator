@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Sand Wave</title>
+<desc>Atlas index 1465; category spell; subtype earth; tags earth|magic|yellow; visual tier 4</desc>
+<path fill="#6A260E" d="M10 1h1v1h-1zM8 2h2v1h-2zM9 6h2v1h-2zM11 7h1v1h-1zM10 8h2v1h-2zM8 9h2v1h-2zM7 10h1v1h-1zM3 11h1v1h-1zM5 11h2v1h-2zM6 12h1v1h-1zM6 13h3v1h-3zM7 14h2v1h-2z"/>
+<path fill="#89480F" d="M3 6h1v1h-1zM4 7h1v1h-1zM2 8h2v1h-2zM2 9h1v1h-1zM2 10h2v1h-2z"/>
+<path fill="#945016" d="M9 1h1v1h-1zM7 2h1v1h-1zM6 3h2v1h-2zM5 4h2v1h-2zM6 5h5v1h-5zM8 6h1v1h-1zM11 6h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM8 8h2v1h-2zM6 9h2v1h-2zM5 10h2v1h-2zM4 11h1v1h-1zM5 12h1v1h-1zM7 12h2v1h-2zM9 13h2v1h-2zM5 14h2v1h-2zM9 14h1v1h-1z"/>
+<path fill="#A45B1D" d="M2 1h4v1h-4zM8 1h1v1h-1zM13 1h1v1h-1zM1 2h3v1h-3zM13 2h2v1h-2zM1 3h2v1h-2zM12 3h3v1h-3zM13 4h2v1h-2zM1 4h3v2h-3zM14 5h1v1h-1zM4 6h1v1h-1zM12 6h1v1h-1zM1 6h1v2h-1zM1 9h1v1h-1zM13 10h2v1h-2zM11 11h4v1h-4zM13 12h2v1h-2zM1 12h1v2h-1zM14 13h1v1h-1zM2 14h1v1h-1zM13 14h1v1h-1z"/>
+<path fill="#D79A46" d="M6 1h2v1h-2zM11 1h2v1h-2zM4 2h3v1h-3zM10 2h3v1h-3zM3 3h3v1h-3zM8 3h4v1h-4zM7 4h3v1h-3zM11 4h2v1h-2zM4 4h1v2h-1zM13 5h1v1h-1zM2 6h1v1h-1zM5 6h1v1h-1zM14 6h1v1h-1zM2 7h2v1h-2zM5 7h3v1h-3zM13 7h2v1h-2zM1 8h1v1h-1zM4 8h2v1h-2zM14 8h1v1h-1zM3 9h1v1h-1zM10 9h1v1h-1zM13 9h2v1h-2zM1 10h1v1h-1zM8 10h1v1h-1zM11 10h2v1h-2zM1 11h2v1h-2zM10 11h1v1h-1zM2 12h2v1h-2zM11 12h2v1h-2zM2 13h3v1h-3zM12 13h2v1h-2zM3 14h1v1h-1zM11 14h2v1h-2z"/>
+<path fill="#F7DB7A" d="M10 4h1v1h-1zM5 5h1v1h-1zM11 5h2v1h-2zM6 6h2v1h-2zM13 6h1v1h-1zM8 7h2v1h-2zM6 8h2v1h-2zM12 8h2v1h-2zM4 9h2v1h-2zM11 9h2v1h-2zM4 10h1v1h-1zM9 10h2v1h-2zM7 11h3v1h-3zM4 12h1v1h-1zM9 12h2v1h-2zM5 13h1v1h-1zM11 13h1v1h-1zM4 14h1v1h-1zM10 14h1v1h-1z"/>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Balanced Flameforged Dagger</title>
+<desc>Atlas index 325; category weapon; subtype dagger; tags orange|dagger|metal|melee|light|flameforged; visual tier 1</desc>
+<path fill="#4C0600" d="M13 3h1v2h-1zM12 5h2v1h-2zM11 6h1v1h-1zM10 7h1v2h-1zM9 9h1v1h-1zM10 10h1v1h-1zM6 11h5v1h-5zM5 12h1v1h-1zM3 13h2v1h-2z"/>
+<path fill="#5E1400" d="M10 2h4v1h-4zM10 3h1v1h-1zM9 4h1v1h-1zM4 5h2v1h-2zM7 5h2v1h-2zM6 6h1v1h-1zM4 6h1v4h-1zM3 10h1v1h-1zM2 11h1v2h-1z"/>
+<path fill="#81340E" d="M6 7h2v1h-2zM5 9h1v1h-1zM8 8h1v2h-1zM4 10h1v1h-1zM6 10h1v1h-1zM4 11h2v1h-2z"/>
+<path fill="#9E002E" d="M7 9h1v1h-1z"/>
+<path fill="#CF6D1C" d="M12 4h1v1h-1zM11 5h1v1h-1zM10 6h1v1h-1zM5 8h1v1h-1zM9 7h1v2h-1zM7 10h1v1h-1z"/>
+<path fill="#D79235" d="M5 10h1v1h-1zM3 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#FF0000" d="M7 8h1v1h-1zM6 9h1v1h-1z"/>
+<path fill="#FFD671" d="M10 4h1v1h-1zM9 5h1v1h-1zM7 6h2v1h-2zM5 7h1v1h-1zM8 7h1v1h-1zM8 10h2v1h-2zM3 12h1v1h-1z"/>
+<path fill="#FFFFFF" d="M11 3h2v1h-2zM11 4h1v1h-1zM10 5h1v1h-1zM5 6h1v1h-1zM9 6h1v1h-1zM6 8h1v1h-1z"/>
+</svg>

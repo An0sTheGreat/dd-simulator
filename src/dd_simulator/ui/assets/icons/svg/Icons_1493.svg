@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Toxic Burst</title>
+<desc>Atlas index 1493; category spell; subtype poison; tags poison|magic|teal; visual tier 3</desc>
+<path fill="#002E6C" d="M2 1h2v1h-2zM1 2h1v1h-1zM14 13h1v1h-1zM12 14h2v1h-2z"/>
+<path fill="#00427B" d="M4 1h2v1h-2zM8 1h2v1h-2zM13 1h1v1h-1zM2 2h3v1h-3zM14 2h1v1h-1zM1 3h3v1h-3zM1 4h2v1h-2zM1 5h1v1h-1zM5 5h1v1h-1zM3 6h2v1h-2zM1 7h3v1h-3zM14 7h1v1h-1zM1 8h2v1h-2zM4 8h1v1h-1zM13 8h2v1h-2zM1 9h1v1h-1zM12 9h3v1h-3zM13 10h2v1h-2zM2 11h1v1h-1zM14 11h1v1h-1zM1 12h1v1h-1zM8 12h2v1h-2zM13 12h2v1h-2zM1 13h2v1h-2zM7 13h2v1h-2zM12 13h2v1h-2zM6 14h2v1h-2zM11 14h1v1h-1z"/>
+<path fill="#007C90" d="M6 1h2v1h-2zM10 1h3v1h-3zM5 2h1v1h-1zM8 2h2v1h-2zM13 2h1v1h-1zM4 3h2v1h-2zM7 3h2v1h-2zM3 4h2v1h-2zM6 4h2v1h-2zM2 5h3v1h-3zM6 5h1v1h-1zM1 6h2v1h-2zM5 6h1v1h-1zM7 6h1v1h-1zM14 3h1v4h-1zM4 7h1v1h-1zM6 7h1v1h-1zM13 7h1v1h-1zM3 8h1v1h-1zM5 8h1v1h-1zM12 8h1v1h-1zM2 9h1v1h-1zM4 9h1v1h-1zM11 9h1v1h-1zM1 10h4v1h-4zM8 10h1v1h-1zM10 10h3v1h-3zM1 11h1v1h-1zM3 11h1v1h-1zM7 11h1v1h-1zM9 11h2v1h-2zM13 11h1v1h-1zM2 12h1v1h-1zM4 12h4v1h-4zM10 12h1v1h-1zM12 12h1v1h-1zM3 13h2v1h-2zM6 13h1v1h-1zM9 13h1v1h-1zM11 13h1v1h-1zM2 14h2v1h-2zM5 14h1v1h-1zM8 14h3v1h-3z"/>
+<path fill="#0BA055" d="M12 6h1v1h-1zM11 7h1v1h-1zM6 8h1v1h-1zM10 8h2v1h-2zM5 9h1v1h-1zM8 9h3v1h-3zM7 10h1v1h-1zM9 10h1v1h-1zM6 11h1v1h-1zM8 11h1v1h-1z"/>
+<path fill="#59DC59" d="M7 2h1v1h-1zM10 2h3v1h-3zM6 3h1v1h-1zM9 3h1v1h-1zM5 4h1v1h-1zM8 4h2v1h-2zM12 3h2v2h-2zM7 5h2v1h-2zM10 5h4v1h-4zM6 6h1v1h-1zM8 6h4v1h-4zM13 6h1v1h-1zM5 7h1v1h-1zM7 7h4v1h-4zM12 7h1v1h-1zM7 8h3v1h-3zM3 9h1v1h-1zM6 9h2v1h-2zM5 10h2v1h-2zM4 11h2v1h-2zM12 11h1v1h-1zM3 12h1v1h-1zM11 12h1v1h-1zM5 13h1v1h-1zM10 13h1v1h-1zM4 14h1v1h-1z"/>
+<path fill="#E3FF94" d="M6 2h1v1h-1zM11 3h1v1h-1zM10 4h2v1h-2zM9 5h1v1h-1zM11 11h1v1h-1z"/>
+<path fill="#FDFFEE" d="M10 3h1v1h-1z"/>
+</svg>

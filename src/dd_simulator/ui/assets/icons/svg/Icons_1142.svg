@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Ivory Fang</title>
+<desc>Atlas index 1142; category material; subtype monster_part; tags crafting|ingredient|orange; visual tier 0</desc>
+<path fill="#3C1106" d="M11 7h1v2h-1zM10 9h1v2h-1zM9 11h1v1h-1zM8 12h1v1h-1zM5 13h3v1h-3z"/>
+<path fill="#481E08" d="M5 4h3v1h-3zM9 4h3v1h-3zM8 5h1v1h-1zM4 5h1v2h-1zM12 5h1v2h-1zM5 7h1v1h-1zM6 8h1v3h-1zM5 11h1v2h-1z"/>
+<path fill="#C89C71" d="M7 5h1v1h-1zM9 5h1v1h-1zM7 8h1v1h-1zM6 11h1v1h-1zM7 12h1v1h-1z"/>
+<path fill="#DFC6A4" d="M5 5h1v1h-1zM7 6h2v1h-2zM11 6h1v1h-1zM6 7h1v1h-1zM9 7h2v1h-2zM10 8h1v1h-1zM7 9h1v1h-1zM9 10h1v1h-1zM8 11h1v1h-1z"/>
+<path fill="#FFF6E3" d="M6 5h1v1h-1zM10 5h2v1h-2zM5 6h1v1h-1zM9 6h2v1h-2zM8 8h2v1h-2zM9 9h1v1h-1zM7 10h2v1h-2zM7 11h1v1h-1zM6 12h1v1h-1z"/>
+<path fill="#FFFFFF" d="M6 6h1v1h-1zM7 7h2v1h-2zM8 9h1v1h-1z"/>
+</svg>

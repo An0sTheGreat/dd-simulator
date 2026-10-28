@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Water Tome</title>
+<desc>Atlas index 1246; category spell; subtype tome; tags book|water|blue; visual tier 1</desc>
+<path fill="#0072DE" d="M9 5h1v1h-1zM10 7h1v2h-1zM9 9h1v1h-1z"/>
+<path fill="#192264" d="M13 2h1v12h-1zM3 14h10v1h-10z"/>
+<path fill="#1B97FF" d="M7 5h1v1h-1zM9 6h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM7 9h2v1h-2z"/>
+<path fill="#1C3269" d="M3 1h10v1h-10zM2 2h1v12h-1z"/>
+<path fill="#242C95" d="M3 2h1v1h-1zM3 13h1v1h-1z"/>
+<path fill="#3647AB" d="M6 3h5v1h-5zM5 4h3v1h-3zM9 4h3v1h-3zM5 5h2v2h-2zM10 5h2v2h-2zM5 7h1v2h-1zM11 7h1v2h-1zM5 9h2v1h-2zM10 9h2v1h-2z"/>
+<path fill="#3E5DBF" d="M3 3h1v8h-1zM3 11h9v1h-9zM3 12h1v1h-1zM12 12h1v1h-1zM4 13h1v1h-1z"/>
+<path fill="#4976BC" d="M10 13h1v1h-1z"/>
+<path fill="#4A77CA" d="M4 12h1v1h-1z"/>
+<path fill="#6598D4" d="M4 2h1v1h-1zM10 2h1v1h-1zM5 3h1v1h-1zM11 3h1v1h-1zM12 4h1v1h-1zM12 8h1v1h-1zM4 10h1v1h-1zM10 10h1v1h-1zM5 13h5v1h-5z"/>
+<path fill="#828AA6" d="M12 11h1v1h-1z"/>
+<path fill="#8BC1F3" d="M5 2h5v1h-5zM12 5h1v3h-1zM4 3h1v7h-1zM5 10h5v1h-5z"/>
+<path fill="#8CE8FF" d="M8 4h1v3h-1zM6 7h1v1h-1zM9 7h1v1h-1zM7 8h2v1h-2z"/>
+<path fill="#C5C9D3" d="M11 2h1v1h-1zM12 3h1v1h-1zM12 9h1v1h-1zM11 10h1v1h-1zM11 13h1v1h-1z"/>
+<path fill="#CABA8B" d="M5 12h1v1h-1zM11 12h1v1h-1z"/>
+<path fill="#DDE0E7" d="M12 13h1v1h-1z"/>
+<path fill="#E2DAAC" d="M6 12h2v1h-2zM10 12h1v1h-1z"/>
+<path fill="#F5F1C6" d="M8 12h2v1h-2z"/>
+<path fill="#FFFFFF" d="M12 2h1v1h-1zM7 6h1v1h-1zM7 7h2v1h-2zM12 10h1v1h-1z"/>
+</svg>

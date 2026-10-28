@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>White Flower</title>
+<desc>Atlas index 1167; category material; subtype monster_part; tags crafting|ingredient|green; visual tier 1</desc>
+<path fill="#003A1F" d="M11 12h2v1h-2zM9 13h2v1h-2z"/>
+<path fill="#004404" d="M10 9h2v1h-2zM8 10h2v1h-2zM12 10h1v1h-1zM2 11h1v1h-1zM6 10h1v2h-1zM13 11h1v1h-1zM3 12h1v1h-1zM4 13h2v1h-2zM6 14h1v1h-1zM8 11h1v4h-1z"/>
+<path fill="#1D8022" d="M10 11h1v1h-1zM5 12h2v1h-2zM9 12h1v1h-1zM6 13h1v1h-1z"/>
+<path fill="#2F3157" d="M7 1h1v1h-1zM6 2h1v1h-1zM8 2h2v1h-2zM4 3h2v1h-2zM10 3h1v1h-1zM3 4h1v1h-1zM11 4h1v1h-1zM2 5h1v1h-1zM10 5h1v1h-1zM3 6h1v1h-1zM11 6h1v1h-1zM2 7h1v1h-1zM10 7h1v1h-1zM3 8h1v1h-1zM5 8h1v1h-1zM9 8h1v1h-1zM4 9h2v1h-2zM8 9h1v1h-1z"/>
+<path fill="#57AA3D" d="M5 11h1v1h-1zM7 10h1v2h-1zM9 11h1v1h-1zM4 12h1v1h-1zM10 12h1v1h-1zM7 14h1v1h-1z"/>
+<path fill="#7782A3" d="M8 4h1v1h-1zM5 6h1v1h-1zM8 6h1v1h-1zM6 7h2v1h-2zM8 8h1v1h-1zM7 9h1v1h-1z"/>
+<path fill="#8ECE65" d="M10 10h1v1h-1zM3 11h1v1h-1zM11 11h2v1h-2zM7 12h1v2h-1z"/>
+<path fill="#B5B8CB" d="M8 3h1v1h-1zM5 4h1v1h-1zM9 5h1v1h-1zM4 6h1v1h-1zM5 7h1v1h-1zM8 7h1v1h-1z"/>
+<path fill="#B66126" d="M8 5h1v1h-1zM6 6h2v1h-2z"/>
+<path fill="#BFE88C" d="M11 10h1v1h-1zM4 11h1v1h-1z"/>
+<path fill="#CF8144" d="M6 4h2v1h-2zM5 5h1v1h-1z"/>
+<path fill="#EBB362" d="M6 5h2v1h-2z"/>
+<path fill="#FFFFFF" d="M7 2h1v1h-1zM6 3h2v1h-2zM9 3h1v1h-1zM4 4h1v1h-1zM9 4h2v1h-2zM3 5h2v1h-2zM9 6h2v1h-2zM3 7h2v1h-2zM9 7h1v1h-1zM4 8h1v1h-1zM6 8h2v1h-2zM6 9h1v1h-1z"/>
+</svg>

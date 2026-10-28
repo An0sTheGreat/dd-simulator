@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Iron Helmet</title>
+<desc>Atlas index 624; category armor; subtype helmet; tags gray|helmet|defense|head|armor|iron|plain; visual tier 0</desc>
+<path fill="#2A172A" d="M6 3h1v1h-1zM13 3h1v2h-1zM14 5h1v1h-1zM13 6h1v1h-1zM12 7h1v2h-1zM13 9h1v2h-1zM12 11h1v1h-1zM11 12h1v1h-1zM9 13h2v1h-2zM8 14h1v1h-1z"/>
+<path fill="#2E1E2E" d="M2 2h3v1h-3zM7 2h2v1h-2zM11 2h3v1h-3zM5 3h1v1h-1zM9 3h2v1h-2zM2 3h1v2h-1zM1 5h1v1h-1zM2 6h1v1h-1zM3 7h1v2h-1zM2 9h1v2h-1zM3 11h1v1h-1zM4 12h1v1h-1zM5 13h2v1h-2zM7 14h1v1h-1z"/>
+<path fill="#51455C" d="M12 4h1v1h-1zM9 5h2v1h-2zM12 5h2v1h-2zM11 6h2v1h-2zM10 7h2v1h-2zM11 8h1v1h-1zM12 9h1v2h-1zM8 6h1v6h-1zM11 11h1v1h-1zM8 12h3v1h-3zM8 13h1v1h-1z"/>
+<path fill="#6F6679" d="M3 4h1v1h-1zM9 4h1v1h-1zM5 5h2v1h-2zM4 6h1v1h-1z"/>
+<path fill="#7A1D00" d="M9 7h1v1h-1zM10 8h1v1h-1zM11 9h1v1h-1zM9 10h2v1h-2z"/>
+<path fill="#7D7486" d="M11 10h1v1h-1zM9 11h2v1h-2z"/>
+<path fill="#99929F" d="M7 4h2v1h-2z"/>
+<path fill="#ABA5B1" d="M3 5h1v1h-1zM8 5h1v1h-1zM4 7h2v1h-2zM4 8h1v1h-1zM3 9h1v2h-1zM4 11h1v1h-1zM7 6h1v6h-1zM5 12h3v1h-3zM7 13h1v1h-1z"/>
+<path fill="#B2AEB6" d="M6 4h1v1h-1z"/>
+<path fill="#B31E02" d="M11 5h1v1h-1zM9 6h2v1h-2zM6 7h1v1h-1zM5 8h1v1h-1zM9 8h1v1h-1zM4 9h1v1h-1zM9 9h2v1h-2zM5 10h2v1h-2z"/>
+<path fill="#C4C2C5" d="M4 3h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM4 4h2v1h-2zM10 4h2v1h-2zM2 5h1v1h-1zM7 5h1v1h-1zM3 6h1v1h-1z"/>
+<path fill="#E94D24" d="M4 5h1v1h-1zM5 6h2v1h-2zM6 8h1v1h-1zM5 9h2v1h-2z"/>
+<path fill="#E9E9E9" d="M3 3h1v1h-1zM7 3h1v1h-1zM12 3h1v1h-1z"/>
+<path fill="#F3F3F3" d="M4 10h1v1h-1zM5 11h2v1h-2z"/>
+</svg>

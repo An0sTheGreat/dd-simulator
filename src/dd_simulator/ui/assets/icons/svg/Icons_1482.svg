@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Sand Vortex</title>
+<desc>Atlas index 1482; category spell; subtype earth; tags earth|magic|yellow; visual tier 3</desc>
+<path fill="#742C13" d="M5 1h1v1h-1zM6 2h1v1h-1zM4 3h1v1h-1zM10 3h1v1h-1zM5 4h1v1h-1zM7 3h1v2h-1zM11 4h2v1h-2zM6 5h1v1h-1zM7 6h2v1h-2zM13 5h1v2h-1zM2 7h1v1h-1zM9 7h2v1h-2zM3 8h1v1h-1zM11 8h1v1h-1zM4 9h1v1h-1zM5 10h1v1h-1zM12 9h1v4h-1zM8 13h4v1h-4z"/>
+<path fill="#823616" d="M2 1h1v1h-1zM11 1h3v1h-3zM13 2h2v1h-2zM1 2h1v2h-1zM14 3h1v1h-1zM1 12h1v1h-1zM1 13h2v1h-2zM14 12h1v2h-1zM2 14h3v1h-3zM13 14h1v1h-1z"/>
+<path fill="#8F481F" d="M4 2h1v1h-1zM5 3h1v1h-1zM3 3h1v2h-1zM6 4h1v1h-1zM9 4h1v1h-1zM10 5h1v1h-1zM4 5h1v2h-1zM11 6h1v1h-1zM12 7h2v1h-2zM1 8h1v1h-1zM5 7h1v2h-1zM2 9h1v2h-1zM3 11h2v1h-2zM6 9h1v3h-1zM7 12h1v1h-1z"/>
+<path fill="#BA7644" d="M4 4h1v1h-1zM5 5h1v1h-1zM5 6h2v1h-2zM6 7h3v1h-3zM6 8h1v1h-1zM9 8h2v1h-2zM11 9h1v1h-1zM7 11h1v1h-1zM8 12h1v1h-1z"/>
+<path fill="#C3742A" d="M3 1h1v1h-1zM8 1h3v1h-3zM2 2h1v1h-1zM9 2h1v1h-1zM11 2h2v1h-2zM13 3h1v1h-1zM1 4h1v1h-1zM14 4h1v1h-1zM1 5h2v1h-2zM1 6h1v1h-1zM1 11h1v1h-1zM14 8h1v4h-1zM2 12h1v1h-1zM3 13h3v1h-3zM13 13h1v1h-1zM5 14h2v1h-2zM12 14h1v1h-1z"/>
+<path fill="#E5AF6C" d="M5 2h1v1h-1zM10 4h1v1h-1zM11 5h2v1h-2zM2 8h1v1h-1zM7 8h2v1h-2zM7 9h4v1h-4zM3 9h1v2h-1zM7 10h2v1h-2zM10 10h1v1h-1zM8 11h2v1h-2zM11 11h1v1h-1zM9 12h1v1h-1z"/>
+<path fill="#E6B75E" d="M4 1h1v1h-1zM6 1h2v1h-2zM3 2h1v1h-1zM7 2h2v1h-2zM10 2h1v1h-1zM8 3h2v1h-2zM11 3h2v1h-2zM2 3h1v2h-1zM8 4h1v1h-1zM13 4h1v1h-1zM3 5h1v1h-1zM7 5h3v1h-3zM2 6h2v1h-2zM9 6h2v1h-2zM1 7h1v1h-1zM3 7h2v1h-2zM11 7h1v1h-1zM14 5h1v3h-1zM4 8h1v1h-1zM12 8h2v1h-2zM5 9h1v1h-1zM13 9h1v1h-1zM1 9h1v2h-1zM5 11h1v2h-1zM13 12h1v1h-1zM6 13h1v1h-1zM12 13h1v1h-1zM7 14h2v1h-2zM11 14h1v1h-1z"/>
+<path fill="#F7DB7A" d="M2 11h1v1h-1zM13 10h1v2h-1zM3 12h2v1h-2zM6 12h1v1h-1zM7 13h1v1h-1zM9 14h2v1h-2z"/>
+<path fill="#FFD68E" d="M6 3h1v1h-1zM12 6h1v1h-1zM4 10h1v1h-1zM9 10h1v1h-1zM11 10h1v1h-1zM10 11h1v1h-1zM10 12h2v1h-2z"/>
+</svg>

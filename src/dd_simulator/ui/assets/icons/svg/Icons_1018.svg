@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Honey Cluster</title>
+<desc>Atlas index 1018; category food; subtype ingredient; tags consumable|ingredient|yellow; visual tier 1</desc>
+<path fill="#591300" d="M9 3h1v1h-1zM10 4h2v1h-2zM12 5h1v1h-1zM13 6h1v3h-1zM12 9h1v3h-1zM6 12h2v1h-2zM11 12h1v1h-1zM4 13h2v1h-2zM8 13h3v1h-3z"/>
+<path fill="#652500" d="M6 2h3v1h-3zM5 3h1v1h-1zM3 4h2v1h-2zM2 5h1v1h-1zM1 6h1v3h-1zM2 9h1v3h-1zM3 12h1v1h-1z"/>
+<path fill="#E48211" d="M8 3h1v1h-1zM6 4h2v1h-2zM9 4h1v1h-1zM6 5h1v1h-1zM11 5h1v1h-1zM3 6h2v1h-2zM9 6h2v1h-2zM3 7h1v1h-1zM6 7h2v1h-2zM9 7h1v1h-1zM12 6h1v2h-1zM2 8h1v1h-1zM6 8h1v1h-1zM11 8h2v1h-2zM4 9h2v1h-2zM8 9h2v1h-2zM4 10h1v1h-1zM8 10h1v1h-1zM11 9h1v2h-1zM3 11h1v1h-1zM6 11h2v1h-2zM10 11h2v1h-2zM4 12h2v1h-2zM8 12h3v1h-3z"/>
+<path fill="#F5BA2A" d="M7 5h1v1h-1zM5 6h1v1h-1zM4 7h1v1h-1zM3 8h1v1h-1zM7 8h2v1h-2zM10 7h1v2h-1zM5 10h1v1h-1zM9 10h1v1h-1z"/>
+<path fill="#FBDF31" d="M7 3h1v1h-1zM4 5h1v1h-1zM8 4h1v2h-1zM10 5h1v1h-1zM7 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM11 6h1v2h-1zM4 8h1v1h-1zM9 8h1v1h-1zM6 9h1v2h-1zM10 9h1v2h-1zM4 11h2v1h-2zM8 11h2v1h-2z"/>
+<path fill="#FFFBA2" d="M6 3h1v1h-1zM3 5h1v1h-1zM5 4h1v2h-1zM9 5h1v1h-1zM2 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM5 7h1v2h-1zM3 9h1v2h-1zM7 9h1v2h-1z"/>
+</svg>

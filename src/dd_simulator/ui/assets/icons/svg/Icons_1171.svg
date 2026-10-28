@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Pink Coral</title>
+<desc>Atlas index 1171; category material; subtype monster_part; tags crafting|ingredient|pink; visual tier 1</desc>
+<path fill="#560027" d="M12 3h1v1h-1zM8 3h1v2h-1zM10 4h2v1h-2zM13 4h1v1h-1zM11 5h1v1h-1zM14 5h1v1h-1zM9 5h1v2h-1zM13 6h1v1h-1zM12 7h1v1h-1zM13 8h1v1h-1zM14 9h1v1h-1zM13 10h1v1h-1zM12 11h1v1h-1zM10 12h2v1h-2zM13 12h1v1h-1zM9 13h1v1h-1zM12 13h1v1h-1zM7 14h2v1h-2z"/>
+<path fill="#6B0029" d="M7 2h1v1h-1zM3 3h1v1h-1zM6 3h1v1h-1zM2 4h1v1h-1zM4 4h2v1h-2zM1 5h1v1h-1zM4 5h3v1h-3zM2 6h1v1h-1zM3 7h2v1h-2zM8 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM11 8h1v1h-1zM2 9h2v1h-2zM7 8h1v2h-1zM10 9h1v1h-1zM1 10h1v1h-1zM3 10h3v1h-3zM2 11h1v1h-1zM3 12h1v1h-1zM5 12h2v1h-2zM9 12h1v1h-1zM4 13h1v1h-1zM6 13h1v1h-1z"/>
+<path fill="#9F2A5F" d="M9 11h1v1h-1zM8 13h1v1h-1z"/>
+<path fill="#B63B5E" d="M5 6h2v1h-2z"/>
+<path fill="#BA3E5D" d="M11 7h1v1h-1zM8 8h1v1h-1zM10 8h1v1h-1zM11 9h1v1h-1zM12 10h1v1h-1zM10 11h1v1h-1z"/>
+<path fill="#CB4D64" d="M3 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM5 7h1v1h-1zM7 7h1v1h-1zM6 8h1v1h-1zM7 10h2v1h-2zM7 11h1v1h-1zM8 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#DD5860" d="M5 11h1v1h-1z"/>
+<path fill="#E06269" d="M8 5h1v1h-1zM10 5h1v1h-1zM13 5h1v1h-1zM7 6h1v1h-1zM12 6h1v1h-1zM10 7h1v1h-1zM6 9h1v1h-1zM8 9h2v1h-2zM12 9h2v1h-2zM9 10h1v1h-1zM11 10h1v2h-1zM12 12h1v1h-1z"/>
+<path fill="#FA8882" d="M3 5h1v1h-1zM7 4h1v2h-1zM12 4h1v2h-1zM4 6h1v1h-1zM11 6h1v1h-1zM6 7h1v1h-1zM3 8h1v1h-1zM5 8h1v1h-1zM9 7h1v2h-1zM12 8h1v1h-1zM4 9h2v1h-2zM10 10h1v1h-1zM6 10h1v2h-1zM8 11h1v1h-1zM4 11h1v2h-1zM7 12h1v1h-1z"/>
+<path fill="#FFA99D" d="M7 3h1v1h-1zM3 4h1v1h-1zM6 4h1v1h-1zM2 5h1v1h-1zM2 10h1v1h-1zM3 11h1v1h-1z"/>
+</svg>

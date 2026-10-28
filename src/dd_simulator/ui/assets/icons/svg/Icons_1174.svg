@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Large Sack</title>
+<desc>Atlas index 1174; category misc; subtype sack; tags storage|orange; visual tier 1</desc>
+<path fill="#3B002B" d="M9 4h1v1h-1zM11 3h1v3h-1zM10 7h1v1h-1zM11 8h1v1h-1zM12 9h1v3h-1zM11 12h1v1h-1zM5 13h6v1h-6z"/>
+<path fill="#520606" d="M8 2h3v1h-3zM6 3h2v1h-2zM5 4h1v1h-1zM8 4h1v1h-1zM6 5h1v1h-1zM7 6h4v1h-4zM5 7h2v1h-2zM4 8h1v1h-1zM3 9h1v3h-1zM4 12h1v1h-1z"/>
+<path fill="#893E29" d="M9 3h2v1h-2zM7 4h1v1h-1zM10 5h1v1h-1zM9 8h2v1h-2zM10 9h2v2h-2zM4 11h1v1h-1zM9 11h3v1h-3zM5 12h6v1h-6z"/>
+<path fill="#9F593B" d="M5 8h1v1h-1zM4 9h1v1h-1zM7 8h1v2h-1zM9 9h1v1h-1zM8 10h1v1h-1zM7 11h1v1h-1z"/>
+<path fill="#BA7A51" d="M8 3h1v1h-1zM6 4h1v1h-1zM10 4h1v1h-1zM7 5h3v1h-3zM5 9h1v1h-1zM4 10h1v1h-1zM6 10h2v1h-2zM9 10h1v1h-1zM5 11h2v1h-2zM8 11h1v1h-1z"/>
+<path fill="#BD8162" d="M9 7h1v1h-1z"/>
+<path fill="#CA9470" d="M6 6h1v1h-1z"/>
+<path fill="#DCAC85" d="M8 7h1v1h-1z"/>
+<path fill="#ECC297" d="M7 7h1v1h-1zM6 9h1v1h-1zM8 8h1v2h-1zM5 10h1v1h-1z"/>
+<path fill="#F7CEA4" d="M6 8h1v1h-1z"/>
+</svg>

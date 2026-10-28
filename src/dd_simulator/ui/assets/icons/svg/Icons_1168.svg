@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Green Herbs</title>
+<desc>Atlas index 1168; category material; subtype monster_part; tags crafting|ingredient|green; visual tier 0</desc>
+<path fill="#003A1F" d="M12 4h1v2h-1zM11 6h1v1h-1zM14 7h1v1h-1zM13 8h1v1h-1zM12 9h1v1h-1zM11 10h1v1h-1zM10 11h1v2h-1zM6 13h4v1h-4z"/>
+<path fill="#004404" d="M3 2h2v1h-2zM5 3h1v1h-1zM11 3h2v1h-2zM6 4h1v1h-1zM9 4h2v1h-2zM3 3h1v3h-1zM7 5h2v1h-2zM4 6h1v1h-1zM12 6h2v1h-2zM3 7h2v1h-2zM7 6h1v2h-1zM10 7h2v1h-2zM2 8h1v1h-1zM5 8h1v1h-1zM9 8h1v1h-1zM3 9h1v1h-1zM6 9h1v1h-1zM4 10h1v1h-1zM5 11h1v2h-1z"/>
+<path fill="#035422" d="M10 8h1v1h-1zM7 8h1v2h-1zM9 9h1v1h-1zM7 10h2v1h-2zM7 11h1v1h-1zM8 12h2v1h-2z"/>
+<path fill="#1D8022" d="M6 5h1v1h-1zM5 7h1v1h-1zM6 8h1v1h-1zM8 9h1v1h-1zM11 9h1v1h-1zM6 10h1v1h-1zM9 10h1v1h-1zM8 11h2v1h-2zM6 12h2v1h-2z"/>
+<path fill="#57AA3D" d="M5 5h1v1h-1zM11 5h1v1h-1zM9 6h1v1h-1zM6 6h1v2h-1zM8 7h2v1h-2zM8 8h1v1h-1zM12 8h1v1h-1zM4 9h1v1h-1zM5 10h1v1h-1zM10 9h1v2h-1zM6 11h1v1h-1z"/>
+<path fill="#8ECE65" d="M5 4h1v1h-1zM4 5h1v1h-1zM9 5h1v1h-1zM5 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM13 7h1v1h-1zM3 8h1v1h-1zM11 8h1v1h-1zM5 9h1v1h-1z"/>
+<path fill="#BFE88C" d="M4 3h1v2h-1zM11 4h1v1h-1zM10 5h1v1h-1zM12 7h1v1h-1zM4 8h1v1h-1z"/>
+</svg>

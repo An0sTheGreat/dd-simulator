@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dnd-simulator"
+version = "0.27.0"
+description = "Local-first D&D-style single-player adventure desktop application"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "PySide6>=6.8,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<10",
+    "pyinstaller>=6.11,<7",
+]
+
+[project.scripts]
+dnd-simulator = "dd_simulator.app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dd_simulator = [
+    "state/presets/*.json",
+    "ui/assets/fonts/*",
+    "ui/assets/icons/*",
+    "ui/assets/icons/svg/*",
+    "ui/assets/icons/ui_pack/*",
+    "ui/assets/inventory/*",
+    "ui/assets/location/*/*.png",
+    "ui/themes/*/*.json",
+    "ui/themes/*/*.qss",
+    "ui/themes/*/assets/*",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["src"]

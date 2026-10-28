@@ -1,0 +1,13 @@
+D&D Simulator local AI components
+
+llama.cpp
+Copyright (c) 2023-2026 The ggml authors
+MIT License; see llama.cpp-LICENSE.txt.
+Source: https://github.com/ggml-org/llama.cpp
+Bundled runtime release: b10107
+
+Primary recommended model: Qwen3-4B-Q4_K_M.gguf
+The model is downloaded directly from Qwen/Qwen3-4B-GGUF and is not included
+in the D&D Simulator installer. It is offered under Apache-2.0.
+Source: https://huggingface.co/Qwen/Qwen3-4B-GGUF
+License: https://huggingface.co/Qwen/Qwen3-4B-GGUF/blob/main/LICENSE

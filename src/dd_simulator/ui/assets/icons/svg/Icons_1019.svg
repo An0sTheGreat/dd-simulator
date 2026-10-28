@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Tea Kettle</title>
+<desc>Atlas index 1019; category food; subtype drink; tags consumable|ingredient|orange; visual tier 1</desc>
+<path fill="#3B002B" d="M11 4h1v1h-1zM12 5h1v2h-1zM11 7h1v1h-1zM12 8h1v1h-1zM13 9h1v4h-1zM12 13h1v1h-1zM4 14h8v1h-8z"/>
+<path fill="#520606" d="M10 1h2v1h-2zM9 2h1v1h-1zM5 3h5v1h-5zM12 2h1v2h-1zM4 4h1v1h-1zM8 4h1v1h-1zM6 5h3v1h-3zM10 5h1v1h-1zM3 5h1v2h-1zM4 7h1v1h-1zM3 8h1v1h-1zM2 9h1v4h-1zM3 13h1v1h-1z"/>
+<path fill="#752D10" d="M12 10h1v2h-1zM11 12h2v1h-2zM10 13h2v1h-2z"/>
+<path fill="#8C471D" d="M5 8h1v1h-1zM7 8h5v1h-5zM6 9h1v1h-1zM11 9h2v1h-2zM3 10h1v1h-1zM10 10h2v1h-2zM4 11h8v1h-8zM3 12h1v1h-1zM9 12h2v1h-2zM4 13h6v1h-6z"/>
+<path fill="#A96833" d="M10 2h1v1h-1zM11 3h1v1h-1zM10 4h1v1h-1zM9 5h1v1h-1zM4 8h1v1h-1zM3 9h1v1h-1zM5 9h1v1h-1zM7 9h4v1h-4zM4 10h1v1h-1zM7 10h3v1h-3zM3 11h1v1h-1zM4 12h1v1h-1zM7 12h2v1h-2z"/>
+<path fill="#C38A4C" d="M4 9h1v1h-1zM5 10h2v1h-2zM5 12h2v1h-2z"/>
+<path fill="#D57310" d="M10 7h1v1h-1z"/>
+<path fill="#DBA862" d="M11 2h1v1h-1zM10 3h1v1h-1zM9 4h1v1h-1z"/>
+<path fill="#E48211" d="M5 4h1v1h-1zM4 6h1v1h-1zM11 6h1v1h-1zM5 7h1v1h-1zM7 7h1v1h-1zM9 7h1v1h-1z"/>
+<path fill="#FBE246" d="M6 4h2v1h-2zM4 5h1v1h-1zM11 5h1v1h-1zM5 6h1v1h-1zM8 6h3v1h-3zM8 7h1v1h-1zM6 8h1v1h-1z"/>
+<path fill="#FFFBA2" d="M5 5h1v1h-1zM6 6h2v1h-2zM6 7h1v1h-1z"/>
+</svg>

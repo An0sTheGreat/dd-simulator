@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Purple Grapes</title>
+<desc>Atlas index 991; category food; subtype fruit; tags consumable|ingredient|purple; visual tier 0</desc>
+<path fill="#004404" d="M8 2h3v1h-3zM7 3h1v1h-1zM11 3h2v1h-2zM13 4h1v1h-1zM12 5h1v1h-1zM13 6h1v3h-1z"/>
+<path fill="#217D38" d="M10 4h1v1h-1zM11 6h1v1h-1z"/>
+<path fill="#44A83D" d="M10 3h1v1h-1zM9 4h1v1h-1zM12 6h1v1h-1zM11 7h1v1h-1z"/>
+<path fill="#460636" d="M10 7h1v1h-1zM11 8h1v1h-1zM12 9h1v2h-1zM9 11h3v1h-3zM6 12h3v1h-3zM3 13h3v1h-3z"/>
+<path fill="#4C0F4F" d="M6 4h3v1h-3zM9 5h1v1h-1zM5 5h1v2h-1zM4 7h1v2h-1zM3 9h1v2h-1zM2 11h1v2h-1z"/>
+<path fill="#7018A2" d="M7 7h2v1h-2zM7 8h1v1h-1zM9 8h2v1h-2zM5 9h3v1h-3zM9 9h1v1h-1zM7 10h3v1h-3zM8 11h1v1h-1zM5 11h1v2h-1z"/>
+<path fill="#893E29" d="M11 5h1v1h-1zM10 6h1v1h-1z"/>
+<path fill="#8A3ACE" d="M8 5h1v1h-1zM6 6h2v1h-2zM6 8h1v1h-1zM4 10h1v1h-1zM11 10h1v1h-1zM7 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#9BD164" d="M8 3h2v1h-2zM12 7h1v2h-1z"/>
+<path fill="#AB6FEE" d="M7 5h1v1h-1zM6 7h1v1h-1zM9 6h1v2h-1zM5 8h1v1h-1zM8 9h1v1h-1zM11 9h1v1h-1zM5 10h1v1h-1zM10 10h1v1h-1zM4 11h1v1h-1zM6 11h1v1h-1zM3 12h1v1h-1z"/>
+<path fill="#AD7048" d="M10 5h1v1h-1z"/>
+<path fill="#BB855A" d="M11 4h2v1h-2z"/>
+<path fill="#BE8FFE" d="M4 9h1v1h-1z"/>
+<path fill="#E5AFFF" d="M6 5h1v1h-1zM8 6h1v1h-1zM5 7h1v1h-1zM8 8h1v1h-1zM10 9h1v1h-1zM6 10h1v1h-1zM3 11h1v1h-1z"/>
+</svg>

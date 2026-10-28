@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Masterwork Cobalt Ring</title>
+<desc>Atlas index 907; category armor; subtype ring; tags blue|ring|accessory|finger|magic|cobalt|ornate; visual tier 2</desc>
+<path fill="#163A87" d="M3 2h2v1h-2zM2 3h1v1h-1zM1 4h1v2h-1zM2 6h1v1h-1z"/>
+<path fill="#1A1D7F" d="M5 3h1v1h-1zM6 4h1v2h-1zM5 6h1v1h-1z"/>
+<path fill="#1B0542" d="M11 4h1v1h-1zM12 5h1v1h-1zM8 6h1v1h-1zM7 7h1v1h-1zM6 8h1v2h-1zM9 7h1v3h-1zM7 10h2v1h-2zM13 6h1v5h-1zM12 11h1v1h-1zM11 12h1v1h-1zM5 13h6v1h-6z"/>
+<path fill="#20184F" d="M6 3h5v1h-5zM2 7h1v4h-1zM3 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#314596" d="M3 7h2v1h-2z"/>
+<path fill="#46456F" d="M9 6h2v1h-2zM10 7h1v1h-1zM11 8h1v2h-1zM6 10h1v1h-1zM7 11h3v1h-3z"/>
+<path fill="#4A8AD6" d="M5 5h1v1h-1zM3 6h2v1h-2z"/>
+<path fill="#57B0DA" d="M2 4h1v2h-1z"/>
+<path fill="#676DA1" d="M10 4h1v1h-1zM11 7h1v1h-1zM10 8h1v2h-1zM9 10h3v1h-3zM10 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#A5F0F9" d="M3 3h2v1h-2zM5 4h1v1h-1zM3 5h2v1h-2z"/>
+<path fill="#A6AFC6" d="M8 4h2v1h-2zM10 5h2v1h-2zM11 6h2v1h-2zM12 7h1v2h-1zM3 10h2v1h-2zM4 11h2v1h-2zM6 12h3v1h-3z"/>
+<path fill="#C5C9D3" d="M7 4h1v1h-1zM7 5h3v1h-3zM3 8h2v2h-2z"/>
+<path fill="#FFFFFF" d="M3 4h2v1h-2zM6 6h2v1h-2zM5 7h2v1h-2zM5 8h1v3h-1zM12 9h1v2h-1zM6 11h1v1h-1zM11 11h1v1h-1zM9 12h2v1h-2z"/>
+</svg>

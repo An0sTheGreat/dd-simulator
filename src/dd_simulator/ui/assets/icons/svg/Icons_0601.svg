@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Stormbound Sunforged Shield</title>
+<desc>Atlas index 601; category armor; subtype shield; tags yellow|shield|defense|off-hand|armor|sunforged|ornate|magic; visual tier 3</desc>
+<path fill="#3B002B" d="M11 2h1v1h-1zM12 3h1v1h-1zM13 4h1v1h-1zM14 5h1v6h-1zM13 11h1v1h-1zM12 12h1v1h-1zM11 13h1v1h-1zM5 14h6v1h-6z"/>
+<path fill="#520606" d="M5 1h6v1h-6zM4 2h1v1h-1zM3 3h1v1h-1zM2 4h1v1h-1zM1 5h1v6h-1zM2 11h1v1h-1zM3 12h1v1h-1zM4 13h1v1h-1z"/>
+<path fill="#76311F" d="M9 3h2v1h-2zM9 4h3v1h-3zM11 5h2v1h-2zM9 5h1v4h-1zM7 9h3v1h-3zM12 6h1v4h-1zM9 10h1v1h-1zM11 10h2v1h-2zM9 11h3v1h-3zM7 12h4v1h-4z"/>
+<path fill="#828AA6" d="M8 8h1v1h-1z"/>
+<path fill="#89492A" d="M5 3h4v1h-4zM4 4h1v1h-1zM6 4h1v2h-1zM6 6h3v1h-3zM3 5h1v6h-1zM4 11h1v1h-1zM6 7h1v5h-1zM5 12h2v1h-2z"/>
+<path fill="#A16737" d="M9 2h2v1h-2zM11 3h1v1h-1zM5 4h1v1h-1zM12 4h1v1h-1zM4 5h1v1h-1zM8 4h1v2h-1zM10 5h1v1h-1zM11 6h1v3h-1zM5 8h1v2h-1zM10 9h2v1h-2zM4 10h2v1h-2zM8 10h1v1h-1zM10 10h1v1h-1zM13 5h1v6h-1zM5 11h1v1h-1zM7 11h2v1h-2zM12 11h1v1h-1zM11 12h1v1h-1zM7 13h4v1h-4z"/>
+<path fill="#C5C9D3" d="M8 7h1v1h-1zM7 8h1v1h-1z"/>
+<path fill="#D59F65" d="M7 2h2v1h-2zM3 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM5 5h1v1h-1zM4 6h1v1h-1zM5 7h1v1h-1zM2 8h1v1h-1zM10 6h1v3h-1zM4 9h1v1h-1zM2 10h1v1h-1zM7 10h1v1h-1zM3 11h1v1h-1zM4 12h1v1h-1zM5 13h2v1h-2z"/>
+<path fill="#E2BC78" d="M5 2h2v1h-2zM4 3h1v1h-1zM7 5h1v1h-1zM5 6h1v1h-1zM2 6h1v2h-1zM4 7h1v2h-1zM2 9h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 7h1v1h-1z"/>
+</svg>

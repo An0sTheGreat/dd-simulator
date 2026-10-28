@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Polished Bronze Armor</title>
+<desc>Atlas index 735; category armor; subtype chestpiece; tags orange|chestpiece|defense|body|armor|bronze; visual tier 1</desc>
+<path fill="#320326" d="M6 3h1v1h-1zM9 3h1v1h-1zM7 4h2v1h-2z"/>
+<path fill="#3D160B" d="M12 3h1v1h-1zM13 4h1v1h-1zM14 5h1v2h-1zM13 7h1v1h-1zM12 8h1v1h-1zM11 9h1v2h-1zM12 11h1v2h-1zM11 13h1v1h-1zM5 14h6v1h-6z"/>
+<path fill="#49291A" d="M3 3h1v1h-1zM2 4h1v1h-1zM1 5h1v2h-1zM2 7h1v1h-1zM3 8h1v1h-1zM4 9h1v2h-1zM3 11h1v2h-1zM4 13h1v1h-1z"/>
+<path fill="#520606" d="M6 1h4v1h-4zM5 2h1v1h-1zM10 2h1v1h-1zM4 3h1v1h-1zM11 3h1v1h-1z"/>
+<path fill="#543927" d="M7 3h2v1h-2z"/>
+<path fill="#5A1C14" d="M5 10h1v1h-1zM10 10h1v1h-1zM6 11h4v1h-4z"/>
+<path fill="#836545" d="M4 8h1v1h-1zM11 8h1v1h-1zM11 11h1v1h-1z"/>
+<path fill="#8D422D" d="M10 3h1v1h-1zM9 4h1v1h-1zM11 4h1v2h-1zM10 6h1v1h-1zM9 7h1v3h-1zM6 10h4v1h-4zM6 12h1v1h-1zM9 12h1v1h-1zM6 13h4v1h-4z"/>
+<path fill="#A36242" d="M6 2h1v1h-1zM9 2h1v1h-1zM5 3h1v1h-1zM6 4h1v1h-1zM4 4h1v2h-1zM7 5h2v1h-2zM5 6h1v1h-1zM6 7h1v3h-1zM8 9h1v1h-1zM7 12h2v1h-2z"/>
+<path fill="#A68D6C" d="M10 4h1v1h-1zM12 4h1v1h-1zM9 5h2v1h-2zM13 5h1v1h-1zM6 6h1v1h-1zM9 6h1v1h-1zM10 7h2v1h-2zM5 9h1v1h-1zM10 8h1v2h-1zM4 11h1v1h-1zM10 11h1v2h-1z"/>
+<path fill="#C4845F" d="M7 2h2v1h-2zM7 7h2v2h-2zM7 9h1v1h-1z"/>
+<path fill="#CABA9C" d="M3 4h1v1h-1zM5 4h1v1h-1zM2 5h1v1h-1zM5 5h2v1h-2zM12 5h1v1h-1zM7 6h2v1h-2zM11 6h3v1h-3zM4 7h2v1h-2zM12 7h1v1h-1zM5 8h1v1h-1zM5 11h1v2h-1zM11 12h1v1h-1zM10 13h1v1h-1z"/>
+<path fill="#E2DAC3" d="M3 5h1v1h-1zM2 6h3v1h-3zM3 7h1v1h-1zM4 12h1v1h-1zM5 13h1v1h-1z"/>
+</svg>

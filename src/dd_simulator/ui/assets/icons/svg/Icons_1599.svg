@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Ranger Trap</title>
+<desc>Atlas index 1599; category skill; subtype ranger; tags ranger|ability|green; visual tier 3</desc>
+<path fill="#435600" d="M7 6h2v1h-2zM6 7h1v2h-1zM9 7h1v2h-1zM7 9h2v1h-2z"/>
+<path fill="#4B7A15" d="M5 1h2v1h-2zM9 1h2v1h-2zM3 2h1v1h-1zM12 2h1v1h-1zM2 3h1v1h-1zM13 3h1v1h-1zM6 4h1v1h-1zM9 4h1v1h-1zM5 5h6v1h-6zM1 5h1v2h-1zM4 6h3v1h-3zM9 6h3v1h-3zM14 5h1v2h-1zM5 7h1v2h-1zM10 7h1v2h-1zM4 9h3v1h-3zM9 9h3v1h-3zM1 9h1v2h-1zM5 10h6v1h-6zM14 9h1v2h-1zM6 11h1v1h-1zM9 11h1v1h-1zM2 12h1v1h-1zM13 12h1v1h-1zM3 13h1v1h-1zM12 13h1v1h-1zM5 14h2v1h-2zM9 14h2v1h-2z"/>
+<path fill="#828282" d="M4 2h1v1h-1zM11 2h1v1h-1zM5 3h1v1h-1zM10 3h1v1h-1zM2 4h1v1h-1zM13 4h1v1h-1zM3 5h1v1h-1zM12 5h1v1h-1zM3 10h1v1h-1zM12 10h1v1h-1zM2 11h1v1h-1zM13 11h1v1h-1zM5 12h1v1h-1zM10 12h1v1h-1zM4 13h1v1h-1zM11 13h1v1h-1z"/>
+<path fill="#84AB38" d="M6 3h1v1h-1zM9 3h1v1h-1zM4 4h2v1h-2zM10 4h2v1h-2zM4 5h1v1h-1zM11 5h1v1h-1zM3 6h1v1h-1zM12 6h1v1h-1zM3 9h1v1h-1zM12 9h1v1h-1zM4 10h1v1h-1zM11 10h1v1h-1zM4 11h2v1h-2zM10 11h2v1h-2zM6 12h1v1h-1zM9 12h1v1h-1z"/>
+<path fill="#94B84E" d="M2 1h3v1h-3zM11 1h3v1h-3zM1 2h2v1h-2zM13 2h2v1h-2zM1 3h1v2h-1zM14 3h1v2h-1zM1 11h1v2h-1zM14 11h1v2h-1zM1 13h2v1h-2zM13 13h2v1h-2zM2 14h3v1h-3zM11 14h3v1h-3z"/>
+<path fill="#C97A3C" d="M7 7h2v2h-2z"/>
+<path fill="#D0D0D0" d="M3 3h1v1h-1zM12 3h1v1h-1zM3 12h1v1h-1zM12 12h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 1h2v1h-2zM5 2h6v1h-6zM4 3h1v1h-1zM11 3h1v1h-1zM3 4h1v1h-1zM7 3h2v2h-2zM12 4h1v1h-1zM2 5h1v2h-1zM13 5h1v2h-1zM1 7h4v2h-4zM11 7h4v2h-4zM2 9h1v2h-1zM13 9h1v2h-1zM3 11h1v1h-1zM12 11h1v1h-1zM4 12h1v1h-1zM7 11h2v2h-2zM11 12h1v1h-1zM5 13h6v1h-6zM7 14h2v1h-2z"/>
+</svg>

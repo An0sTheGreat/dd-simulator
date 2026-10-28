@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Enchanted Cobalt Greataxe</title>
+<desc>Atlas index 247; category weapon; subtype greataxe; tags blue|greataxe|metal|melee|two-handed|cobalt|ornate; visual tier 2</desc>
+<path fill="#162376" d="M14 3h1v1h-1zM13 4h1v1h-1zM14 5h1v5h-1zM7 10h1v1h-1zM13 10h1v1h-1zM12 11h1v1h-1zM9 12h3v1h-3zM4 13h1v1h-1zM1 14h4v1h-4z"/>
+<path fill="#163A87" d="M7 1h5v1h-5zM6 2h1v1h-1zM11 2h4v1h-4zM5 3h1v1h-1zM11 3h1v1h-1zM10 4h1v1h-1zM9 5h1v1h-1zM12 5h2v1h-2zM4 4h1v3h-1zM6 6h3v1h-3zM4 7h2v1h-2zM7 7h1v1h-1zM6 8h1v1h-1zM9 8h1v3h-1zM1 11h2v1h-2zM3 12h1v1h-1zM8 11h1v2h-1zM1 12h1v2h-1z"/>
+<path fill="#3368AB" d="M11 6h1v1h-1zM10 7h1v1h-1z"/>
+<path fill="#3B002B" d="M8 9h1v1h-1zM6 11h1v1h-1zM5 12h1v1h-1z"/>
+<path fill="#520606" d="M5 9h1v1h-1zM4 10h1v1h-1zM3 11h1v1h-1z"/>
+<path fill="#742E10" d="M11 5h1v1h-1zM9 7h1v1h-1zM7 9h1v1h-1zM5 11h1v1h-1zM4 12h1v1h-1z"/>
+<path fill="#84CEEC" d="M10 6h1v1h-1zM8 8h1v1h-1zM6 10h1v1h-1z"/>
+<path fill="#984E28" d="M10 5h1v1h-1zM9 6h1v1h-1zM6 9h1v1h-1zM5 10h1v1h-1zM4 11h1v1h-1z"/>
+<path fill="#9BEBFF" d="M9 3h2v1h-2zM6 4h2v1h-2zM9 4h1v1h-1zM11 4h2v1h-2zM6 5h3v1h-3zM12 6h1v1h-1zM8 7h1v1h-1zM11 7h1v1h-1zM7 8h1v1h-1zM10 8h1v1h-1zM10 9h3v1h-3zM10 10h2v1h-2zM2 12h1v1h-1zM3 13h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 2h4v1h-4zM6 3h3v1h-3zM12 3h2v1h-2zM8 4h1v1h-1zM5 4h1v3h-1zM13 6h1v1h-1zM12 7h2v1h-2zM11 8h3v1h-3zM13 9h1v1h-1zM12 10h1v1h-1zM9 11h3v1h-3zM2 13h1v1h-1z"/>
+</svg>

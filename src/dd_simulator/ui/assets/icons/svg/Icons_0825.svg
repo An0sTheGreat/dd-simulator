@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Arcane Crimson Amulet</title>
+<desc>Atlas index 825; category armor; subtype amulet; tags red|amulet|accessory|neck|magic|crimson|ornate; visual tier 3</desc>
+<path fill="#003B14" d="M11 11h1v2h-1zM7 13h1v1h-1zM10 13h1v1h-1zM8 14h2v1h-2z"/>
+<path fill="#034903" d="M8 9h2v1h-2zM7 10h1v1h-1zM10 10h1v1h-1zM6 11h1v2h-1z"/>
+<path fill="#3B002B" d="M13 4h1v1h-1zM14 5h1v4h-1zM13 9h1v1h-1zM12 10h1v1h-1z"/>
+<path fill="#520606" d="M5 1h3v1h-3zM4 2h1v1h-1zM8 2h4v1h-4zM12 3h1v1h-1zM5 4h3v1h-3zM8 5h4v1h-4zM3 3h1v5h-1zM5 5h1v3h-1zM12 6h1v3h-1zM4 8h1v2h-1zM6 8h1v2h-1zM11 9h1v1h-1zM5 10h1v1h-1z"/>
+<path fill="#52C730" d="M9 10h1v1h-1zM10 11h1v2h-1zM9 13h1v1h-1z"/>
+<path fill="#8D422D" d="M5 3h3v1h-3zM8 4h4v1h-4zM12 5h1v1h-1z"/>
+<path fill="#A16737" d="M7 2h1v1h-1zM8 3h1v1h-1zM11 3h1v1h-1zM12 4h1v1h-1zM13 5h1v1h-1zM13 8h1v1h-1zM12 9h1v1h-1zM6 10h1v1h-1zM11 10h1v1h-1z"/>
+<path fill="#BDFD6B" d="M8 10h1v1h-1zM7 11h1v2h-1zM9 12h1v1h-1zM8 13h1v1h-1z"/>
+<path fill="#D59F65" d="M5 2h2v1h-2zM9 3h2v1h-2zM4 3h1v5h-1zM13 6h1v2h-1zM5 8h1v2h-1z"/>
+<path fill="#FFFFFF" d="M8 11h2v1h-2zM8 12h1v1h-1z"/>
+</svg>

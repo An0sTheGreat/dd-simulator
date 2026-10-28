@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Peach</title>
+<desc>Atlas index 964; category food; subtype fruit; tags consumable|ingredient|orange; visual tier 0</desc>
+<path fill="#003A1F" d="M11 3h1v1h-1zM12 4h1v1h-1zM11 5h1v1h-1z"/>
+<path fill="#004404" d="M4 2h3v1h-3zM9 2h2v1h-2zM3 3h1v1h-1zM7 3h2v1h-2zM4 4h1v1h-1z"/>
+<path fill="#217D38" d="M5 4h1v1h-1zM8 4h2v1h-2zM8 5h1v1h-1z"/>
+<path fill="#44A83D" d="M4 3h1v1h-1zM9 3h1v1h-1zM6 4h2v1h-2zM10 4h2v1h-2z"/>
+<path fill="#4E002B" d="M5 13h5v1h-5z"/>
+<path fill="#710024" d="M4 5h4v1h-4zM9 5h2v1h-2zM3 6h1v1h-1zM8 6h1v1h-1zM11 6h1v1h-1zM2 7h1v4h-1zM12 7h1v4h-1zM3 11h1v1h-1zM11 11h1v1h-1zM4 12h1v1h-1zM10 12h1v1h-1z"/>
+<path fill="#A3E271" d="M5 3h2v1h-2zM10 3h1v1h-1z"/>
+<path fill="#D65C35" d="M6 6h2v1h-2zM9 6h2v1h-2zM7 7h2v1h-2zM10 7h2v1h-2zM8 8h1v2h-1zM7 10h1v1h-1zM11 8h1v3h-1zM10 11h1v1h-1zM5 12h1v1h-1zM9 12h1v1h-1z"/>
+<path fill="#E3794B" d="M4 6h1v1h-1zM3 7h1v1h-1z"/>
+<path fill="#EA935F" d="M5 6h1v1h-1zM6 7h1v1h-1zM9 7h1v1h-1zM7 8h1v1h-1zM10 8h1v1h-1zM6 9h2v1h-2zM3 10h1v1h-1zM6 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM4 11h2v1h-2zM7 11h3v1h-3zM6 12h3v1h-3z"/>
+<path fill="#F3CCA3" d="M4 7h2v1h-2zM3 8h4v1h-4zM9 8h1v1h-1zM3 9h3v1h-3zM9 9h2v1h-2zM4 10h2v1h-2zM9 10h1v1h-1zM6 11h1v1h-1z"/>
+</svg>

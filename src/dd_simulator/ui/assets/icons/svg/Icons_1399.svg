@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Combustion</title>
+<desc>Atlas index 1399; category spell; subtype fire; tags fire|magic|yellow; visual tier 3</desc>
+<path fill="#6D0025" d="M2 1h2v1h-2zM5 1h1v1h-1zM8 1h6v1h-6zM1 2h2v1h-2zM4 2h1v1h-1zM10 2h1v1h-1zM13 2h2v1h-2zM1 3h1v1h-1zM7 4h3v1h-3zM14 3h1v2h-1zM9 5h3v1h-3zM7 6h6v1h-6zM6 7h5v1h-5zM5 8h5v1h-5zM4 9h5v1h-5zM4 10h3v1h-3zM6 11h3v1h-3zM1 12h1v1h-1zM6 12h1v1h-1zM1 13h2v1h-2zM4 13h2v1h-2zM14 13h1v1h-1zM2 14h7v1h-7zM12 14h2v1h-2z"/>
+<path fill="#9D001A" d="M4 1h1v1h-1zM6 1h2v1h-2zM3 2h1v1h-1zM9 2h1v1h-1zM11 2h2v1h-2zM2 3h1v1h-1zM8 3h3v1h-3zM13 3h1v1h-1zM1 4h1v1h-1zM10 4h1v1h-1zM7 5h2v1h-2zM12 5h1v1h-1zM14 5h1v1h-1zM6 6h1v1h-1zM13 6h2v1h-2zM5 7h1v1h-1zM11 7h1v1h-1zM14 7h1v1h-1zM1 8h1v1h-1zM4 8h1v1h-1zM10 8h1v1h-1zM1 9h3v1h-3zM9 9h1v1h-1zM3 10h1v1h-1zM7 10h2v1h-2zM1 10h1v2h-1zM14 11h1v1h-1zM2 12h1v1h-1zM5 11h1v2h-1zM7 12h1v1h-1zM13 12h2v1h-2zM3 13h1v1h-1zM6 13h1v1h-1zM11 13h3v1h-3zM9 14h3v1h-3z"/>
+<path fill="#E02F01" d="M7 2h2v1h-2zM6 4h1v1h-1zM13 5h1v1h-1zM5 6h1v1h-1zM2 10h1v1h-1zM9 11h1v1h-1zM7 13h2v1h-2zM10 13h1v1h-1z"/>
+<path fill="#F26D00" d="M5 2h2v1h-2zM3 3h2v1h-2zM7 3h1v1h-1zM2 4h1v1h-1zM12 4h2v1h-2zM1 5h1v1h-1zM5 5h2v1h-2zM4 7h1v1h-1zM3 8h1v1h-1zM10 9h1v1h-1zM9 10h2v1h-2zM14 8h1v3h-1zM2 11h2v1h-2zM13 11h1v1h-1zM8 12h1v1h-1zM12 12h1v1h-1zM9 13h1v1h-1z"/>
+<path fill="#F5D000" d="M5 3h2v1h-2zM12 3h1v1h-1zM3 4h3v1h-3zM11 4h1v1h-1zM2 5h1v1h-1zM4 5h1v2h-1zM1 6h1v2h-1zM12 7h2v1h-2zM2 8h1v1h-1zM11 8h1v3h-1zM13 10h1v1h-1zM4 11h1v1h-1zM10 11h3v1h-3zM3 12h1v1h-1zM9 12h3v1h-3z"/>
+<path fill="#FFFFFF" d="M11 3h1v1h-1zM3 5h1v1h-1zM2 6h2v2h-2zM12 8h2v2h-2zM12 10h1v1h-1zM4 12h1v1h-1z"/>
+</svg>

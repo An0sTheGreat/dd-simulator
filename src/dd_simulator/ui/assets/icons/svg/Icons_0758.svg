@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Tempered Copper Gauntlets</title>
+<desc>Atlas index 758; category armor; subtype gloves; tags orange|gloves|defense|hands|armor|copper; visual tier 1</desc>
+<path fill="#3C1106" d="M12 4h1v2h-1zM11 6h1v1h-1zM10 7h1v2h-1zM8 11h2v1h-2zM11 9h1v3h-1zM7 12h1v1h-1zM9 12h2v1h-2zM8 13h1v1h-1zM5 14h3v1h-3z"/>
+<path fill="#481E08" d="M7 2h6v1h-6zM12 3h1v1h-1zM6 3h1v2h-1zM5 5h2v1h-2zM4 6h1v1h-1zM3 7h1v6h-1zM4 13h1v1h-1z"/>
+<path fill="#693D2D" d="M10 6h1v1h-1z"/>
+<path fill="#A16A48" d="M9 4h2v1h-2zM11 5h1v1h-1zM6 6h1v2h-1zM9 7h1v1h-1zM4 10h1v1h-1zM8 10h2v1h-2zM7 11h1v1h-1zM4 12h1v1h-1zM5 13h1v1h-1z"/>
+<path fill="#B4805F" d="M8 6h1v1h-1zM6 9h1v1h-1zM5 10h1v1h-1z"/>
+<path fill="#C09A7E" d="M7 4h2v1h-2zM9 5h2v1h-2zM7 6h1v1h-1zM7 8h1v1h-1zM7 9h3v1h-3zM6 10h1v1h-1zM10 11h1v1h-1z"/>
+<path fill="#CCB497" d="M4 11h1v1h-1zM5 12h1v1h-1zM6 13h1v1h-1z"/>
+<path fill="#E2CEB3" d="M11 4h1v1h-1zM9 6h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM4 9h2v1h-2zM10 9h1v2h-1z"/>
+<path fill="#FFF2DE" d="M9 3h3v1h-3zM7 5h2v1h-2zM7 7h2v1h-2zM5 8h1v1h-1zM9 8h1v1h-1zM7 10h1v1h-1zM5 11h1v1h-1zM6 12h1v1h-1zM7 13h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 3h2v1h-2zM5 6h1v1h-1zM4 7h2v1h-2zM4 8h1v1h-1zM6 11h1v1h-1z"/>
+</svg>

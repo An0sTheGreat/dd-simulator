@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Salt Pile</title>
+<desc>Atlas index 1023; category food; subtype ingredient; tags ingredient|cooking|white; visual tier 0</desc>
+<path fill="#313131" d="M6 3h2v1h-2zM5 4h1v1h-1zM8 4h1v1h-1zM4 5h1v1h-1zM9 5h1v1h-1zM10 6h1v1h-1zM3 6h1v2h-1zM2 8h1v1h-1zM11 7h1v2h-1zM1 9h1v2h-1zM12 9h1v2h-1zM2 11h1v1h-1zM11 11h1v1h-1zM3 12h2v1h-2zM9 12h2v1h-2zM5 13h4v1h-4z"/>
+<path fill="#C5C5C5" d="M8 5h1v1h-1zM4 6h1v1h-1zM9 6h1v1h-1zM9 7h2v1h-2zM8 8h1v1h-1zM10 8h1v1h-1zM2 9h1v1h-1zM9 9h3v1h-3zM2 10h2v1h-2zM6 10h1v1h-1zM8 10h1v1h-1zM10 10h2v1h-2zM3 11h3v1h-3zM7 11h1v1h-1zM9 11h2v1h-2zM5 12h4v1h-4z"/>
+<path fill="#E8E7E7" d="M9 10h1v1h-1zM6 11h1v1h-1zM8 11h1v1h-1z"/>
+<path fill="#F2F2F2" d="M7 7h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM3 9h1v1h-1zM5 9h1v1h-1zM7 9h2v1h-2zM7 10h1v1h-1z"/>
+<path fill="#FFFFFF" d="M6 4h2v1h-2zM5 5h3v1h-3zM5 6h4v1h-4zM4 7h3v1h-3zM8 7h1v1h-1zM3 8h1v1h-1zM5 8h1v1h-1zM7 8h1v1h-1zM4 9h1v1h-1zM6 9h1v1h-1zM4 10h2v1h-2z"/>
+</svg>

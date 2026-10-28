@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Cooking Ladle</title>
+<desc>Atlas index 1219; category tool; subtype ladle; tags cooking|brown; visual tier 1</desc>
+<path fill="#2A172A" d="M10 10h1v3h-1zM5 13h5v1h-5z"/>
+<path fill="#2E1E2E" d="M6 8h1v1h-1zM5 9h1v1h-1zM9 9h1v1h-1zM4 10h1v3h-1z"/>
+<path fill="#3A2F3B" d="M7 11h2v2h-2z"/>
+<path fill="#441C00" d="M12 2h1v2h-1zM11 4h1v1h-1zM10 5h1v1h-1zM9 6h1v2h-1zM8 8h1v1h-1z"/>
+<path fill="#552B00" d="M10 2h2v1h-2zM8 3h2v1h-2zM7 4h1v1h-1zM6 5h1v3h-1z"/>
+<path fill="#5C4F65" d="M7 9h1v1h-1zM6 11h1v2h-1zM9 11h1v2h-1z"/>
+<path fill="#5F5564" d="M9 10h1v1h-1z"/>
+<path fill="#7B7384" d="M8 9h1v2h-1z"/>
+<path fill="#8E8A96" d="M6 9h1v1h-1zM7 10h1v1h-1zM5 10h1v3h-1z"/>
+<path fill="#B19A8B" d="M8 7h1v1h-1zM7 8h1v1h-1z"/>
+<path fill="#B5B5B5" d="M6 10h1v1h-1z"/>
+<path fill="#BEAB9A" d="M9 4h2v1h-2zM8 5h1v1h-1z"/>
+<path fill="#FFFFFF" d="M10 3h2v1h-2zM8 4h1v1h-1zM7 5h1v1h-1zM9 5h1v1h-1zM7 6h2v1h-2zM7 7h1v1h-1z"/>
+</svg>

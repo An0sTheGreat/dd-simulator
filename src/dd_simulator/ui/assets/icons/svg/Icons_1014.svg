@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Red Wine Bottle</title>
+<desc>Atlas index 1014; category food; subtype drink; tags consumable|ingredient|red; visual tier 1</desc>
+<path fill="#000000" fill-opacity="0.0313725490" d="M12 11h1v1h-1z"/>
+<path fill="#410A24" d="M9 5h1v1h-1zM10 6h1v1h-1zM11 7h1v7h-1zM5 14h6v1h-6z"/>
+<path fill="#43110C" d="M8 1h1v1h-1zM9 2h1v3h-1z"/>
+<path fill="#511022" d="M6 5h1v1h-1zM5 6h1v1h-1zM4 7h1v7h-1z"/>
+<path fill="#551C12" d="M7 1h1v1h-1zM6 2h1v3h-1z"/>
+<path fill="#6E2A1D" d="M7 4h2v1h-2z"/>
+<path fill="#8F0D21" d="M10 7h1v6h-1zM5 13h1v1h-1zM9 13h2v1h-2z"/>
+<path fill="#B81E1D" d="M5 7h1v6h-1zM6 13h3v1h-3z"/>
+<path fill="#BF533A" d="M8 2h1v1h-1zM7 3h2v1h-2z"/>
+<path fill="#DC4C3D" d="M7 5h2v1h-2zM7 6h3v1h-3zM6 7h1v1h-1zM9 7h1v1h-1zM6 8h4v5h-4z"/>
+<path fill="#EB8B75" d="M7 2h1v1h-1z"/>
+<path fill="#FFC699" d="M6 6h1v1h-1zM7 7h2v1h-2z"/>
+</svg>

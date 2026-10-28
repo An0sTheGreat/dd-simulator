@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Runed Froststeel Helmet</title>
+<desc>Atlas index 666; category armor; subtype helmet; tags blue|helmet|defense|head|armor|froststeel|ornate; visual tier 2</desc>
+<path fill="#001076" d="M5 2h3v1h-3zM4 3h1v1h-1zM4 4h2v1h-2zM6 5h1v3h-1zM5 8h1v1h-1zM4 9h1v1h-1zM2 10h2v1h-2z"/>
+<path fill="#060053" d="M8 3h1v1h-1zM9 4h1v1h-1zM10 5h1v2h-1zM11 7h1v2h-1zM12 9h1v1h-1zM13 10h1v1h-1z"/>
+<path fill="#32283D" d="M5 9h1v1h-1zM10 9h2v1h-2z"/>
+<path fill="#3647AB" d="M4 10h2v1h-2zM10 10h3v1h-3zM5 11h6v1h-6z"/>
+<path fill="#4867CA" d="M6 4h1v1h-1zM7 5h1v1h-1zM7 6h2v1h-2zM7 7h1v1h-1zM10 7h1v1h-1zM6 8h5v1h-5zM4 11h1v1h-1zM11 11h2v1h-2zM9 12h2v1h-2z"/>
+<path fill="#4C0600" d="M9 9h1v2h-1zM14 11h1v1h-1zM13 12h1v1h-1zM11 13h2v1h-2zM5 14h6v1h-6z"/>
+<path fill="#5281D1" d="M5 12h4v1h-4z"/>
+<path fill="#5484C6" d="M7 3h1v1h-1zM9 5h1v1h-1z"/>
+<path fill="#5E1400" d="M6 9h1v2h-1zM1 11h1v1h-1zM2 12h1v1h-1zM3 13h2v1h-2z"/>
+<path fill="#6598D4" d="M5 3h2v1h-2zM7 4h2v1h-2zM8 5h1v1h-1zM9 6h1v1h-1zM8 7h2v1h-2zM3 11h1v1h-1z"/>
+<path fill="#CF6D1C" d="M8 10h1v1h-1zM13 11h1v1h-1zM11 12h2v1h-2zM9 13h2v1h-2z"/>
+<path fill="#FFD671" d="M8 9h1v1h-1zM7 10h1v1h-1zM2 11h1v1h-1zM3 12h2v1h-2zM5 13h1v1h-1zM7 13h2v1h-2z"/>
+<path fill="#FFFFFF" d="M7 9h1v1h-1zM6 13h1v1h-1z"/>
+</svg>

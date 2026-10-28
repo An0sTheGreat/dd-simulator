@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Locked Chest</title>
+<desc>Atlas index 1208; category misc; subtype chest; tags storage|locked|yellow; visual tier 1</desc>
+<path fill="#000000" fill-opacity="0.0313725490" d="M3 4h1v1h-1zM12 4h1v1h-1zM13 5h1v1h-1zM14 10h1v1h-1zM13 12h1v1h-1z"/>
+<path fill="#000000" fill-opacity="0.0627450980" d="M2 12h1v1h-1z"/>
+<path fill="#3B002B" d="M12 5h1v3h-1zM13 8h1v4h-1zM12 12h1v1h-1zM4 13h8v1h-8z"/>
+<path fill="#520606" d="M5 3h6v1h-6zM4 4h1v1h-1zM11 4h1v1h-1zM3 5h1v3h-1zM11 8h1v1h-1zM9 9h2v1h-2zM2 8h1v4h-1zM3 12h1v1h-1z"/>
+<path fill="#6F7699" d="M8 9h1v1h-1z"/>
+<path fill="#7C3815" d="M5 4h1v4h-1zM10 4h1v4h-1zM4 8h1v1h-1zM6 8h1v1h-1zM9 8h1v1h-1zM5 9h2v1h-2zM7 10h2v1h-2zM12 8h1v4h-1zM11 12h1v1h-1z"/>
+<path fill="#8E4F29" d="M3 8h1v3h-1zM11 9h1v2h-1zM3 11h2v1h-2zM10 11h2v1h-2zM4 12h7v1h-7z"/>
+<path fill="#A16737" d="M6 4h4v1h-4zM4 5h1v1h-1zM6 5h1v1h-1zM9 5h1v1h-1zM7 7h2v1h-2zM11 5h1v3h-1zM5 8h1v1h-1zM10 8h1v1h-1z"/>
+<path fill="#A9AFC0" d="M8 8h1v1h-1zM7 9h1v1h-1z"/>
+<path fill="#C69055" d="M4 9h1v1h-1zM4 10h3v1h-3zM9 10h2v1h-2zM5 11h5v1h-5z"/>
+<path fill="#CD995B" d="M7 5h2v1h-2zM6 6h4v1h-4zM4 6h1v2h-1zM6 7h1v1h-1zM9 7h1v1h-1z"/>
+<path fill="#FFFFFF" d="M7 8h1v1h-1z"/>
+</svg>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Power Slash</title>
+<desc>Atlas index 1612; category skill; subtype melee; tags melee|ability|red; visual tier 4</desc>
+<path fill="#530032" d="M2 1h2v1h-2zM1 2h1v1h-1zM5 10h1v1h-1zM6 11h1v1h-1zM14 13h1v1h-1zM12 14h2v1h-2z"/>
+<path fill="#600017" d="M10 2h4v1h-4zM9 3h1v1h-1zM8 4h1v1h-1zM7 5h1v1h-1zM13 3h1v3h-1zM6 6h1v1h-1zM12 6h1v1h-1zM3 7h1v1h-1zM5 7h1v1h-1zM11 7h1v1h-1zM10 8h1v1h-1zM4 8h1v2h-1zM9 9h1v1h-1zM8 10h1v1h-1zM2 8h1v4h-1zM7 11h1v1h-1zM8 12h1v1h-1zM1 12h1v2h-1zM4 13h4v1h-4zM2 14h2v1h-2z"/>
+<path fill="#75002C" d="M8 1h1v1h-1zM2 2h1v1h-1zM6 2h2v1h-2zM1 3h3v1h-3zM5 3h2v1h-2zM1 4h2v1h-2zM4 4h2v1h-2zM1 5h4v1h-4zM2 6h1v1h-1zM14 7h1v1h-1zM13 8h1v1h-1zM12 9h2v1h-2zM11 10h2v1h-2zM10 11h2v1h-2zM10 12h1v1h-1zM12 12h1v1h-1zM14 12h1v1h-1zM9 13h5v1h-5zM10 14h2v1h-2z"/>
+<path fill="#888CA6" d="M12 4h1v1h-1zM11 5h2v1h-2zM10 6h2v1h-2zM9 7h2v1h-2zM8 8h2v1h-2zM7 9h2v1h-2zM6 10h2v1h-2z"/>
+<path fill="#A56129" d="M3 11h1v1h-1zM4 12h1v1h-1zM2 13h2v1h-2z"/>
+<path fill="#C41A2B" d="M4 1h1v1h-1zM7 1h1v1h-1zM3 2h1v1h-1zM5 2h1v1h-1zM8 2h1v1h-1zM4 3h1v1h-1zM7 3h1v1h-1zM3 4h1v1h-1zM6 4h1v1h-1zM5 5h1v1h-1zM1 6h1v1h-1zM3 6h3v1h-3zM1 7h2v1h-2zM4 7h1v1h-1zM13 7h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM11 9h1v1h-1zM9 10h2v1h-2zM13 10h1v1h-1zM1 8h1v4h-1zM8 11h2v1h-2zM12 11h1v1h-1zM14 11h1v1h-1zM9 12h1v1h-1zM11 12h1v1h-1zM13 12h1v1h-1zM8 13h1v1h-1zM4 14h6v1h-6z"/>
+<path fill="#C5C9D3" d="M10 3h3v1h-3zM9 4h3v1h-3zM8 5h2v1h-2zM7 6h2v1h-2zM6 7h2v1h-2zM5 8h2v1h-2zM5 9h1v1h-1z"/>
+<path fill="#D9A154" d="M2 12h2v1h-2z"/>
+<path fill="#F0BA5B" d="M3 8h1v1h-1zM3 10h1v1h-1zM4 11h2v1h-2zM5 12h1v1h-1z"/>
+<path fill="#F3785B" d="M5 1h2v1h-2zM9 1h5v1h-5zM4 2h1v1h-1zM9 2h1v1h-1zM8 3h1v1h-1zM7 4h1v1h-1zM6 5h1v1h-1zM14 2h1v4h-1zM13 6h2v1h-2zM12 7h1v1h-1zM11 8h1v1h-1zM10 9h1v1h-1zM14 9h1v2h-1zM13 11h1v1h-1z"/>
+<path fill="#FFDD89" d="M6 12h2v1h-2z"/>
+<path fill="#FFFFFF" d="M10 5h1v1h-1zM9 6h1v1h-1zM8 7h1v1h-1zM7 8h1v1h-1zM3 9h1v1h-1zM6 9h1v1h-1zM4 10h1v1h-1z"/>
+</svg>

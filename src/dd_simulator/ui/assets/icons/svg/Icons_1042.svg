@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<title>Orange Octopus</title>
+<desc>Atlas index 1042; category food; subtype seafood; tags fishing|ingredient|orange; visual tier 1</desc>
+<path fill="#000000" d="M7 7h1v1h-1zM10 8h1v1h-1z"/>
+<path fill="#521800" d="M13 2h1v1h-1zM14 3h1v3h-1zM13 6h1v2h-1zM14 8h1v3h-1zM13 11h1v1h-1zM6 12h2v1h-2zM12 12h1v1h-1zM14 12h1v1h-1zM3 13h3v1h-3zM8 13h1v1h-1zM13 13h1v1h-1zM9 14h4v1h-4z"/>
+<path fill="#621D00" d="M8 1h5v1h-5zM7 2h1v1h-1zM3 4h1v1h-1zM2 5h1v1h-1zM4 5h1v1h-1zM6 3h1v3h-1zM3 6h3v1h-3zM4 7h2v1h-2zM1 6h1v3h-1zM12 7h1v2h-1zM2 9h1v1h-1zM5 9h1v1h-1zM3 10h2v1h-2zM1 10h1v2h-1zM12 11h1v1h-1zM2 12h1v1h-1zM11 12h1v1h-1z"/>
+<path fill="#AA5720" d="M12 5h2v1h-2zM11 6h2v1h-2zM8 6h1v2h-1zM7 8h2v1h-2zM11 7h1v2h-1zM6 9h5v1h-5zM12 9h1v1h-1zM5 10h1v1h-1zM7 10h2v1h-2zM10 10h2v1h-2zM13 10h1v1h-1zM6 11h2v1h-2zM11 11h1v1h-1zM8 12h1v1h-1zM9 13h1v1h-1z"/>
+<path fill="#C57435" d="M2 8h1v1h-1zM3 9h2v1h-2z"/>
+<path fill="#D28942" d="M10 2h3v1h-3zM7 3h1v1h-1zM10 3h2v1h-2zM13 3h1v1h-1zM7 4h3v1h-3zM11 4h3v1h-3zM7 5h5v1h-5zM6 6h1v1h-1zM9 6h2v1h-2zM2 7h2v1h-2zM9 7h1v1h-1zM4 8h3v1h-3zM13 8h1v1h-1zM11 9h1v1h-1zM2 10h1v1h-1zM6 10h1v1h-1zM9 10h1v1h-1zM3 11h3v1h-3zM8 11h3v1h-3zM4 12h1v1h-1zM10 12h1v1h-1zM13 12h1v1h-1zM11 13h1v1h-1z"/>
+<path fill="#F7D385" d="M8 2h2v2h-2zM12 3h1v1h-1zM10 4h1v1h-1zM3 5h1v1h-1zM2 6h1v1h-1zM3 8h1v1h-1zM13 9h1v1h-1zM12 10h1v1h-1zM2 11h1v1h-1zM3 12h1v1h-1zM5 12h1v1h-1zM9 12h1v1h-1zM10 13h1v1h-1zM12 13h1v1h-1z"/>
+<path fill="#FFD079" d="M7 6h1v1h-1zM10 7h1v1h-1z"/>
+<path fill="#FFE79B" d="M6 7h1v1h-1zM9 8h1v1h-1z"/>
+</svg>
