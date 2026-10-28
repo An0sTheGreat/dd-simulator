@@ -5,14 +5,14 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication, QLabel
+from PySide6.QtWidgets import QApplication, QLabel, QSplitter
 
 from dd_simulator.app import build_application
 from dd_simulator.state import ActionOutcome, NarrativeSegment
 from dd_simulator.state.turns import normalize_narrative_segment, sanitize_model_text
 from dd_simulator.ui.item_icons import icon_records, resolve_icon
-from dd_simulator.ui.models.presentation import NarrativeMessageView, NarrativeView
-from dd_simulator.ui.panels.narrative_panels import NarrativePanel
+from dd_simulator.ui.models.presentation import NarrativeMessageView
+from dd_simulator.ui.widgets.conversation_view import ConversationView
 from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
 
 
@@ -51,29 +51,22 @@ def test_item_icons_survive_simple_themes_and_splitters_remain_live(tmp_path: Pa
     assert {theme.theme_id for theme in manager.available_themes()} == {
         "high_fantasy", "modern_proof",
     }
-    assert all(not splitter.childrenCollapsible() for splitter in (
-        window.main_splitter,
-        window.summary_splitter,
-        window.narrative_splitter,
-        window.lower_splitter,
-        window.dashboard_rows_splitter,
-    ))
-    assert all(splitter.handleWidth() > 0 for splitter in (
-        window.main_splitter,
-        window.summary_splitter,
-        window.narrative_splitter,
-        window.lower_splitter,
-        window.dashboard_rows_splitter,
-    ))
+    splitters = (
+        window.concept_splitter,
+        window.findChild(QSplitter, "peopleTradeConversationSplitter"),
+    )
+    assert all(splitter is not None for splitter in splitters)
+    assert all(not splitter.childrenCollapsible() for splitter in splitters)
+    assert all(splitter.handleWidth() > 0 for splitter in splitters)
     item_icons = window.findChildren(QLabel, "itemIcon")
     assert any(label.pixmap() is not None and not label.pixmap().isNull() for label in item_icons)
-    assert window.navigation_buttons["map"].icon().isNull()
+    assert window.scene_view.tabs.buttons["map"].icon().isNull()
 
     window.theme_selector.setCurrentIndex(window.theme_selector.findData("modern_proof"))
     app.processEvents()
     assert manager.current_theme_id == "modern_proof"
     assert any(label.pixmap() is not None and not label.pixmap().isNull() for label in item_icons)
-    assert window.navigation_buttons["map"].icon().isNull()
+    assert window.scene_view.tabs.buttons["map"].icon().isNull()
 
     window.close()
     window.deleteLater()
@@ -102,16 +95,11 @@ def test_narrative_normalizer_preserves_model_segment_kind() -> None:
     assert spoken[0].text == merchant_line.strip("*")
 
     app = QApplication.instance() or QApplication([])
-    panel = NarrativePanel(NarrativeView(
-        title="Greystone Road",
-        paragraphs=(),
-        dialogue="",
-        prompt="What do you do next?",
-        suggested_actions=tuple(f"Option {index}" for index in range(1, 7)),
-        messages=(NarrativeMessageView("narrative", segments[0].text),),
-    ))
+    panel = ConversationView(reduced_motion=True)
+    panel.set_messages((NarrativeMessageView("narrative", segments[0].text),), False)
+    assert [row.role for row in panel.rows] == ["narrator"]
+    assert "I'm listening, traveler!" in panel.rows[0].text_label.text()
     rendered = panel.findChildren(QLabel)
-    assert any(label.property("textRole") == "narrative" for label in rendered)
     assert all("`" not in label.text() for label in rendered)
     panel.deleteLater()
     app.processEvents()

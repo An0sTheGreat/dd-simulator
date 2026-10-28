@@ -84,7 +84,9 @@ def test_first_run_requires_ai_setup_and_retired_modes_are_rejected(tmp_path: Pa
     })
     app, window, _themes = build_application([], config_dir=tmp_path)
     assert window.current_page == "local_ai_setup"
-    assert window.bottom_navigation.isHidden()
+    # No navigation is reachable until setup completes: the scene and its tabs are not shown.
+    assert window.content_stack.currentWidget() is not window.concept_splitter
+    assert not window.scene_view.tabs.isVisibleTo(window)
     assert window.local_ai_setup_panel.findChild(object, "selectNoAiButton") is None
     saved = LocalAiConfiguration.from_mapping(
         UiPreferencesStore(tmp_path / "preferences.json").load_local_ai()

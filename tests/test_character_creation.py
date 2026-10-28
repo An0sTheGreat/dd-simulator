@@ -822,7 +822,8 @@ def test_application_starts_on_local_ai_setup_then_campaign_browser(tmp_path: Pa
     app, window, manager = build_application([], config_dir=tmp_path)
 
     assert window.current_page == "settings"
-    assert not window.bottom_navigation.isHidden()
+    # Navigation tabs live on the Adventure scene; Settings offers the way back to it.
+    assert window.settings_panel.back_button.isVisibleTo(window.settings_page)
     assert window.settings_page.isAncestorOf(window.campaign_browser)
     assert window.campaign_browser.campaign_list.count() == 1
     assert window.findChild(object, "newCampaignButton") is not None

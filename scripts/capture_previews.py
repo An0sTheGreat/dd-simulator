@@ -97,33 +97,30 @@ def main() -> int:
         loaded = manager.load_theme(theme_id)
         manager.apply_loaded_theme(application, loaded, persist=False)
         window.select_theme(theme_id)
-        for page, label, creation_tab, utility_tab, action_state in (
-            ("campaigns", "campaigns", None, None, None),
-            ("character_creation", "character-identity", 0, None, None),
-            ("character_creation", "character-appearance", 1, None, None),
-            ("character_creation", "character-equipment", 3, None, None),
-            ("character_creation", "character-story", 4, None, None),
-            ("character_creation", "character-world", 5, None, None),
-            ("skills", "skills-compact", None, None, None),
-            ("quests", "quests-compact", None, None, None),
-            ("dashboard", "dashboard-action-ready", None, 1, "ready"),
-            ("dashboard", "dashboard-action-pending", None, 1, "pending"),
-            ("dashboard", "dashboard-action-error", None, 1, "error"),
-            ("dashboard", "dashboard-inventory", None, 2, "ready"),
+        choices = window.scene_view.choice_grid
+        for page, label, creation_tab, action_state in (
+            ("settings", "campaigns", None, None),
+            ("character_creation", "character-identity", 0, None),
+            ("character_creation", "character-appearance", 1, None),
+            ("character_creation", "character-equipment", 3, None),
+            ("character_creation", "character-story", 4, None),
+            ("character_creation", "character-world", 5, None),
+            ("character_sheet", "character-sheet", None, None),
+            ("dashboard", "dashboard-action-ready", None, "ready"),
+            ("dashboard", "dashboard-action-pending", None, "pending"),
+            ("dashboard", "dashboard-action-error", None, "error"),
         ):
             window.controller.navigate(page)
             if creation_tab is not None:
                 window.character_creation_panel.tabs.setCurrentIndex(creation_tab)
-            if utility_tab is not None:
-                window.utility_panel.set_current_tab(utility_tab)
             if action_state == "ready":
-                window.narrative_panel.reset_resolution_controls()
+                choices.reset_resolution_controls()
             elif action_state == "pending":
-                window.narrative_panel.show_resolution_pending(
+                choices.show_resolution_pending(
                     "Inspect the damaged cart for useful clues"
                 )
             elif action_state == "error":
-                window.narrative_panel.show_resolution_error(
+                choices.show_resolution_error(
                     "LM Studio returned an invalid turn. Your action was preserved."
                 )
             application.processEvents()
@@ -134,26 +131,13 @@ def main() -> int:
             temporary.replace(destination)
             print(destination)
 
-        window.resize(1600, 900)
-        window.controller.navigate("dashboard")
-        window.dashboard_rows_splitter.setSizes([650, 120])
-        application.processEvents()
-        destination = output_dir / f"ui-phase11-dashboard-events-compressed-{theme_id}.png"
-        temporary = destination.with_suffix(".tmp.png")
-        if not window.grab().save(str(temporary), "PNG"):
-            raise RuntimeError(f"Could not save preview: {temporary}")
-        temporary.replace(destination)
-        print(destination)
-        window.dashboard_rows_splitter.setSizes([500, 300])
-
-        for page, label, utility_tab in (
-            ("dashboard", "dashboard-minimum", 1),
-            ("skills", "skills-compact-minimum", None),
+        choices.reset_resolution_controls()
+        for page, label in (
+            ("dashboard", "dashboard-minimum"),
+            ("character_sheet", "character-sheet-minimum"),
         ):
             window.resize(1280, 720)
             window.controller.navigate(page)
-            if utility_tab is not None:
-                window.utility_panel.set_current_tab(utility_tab)
             application.processEvents()
             destination = output_dir / f"ui-phase11-{label}-{theme_id}.png"
             temporary = destination.with_suffix(".tmp.png")
@@ -201,7 +185,6 @@ def main() -> int:
         game_state_service=combat_service,
     )
     combat_window.show()
-    combat_window.utility_panel.set_current_tab(0)
     for theme_id in ("high_fantasy", "modern_proof"):
         loaded = manager.load_theme(theme_id)
         manager.apply_loaded_theme(application, loaded, persist=False)
@@ -218,18 +201,6 @@ def main() -> int:
                 raise RuntimeError(f"Could not save preview: {temporary}")
             temporary.replace(destination)
             print(destination)
-            scrollbar = combat_window.utility_panel.combat_page.verticalScrollBar()
-            scrollbar.setValue(scrollbar.maximum())
-            application.processEvents()
-            action_destination = output_dir / (
-                f"ui-phase11-dashboard-combat-actions{suffix}-{theme_id}.png"
-            )
-            action_temporary = action_destination.with_suffix(".tmp.png")
-            if not combat_window.grab().save(str(action_temporary), "PNG"):
-                raise RuntimeError(f"Could not save preview: {action_temporary}")
-            action_temporary.replace(action_destination)
-            print(action_destination)
-            scrollbar.setValue(0)
     combat_window.close()
     combat_database.close()
 
@@ -249,7 +220,6 @@ def main() -> int:
     )
     generated_window.resize(1600, 900)
     generated_window.show()
-    generated_window.utility_panel.set_current_tab(0)
     for theme_id in ("high_fantasy", "modern_proof"):
         loaded = manager.load_theme(theme_id)
         manager.apply_loaded_theme(application, loaded, persist=False)

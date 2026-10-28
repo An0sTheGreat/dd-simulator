@@ -24,6 +24,8 @@ from dd_simulator.ui.widgets.inventory_grid import (
     InventorySlotWidget,
     _themed_artwork,
 )
+from dd_simulator.ui.widgets.codex_cards import CARD_COLUMNS
+from dd_simulator.ui.widgets.codex_character import PAPERDOLL_SLOT_NAMES
 from dd_simulator.ui.widgets.themed_dialog import ThemedDialog
 
 
@@ -202,7 +204,8 @@ def test_player_resources_no_longer_create_icons(tmp_path: Path) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.theme_requested.emit("high_fantasy")
     assert not window.findChildren(QLabel, "resourceIcon")
-    assert len(window.findChildren(QWidget, "resourceBar")) == 5
+    assert len(window.character_strip.bars) == 5
+    assert len(window.findChildren(QWidget, "codexResourceBar")) == 5
     window.close()
     window.deleteLater()
     app.processEvents()
@@ -235,36 +238,29 @@ def test_release_26_3_custom_chrome_centers_title_and_dims_for_dialogs(
     app.processEvents()
 
 
-def test_inventory_consolidates_equipment_and_frames_minimap(
+def test_codex_column_consolidates_equipment_and_scene_frames_location(
     tmp_path: Path,
 ) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.resize(1600, 900)
     window.show()
+    window.controller.navigate("dashboard")
     app.processEvents()
-    assert [window.utility_panel.tabs.tabText(index) for index in range(4)] == [
-        "Combat", "Skills", "Inventory", "Crafting"
-    ]
-    window.main_splitter.setSizes([850, 750])
-    app.processEvents()
-    assert window.utility_panel.inventory_grid.columns == 6
-    assert window.utility_panel.top_equipment_grid.columns == 5
-    assert window.utility_panel.left_equipment_grid.columns == 1
-    inventory = window.utility_panel.inventory_grid
-    top = window.utility_panel.top_equipment_grid
-    left = window.utility_panel.left_equipment_grid
-    assert all(slot.size() == inventory.slots[0].size() for slot in (*top.slots, *left.slots))
-    assert top.geometry().center().x() == inventory.geometry().center().x()
-    assert inventory.y() - (top.y() + top.height()) == 8
-    assert inventory.x() - (left.x() + left.width()) == 8
-    assert left.y() == inventory.y() + inventory.slots[0].height()
-    assert top.slots[1].x() - top.slots[0].x() == inventory.slots[1].x() - inventory.slots[0].x()
-    assert left.slots[1].y() - left.slots[0].y() == inventory.slots[6].y() - inventory.slots[0].y()
-    assert window.utility_panel.findChild(QWidget, "inventoryUtilityPage") is not None
-    assert window.utility_panel.findChild(QScrollArea, "inventoryUtilityPage") is None
-    assert window.utility_panel.findChild(QWidget, "equipmentUtilityPage") is None
+    # Equipment and inventory share the codex column instead of utility tabs.
+    codex = window.concept_splitter.widget(0)
+    paperdoll = window.paperdoll_panel
+    inventory = window.inventory_card
+    assert codex.isAncestorOf(paperdoll) and codex.isAncestorOf(inventory)
+    assert [slot.slot.slot_name for slot in paperdoll.slots] == list(PAPERDOLL_SLOT_NAMES)
+    assert inventory.grid.columns == CARD_COLUMNS
+    paperdoll_bottom = paperdoll.mapTo(window, paperdoll.rect().bottomLeft()).y()
+    assert paperdoll_bottom < inventory.mapTo(window, inventory.rect().topLeft()).y()
+    for name in ("inventoryUtilityPage", "equipmentUtilityPage"):
+        assert window.findChild(QWidget, name) is None
+    # The scene, not a minimap or a summary label, frames the location art.
     assert window.findChild(QWidget, "minimapCanvas") is None
-    assert window.findChild(QLabel, "locationVisualPlaceholder") is not None
+    assert window.findChild(QLabel, "locationVisualPlaceholder") is None
+    assert window.scene_view.image_path is not None and window.scene_view.image_path.is_file()
     window.close()
     window.deleteLater()
     app.processEvents()
