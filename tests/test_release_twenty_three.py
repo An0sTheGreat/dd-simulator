@@ -176,7 +176,7 @@ def test_profile_request_and_ui_failure_are_bounded(monkeypatch) -> None:  # typ
 
     class OfflineRandomizer:
         def generate_campaign(self, _draft):  # type: ignore[no-untyped-def]
-            raise LocalModelConnectionError("The local model is offline")
+            raise LocalModelConnectionError("LM Studio is offline")
 
     class ImmediatePool:
         def start(self, task):  # type: ignore[no-untyped-def]
@@ -191,7 +191,7 @@ def test_profile_request_and_ui_failure_are_bounded(monkeypatch) -> None:  # typ
     panel._request_campaign_randomization()
     assert panel.campaign_name.text() == "Keep This Campaign"
     assert panel.randomize_campaign_button.isEnabled()
-    assert panel.error_label.text() == "The local model is offline"
+    assert panel.error_label.text() == "LM Studio is offline"
     panel.deleteLater()
     app.processEvents()
 

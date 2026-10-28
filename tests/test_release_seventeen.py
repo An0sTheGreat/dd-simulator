@@ -78,6 +78,24 @@ def test_dialogue_prose_is_capped_at_125_total_words() -> None:
     assert len(speech.split()) + len(monologue.split()) == 125
 
 
+def test_model_selection_prefers_lm_studio_loaded_instance(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = LocalModelClient(provider="lm_studio")
+    monkeypatch.setattr(
+        client,
+        "_json_request_url",
+        lambda _url: {
+            "models": [
+                {"key": "installed-only", "loaded_instances": []},
+                {
+                    "key": "gemma-4-e4b-uncensored",
+                    "loaded_instances": [{"id": "gemma-4-e4b-uncensored"}],
+                },
+            ]
+        },
+    )
+    assert client.preferred_model_id() == "gemma-4-e4b-uncensored"
+
+
 def test_model_selection_prefers_loaded_model(monkeypatch: pytest.MonkeyPatch) -> None:
     client = LocalModelClient()
     monkeypatch.setattr(

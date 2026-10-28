@@ -30,8 +30,31 @@ def _themes(tmp_path: Path):  # type: ignore[no-untyped-def]
     ).available_themes()
 
 
+def test_client_loads_installed_model_through_lm_studio_native_api(monkeypatch) -> None:
+    client = LocalModelClient(provider="lm_studio")
+    calls: list[tuple[str, str, dict[str, object] | None, float | None]] = []
+
+    def request(  # type: ignore[no-untyped-def]
+        url: str, *, method: str = "GET", payload=None, timeout_seconds=None
+    ):
+        calls.append((url, method, payload, timeout_seconds))
+        return {"status": "loaded", "instance_id": "gemma-loaded"}
+
+    monkeypatch.setattr(client, "_json_request_url", request)
+
+    assert client.load_model("gemma-model") == "gemma-loaded"
+    assert calls == [
+        (
+            "http://localhost:1234/api/v1/models/load",
+            "POST",
+            {"model": "gemma-model"},
+            300.0,
+        )
+    ]
+
+
 def test_client_loads_installed_model_through_unsloth_inference_api(monkeypatch) -> None:
-    client = LocalModelClient(api_key="test-key")
+    client = LocalModelClient(api_key="test-key", provider="unsloth")
     calls: list[tuple[str, str, dict[str, object] | None, float | None]] = []
 
     def request(  # type: ignore[no-untyped-def]
@@ -73,7 +96,7 @@ def test_missing_load_route_tells_user_to_load_in_unsloth_studio(monkeypatch) ->
 
     monkeypatch.setattr("dd_simulator.local_model.client.urlopen", missing)
     with pytest.raises(LocalModelModelError, match="does not expose model loading"):
-        LocalModelClient(api_key="test-key").load_model("gemma-model")
+        LocalModelClient(api_key="test-key", provider="unsloth").load_model("gemma-model")
 
 
 def test_unloaded_model_is_selectable_and_emits_explicit_load(tmp_path: Path) -> None:

@@ -133,7 +133,8 @@ def build_application(
         try:
             endpoint = local_ai_runtime.start(Path(local_ai_configuration.model_path))
             lm_client = LocalModelClient(
-                endpoint, timeout_seconds=90, model_id=local_ai_configuration.model_id
+                endpoint, timeout_seconds=90, model_id=local_ai_configuration.model_id,
+                provider="openai",
             )
         except (OSError, LocalAiError):
             LOGGER.exception("Configured llama.cpp runtime could not start")
@@ -147,6 +148,15 @@ def build_application(
             timeout_seconds=90,
             model_id=model_preference if isinstance(model_preference, str) else None,
             api_key=local_ai_configuration.api_key,
+            provider="unsloth",
+        )
+    elif local_ai_configuration.mode == "lm_studio" and local_ai_configuration.setup_complete:
+        model_preference = preferences_store.load_lm_studio().get("model_id")
+        lm_client = LocalModelClient(
+            "http://localhost:1234/v1",
+            timeout_seconds=90,
+            model_id=model_preference if isinstance(model_preference, str) else None,
+            provider="lm_studio",
         )
     window = MainWindow(
         theme_manager.available_themes(),

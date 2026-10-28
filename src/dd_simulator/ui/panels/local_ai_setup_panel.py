@@ -33,7 +33,8 @@ class LocalAiSetupPanel(DashboardPanel):
         ))
         self.content_layout.addWidget(semantic_label("BEFORE YOU START", text_role="heading"))
         self.content_layout.addWidget(semantic_label(
-            "1. Choose the recommended 2.5 GB model for most systems, or connect Unsloth Studio.\n"
+            "1. Choose the recommended 2.5 GB model for most systems, or connect Unsloth Studio\n"
+            "   (LM Studio is also supported as a secondary option).\n"
             "2. Keep at least 5 GB of storage free and close other GPU-heavy applications.\n"
             "3. After setup, run the 3-sample evaluation in Settings before creating a campaign.",
             text_role="secondary", word_wrap=True,
@@ -85,15 +86,19 @@ class LocalAiSetupPanel(DashboardPanel):
                 "unsloth", self.model_directory.text().strip(), ""
             )
         )
-        self.choice_buttons = (
-            self.recommended_button, self.large_model_button, self.existing_button,
-            self.unsloth_button,
+        self.lm_studio_button = SemanticButton(
+            "Connect to LM Studio — Secondary Option", role="secondary"
         )
-        for button in self.choice_buttons:
-            choices.addWidget(button)
-        self.content_layout.addLayout(choices)
-
-        self.content_layout.addWidget(semantic_label("UNSLOTH STUDIO", text_role="heading"))
+        self.lm_studio_button.setObjectName("connectLmStudioButton")
+        self.lm_studio_button.clicked.connect(
+            lambda: self.configuration_requested.emit(
+                "lm_studio", self.model_directory.text().strip(), ""
+            )
+        )
+        self.choice_buttons = (
+            self.recommended_button, self.existing_button, self.unsloth_button,
+            self.large_model_button, self.lm_studio_button,
+        )
         unsloth_row = QHBoxLayout()
         self.unsloth_port = QSpinBox()
         self.unsloth_port.setObjectName("unslothPort")
@@ -107,7 +112,12 @@ class LocalAiSetupPanel(DashboardPanel):
         self.api_key.setPlaceholderText("API key from Unsloth Studio (Settings -> API)")
         self.api_key.setEchoMode(QLineEdit.EchoMode.Password)
         unsloth_row.addWidget(self.api_key, 1)
-        self.content_layout.addLayout(unsloth_row)
+        for button in self.choice_buttons[:3]:
+            choices.addWidget(button)
+        choices.addLayout(unsloth_row)
+        for button in self.choice_buttons[3:]:
+            choices.addWidget(button)
+        self.content_layout.addLayout(choices)
 
         self.progress = QProgressBar()
         self.progress.setObjectName("localAiSetupProgress")

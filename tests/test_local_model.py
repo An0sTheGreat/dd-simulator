@@ -325,8 +325,35 @@ def test_campaign_introduction_is_capped_at_220_words() -> None:
     assert len(LocalModelClient._parse_introduction(response).split()) == 220
 
 
+def test_lm_studio_loading_a_model_unloads_other_active_instances(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    client = LocalModelClient(model_id="old", provider="lm_studio")
+    requests: list[tuple[str, str, object]] = []
+
+    def fake_request(url, *, method="GET", payload=None, timeout_seconds=None):  # type: ignore[no-untyped-def]
+        requests.append((url, method, payload))
+        if url.endswith("/api/v1/models"):
+            return {
+                "models": [
+                    {"key": "old", "loaded_instances": [{"id": "old-instance"}]},
+                    {"key": "target", "loaded_instances": []},
+                ]
+            }
+        if url.endswith("/unload"):
+            return {"status": "unloaded"}
+        if url.endswith("/load"):
+            return {"status": "loaded", "instance_id": "target-instance"}
+        raise AssertionError(url)
+
+    monkeypatch.setattr(client, "_json_request_url", fake_request)
+    assert client.load_exclusive_model("target") == "target-instance"
+    assert any(
+        url.endswith("/unload") and payload == {"instance_id": "old-instance"}
+        for url, _method, payload in requests
+    )
+
+
 def test_loading_a_model_unloads_other_loaded_models_then_loads(monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    client = LocalModelClient(model_id="old", api_key="test-key")
+    client = LocalModelClient(model_id="old", api_key="test-key", provider="unsloth")
     requests: list[tuple[str, str, object]] = []
     loaded = {"old": True, "target": False, "installed": False}
 
@@ -368,7 +395,7 @@ def test_client_sends_bearer_key_only_when_configured(monkeypatch) -> None:  # t
         return FakeResponse({"data": [{"id": "local-model"}]})
 
     monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
-    LocalModelClient(api_key="sk-unsloth-test-key").discover_models()
+    LocalModelClient(api_key="sk-unsloth-test-key", provider="unsloth").discover_models()
     keyed = list(headers)
     headers.clear()
     LocalModelClient("http://127.0.0.1:5000/v1").discover_models()
@@ -392,7 +419,7 @@ def test_rejected_key_raises_authentication_error_without_the_key(monkeypatch, c
         raise HTTPError(request.full_url, 401, "Unauthorized", {}, io.BytesIO(body))
 
     monkeypatch.setattr("dd_simulator.local_model.client.urlopen", unauthorized)
-    client = LocalModelClient(api_key=secret)
+    client = LocalModelClient(api_key=secret, provider="unsloth")
     with pytest.raises(LocalModelAuthenticationError, match="Settings -> API") as raised:
         client.discover_models()
 

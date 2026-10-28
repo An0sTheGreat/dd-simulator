@@ -420,7 +420,7 @@ def test_failed_randomization_reenables_button_and_preserves_text() -> None:
         def generate_options(self, _section, _draft):  # type: ignore[no-untyped-def]
             from dd_simulator.local_model import LocalModelConnectionError
 
-            raise LocalModelConnectionError("The local model is offline")
+            raise LocalModelConnectionError("LM Studio is offline")
 
     class ImmediatePool:
         def start(self, task):  # type: ignore[no-untyped-def]
@@ -437,7 +437,7 @@ def test_failed_randomization_reenables_button_and_preserves_text() -> None:
     assert panel.body.toPlainText() == "Keep this body description"
     assert panel.randomize_buttons["body_description"].isEnabled()
     assert panel.randomize_buttons["body_description"].text() == "Randomize"
-    assert panel.error_label.text() == "The local model is offline"
+    assert panel.error_label.text() == "LM Studio is offline"
     panel.deleteLater()
     app.processEvents()
 
@@ -816,7 +816,7 @@ def test_creation_failure_rolls_back_campaign_and_character(tmp_path: Path) -> N
 
 def test_application_starts_on_local_ai_setup_then_campaign_browser(tmp_path: Path) -> None:
     UiPreferencesStore(tmp_path / "preferences.json").save_local_ai({
-        "mode": "unsloth", "setup_complete": True, "api_key": "test-key",
+        "mode": "lm_studio", "setup_complete": True,
         "model_directory": str(tmp_path / "models"), "model_path": "",
     })
     app, window, manager = build_application([], config_dir=tmp_path)

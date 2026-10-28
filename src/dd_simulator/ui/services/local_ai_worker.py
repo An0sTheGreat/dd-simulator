@@ -76,8 +76,13 @@ class LocalAiActivationTask(QRunnable):
             elif self.configuration.mode == "unsloth":
                 endpoint = self.configuration.unsloth_base_url
                 client = LocalModelClient(
-                    endpoint, timeout_seconds=10, api_key=self.configuration.api_key
+                    endpoint, timeout_seconds=10, api_key=self.configuration.api_key,
+                    provider="unsloth",
                 )
+                model_id = client.discover_models()[0]
+            elif self.configuration.mode == "lm_studio":
+                endpoint = "http://localhost:1234/v1"
+                client = LocalModelClient(endpoint, timeout_seconds=10, provider="lm_studio")
                 model_id = client.discover_models()[0]
             else:
                 raise LocalAiError("Unsupported local AI setup mode.")

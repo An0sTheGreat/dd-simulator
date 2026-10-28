@@ -50,7 +50,7 @@ class SettingsPanel(DashboardPanel):
         )
         self.content_layout.addWidget(
             semantic_label(
-                "Review the model provided by llama.cpp or Unsloth Studio before evaluation or play.",
+                "Review the model provided by llama.cpp, Unsloth Studio, or LM Studio before evaluation or play.",
                 text_role="secondary",
                 word_wrap=True,
             )

@@ -121,7 +121,7 @@ def test_action_resolver_uses_safe_narration_after_two_format_failures() -> None
         def _json_request(self, _path: str, *, method: str, payload: dict):
             del method
             if "response_format" in payload:
-                raise LocalModelConnectionError("The local model server returned HTTP 400")
+                raise LocalModelConnectionError("LM Studio returned HTTP 400")
             if "format correction retry" in payload["messages"][0]["content"]:
                 raise LocalModelConnectionError("Channel Error")
             return {"choices": [{"message": {"content": "The road opens ahead."}}]}

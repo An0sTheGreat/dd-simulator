@@ -73,9 +73,7 @@ class LocalAiConfiguration:
     @classmethod
     def from_mapping(cls, raw: dict[str, Any]) -> "LocalAiConfiguration":
         mode = str(raw.get("mode") or "")
-        if mode == "lm_studio":  # Phase 29: the external-server mode moved to Unsloth Studio.
-            mode = "unsloth"
-        valid_mode = mode in {"llama_cpp", "unsloth"}
+        valid_mode = mode in {"llama_cpp", "unsloth", "lm_studio"}
         try:
             port = int(raw.get("unsloth_port") or UNSLOTH_DEFAULT_PORT)
         except (TypeError, ValueError):
@@ -98,7 +96,9 @@ class LocalAiConfiguration:
             return False
         if self.mode == "llama_cpp":
             return Path(self.model_path).is_file() and bool(runtime_executables())
-        return self.mode == "unsloth" and bool(self.api_key.strip())
+        if self.mode == "unsloth":
+            return bool(self.api_key.strip())
+        return self.mode == "lm_studio"
 
 
 class LocalAiError(RuntimeError):

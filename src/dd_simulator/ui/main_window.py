@@ -1636,6 +1636,11 @@ class MainWindow(QMainWindow):
                 unsloth_port=self.local_ai_setup_panel.unsloth_port.value(),
                 api_key=api_key,
             )
+        elif mode == "lm_studio":
+            self.local_ai_runtime.stop()
+            configuration = LocalAiConfiguration(
+                mode="lm_studio", model_directory=str(folder)
+            )
         else:
             self.local_ai_setup_panel.show_status("Unknown local AI setup option.", error=True)
             return
@@ -1659,6 +1664,8 @@ class MainWindow(QMainWindow):
             True,
             "Starting and testing the local model..."
             if configuration.mode == "llama_cpp"
+            else "Checking LM Studio and its loaded model..."
+            if configuration.mode == "lm_studio"
             else "Checking Unsloth Studio and its loaded model...",
         )
         task = LocalAiActivationTask(configuration, self.local_ai_runtime)
@@ -1690,6 +1697,7 @@ class MainWindow(QMainWindow):
         client = LocalModelClient(
             endpoint, timeout_seconds=90, model_id=model_id,
             api_key=configuration.api_key or None,
+            provider="openai" if configuration.mode == "llama_cpp" else configuration.mode,
         )
         self._finish_local_ai_setup(completed, client)
 
@@ -1719,7 +1727,7 @@ class MainWindow(QMainWindow):
         if self.preferences_store is not None:
             self.preferences_store.save_local_ai(configuration.to_mapping())
             if client is not None:
-                self.preferences_store.save_unsloth({"model_id": configuration.model_id})
+                self._save_model_preference(configuration.model_id)
         self.character_creation_panel.randomizer = self.character_randomizer
         self.local_ai_setup_panel.configuration = configuration
         self.local_ai_setup_panel.cancel_button.show()
@@ -1834,12 +1842,20 @@ class MainWindow(QMainWindow):
             return
         self.lm_client.select_model(model_id)
         if self.preferences_store is not None:
-            self.preferences_store.save_unsloth({"model_id": model_id})
+            self._save_model_preference(model_id)
         for panel in self._model_panels():
             panel.show_model_status(  # type: ignore[attr-defined]
                 f"Selected {model_id}. All local generation paths will use this model."
             )
         self._show_model_status_message(f"Local model selected: {model_id}")
+
+    def _save_model_preference(self, model_id: str) -> None:
+        if self.preferences_store is None:
+            return
+        if self.local_ai_configuration.mode == "unsloth":
+            self.preferences_store.save_unsloth({"model_id": model_id})
+        else:
+            self.preferences_store.save_lm_studio({"model_id": model_id})
 
     def _load_lm_model(self, model_id: str) -> None:
         if self.lm_client is None or any(

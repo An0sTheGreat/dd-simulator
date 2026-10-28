@@ -39,15 +39,18 @@ class UiPreferencesStore:
         root.pop("ui", None)
         self._write_root(root)
 
-    def load_unsloth(self) -> dict[str, Any]:
+    def load_lm_studio(self) -> dict[str, Any]:
+        values = self._read_root().get("lm_studio")
+        return dict(values) if isinstance(values, dict) else {}
+
+    def save_lm_studio(self, values: dict[str, Any]) -> None:
         root = self._read_root()
-        values = root.get("unsloth")
-        if isinstance(values, dict):
-            return dict(values)
-        legacy = root.get("lm_studio")  # Pre-Phase 29 external-server model choice.
-        if isinstance(legacy, dict) and isinstance(legacy.get("model_id"), str):
-            return {"model_id": legacy["model_id"]}
-        return {}
+        root["lm_studio"] = values
+        self._write_root(root)
+
+    def load_unsloth(self) -> dict[str, Any]:
+        values = self._read_root().get("unsloth")
+        return dict(values) if isinstance(values, dict) else {}
 
     def save_unsloth(self, values: dict[str, Any]) -> None:
         root = self._read_root()
