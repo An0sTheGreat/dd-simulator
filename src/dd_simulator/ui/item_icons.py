@@ -10,8 +10,8 @@ from pathlib import Path
 import re
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon, QPixmap
-from PySide6.QtWidgets import QLabel
+from PySide6.QtGui import QColor, QIcon, QPixmap
+from PySide6.QtWidgets import QApplication, QGraphicsDropShadowEffect, QLabel
 
 
 ASSET_ROOT = Path(__file__).parent / "assets" / "icons"
@@ -300,10 +300,50 @@ def refresh_item_icon(
         size=max(1, label.width()),
     )
     label.setPixmap(pixmap)
+    apply_rarity_glow(label, rarity)
     if pixmap.isNull():
         label.hide()
     elif label.parentWidget() is not None:
         label.show()
+
+
+@lru_cache(maxsize=4)
+def _rarity_colours(theme_id: str) -> dict[str, str]:
+    path = Path(__file__).resolve().parent / "themes" / theme_id / "theme.json"
+    try:
+        codex = json.loads(path.read_text(encoding="utf-8"))["tokens"]["codex"]
+    except (OSError, KeyError, json.JSONDecodeError):
+        return {}
+    return {key.removeprefix("rarity_"): value for key, value in codex.items() if key.startswith("rarity_")}
+
+
+class _RarityGlow(QGraphicsDropShadowEffect):
+    def draw(self, painter) -> None:  # type: ignore[no-untyped-def]
+        super().draw(painter)
+        # a second pass at half opacity makes the glow about 1.5x as strong
+        painter.save()
+        painter.setOpacity(0.5)
+        super().draw(painter)
+        painter.restore()
+
+
+def apply_rarity_glow(icon: QLabel, rarity: str) -> None:
+    """Glow outline in the rarity colour around the icon's shape; none for common items."""
+
+    application = QApplication.instance()
+    theme_id = str(application.property("themeId") or "high_fantasy") if application else "high_fantasy"
+    colour = _rarity_colours(theme_id).get(rarity.casefold())
+    if not colour or rarity.casefold() == "common":
+        icon.setGraphicsEffect(None)
+        return
+    glow = icon.graphicsEffect()
+    if not isinstance(glow, _RarityGlow):
+        glow = _RarityGlow(icon)
+        glow.setOffset(0, 0)
+        icon.setGraphicsEffect(glow)
+    # 9 px blur at the 59 px inventory icon; smaller icons get a tighter outline
+    glow.setBlurRadius(max(7, icon.width() * 9 // 59))
+    glow.setColor(QColor(colour))
 
 
 def ui_icon(name: str) -> QIcon:

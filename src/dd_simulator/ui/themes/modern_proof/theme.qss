@@ -1158,10 +1158,6 @@ QWidget#paperdollPanel { background: transparent; }
 QWidget#paperdollPanel QFrame#equipmentSlot {
     background: {{colors.background_elevated}}; border: 1px solid {{colors.border_primary}}; border-radius: 4px;
 }
-QWidget#paperdollPanel QFrame#equipmentSlot[rarity="uncommon"] { border-color: {{codex.rarity_uncommon}}; }
-QWidget#paperdollPanel QFrame#equipmentSlot[rarity="rare"] { border-color: {{codex.rarity_rare}}; }
-QWidget#paperdollPanel QFrame#equipmentSlot[rarity="epic"] { border-color: {{codex.rarity_epic}}; }
-QWidget#paperdollPanel QFrame#equipmentSlot[rarity="legendary"] { border-color: {{codex.rarity_legendary}}; }
 QWidget#paperdollPanel QFrame#equipmentSlot[empty="true"] { background: {{colors.background_secondary}}; border-color: {{colors.border_primary}}; }
 QWidget#paperdollPanel QLabel#itemQuantityBadge { background: transparent; border: none; color: {{colors.text_primary}}; font-family: "Oxanium"; font-size: 10px; font-weight: 600; }
 QLabel#paperdollSlotCaption { background: transparent; font-family: "Oxanium"; font-size: 8px; font-weight: 600; color: {{codex.muted}}; }
