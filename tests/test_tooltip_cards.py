@@ -7,9 +7,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from dataclasses import replace
 
 import pytest
-from PySide6.QtCore import QEvent, QPoint, QPointF, QRect
-from PySide6.QtGui import QEnterEvent
-from PySide6.QtWidgets import QApplication, QLabel, QProgressBar, QWidget
+from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, QRect, Qt
+from PySide6.QtGui import QEnterEvent, QHelpEvent
+from PySide6.QtWidgets import QApplication, QLabel, QProgressBar, QToolTip, QWidget
 
 from dd_simulator.ui.models.presentation import (
     CombatActionOptionView,
@@ -17,6 +17,7 @@ from dd_simulator.ui.models.presentation import (
     InventorySlotView,
     SkillView,
 )
+from dd_simulator.ui.widgets.codex_cards import PowerEntry
 from dd_simulator.ui.widgets.codex_character import SkillDetailRow
 from dd_simulator.ui.widgets.hover_card import PositionedHoverCard, card_bounds, place_card
 from dd_simulator.ui.widgets.inventory_grid import (
@@ -24,7 +25,7 @@ from dd_simulator.ui.widgets.inventory_grid import (
     ItemHoverCard,
     equipped_comparisons,
 )
-from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard, SkillHoverCard
+from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard, CombatSkillGridItem, SkillHoverCard
 
 
 def _app() -> QApplication:
@@ -68,6 +69,10 @@ DAGGER = InventorySlotView(
 )
 LONGSWORD = replace(
     DAGGER, name="Warden's Longsword", rarity="rare", damage="1d8 + 3 slashing", weight=3.0,
+)
+POWER = CombatActionOptionView(
+    key="x", name="Test Power", kind="ability", description="Does a thing.",
+    resource_label="5 stamina", available=True, status_label="Ready",
 )
 EQUIPMENT = (
     EquipmentSlotView("Main Hand", "Iron Dagger", item=DAGGER),
@@ -184,6 +189,66 @@ def test_one_card_at_a_time_and_none_after_leave() -> None:
     _leave(second)
     _flush()
     assert _open_cards() == []
+
+
+class _WindowShowSpy(QObject):
+    def __init__(self) -> None:
+        super().__init__()
+        self.strays: list[tuple[str, str]] = []
+
+    def eventFilter(self, watched, event) -> bool:  # type: ignore[no-untyped-def]  # noqa: N802
+        shown = event.type() == QEvent.Type.Show and watched.isWidgetType() and watched.isWindow()
+        if shown and not _is_card_window(watched):
+            self.strays.append((type(watched).__name__, watched.objectName()))
+        return False
+
+
+def _is_card_window(widget: QWidget) -> bool:
+    flags = widget.windowFlags()
+    return (
+        isinstance(widget, PositionedHoverCard)
+        and Qt.WindowType.ToolTip in flags
+        and Qt.WindowType.FramelessWindowHint in flags
+    )
+
+
+def test_hover_opens_no_window_but_the_card() -> None:
+    # A card child shown before it had a parent became a native captioned window.
+    app = _app()
+    host = _host()
+    host.resize(400, 300)
+    rows = (
+        SkillDetailRow(SkillView("Attack", 52, current_xp=380, next_level_xp=600)),
+        InventorySlotWidget(LONGSWORD, 0, comparison_item=DAGGER),
+        PowerEntry(POWER),
+    )
+    spy = _WindowShowSpy()
+    app.installEventFilter(spy)
+    try:
+        for row in rows:
+            row.setParent(host)
+            _enter(row)
+            assert _open_cards(), type(row).__name__
+            visible = [w for w in QApplication.topLevelWidgets() if w.isVisible()]
+            assert visible and all(_is_card_window(w) for w in visible), visible
+            _leave(row)
+            _flush()
+    finally:
+        app.removeEventFilter(spy)
+    assert spy.strays == []
+
+
+def test_native_tooltip_is_suppressed_while_a_card_shows() -> None:
+    _app()
+    item = CombatSkillGridItem(POWER)
+    assert item.toolTip()
+    _enter(item)
+    assert _open_cards()
+    event = QHelpEvent(QEvent.Type.ToolTip, QPoint(5, 5), item.mapToGlobal(QPoint(5, 5)))
+    QApplication.sendEvent(item, event)
+    assert not QToolTip.isVisible()
+    _leave(item)
+    _flush()
 
 
 def test_skill_row_hover_makes_a_card_and_leaves_tooltip_empty() -> None:

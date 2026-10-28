@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Sequence
 
-from PySide6.QtCore import QPoint, QRect, QSize, Qt
+from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt
 from PySide6.QtGui import QCursor, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QStyle,
     QStyleOption,
+    QToolTip,
     QVBoxLayout,
     QWidget,
 )
@@ -91,6 +92,20 @@ class PositionedHoverCard(QFrame):
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
         self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
 
+    # The card replaces the native tooltip of whatever it describes: hide one
+    # already up and swallow new ones while the card shows.
+    def showEvent(self, event) -> None:  # type: ignore[no-untyped-def]  # noqa: N802
+        QToolTip.hideText()
+        QApplication.instance().installEventFilter(self)
+        super().showEvent(event)
+
+    def hideEvent(self, event) -> None:  # type: ignore[no-untyped-def]  # noqa: N802
+        QApplication.instance().removeEventFilter(self)
+        super().hideEvent(event)
+
+    def eventFilter(self, watched, event) -> bool:  # type: ignore[no-untyped-def]  # noqa: N802
+        return event.type() == QEvent.Type.ToolTip
+
     def show_near(self, global_position: QPoint) -> None:
         # One card at a time: a newly hovered card replaces any other open one.
         for widget in QApplication.topLevelWidgets():
@@ -167,7 +182,10 @@ class TooltipCard(PositionedHoverCard):
         self.title_label.setProperty("tone", tone)
         names.addWidget(self.title_label)
         self.subtitle_label = card_label(subtitle, "tooltipSubtitle", wrap=True)
-        self.subtitle_label.setVisible(bool(subtitle))
+        # Never show() a child before its layout gives it a parent: a parentless
+        # widget shown becomes its own native window (a captioned pop-up on Windows).
+        if not subtitle:
+            self.subtitle_label.hide()
         names.addWidget(self.subtitle_label)
         header.addLayout(names, 1)
         self.badge_label: QLabel | None = None
