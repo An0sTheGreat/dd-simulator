@@ -436,12 +436,12 @@ class ChoiceGrid(QWidget):
     retry_requested = Signal(str)
     combat_action_requested = Signal(object)
 
-    def __init__(self, suggestions: tuple[str, ...] = (), *, actor: str = "you") -> None:
+    def __init__(self, suggestions: tuple[str, ...] = (), *, actor: str | None = None) -> None:
         super().__init__()
         self.setObjectName("choiceGrid")
         self.combat_actions: tuple[tuple[str, CombatAction], ...] = ()
         self.target_id: str | None = None
-        self._placeholder = f"Or write what {actor} does..."
+        self._placeholder = f"Or write what {actor} does…" if actor else "Or describe your action…"
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(8)
@@ -647,7 +647,7 @@ class SceneView(QWidget):
         *,
         quest_list: tuple[QuestListItemView, ...] = (),
         combat: CombatEncounterView | None = None,
-        actor: str = "you",
+        actor: str | None = None,
     ) -> None:
         super().__init__()
         self.setObjectName("sceneView")

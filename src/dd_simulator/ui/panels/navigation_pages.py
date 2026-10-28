@@ -70,6 +70,8 @@ def _sheet_section(title: str) -> tuple[ThemedFrame, QVBoxLayout]:
 class CharacterSheetPage(NavigationPage):
     """Original, read-only 5E-inspired view of authoritative campaign state."""
 
+    crafting_requested = Signal()
+
     def __init__(self, dashboard: DashboardView) -> None:
         super().__init__(
             "characterSheetNavigationPage",
@@ -319,6 +321,12 @@ class CharacterSheetPage(NavigationPage):
         centered.addWidget(sheet, 0, 1)
         scroll.setWidget(viewport)
         self.layout.addWidget(scroll, 1)
+        crafting = SemanticButton("Crafting", role="secondary")
+        crafting.setObjectName("characterSheetCraftingButton")
+        crafting.setAccessibleName("Open crafting")
+        crafting.setToolTip("Craft items from known recipes")
+        crafting.clicked.connect(self.crafting_requested)
+        self.layout.addWidget(centered_third(crafting, "characterSheetCraftingFooter"))
         self.finish()
 
 

@@ -308,6 +308,9 @@ class MainWindow(QMainWindow):
         for target, page in self.navigation_pages.items():
             page.back_requested.connect(lambda name="dashboard": self.controller.navigate(name))
             self.page_indices[target] = self.content_stack.addWidget(page)
+        self.navigation_pages["character_sheet"].crafting_requested.connect(
+            lambda: self.controller.navigate("crafting")
+        )
 
         self.local_ai_setup_panel = LocalAiSetupPanel(self.local_ai_configuration)
         self.local_ai_setup_panel.configuration_requested.connect(
@@ -844,6 +847,7 @@ class MainWindow(QMainWindow):
             dashboard.narrative.suggested_actions,
             quest_list=dashboard.quest_list,
             combat=dashboard.combat,
+            actor=(dashboard.player.name.split() or [None])[0],
         )
         self.scene_view.set_clock(dashboard.location.day, dashboard.location.turn_number)
         self.conversation_view = ConversationView(
@@ -898,8 +902,8 @@ class MainWindow(QMainWindow):
         self.crafting_page.craft_requested.connect(self._request_crafting)
         layout.addWidget(self.crafting_page, 1)
         back = SemanticButton("Back", role="navigation", object_name="craftingBackButton")
-        back.setToolTip("Return to the adventure")
-        back.clicked.connect(lambda: self.controller.navigate("dashboard"))
+        back.setToolTip("Return to the character sheet")
+        back.clicked.connect(lambda: self.controller.navigate("character_sheet"))
         layout.addWidget(centered_third(back, "craftingCenteredFooter"))
         return page
 
@@ -2056,6 +2060,7 @@ class MainWindow(QMainWindow):
         new_page.back_requested.connect(
             lambda name="dashboard": self.controller.navigate(name)
         )
+        new_page.crafting_requested.connect(lambda: self.controller.navigate("crafting"))
         self.content_stack.removeWidget(old_page)
         old_page.deleteLater()
         self.content_stack.insertWidget(index, new_page)

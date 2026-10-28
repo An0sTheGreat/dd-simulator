@@ -201,6 +201,11 @@ def test_combat_mode_replaces_choices_and_locks_input() -> None:
     assert grid.action_input.isEnabled() and grid.submit_button.isEnabled()
 
 
+def test_action_placeholder_names_the_actor_or_falls_back() -> None:
+    assert scene(actor="Kaelen").choice_grid.action_input.placeholderText() == "Or write what Kaelen does…"
+    assert scene().choice_grid.action_input.placeholderText() == "Or describe your action…"
+
+
 def test_long_choice_text_is_never_silently_truncated() -> None:
     view = scene()
     view.resize(560, 876)

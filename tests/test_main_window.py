@@ -9,7 +9,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QSignalSpy
-from PySide6.QtWidgets import QApplication, QComboBox, QLabel, QLineEdit, QProgressBar, QWidget
+from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QProgressBar, QWidget
 
 from dd_simulator.app import build_application
 from dd_simulator.state import (
@@ -53,13 +53,17 @@ def test_phase_four_window_preserves_required_regions(tmp_path: Path) -> None:
     app, window = build_window(tmp_path)
     assert window.minimumWidth() == 1280
     assert window.minimumHeight() == 720
-    assert window.right_sidebar.minimumWidth() == 360
-    assert window.findChild(object, "narrativePanel") is not None
-    assert window.findChild(object, "questObjectivePanel") is not None
-    assert window.findChild(object, "minimapPanel") is not None
-    assert window.findChild(object, "resourceIndicatorStrip") is None
-    assert window.findChild(object, "playerResourceGrid") is not None
-    assert window.findChild(object, "utilityTabBar") is not None
+    # Concept T regions replace the sidebar, narrative, minimap and utility tabs.
+    assert window.concept_splitter.objectName() == "conceptTSplitter"
+    assert window.concept_splitter.count() == 2
+    for name in (
+        "characterStrip", "paperdollPanel", "skillDetailList", "inventoryCard",
+        "powersCard", "codexCardRow", "sceneView", "questProgressCard", "choiceGrid",
+    ):
+        assert window.findChild(QWidget, name) is not None, name
+    assert window.conversation_view.parentWidget() is not None
+    for retired in ("narrativePanel", "minimapPanel", "utilityTabBar", "resourceIndicatorStrip"):
+        assert window.findChild(object, retired) is None, retired
     window.close()
     window.deleteLater()
     app.processEvents()
@@ -67,14 +71,17 @@ def test_phase_four_window_preserves_required_regions(tmp_path: Path) -> None:
 
 def test_phase_four_window_binds_mock_presentation_data(tmp_path: Path) -> None:
     app, window = build_window(tmp_path)
-    assert window.findChild(QLabel, "playerName").text() == "Kaelen Stormborne"
-    assert window.findChild(QLabel, "sceneTitle").text() == "Greystone Road"
-    assert window.findChild(QLabel, "activeQuestTitle").text() == "The Lost Heirloom"
-    assert window.findChild(QProgressBar, "resourceBar").value() == 42
-    assert len(window.findChild(object, "playerSummaryPanel").findChildren(QProgressBar, "resourceBar")) == 5
-    assert len(window.findChildren(object, "suggestedActionButton")) == 6
-    assert window.findChild(QLineEdit, "playerActionInput").isEnabled()
-    assert not window.findChild(QLineEdit, "playerActionInput").isReadOnly()
+    assert window.character_strip.name_label.text() == "Kaelen Stormborne"
+    assert window.scene_view.title.text() == "Greystone Road"
+    assert window.scene_view.quest_card.title.text() == "The Lost Heirloom"
+    assert window.character_strip.bars[0].value() == 42
+    assert len(window.character_strip.findChildren(QProgressBar, "codexResourceBar")) == 5
+    grid = window.scene_view.choice_grid
+    assert sum(bool(button.text_label.full_text) for button in grid.choice_buttons) == 6
+    action_input = window.findChild(QLineEdit, "sceneActionInput")
+    assert action_input.isEnabled()
+    assert not action_input.isReadOnly()
+    assert action_input.placeholderText() == "Or write what Kaelen does…"
     window.close()
     window.deleteLater()
     app.processEvents()
@@ -203,13 +210,19 @@ def test_item_move_refreshes_grids_without_rebuilding_content_stack(
 
 
 def test_combat_tab_exposes_start_control_without_an_encounter(tmp_path: Path) -> None:
+    # "Begin Encounter" was retired (combat starts from free text and travel);
+    # outside combat the PowersCard offers Short Rest instead.
     app, window = build_window(tmp_path)
-    start = window.findChild(object, "startCombatButton")
-    assert start is not None
-    assert window.findChild(object, "combatRestButton") is not None
-    spy = QSignalSpy(window.utility_panel.combat_start_requested)
-    start.click()
+    assert window.findChild(object, "startCombatButton") is None
+    rest = window.findChild(QWidget, "powersCardRest")
+    assert rest is window.powers_card.rest_button
+    assert not rest.isHidden()
+    window._resolve_combat_action = lambda command: commands.append(command)  # type: ignore[method-assign]
+    commands: list = []
+    spy = QSignalSpy(window.powers_card.rest_requested)
+    rest.click()
     assert spy.count() == 1
+    assert [command.action for command in commands] == [CombatAction.RECOVER]
     window.close()
     window.deleteLater()
     app.processEvents()
@@ -238,23 +251,23 @@ def test_active_combat_tab_binds_targets_actions_and_locks_freeform_input(
         service.load_active_dashboard(),
         game_state_service=service,
     )
-    target = window.findChild(QComboBox, "combatTargetSelector")
-    buttons = window.findChildren(object, "combatActionButton")
-
-    assert target is not None and target.count() == 1
-    assert len(buttons) == 7
-    ability_selector = window.findChild(QComboBox, "combatClassAbilitySelector")
-    assert ability_selector is not None and ability_selector.count() == 4
-    assert not ability_selector.isEditable()
-    assert not window.findChild(QLineEdit, "playerActionInput").isEnabled()
-    window.utility_panel.combat_action_requested.disconnect(
-        window._resolve_combat_action
-    )
-    spy = QSignalSpy(window.utility_panel.combat_action_requested)
-    attack = next(button for button in buttons if button.property("combatAction") == "attack")
-    attack.click()
+    # Target: first active enemy (no picker yet); actions: six combat choices;
+    # class abilities: the PowersCard; Short Rest hidden while the encounter runs.
+    grid = window.scene_view.choice_grid
+    assert window.scene_view.encounter_card is not None
+    goblin = next(c for c in window.dashboard.combat.combatants if c.side == "enemy")
+    assert grid.target_id == goblin.id
+    assert len(grid.combat_actions) == 6
+    assert all(button.isEnabled() for button in grid.choice_buttons)
+    assert len(window.powers_card.ability_column.entries) == len(window.dashboard.abilities) == 4
+    assert window.powers_card.rest_button.isHidden()
+    assert not window.findChild(QLineEdit, "sceneActionInput").isEnabled()
+    window.scene_view.combat_action_requested.disconnect(window._resolve_combat_action)
+    spy = QSignalSpy(window.scene_view.combat_action_requested)
+    grid.choice_buttons[0].click()
     assert spy.count() == 1
     assert spy.at(0)[0].action is CombatAction.ATTACK
+    assert spy.at(0)[0].target_id == goblin.id
     window.close()
     window.deleteLater()
     app.processEvents()
@@ -267,16 +280,18 @@ def test_phase_four_window_keeps_panels_usable_at_minimum_size(tmp_path: Path) -
     window.show()
     app.processEvents()
 
-    assert window.right_sidebar.width() >= 360
+    assert min(window.concept_splitter.sizes()) >= 360
+    # The character strip is a one-line strip by design: it must keep its natural height.
+    strip = window.character_strip
+    assert strip.width() >= 120 and strip.height() >= strip.minimumSizeHint().height()
     for object_name in (
-        "playerSummaryPanel",
-        "locationSummaryPanel",
-        "narrativePanel",
-        "questObjectivePanel",
-        "eventLogPanel",
-        "recentEventsPanel",
-        "minimapPanel",
-        "utilityContentStack",
+        "paperdollPanel",
+        "skillDetailList",
+        "inventoryCard",
+        "powersCard",
+        "sceneView",
+        "questProgressCard",
+        "choiceGrid",
     ):
         panel = window.findChild(object, object_name)
         assert panel is not None
@@ -286,6 +301,32 @@ def test_phase_four_window_keeps_panels_usable_at_minimum_size(tmp_path: Path) -
     window.close()
     window.deleteLater()
     app.processEvents()
+
+
+def test_scene_clock_shows_the_campaign_turn_counter(tmp_path: Path) -> None:
+    # campaign_clock.turn_number is the live counter: every accepted turn increments it
+    # and stamps its transcript rows with it. The seed's opening scene is turn 0.
+    app = QApplication.instance() or QApplication([])
+    themes = ThemeManager(
+        themes_root=THEMES_ROOT, preferences_path=tmp_path / "clock.json", default_theme_id="high_fantasy",
+    ).available_themes()
+    database = GameStateDatabase.in_memory()
+    service = GameStateService(database)
+    service.initialize()
+    service.ensure_demo_campaign()
+    opening = MainWindow(themes, service.load_active_dashboard(), game_state_service=service)
+    assert {m.turn_number for m in opening.dashboard.narrative.messages} == {0}
+    assert opening.scene_view.tabs.clock_label.text() == "DAY 17 · TURN 0"
+    opening.close()
+    with database.transaction() as connection:
+        connection.execute("UPDATE campaign_clock SET turn_number = 3")
+    window = MainWindow(themes, service.load_active_dashboard(), game_state_service=service)
+    assert window.scene_view.tabs.clock_label.text() == "DAY 17 · TURN 3"
+    window.close()
+    window.deleteLater()
+    opening.deleteLater()
+    app.processEvents()
+    database.close()
 
 
 def test_settings_font_size_applies_live_and_persists(tmp_path: Path) -> None:
