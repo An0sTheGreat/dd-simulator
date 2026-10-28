@@ -50,8 +50,20 @@ BOSS_TIER = 4
 ROTATING_CONTEXTS = {"battle"}
 CROSSFADE_MS = 2000
 FADE_STEP_MS = 50
-DEFAULT_MUSIC_VOLUME = 60
-DEFAULT_AMBIENCE_VOLUME = 40
+DEFAULT_MUSIC_VOLUME = 35
+DEFAULT_AMBIENCE_VOLUME = 30
+
+
+def output_gain(percent: float) -> float:
+    """Slider percent (0-100) to linear output gain, on a perceptual (logarithmic) curve.
+
+    Linear gain makes the lower half of the slider near full loudness; 50 maps to about 0.15.
+    """
+    from PySide6.QtMultimedia import QtAudio
+
+    scale = QtAudio.VolumeScale
+    gain = QtAudio.convertVolume(percent / 100, scale.LogarithmicVolumeScale, scale.LinearVolumeScale)
+    return max(0.0, gain)
 
 
 def audio_disabled() -> bool:
@@ -295,11 +307,11 @@ class MusicController(QObject):
 
     def _apply_volumes(self) -> None:
         scale = 0.0 if self.muted else 1.0
-        music = scale * self.music_volume / 100
+        music = scale * output_gain(self.music_volume)
         incoming, outgoing = self._music
         incoming.audioOutput().setVolume(music * self._fade)
         outgoing.audioOutput().setVolume(music * self._fade_out)
-        self._ambience_player.audioOutput().setVolume(scale * self.ambience_volume / 100)
+        self._ambience_player.audioOutput().setVolume(scale * output_gain(self.ambience_volume))
 
     @_guarded
     def stop(self) -> None:

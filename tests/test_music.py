@@ -164,6 +164,23 @@ def test_audio_settings_round_trip_and_reset(tmp_path: Path) -> None:
     close_window(app, restored)
 
 
+def test_output_gain_is_a_perceptual_curve() -> None:
+    gains = [audio.output_gain(percent) for percent in range(101)]
+    assert gains[0] == 0.0 and gains[100] == pytest.approx(1.0)
+    assert gains[1] > 0.0
+    assert all(low <= high for low, high in zip(gains, gains[1:]))  # Qt's curve reaches 1.0 at 99
+    assert gains[50] < 0.25  # linear would be 0.5, near full loudness
+
+
+def test_controller_sends_curved_gain_to_outputs() -> None:
+    controller = _fake_controller()
+    controller.set_volumes(50, 30, False)
+    incoming, outgoing = controller._music
+    assert incoming.out.volume == pytest.approx(audio.output_gain(50))
+    assert outgoing.out.volume == 0.0
+    assert controller._ambience_player.out.volume == pytest.approx(audio.output_gain(30))
+
+
 def test_missing_manifest_loads_as_empty(tmp_path: Path) -> None:
     assert load_manifest(tmp_path / "missing.json") == {}
 
