@@ -69,16 +69,6 @@ QWidget#craftingRecipeContent {
     border: none;
 }
 
-QFrame#craftingRecipeCard {
-    background-color: {{colors.panel_surface_alt}};
-    border: {{geometry.border_width}} solid {{colors.border_primary}};
-    border-radius: {{geometry.border_radius_small}};
-}
-
-QFrame#craftingRecipeCard[available="false"] {
-    color: {{colors.text_muted}};
-}
-
 QDialog#craftingResultsDialog {
     background-color: {{colors.background_secondary}};
     color: {{colors.text_primary}};

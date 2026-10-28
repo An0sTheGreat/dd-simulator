@@ -74,6 +74,7 @@ from dd_simulator.ui.panels.campaign_panels import (
 )
 from dd_simulator.ui.panels.navigation_pages import (
     CharacterSheetPage,
+    NavigationPage,
     create_navigation_pages,
     page_action_bar,
 )
@@ -960,17 +961,20 @@ class MainWindow(QMainWindow):
 
     def _build_crafting_page(self) -> QWidget:
         # Temporary home until the crafting move into the Character Sheet.
-        page = QWidget()
-        page.setObjectName("craftingNavigationPage")
-        layout = QVBoxLayout(page)
-        layout.setContentsMargins(8, 8, 8, 8)
-        back = SemanticButton("Back", role="navigation", object_name="craftingBackButton")
+        page = NavigationPage(
+            "craftingNavigationPage",
+            "CRAFTING RECIPES",
+            "Ingredients and tool uses are consumed only after a successful deterministic attempt.",
+        )
+        # The page's own secondary back button, on the title row, returns to the sheet.
+        back = page.back_button
+        back.setText("Back")
+        back.setObjectName("craftingBackButton")
         back.setToolTip("Return to the character sheet")
-        back.clicked.connect(lambda: self.controller.navigate("character_sheet"))
-        layout.addWidget(page_action_bar(back), 0, Qt.AlignmentFlag.AlignRight)
+        page.back_requested.connect(lambda: self.controller.navigate("character_sheet"))
         self.crafting_page = CraftingPage(self.dashboard.crafting_recipes)
         self.crafting_page.craft_requested.connect(self._request_crafting)
-        layout.addWidget(self.crafting_page, 1)
+        page.layout.addWidget(self.crafting_page, 1)
         return page
 
     def _activate_power(self, key: str) -> None:

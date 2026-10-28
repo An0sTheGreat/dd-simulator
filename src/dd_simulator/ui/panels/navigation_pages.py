@@ -46,6 +46,7 @@ class NavigationPage(ThemedFrame):
         back = SemanticButton("Return to Adventure", role="secondary")
         back.setObjectName("navigationBackButton")
         back.clicked.connect(self.back_requested)
+        self.back_button = back
         self.action_bar = page_action_bar(back)
         header = QHBoxLayout()
         header.addWidget(
@@ -96,9 +97,17 @@ def _field(layout: QGridLayout, row: int, column: int, label: str, value: str, v
 
 
 def _lines(layout: QVBoxLayout, rows: tuple[tuple[str, str], ...]) -> None:
-    for label, value in rows:
-        layout.addWidget(plain_label(label.upper(), "pageCardLabel"))
-        layout.addWidget(plain_label(value, "pageCardValue", word_wrap=True))
+    """Two-column label/value grid, each label beside its value."""
+
+    grid = QGridLayout()
+    grid.setHorizontalSpacing(12)
+    grid.setVerticalSpacing(3)
+    for row, (label, value) in enumerate(rows):
+        name = plain_label(label.upper(), "pageCardLabel")
+        grid.addWidget(name, row, 0, Qt.AlignmentFlag.AlignTop)
+        grid.addWidget(plain_label(value, "pageCardValue", word_wrap=True), row, 1)
+    grid.setColumnStretch(1, 1)
+    layout.addLayout(grid)
 
 
 class CharacterSheetPage(NavigationPage):

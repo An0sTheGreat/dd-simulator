@@ -500,6 +500,45 @@ def test_character_sheet_and_map_use_the_shared_page_card(tmp_path: Path) -> Non
     close(app, window)
 
 
+def test_crafting_recipes_are_page_cards_with_back_on_the_title_row(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("crafting")
+    app.processEvents()
+    page = window.content_stack.currentWidget()
+    cards = [card for card in page.findChildren(QFrame, "craftingRecipeCard") if card.property("pageCard")]
+    assert len(cards) == len(window.dashboard.crafting_recipes) > 0
+    assert all(card.property("codexCard") for card in cards)
+    title = page.findChild(QLabel, "navigationPageTitle")
+    back = page.findChild(QPushButton, "craftingBackButton")
+    assert title.text() == "CRAFTING RECIPES"
+    # Back shares the title row and the Return buttons' secondary role.
+    title_middle = title.mapTo(page, QPoint(0, title.height() // 2)).y()
+    back_top = back.mapTo(page, QPoint(0, 0)).y()
+    assert back_top <= title_middle <= back_top + back.height() + title.height()
+    assert back.property("buttonRole") == "secondary"
+    close(app, window)
+
+
+def test_character_sheet_story_cards_put_each_label_beside_its_value(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("character_sheet")
+    app.processEvents()
+    sheet = window.navigation_pages["character_sheet"]
+    for title in ("Appearance & Biography", "Role & Character"):
+        card = next(frame for frame in sheet.findChildren(QFrame) if frame.accessibleName() == title)
+        labels = card.findChildren(QLabel, "pageCardLabel")
+        values = card.findChildren(QLabel, "pageCardValue")
+        assert labels and len(labels) == len(values)
+        for label, value in zip(labels, values):
+            assert label.mapTo(card, QPoint(0, 0)).y() == value.mapTo(card, QPoint(0, 0)).y(), title
+            assert label.mapTo(card, QPoint(0, 0)).x() < value.mapTo(card, QPoint(0, 0)).x(), title
+    close(app, window)
+
+
 @pytest.mark.parametrize("size", [(1280, 720), (1600, 900)])
 def test_character_sheet_combat_summary_values_keep_apart(tmp_path: Path, size) -> None:  # type: ignore[no-untyped-def]
     app, window, _manager = build_application([], config_dir=tmp_path)
