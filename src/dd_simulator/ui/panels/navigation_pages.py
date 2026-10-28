@@ -158,23 +158,25 @@ class CharacterSheetPage(NavigationPage):
             ),
             None,
         )
-        # One row per value (label left, value right): five columns do not fit the narrow
-        # left column, where the values ran together.
+        # Each value in its own equal-stretch column under its label, with a real gutter:
+        # at the default 2 px spacing the five values ran together.
         vitals_grid = QGridLayout()
-        vitals_grid.setHorizontalSpacing(12)
-        vitals_grid.setVerticalSpacing(1)
-        vitals_grid.setColumnStretch(0, 1)
-        for row, (label, value) in enumerate((
+        vitals_grid.setHorizontalSpacing(10)
+        vitals_grid.setVerticalSpacing(0)
+        for column, (label, value) in enumerate((
             ("Hit Points", f"{health.current} / {health.maximum}" if health else "—"),
             ("Armor", str(dashboard.player.armor_class)),
             ("Initiative", f"{dashboard.player.initiative_modifier:+d}"),
             ("Speed", f"{dashboard.player.movement_feet} ft"),
             ("Proficiency", f"+{dashboard.player.proficiency_bonus}"),
         )):
-            vitals_grid.addWidget(semantic_label(label, text_role="muted"), row, 0)
-            value_label = semantic_label(value, object_name="characterSheetVitalValue", text_role="heading")
-            value_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            vitals_grid.addWidget(value_label, row, 1)
+            vitals_grid.addWidget(semantic_label(label, text_role="muted"), 0, column)
+            vitals_grid.addWidget(
+                semantic_label(value, object_name="characterSheetVitalValue", text_role="heading"),
+                1,
+                column,
+            )
+            vitals_grid.setColumnStretch(column, 1)
         vitals_layout.addLayout(vitals_grid)
         left.addWidget(vitals)
 
