@@ -7,8 +7,21 @@ source attribution; supplied files under Project Resources are unchanged.
 Release 24 uses only assets currently present under
 `Project Resources/dnd_ui_source/assets`.
 
-## Semantic item icons
+## CraftPix item icons
 
+- Source: the owner's CraftPix icon library under `Project Resources/assets/items/<theme>/`
+  (catalog skill and spell records use `Project Resources/assets/skills/<class>/`).
+- Runtime copies: the icons listed in the `sources` section of `item_icon_manifest.json`,
+  downscaled to 128 px PNGs beneath `src/dd_simulator/ui/assets/icons/library` by
+  `scripts/import_item_icons.py`; `scripts/build_item_icon_manifest.py` maps catalog records.
+- Supplied terms: CraftPix free license (https://craftpix.net/file-licenses/); use in the
+  game is permitted; do not redistribute, resell, or reupload the files as a standalone pack.
+- The application packages them only as integrated in-game icons.
+
+## Semantic item icons (retired in Phase 8)
+
+- Retired: the numbered SVGs and the `item_icons.png` atlas are no longer packaged. Only the
+  semantic data in `item_manifest.json` (names, categories, tiers) remains, for the catalog.
 - Source: `Icons_svg` and its semantic manifest.
 - Runtime copies: the numbered SVG files and `item_manifest.json` beneath
   `src/dd_simulator/ui/assets/icons`.
