@@ -301,7 +301,7 @@ def test_ui_preferences_round_trip_and_reset(tmp_path: Path) -> None:
     window.resize(1600, 900)
     window.show()
     current = window.concept_splitter.sizes()
-    window.concept_splitter.setSizes([current[0] + 60, current[1] - 60])
+    window.concept_splitter.moveSplitter(current[0] + 60, 1)  # a user drag
     expected_split = window.concept_splitter.sizes()
     window.controller.navigate("map")
     window.settings_panel.select_font_size(125)
@@ -311,10 +311,11 @@ def test_ui_preferences_round_trip_and_reset(tmp_path: Path) -> None:
     saved = json.loads(preferences_path.read_text(encoding="utf-8"))
     assert saved["ui"]["page"] == "map"
     assert saved["ui"]["font_size"] == 125
-    assert saved["ui"]["splitters"]["concept_t"] == expected_split
+    expected_ratio = expected_split[0] / sum(expected_split)
+    assert abs(saved["ui"]["splitters"]["concept_t_ratio"] - expected_ratio) < 0.01
     # The retired tab/filter and splitter keys are no longer written.
     assert not {"utility_tab", "quest_tab"} & set(saved["ui"])
-    assert set(saved["ui"]["splitters"]) == {"concept_t", "people"}
+    assert set(saved["ui"]["splitters"]) == {"concept_t_ratio", "people"}
     close_window(app, window)
 
     # Old keys left in an existing preferences file are ignored on load.
@@ -330,6 +331,8 @@ def test_ui_preferences_round_trip_and_reset(tmp_path: Path) -> None:
     assert restored.current_page == "map"
     assert restored.font_size_preference == 125
     assert restored.settings_panel.font_size_value.text() == "125%"
+    restored.controller.navigate("dashboard")  # the split is laid out once its page shows
+    app.processEvents()
     restored_split = restored.concept_splitter.sizes()
     assert abs(restored_split[0] / sum(restored_split) - expected_split[0] / sum(expected_split)) < 0.02
 

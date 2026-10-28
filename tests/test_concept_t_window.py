@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 from threading import Event
@@ -7,7 +8,7 @@ from threading import Event
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
-from PySide6.QtCore import QPoint, QThreadPool, Qt
+from PySide6.QtCore import QPoint, QRect, QThreadPool, Qt
 from PySide6.QtWidgets import (
     QAbstractScrollArea,
     QApplication,
@@ -316,20 +317,126 @@ def _persisting_window(tmp_path: Path) -> MainWindow:
     return window
 
 
-def test_concept_splitter_sizes_persist_across_windows(tmp_path: Path) -> None:
+def _left_share(window: MainWindow) -> float:
+    left, right = window.concept_splitter.sizes()
+    return left / (left + right)
+
+
+def _assert_even(window: MainWindow, where: object = "") -> None:
+    left, right = window.concept_splitter.sizes()
+    assert abs(left - right) <= 4, (where, left, right)
+
+
+def _drag_split(window: MainWindow, offset: int) -> None:
+    """A user drag: moveSplitter emits splitterMoved, as the handle does."""
+
+    splitter = window.concept_splitter
+    splitter.moveSplitter(splitter.sizes()[0] + offset, 1)
+    QApplication.processEvents()
+
+
+def _themed_window(config_dir: Path, size: tuple[int, int]):  # type: ignore[no-untyped-def]
+    # The shipped app always applies a theme; unthemed, the platform style's wider
+    # widgets push the codex minimum past half of 1280 px.
+    app, window, _manager = build_application([], config_dir=config_dir)
+    window.resize(*size)
+    window.show()
+    window.controller.navigate("dashboard")
+    app.processEvents()
+    return app, window
+
+
+def test_concept_columns_split_evenly_by_default_at_any_window_size(tmp_path: Path) -> None:
+    for size in ((1600, 900), (1280, 720)):
+        app, window = _themed_window(tmp_path / f"{size[0]}", size)
+        _assert_even(window, size)
+        close(app, window)
+
+
+def test_untouched_concept_split_stays_even_when_the_window_resizes(tmp_path: Path) -> None:
+    app, window = _themed_window(tmp_path, (1600, 900))
+    for size in ((1280, 720), (1920, 1080), (1600, 900)):
+        window.resize(*size)
+        app.processEvents()
+        _assert_even(window, size)
+    window.showMaximized()
+    app.processEvents()
+    _assert_even(window, "maximized")
+    # Nothing the user chose, so nothing is saved for the split.
+    window.save_ui_preferences()
+    saved = json.loads((tmp_path / "preferences.json").read_text(encoding="utf-8"))
+    assert set(saved["ui"]["splitters"]) == {"people"}
+    close(app, window)
+
+
+def test_a_dragged_concept_split_keeps_its_ratio_and_persists_across_windows(tmp_path: Path) -> None:
     app = QApplication.instance() or QApplication([])
     window = _persisting_window(tmp_path)
-    current = window.concept_splitter.sizes()
-    window.concept_splitter.setSizes([current[0] + 60, current[1] - 60])
-    expected = window.concept_splitter.sizes()
-    assert expected != current
+    _drag_split(window, 160)
+    share = _left_share(window)
+    assert share > 0.55
+    window.resize(1920, 1080)
+    app.processEvents()
+    assert abs(_left_share(window) - share) < 0.01  # a resize keeps the user's ratio
+    window._reload_dashboard(window.dashboard)
+    app.processEvents()
+    assert abs(_left_share(window) - share) < 0.01  # so does a dashboard rebuild
     window.save_ui_preferences()
+    saved = json.loads((tmp_path / "preferences.json").read_text(encoding="utf-8"))
+    assert abs(saved["ui"]["splitters"]["concept_t_ratio"] - share) < 0.01
     close(app, window)
 
     restored = _persisting_window(tmp_path)
-    for got, want in zip(restored.concept_splitter.sizes(), expected, strict=True):
-        assert abs(got - want) <= 4
+    assert abs(_left_share(restored) - share) < 0.01
     close(app, restored)
+
+
+def test_full_size_dashboard_shows_68_px_bag_slots_beside_unclipped_abilities(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1920, 1080)
+    window.show()
+    window.controller.navigate("dashboard")
+    app.processEvents()
+    card, powers = window.inventory_card, window.powers_card
+    assert card.grid.slot_size == 68
+    slot = next(slot for slot in card.grid.slots if not slot.item.is_empty)
+    assert slot.width() == slot.height() == 68
+    inner = slot.contentsRect()
+    assert abs(slot.icon_label.width() - min(inner.width(), inner.height()) * 7 // 8) <= 1
+    codex = window.concept_splitter.widget(0)
+    powers_rect = QRect(powers.mapTo(codex, QPoint(0, 0)), powers.size())
+    assert codex.rect().contains(powers_rect)
+    assert powers.width() >= powers.minimumSizeHint().width()
+    close(app, window)
+
+
+def test_old_saved_concept_sizes_are_ignored_for_the_even_default(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    # Older builds wrote these pixel sizes on every save, chosen by the user or not.
+    (tmp_path / "preferences.json").write_text(
+        json.dumps({"ui": {"splitters": {"concept_t": [724, 857], "people": [300, 400]}}}),
+        encoding="utf-8",
+    )
+    window = _persisting_window(tmp_path)
+    _assert_even(window)
+    close(app, window)
+
+
+def test_reset_ui_defaults_returns_the_concept_split_to_even(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = _persisting_window(tmp_path)
+    _drag_split(window, 160)
+    window.save_ui_preferences()
+    window._reset_ui_preferences()
+    app.processEvents()
+    _assert_even(window)
+    window.resize(1920, 1080)
+    app.processEvents()
+    _assert_even(window, "after reset and resize")
+    window.save_ui_preferences()
+    saved = json.loads((tmp_path / "preferences.json").read_text(encoding="utf-8"))
+    assert "concept_t_ratio" not in saved["ui"]["splitters"]
+    close(app, window)
 
 
 def test_journal_event_filter_persists_and_resets(tmp_path: Path) -> None:
@@ -410,7 +517,7 @@ def test_dashboard_fits_1280x720_at_150_percent_font(large_font_window) -> None:
     # Rows keep their natural height (the list scrolls) instead of being squeezed together.
     assert all(r.height() >= r.minimumSizeHint().height() for r in window.skill_detail_list.rows)
     assert window.paperdoll_panel.scale < 1.0
-    assert window.inventory_card.scroll.height() < 5 * 50
+    assert window.inventory_card.scroll.height() < 5 * 68
     assert window.conversation_view.height() >= CONVERSATION_MIN_HEIGHT
     assert rect(scene.card_scroll, scene).bottom() < rect(window.conversation_view, scene).top()
     assert rect(window.conversation_view, scene).bottom() < rect(scene.choice_grid, scene).top()

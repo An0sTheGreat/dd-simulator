@@ -282,7 +282,7 @@ def test_inventory_card_lays_out_whole_square_rows_clear_of_the_scrollbar(tmp_pa
                 application.setStyleSheet("")
             else:
                 manager.apply_loaded_theme(application, manager.load_theme(theme_id), persist=False)
-            for scale, height in ((1.0, 600), (1.0, 390), (0.76, 290), (0.6, 200), (1.0, 230)):
+            for scale, height in ((1.0, 600), (1.0, 530), (0.76, 290), (0.6, 200), (1.0, 230)):
                 row = CodexCardRow(InventoryCard(bag(17)), PowersCard((action("a", "ability"),)))
                 card = row.inventory_card
                 card.set_scale(scale)
@@ -300,7 +300,7 @@ def test_inventory_card_lays_out_whole_square_rows_clear_of_the_scrollbar(tmp_pa
                 ]
                 rows = {rect.y() for _slot, rect in visible}
                 assert 1 <= len(rows) <= 5 and len(visible) == 5 * len(rows), where
-                assert len(rows) == 5 or height < 390, where  # 5 rows whenever they fit
+                assert len(rows) == 5 or height < 530, where  # 5 rows whenever they fit
                 assert {rect.width() for _s, rect in visible} == {card.grid.slot_size}, where
                 for index, (slot, rect) in enumerate(visible):
                     assert rect.width() == rect.height(), where

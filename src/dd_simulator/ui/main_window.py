@@ -141,10 +141,42 @@ WS_MINIMIZEBOX = 0x00020000
 WS_MAXIMIZEBOX = 0x00010000
 WS_SYSMENU = 0x00080000
 NATIVE_SNAP_STYLE = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU
-# Concept T: codex column about 724 px beside the scene at the 1600 px design width.
-CONCEPT_T_SIZES = (724, 876)
 # Equal header side columns keep the title centred; 370 px fits the theme combo.
 HEADER_SIDE_WIDTH = 370
+
+
+class RatioSplitter(QSplitter):
+    """Two panes that keep `ratio` of the width (50/50 by default) across resizes.
+
+    A handle drag sets the ratio and marks it user-set, which is what gets saved.
+    """
+
+    def __init__(self, orientation: Qt.Orientation, ratio: float = 0.5) -> None:
+        super().__init__(orientation)
+        self.ratio = ratio
+        self.user_set = False
+        self.splitterMoved.connect(self._remember_ratio)
+
+    def _remember_ratio(self, _position: int, _index: int) -> None:
+        total = sum(self.sizes())
+        if total > 0:
+            self.ratio = self.sizes()[0] / total
+            self.user_set = True
+
+    def set_ratio(self, ratio: float, *, user_set: bool) -> None:
+        self.ratio = ratio
+        self.user_set = user_set
+        self.apply_ratio()
+
+    def apply_ratio(self) -> None:
+        total = sum(self.sizes())
+        if total > 0:
+            first = round(total * self.ratio)
+            self.setSizes([first, total - first])
+
+    def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        super().resizeEvent(event)
+        self.apply_ratio()
 
 
 class CodexColumn(QWidget):
@@ -906,7 +938,7 @@ class MainWindow(QMainWindow):
         """Codex column (character, paperdoll and skills, cards) beside the scene."""
 
         dashboard = self.dashboard
-        splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter = RatioSplitter(Qt.Orientation.Horizontal)
         splitter.setObjectName("conceptTSplitter")
         splitter.setChildrenCollapsible(False)
         codex = CodexColumn()
@@ -954,9 +986,6 @@ class MainWindow(QMainWindow):
 
         splitter.addWidget(codex)
         splitter.addWidget(self.scene_view)
-        splitter.setStretchFactor(0, 0)
-        splitter.setStretchFactor(1, 1)
-        splitter.setSizes(list(CONCEPT_T_SIZES))
         return splitter
 
     def _show_conversation(self, narrative) -> None:  # type: ignore[no-untyped-def]
@@ -2212,7 +2241,8 @@ class MainWindow(QMainWindow):
         event_scroll = journal.event_log.scroll_state()
         recent_scroll = journal.recent_events.scroll_state()
         inventory_scroll = self.inventory_card.scroll.verticalScrollBar().value()
-        splitter_sizes = {"concept_t": self.concept_splitter.sizes()}
+        concept_ratio = (self.concept_splitter.ratio, self.concept_splitter.user_set)
+        splitter_sizes = {}
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
             splitter_sizes["people"] = people_splitter.sizes()
@@ -2230,9 +2260,7 @@ class MainWindow(QMainWindow):
         self._build_content_stack()
         self._resource_animation_starts = {}
         self.scene_view.select_target(combat_target)
-        sizes = self._valid_sizes(splitter_sizes.get("concept_t"), self.concept_splitter.count())
-        if sizes:
-            self.concept_splitter.setSizes(sizes)
+        self.concept_splitter.set_ratio(concept_ratio[0], user_set=concept_ratio[1])
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
             sizes = self._valid_sizes(splitter_sizes.get("people"), people_splitter.count())
@@ -2331,9 +2359,11 @@ class MainWindow(QMainWindow):
         ui = self.preferences_store.load_ui()
         splitters = ui.get("splitters")
         if isinstance(splitters, dict):
-            sizes = self._valid_sizes(splitters.get("concept_t"), self.concept_splitter.count())
-            if sizes:
-                self.concept_splitter.setSizes(sizes)
+            # Only a ratio the user dragged is saved; the old "concept_t" pixel sizes were
+            # written whether or not the user moved the handle, so they are ignored.
+            ratio = splitters.get("concept_t_ratio")
+            if isinstance(ratio, float) and 0.0 < ratio < 1.0:
+                self.concept_splitter.set_ratio(ratio, user_set=True)
             people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
             if people_splitter is not None:
                 sizes = self._valid_sizes(splitters.get("people"), people_splitter.count())
@@ -2367,16 +2397,18 @@ class MainWindow(QMainWindow):
     def save_ui_preferences(self) -> None:
         if self.preferences_store is None:
             return
+        splitters = {
+            "people": (
+                self.findChild(QSplitter, "peopleTradeConversationSplitter").sizes()
+                if self.findChild(QSplitter, "peopleTradeConversationSplitter")
+                is not None else [300, 400]
+            ),
+        }
+        if self.concept_splitter.user_set:
+            splitters["concept_t_ratio"] = self.concept_splitter.ratio
         self.preferences_store.save_ui(
             {
-                "splitters": {
-                    "concept_t": self.concept_splitter.sizes(),
-                    "people": (
-                        self.findChild(QSplitter, "peopleTradeConversationSplitter").sizes()
-                        if self.findChild(QSplitter, "peopleTradeConversationSplitter")
-                        is not None else [300, 400]
-                    ),
-                },
+                "splitters": splitters,
                 "page": self.current_page,
                 "font_size": self.font_size_preference,
                 "reduced_motion": self.reduced_motion_preference,
@@ -2507,7 +2539,7 @@ class MainWindow(QMainWindow):
 
     def _reset_ui_preferences(self) -> None:
         self._flush_ui_preferences()
-        self.concept_splitter.setSizes(list(CONCEPT_T_SIZES))
+        self.concept_splitter.set_ratio(0.5, user_set=False)
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
             people_splitter.setSizes([300, 400])

@@ -29,7 +29,7 @@ from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
 
 CARD_COLUMNS = 5
 CARD_VISIBLE_ROWS = 5
-CARD_SLOT_SIZE = 50
+CARD_SLOT_SIZE = 68
 CARD_SLOT_SPACING = 3
 CARD_SCROLLBAR_GAP = 5  # between the fifth column and the scrollbar, as in the mockup
 CARD_SCROLLBAR_GUTTER = 10  # 5 px gap + 5 px themed scrollbar, as in the mockup

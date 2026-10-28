@@ -248,6 +248,7 @@ def test_state_backed_ui_action_refreshes_inventory_and_preserves_page(tmp_path:
     window.controller.navigate("dashboard")
     window.resize(1600, 900)
     window.show()
+    app.processEvents()  # park the viewport against the settled rows, not the first layout's
     card = window.inventory_card
     messages: list[str] = []
     window.statusBar().messageChanged.connect(messages.append)
