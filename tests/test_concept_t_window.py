@@ -560,7 +560,7 @@ def test_people_sections_are_page_cards(tmp_path: Path) -> None:
     close(app, window)
 
 
-def test_people_list_sits_above_speaking_with_on_the_left(tmp_path: Path) -> None:
+def test_people_page_runs_conversation_trade_then_people_column(tmp_path: Path) -> None:
     app, window, _manager = build_application([], config_dir=tmp_path)
     window.resize(1600, 900)
     window.show()
@@ -571,12 +571,21 @@ def test_people_list_sits_above_speaking_with_on_the_left(tmp_path: Path) -> Non
     def rect(card):  # type: ignore[no-untyped-def]
         return card.geometry().translated(card.parentWidget().mapTo(page, card.geometry().topLeft()) - card.geometry().topLeft())
 
-    people, identity, conversation = (
-        rect(page.selector_card), rect(page.identity_card), rect(page.conversation_card)
+    trade_card = page.findChild(QFrame, "merchantTradePanel")
+    assert trade_card is not None
+    people, identity, conversation, trade = (
+        rect(page.selector_card), rect(page.identity_card), rect(page.conversation_card),
+        rect(trade_card),
     )
+    # Left to right: Conversation, Trade, then People above Speaking with.
+    assert conversation.right() < trade.left() < trade.right() < people.left()
     assert abs(people.left() - identity.left()) <= 1
     assert identity.top() > people.bottom()
-    assert identity.right() < conversation.left() and people.right() < conversation.left()
+    # The row's full height: Trade and the column run from the Conversation's top to the bottom.
+    assert conversation.top() == trade.top() == people.top()
+    assert abs(trade.bottom() - identity.bottom()) <= 1
+    # HEAD 83240e2 gave the Conversation 291 px at a 14 px line (about 21 lines); now about 1.8x.
+    assert conversation.height() >= 36 * page.fontMetrics().height()
     close(app, window)
 
 
@@ -605,6 +614,11 @@ def test_people_replies_and_trade_fit_at_small_window(tmp_path: Path) -> None:
         assert fits_one_line or wraps, button.text()
     scroll = page.findChild(QAbstractScrollArea, "merchantTradeScroll")
     assert scroll is not None and not scroll.horizontalScrollBar().isVisible()
+    # Stock and sell rows keep their item text on one line.
+    entries = [label for label in scroll.widget().findChildren(QLabel) if label.wordWrap() and label.text()]
+    assert entries
+    for label in entries:
+        assert label.fontMetrics().horizontalAdvance(label.text()) <= label.contentsRect().width(), label.text()
     close(app, window)
 
 

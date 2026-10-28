@@ -2374,7 +2374,7 @@ class MainWindow(QMainWindow):
                     "people": (
                         self.findChild(QSplitter, "peopleTradeConversationSplitter").sizes()
                         if self.findChild(QSplitter, "peopleTradeConversationSplitter")
-                        is not None else [300, 400]
+                        is not None else [500, 400]
                     ),
                 },
                 "page": self.current_page,
@@ -2510,7 +2510,7 @@ class MainWindow(QMainWindow):
         self.concept_splitter.setSizes(list(CONCEPT_T_SIZES))
         people_splitter = self.findChild(QSplitter, "peopleTradeConversationSplitter")
         if people_splitter is not None:
-            people_splitter.setSizes([300, 400])
+            people_splitter.setSizes([500, 400])  # [conversation, trade]
         if self.preferences_store is not None:
             self.preferences_store.reset_ui()
         self.select_font_size(100)

@@ -577,8 +577,8 @@ def _run_release_twenty_one_smoke(app: QApplication, window: MainWindow) -> None
         app.sendPostedEvents(None, QEvent.Type.DeferredDelete.value)
         trade = window.findChild(QWidget, "merchantTradePanel")
         people = window.navigation_pages["people"]
-        if trade is None or abs(trade.width() * 2 - people.width()) >= 60:
-            raise RuntimeError("Packaged Trade panel is not one-half People-page width")
+        if trade is None or not 0.3 * people.width() < trade.width() < 0.45 * people.width():
+            raise RuntimeError("Packaged Trade panel is not about two-fifths of People-page width")
         service.acknowledge_crafting_result(result.id)
         dialog = window.findChild(QWidget, "craftingResultsDialog")
         if dialog is not None:

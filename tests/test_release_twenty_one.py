@@ -151,12 +151,14 @@ def test_crafting_ui_popup_and_people_splitter_layout(tmp_path: Path) -> None:
     trade = window.findChild(QWidget, "merchantTradePanel")
     conversation = window.findChild(QWidget, "peopleConversationRegion")
     assert splitter is not None and trade is not None and conversation is not None
-    assert splitter.orientation().name == "Vertical"
+    # A horizontal divider between Conversation and Trade; Trade takes about two fifths.
+    assert splitter.orientation().name == "Horizontal"
     assert splitter.handleWidth() == window.concept_splitter.handleWidth()
-    assert abs(trade.width() * 2 - window.navigation_pages["people"].width()) < 45
-    assert conversation.width() > trade.width() * 3 // 2
+    page_width = window.navigation_pages["people"].width()
+    assert 0.3 * page_width < trade.width() < 0.45 * page_width
+    assert conversation.width() > trade.width() * 2
 
-    splitter.setSizes([260, 300])
+    splitter.setSizes([600, 450])
     expected = splitter.sizes()
     window.save_ui_preferences()
     assert preferences.load_ui()["splitters"]["people"] == expected

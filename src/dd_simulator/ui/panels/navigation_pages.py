@@ -333,6 +333,15 @@ def centered_third(content: QWidget, object_name: str = "centeredThird", *, shar
     return host
 
 
+def _wrapper(content: QWidget, object_name: str) -> QWidget:
+    host = QWidget()
+    host.setObjectName(object_name)
+    layout = QVBoxLayout(host)
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.addWidget(content)
+    return host
+
+
 class WrappingButton(SemanticButton):
     """Button whose text wraps onto more lines instead of clipping at both ends."""
 
@@ -494,15 +503,16 @@ class NpcNavigationPage(NavigationPage):
         )
         self.conversations = conversations
         self.selected_id = conversations[0].npc.id if conversations else ""
-        self.people_splitter = QSplitter(Qt.Orientation.Vertical)
+        # One full-height row, left to right: Conversation (Your reply beneath it) |
+        # Trade | People above Speaking with. The splitter divides Conversation and Trade.
+        self.people_splitter = QSplitter(Qt.Orientation.Horizontal)
         self.people_splitter.setObjectName("peopleTradeConversationSplitter")
         self.people_splitter.setChildrenCollapsible(False)
         self.trade_host = QWidget()
         self.trade_host.setObjectName("peopleTradeRegion")
         self.trade_layout = QVBoxLayout(self.trade_host)
         self.trade_layout.setContentsMargins(0, 0, 0, 0)
-        self.trade_host.setMinimumHeight(120)
-        self.people_splitter.addWidget(self.trade_host)
+        self.trade_host.setMinimumWidth(240)
 
         body_host = QWidget()
         body_host.setObjectName("peopleConversationRegion")
@@ -530,12 +540,6 @@ class NpcNavigationPage(NavigationPage):
             self.selection_buttons[npc.id] = button
         if not conversations:
             selector.addWidget(plain_label("No known NPCs are present.", "pageCardMeta", word_wrap=True))
-        # People list above Speaking with, both in one left column.
-        side = QVBoxLayout()
-        side.setContentsMargins(0, 0, 0, 0)
-        side.setSpacing(8)
-        side.addWidget(self.selector_card, 1)
-        body.addLayout(side)
         # Cards keep their heading; _render_selected refills the inner hosts.
         self.conversation_card, card = codex_card("Conversation", "npcConversationCard")
         card.setAlignment(Qt.AlignmentFlag(0))  # the thread takes the height
@@ -543,7 +547,31 @@ class NpcNavigationPage(NavigationPage):
         self.conversation_layout = QVBoxLayout(self.conversation_host)
         self.conversation_layout.setContentsMargins(0, 0, 0, 0)
         card.addWidget(self.conversation_host, 1)
-        body.addWidget(self.conversation_card, 1)
+        self.action_host, card = codex_card("Your reply", "npcBottomControls")
+        replies = QWidget()
+        self.action_layout = QVBoxLayout(replies)
+        self.action_layout.setContentsMargins(0, 0, 0, 0)
+        card.addWidget(replies)
+        self.action_layout.setSpacing(4)
+        # Your reply sits under the Conversation card, at its width.
+        conversation_column = QWidget()
+        column = QVBoxLayout(conversation_column)
+        column.setContentsMargins(0, 0, 0, 0)
+        column.setSpacing(8)
+        column.addWidget(self.conversation_card, 1)
+        column.addWidget(_wrapper(self.action_host, "npcCenteredFooter"))
+        conversation_column.setMinimumWidth(320)
+        self.people_splitter.addWidget(conversation_column)
+        self.people_splitter.addWidget(self.trade_host)
+        self.people_splitter.setStretchFactor(0, 5)
+        self.people_splitter.setStretchFactor(1, 4)
+        self.people_splitter.setSizes([500, 400])  # [conversation, trade]
+        body.addWidget(self.people_splitter, 1)
+        # People list above Speaking with, both in one right column.
+        side = QVBoxLayout()
+        side.setContentsMargins(0, 0, 0, 0)
+        side.setSpacing(8)
+        side.addWidget(self.selector_card, 1)
         self.identity_card, card = codex_card("Speaking with", "npcIdentityCard")
         self.identity_host = QWidget()
         self.identity_layout = QVBoxLayout(self.identity_host)
@@ -552,19 +580,8 @@ class NpcNavigationPage(NavigationPage):
         side.addWidget(self.identity_card)
         for column_card in (self.selector_card, self.identity_card):
             column_card.setFixedWidth(260)
-        body_host.setMinimumHeight(180)
-        self.people_splitter.addWidget(body_host)
-        self.people_splitter.setStretchFactor(0, 2)
-        self.people_splitter.setStretchFactor(1, 5)
-        self.people_splitter.setSizes([300, 400])  # trade shows several stock rows at 720p
-        self.layout.addWidget(self.people_splitter, 1)
-        self.action_host, card = codex_card("Your reply", "npcBottomControls")
-        replies = QWidget()
-        self.action_layout = QVBoxLayout(replies)
-        self.action_layout.setContentsMargins(0, 0, 0, 0)
-        card.addWidget(replies)
-        self.action_layout.setSpacing(4)
-        self.layout.addWidget(centered_third(self.action_host, "npcCenteredFooter", share=2))
+        body.addLayout(side)
+        self.layout.addWidget(body_host, 1)
         self._render_selected()
 
     def _select_npc(self, npc_id: str) -> None:
@@ -622,9 +639,9 @@ class NpcNavigationPage(NavigationPage):
         self.conversation_layout.addWidget(self.dialogue_status)
         if conversation.merchant is not None:
             self.trade_host.setVisible(True)
-            self.trade_layout.addWidget(centered_third(
-                self._merchant_panel(conversation), "merchantCenteredContainer", share=2
-            ))
+            self.trade_layout.addWidget(
+                _wrapper(self._merchant_panel(conversation), "merchantCenteredContainer")
+            )
         else:
             self.trade_host.setVisible(False)
         # The Adventure conversation's bubbles, without its fade into the scene art.
@@ -705,8 +722,10 @@ class NpcNavigationPage(NavigationPage):
         grid.setContentsMargins(0, 0, 0, 0)
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(4)
+        # One column: the stock list, then the sell list beneath it.
         grid.addWidget(plain_label("MERCHANT STOCK", "pageCardLabel"), 0, 0, 1, 3)
-        grid.addWidget(plain_label("SELL FROM INVENTORY", "pageCardLabel"), 0, 3, 1, 2)
+        sell_header = len(merchant.stock) + 1
+        grid.addWidget(plain_label("SELL FROM INVENTORY", "pageCardLabel"), sell_header, 0, 1, 3)
         for row_index, item in enumerate(merchant.stock, start=1):
             grid.addWidget(
                 _commerce_entry(
@@ -734,7 +753,7 @@ class NpcNavigationPage(NavigationPage):
             )
             grid.addWidget(buy, row_index, 1)
             grid.addWidget(barter, row_index, 2)
-        for row_index, item in enumerate(merchant.sellable_items, start=1):
+        for row_index, item in enumerate(merchant.sellable_items, start=sell_header + 1):
             label = _commerce_entry(
                 item,
                 f"{item.name} ×{item.quantity} — {item.sell_price} gp",
@@ -747,10 +766,10 @@ class NpcNavigationPage(NavigationPage):
                     self.selected_id, "sell", item_id
                 )
             )
-            grid.addWidget(label, row_index, 3)
-            grid.addWidget(sell, row_index, 4)
-        grid.setColumnStretch(0, 2)
-        grid.setColumnStretch(3, 2)
+            grid.addWidget(label, row_index, 0)
+            grid.addWidget(sell, row_index, 1)
+        grid.setColumnStretch(0, 1)
+        grid.setRowStretch(sell_header + 1 + len(merchant.sellable_items), 1)  # rows start at the top
         scroll.setWidget(content)
         layout.addWidget(scroll, 1)
         return panel

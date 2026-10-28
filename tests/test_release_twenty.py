@@ -6,6 +6,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
+from PySide6.QtCore import QPoint
 from PySide6.QtWidgets import QApplication, QWidget
 
 from dd_simulator.state import GameStateDatabase, GameStateError, GameStateService
@@ -122,7 +123,12 @@ def test_people_trade_ui_and_centered_footers(tmp_path: Path) -> None:
     footer = window.findChild(QWidget, "npcCenteredFooter")
     controls = window.findChild(QWidget, "npcBottomControls")
     assert footer is not None and controls is not None
-    assert abs(controls.width() * 2 - footer.width()) < 40
+    # Your reply lines up under the Conversation card.
+    conversation = window.findChild(QWidget, "npcConversationCard")
+    assert conversation is not None
+    assert controls.width() == footer.width() == conversation.width()
+    assert controls.mapToGlobal(QPoint(0, 0)).x() == conversation.mapToGlobal(QPoint(0, 0)).x()
+    assert controls.mapToGlobal(QPoint(0, 0)).y() > conversation.mapToGlobal(QPoint(0, conversation.height())).y()
 
     for target in ("map",):
         window.controller.navigate(target)
