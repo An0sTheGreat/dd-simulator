@@ -28,8 +28,9 @@ Plan: `docs/UI_REDESIGN_PLAN.md` (approved 2026-10-27; D5 icons from `Project Re
 | `2dd587a` | 2b: schema 23 `turn_notes`; per-turn note tags; transcript pages of 40 whole turns |
 | `d440dd8` | 2c: skill descriptions, abilities/spells split with status, full inventory list, portrait path |
 | `f328f11` | 3a: `power_icon_manifest.json` maps 8 skills + 44 catalog actions to CraftPix icons; `scripts/import_power_icons.py` copies them at 128 px to `ui/assets/icons/powers/`; resolver `ui/power_icons.py`; contact sheet `docs/design/power-icons.png` |
+| (this commit) | 3b: `ui/widgets/codex_character.py` — `CharacterStrip`, `PaperdollPanel` (an `EquipmentGrid` subclass, nine slots around the portrait), `SkillDetailList`; QSS block at the end of both themes; preview `scripts/preview_codex_left.py`; not yet wired in |
 
-Open items: `InventorySlotView` needs a bag `position` for Phase 6 drag and drop; turn notes are not yet written for combat ammo, potion and HP changes or for quests started from dialogue; the Phase 1 source frames include identical placeholder images (panel = tooltip = quest tracker).
+Open items: `InventorySlotView` needs a bag `position` for Phase 6 drag and drop; the paperdoll's ATK figure needs a projected player attack bonus (`PaperdollPanel(attack_bonus=...)`; combat computes it from equipment); turn notes are not yet written for combat ammo, potion and HP changes or for quests started from dialogue; the Phase 1 source frames include identical placeholder images (panel = tooltip = quest tracker).
 Icon library (28 supplied CraftPix packs + RPG Mega gap packs): `Y:/Games/D&D Simulator/Project Resources/assets`.
 
 ## Phase 29 summary (branch `phase-29-unsloth`)
