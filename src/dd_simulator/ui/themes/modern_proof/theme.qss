@@ -1,5 +1,6 @@
 QWidget#applicationRoot {
     background-color: {{colors.background_primary}};
+    border-image: url("assets/background_charcoal.jpg") 0 0 0 0 stretch stretch;
     color: {{colors.text_primary}};
     font-family: "{{typography.font_body}}";
     font-size: {{typography.size_body}};
@@ -115,22 +116,99 @@ QFrame#craftingResultItem[rarity="rare"] { border-color: {{colors.rarity_rare}};
 QFrame#craftingResultItem[rarity="epic"] { border-color: {{colors.rarity_epic}}; }
 QFrame#craftingResultItem[rarity="legendary"] { border-color: {{colors.rarity_legendary}}; }
 
+/* Title bar: no box, flat. A fading neutral hairline with a diamond runs under it. */
+QFrame#topHeader {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+QLabel#titleOrnamentLeft { image: url("assets/title_rule_left.png"); }
+QLabel#titleOrnamentRight { image: url("assets/title_rule_right.png"); }
+QLabel#headerRuleLeft { border-image: url("assets/header_rule_left.png") 0 0 0 0 stretch stretch; }
+QLabel#headerRuleRight { border-image: url("assets/header_rule_right.png") 0 0 0 0 stretch stretch; }
+QLabel#headerCrest { image: url("assets/header_crest.png"); }
+
 QLabel#applicationTitle {
-    color: {{colors.accent_primary}};
+    color: {{colors.text_primary}};
     font-family: "{{typography.font_display}}";
-    font-size: {{typography.size_title}};
-    font-weight: {{typography.weight_bold}};
+    font-size: 21px; /* font-scale-fixed */
+    font-weight: {{typography.weight_normal}};
+    letter-spacing: 3px;
+    padding: 0 10px;
 }
 
 QLabel#phaseLabel, QLabel#themeLabel {
-    color: {{colors.text_secondary}};
+    color: {{colors.text_muted}};
     font-family: "{{typography.font_heading}}";
+    font-size: 11px; /* font-scale-fixed */
     font-weight: {{typography.weight_bold}};
+    letter-spacing: 2px;
 }
 
-QLabel#themeLabel, QComboBox#themeSelector,
+QLabel#themeLabel { letter-spacing: 0px; padding: 0 4px 0 0; }
+
+QComboBox#themeSelector {
+    color: {{colors.text_primary}};
+    background: transparent;
+    font-size: 12px; /* font-scale-fixed */
+    min-width: 150px;
+    padding: 0 18px 1px 2px;
+    border: none;
+    border-bottom: 1px solid {{colors.border_primary}};
+    border-radius: 0;
+}
+
+QComboBox#themeSelector:hover, QComboBox#themeSelector:focus, QComboBox#themeSelector:on {
+    background-color: rgba(255, 255, 255, 12);
+    border: none;
+    border-bottom: 1px solid {{colors.border_highlight}};
+}
+
+QComboBox#themeSelector::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 14px;
+    border: none;
+    background: transparent;
+}
+
+QComboBox#themeSelector::down-arrow {
+    image: url("assets/dropdown_arrow.png");
+    width: 10px;
+    height: 6px;
+}
+
+QComboBox#themeSelector QAbstractItemView {
+    background-color: {{colors.background_elevated}};
+    color: {{colors.text_primary}};
+    border: 1px solid {{colors.border_primary}};
+    selection-background-color: {{colors.selection}};
+}
+
 QPushButton#windowMinimizeButton, QPushButton#windowMaximizeButton,
-QPushButton#windowCloseButton { font-size: 12px; /* font-scale-fixed */ padding: 0; }
+QPushButton#windowCloseButton {
+    color: {{colors.text_secondary}};
+    background: transparent;
+    font-size: 16px; /* font-scale-fixed */
+    font-weight: {{typography.weight_normal}};
+    padding: 0 0 2px 0;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+QPushButton#windowMinimizeButton:hover, QPushButton#windowMaximizeButton:hover,
+QPushButton#windowMinimizeButton:focus, QPushButton#windowMaximizeButton:focus {
+    color: {{colors.text_primary}};
+    background-color: {{colors.hover}};
+    border: 1px solid {{colors.border_primary}};
+}
+
+QPushButton#windowCloseButton:hover, QPushButton#windowCloseButton:focus {
+    color: #ffffff;
+    background-color: #c42b1c;
+    border: 1px solid #c42b1c;
+}
 
 QLabel#placeholderLabel {
     color: {{colors.text_secondary}};

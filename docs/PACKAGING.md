@@ -45,3 +45,7 @@ The current maintenance build also packages the owner-supplied `Inventory_Slot_1
 and `Inventory_Example_01.png` under `ui/assets/inventory`. Their authored colors are
 displayed unchanged in both supported themes. The same packaged slot image is reused for
 exact occupied-equipment-cell overlays; no duplicate runtime asset is required.
+
+The Concept B chrome replaces the 10 MB `background_dark.jpg` with generated title-bar
+ornaments and page backgrounds (about 45 KB across both themes) under each theme's
+`assets/` folder, which the existing `ui/themes/*/assets/*` package-data glob covers.

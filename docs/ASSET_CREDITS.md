@@ -104,7 +104,8 @@ confirming that the intended distribution complies with the supplied asset terms
 ## Supplied Release 26.7 background and Deep Dark Fantasy UI
 
 - Background source: `Project Resources/background_dark.jpg`, supplied by the project
-  owner; runtime copy: `assets/background-dark.jpg` in the Default theme.
+  owner. Its last runtime copy, in the Modern Fantasy Simple theme, was retired by the
+  Concept B chrome below and is no longer packaged.
 - UI source: `Project Resources/ui_final/ornate_fantasy_ui_svg_labeled/themes/`
   `deep_dark_fantasy`, supplied by the project owner.
 - Runtime selection: 27 labeled SVG panel, button, progress, divider, scrollbar, and
@@ -144,3 +145,15 @@ re-run to reproduce the runtime copies byte for byte.
   `Oxanium-Bold.ttf` in `src/dd_simulator/ui/assets/fonts`, from
   `Untitled RPG/Assets/Fonts/Oxanium`. SIL Open Font License 1.1; the license text ships
   beside the fonts as `oxanium-ofl.txt`.
+
+## Concept B title bar and page backgrounds (original, generated in code)
+
+- Original art, drawn procedurally with QPainter and seeded noise by
+  `scripts/generate_chrome_textures.py`; no third-party source. Rerunning the script
+  reproduces the files.
+- Modern Fantasy Simple (`themes/high_fantasy/assets`): `background_stone.jpg` (dark stone,
+  candlelight from the top), `header_crest.png`, `header_rule_left.png`,
+  `header_rule_right.png`, `title_rule_left.png`, `title_rule_right.png`.
+- Modern Dark Simple (`themes/modern_proof/assets`): `background_charcoal.jpg`,
+  `header_crest.png`, `header_rule_left.png`, `header_rule_right.png`,
+  `title_rule_left.png`, `title_rule_right.png`, `dropdown_arrow.png`.

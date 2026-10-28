@@ -12,7 +12,7 @@ import sys
 import zipfile
 
 from PySide6.QtCore import QPoint, QSize, QThreadPool, QTimer, Qt, Signal
-from PySide6.QtGui import QCloseEvent, QGuiApplication
+from PySide6.QtGui import QCloseEvent, QFont, QGuiApplication
 from PySide6.QtWidgets import (
     QComboBox,
     QDialog,
@@ -143,6 +143,8 @@ WS_SYSMENU = 0x00080000
 NATIVE_SNAP_STYLE = WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU
 # Concept T: codex column about 724 px beside the scene at the 1600 px design width.
 CONCEPT_T_SIZES = (724, 876)
+# Equal header side columns keep the title centred; 370 px fits the theme combo.
+HEADER_SIDE_WIDTH = 370
 
 
 class CodexColumn(QWidget):
@@ -699,13 +701,17 @@ class MainWindow(QMainWindow):
         self.title_bar = header
         header.setObjectName("topHeader")
         header.setProperty("role", "header")
-        header.setFixedHeight(54)
-        layout = QHBoxLayout(header)
-        layout.setContentsMargins(18, 6, 18, 6)
+        header.setFixedHeight(66)
+        outer = QVBoxLayout(header)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(0)
+        layout = QHBoxLayout()
+        layout.setContentsMargins(10, 0, 10, 0)
+        outer.addLayout(layout, 1)
 
         left = QWidget()
         left.setObjectName("titleBarLeft")
-        left.setFixedWidth(320)
+        left.setFixedWidth(HEADER_SIDE_WIDTH)
         left_layout = QHBoxLayout(left)
         left_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -720,15 +726,18 @@ class MainWindow(QMainWindow):
         title_layout = QHBoxLayout(title_center)
         title_layout.setContentsMargins(0, 0, 0, 0)
         title_layout.setSpacing(8)
-        # The ornaments give up their 150 px before the title starts to elide.
+        # The ornaments give up their 260 px before the title starts to elide.
         title_ornament_left = QLabel()
         title_ornament_left.setObjectName("titleOrnamentLeft")
         title_ornament_left.setFixedHeight(24)
-        title_ornament_left.setMaximumWidth(150)
+        title_ornament_left.setMaximumWidth(260)
         title_ornament_left.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         title_layout.addWidget(title_ornament_left, 1)
         self.application_title = ElidedLabel("", "applicationTitle", tooltip_on_self=True)
         self.application_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_font = QFont(self.application_title.font())
+        title_font.setCapitalization(QFont.Capitalization.SmallCaps)
+        self.application_title.setFont(title_font)
         self.preset_campaign_badge = QLabel("- PRESET CAMPAIGN")
         self.preset_campaign_badge.setObjectName("presetCampaignBadge")
         self.preset_campaign_badge.setProperty("textRole", "muted")
@@ -746,13 +755,13 @@ class MainWindow(QMainWindow):
         title_ornament_right = QLabel()
         title_ornament_right.setObjectName("titleOrnamentRight")
         title_ornament_right.setFixedHeight(24)
-        title_ornament_right.setMaximumWidth(150)
+        title_ornament_right.setMaximumWidth(260)
         title_ornament_right.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         title_layout.addWidget(title_ornament_right, 1)
 
         right = QWidget()
         right.setObjectName("titleBarRight")
-        right.setFixedWidth(320)
+        right.setFixedWidth(HEADER_SIDE_WIDTH)
         right_layout = QHBoxLayout(right)
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(5)
@@ -770,15 +779,37 @@ class MainWindow(QMainWindow):
             button = SemanticButton(text, role="secondary", object_name=name)
             button.setProperty("nativeTitleBarInteractive", True)
             button.setAccessibleName(name.removeprefix("window").removesuffix("Button"))
-            button.setFixedSize(30, 28)
+            button.setFixedSize(38, 30)
             button.clicked.connect(action)
             right_layout.addWidget(button)
 
         layout.addWidget(left)
         layout.addWidget(title_center, 1)
         layout.addWidget(right)
+        outer.addWidget(self._build_header_rule())
         self._update_application_title()
         return header
+
+    @staticmethod
+    def _build_header_rule() -> QWidget:
+        """Page-wide hairline under the header: two stretching halves around a fixed crest."""
+
+        rule = QWidget()
+        rule.setObjectName("headerCrestRule")
+        rule.setFixedHeight(26)
+        rule_layout = QHBoxLayout(rule)
+        rule_layout.setContentsMargins(0, 0, 0, 0)
+        rule_layout.setSpacing(0)
+        for name, width in (("headerRuleLeft", None), ("headerCrest", 64), ("headerRuleRight", None)):
+            part = QLabel()
+            part.setObjectName(name)
+            if width is None:
+                part.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+                rule_layout.addWidget(part, 1)
+            else:
+                part.setFixedWidth(width)
+                rule_layout.addWidget(part)
+        return rule
 
     def _update_application_title(self) -> None:
         campaign_name = self.dashboard.campaign_name.strip()

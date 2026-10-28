@@ -1,6 +1,6 @@
 QWidget#applicationRoot {
     background-color: {{colors.background_primary}};
-    border-image: url("assets/background_dark.jpg") 0 0 0 0 stretch stretch;
+    border-image: url("assets/background_stone.jpg") 0 0 0 0 stretch stretch;
     color: {{colors.text_primary}};
     font-family: "{{typography.font_body}}";
     font-size: {{typography.size_body}};
@@ -115,22 +115,111 @@ QFrame#craftingResultItem[rarity="rare"] { border-color: {{colors.rarity_rare}};
 QFrame#craftingResultItem[rarity="epic"] { border-color: {{colors.rarity_epic}}; }
 QFrame#craftingResultItem[rarity="legendary"] { border-color: {{colors.rarity_legendary}}; }
 
+/* Title bar: no box. The header sits on the page; a fading hairline with a shield crest
+   runs under it. Sizes are fixed because the bar height is. Small caps is set in code. */
+QFrame#topHeader {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+QLabel#titleOrnamentLeft { image: url("assets/title_rule_left.png"); }
+QLabel#titleOrnamentRight { image: url("assets/title_rule_right.png"); }
+QLabel#headerRuleLeft { border-image: url("assets/header_rule_left.png") 0 0 0 0 stretch stretch; }
+QLabel#headerRuleRight { border-image: url("assets/header_rule_right.png") 0 0 0 0 stretch stretch; }
+QLabel#headerCrest { image: url("assets/header_crest.png"); }
+
 QLabel#applicationTitle {
-    color: {{colors.accent_primary}};
+    color: #e0bd74;
     font-family: "{{typography.font_display}}";
-    font-size: {{typography.size_title}};
-    font-weight: {{typography.weight_bold}};
+    font-size: 24px; /* font-scale-fixed */
+    font-weight: {{typography.weight_normal}};
+    letter-spacing: 3px;
+    padding: 0 10px;
 }
 
-QLabel#phaseLabel, QLabel#themeLabel {
-    color: {{colors.text_secondary}};
-    font-family: "{{typography.font_heading}}";
-    font-weight: {{typography.weight_bold}};
+QLabel#phaseLabel {
+    color: #8f8068;
+    font-family: "Oxanium";
+    font-size: 11px; /* font-scale-fixed */
+    font-weight: 600;
+    letter-spacing: 3px;
 }
 
-QLabel#themeLabel, QComboBox#themeSelector,
+QLabel#themeLabel {
+    color: #8f8068;
+    font-family: "{{typography.font_display}}";
+    font-size: 12px; /* font-scale-fixed */
+    font-style: italic;
+    padding: 0 4px 0 0;
+}
+
+QComboBox#themeSelector {
+    color: {{codex.ink}};
+    background: transparent;
+    font-family: "{{typography.font_display}}";
+    font-size: 13px; /* font-scale-fixed */
+    min-width: 150px;
+    padding: 0 18px 1px 2px;
+    border: none;
+    border-bottom: 1px solid {{codex.gold_dark}};
+    border-radius: 0;
+}
+
+QComboBox#themeSelector:hover, QComboBox#themeSelector:focus, QComboBox#themeSelector:on {
+    color: #f2d592;
+    background-color: rgba(217, 180, 108, 18);
+    border: none;
+    border-bottom: 1px solid {{codex.gold}};
+}
+
+QComboBox#themeSelector::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 14px;
+    border: none;
+    background: transparent;
+}
+
+QComboBox#themeSelector::down-arrow {
+    image: url("../../assets/codex/markers/ui_dropdown_arrow.png");
+    width: 8px;
+    height: 8px;
+}
+
+QComboBox#themeSelector QAbstractItemView {
+    background-color: #17130e;
+    color: {{codex.ink}};
+    border: 1px solid {{codex.gold_dark}};
+    selection-background-color: #3a2a16;
+    selection-color: #f2d592;
+    font-family: "{{typography.font_display}}";
+}
+
 QPushButton#windowMinimizeButton, QPushButton#windowMaximizeButton,
-QPushButton#windowCloseButton { font-size: 12px; /* font-scale-fixed */ padding: 0; }
+QPushButton#windowCloseButton {
+    color: #c9a865;
+    background: transparent;
+    font-family: "{{typography.font_display}}";
+    font-size: 18px; /* font-scale-fixed */
+    font-weight: {{typography.weight_normal}};
+    padding: 0 0 2px 0;
+    border: 1px solid transparent;
+    border-radius: 3px;
+}
+
+QPushButton#windowMinimizeButton:hover, QPushButton#windowMaximizeButton:hover,
+QPushButton#windowMinimizeButton:focus, QPushButton#windowMaximizeButton:focus {
+    color: #f2d592;
+    background-color: rgba(217, 180, 108, 30);
+    border: 1px solid rgba(217, 180, 108, 90);
+}
+
+QPushButton#windowCloseButton:hover, QPushButton#windowCloseButton:focus {
+    color: #ffe9de;
+    background-color: rgba(150, 36, 26, 220);
+    border: 1px solid #c0573f;
+}
 
 QLabel#placeholderLabel {
     color: {{colors.text_secondary}};

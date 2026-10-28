@@ -238,7 +238,7 @@ def test_release_26_3_custom_chrome_centers_title_and_dims_for_dialogs(
     left = window.findChild(QWidget, "titleBarLeft")
     right = window.findChild(QWidget, "titleBarRight")
     title = window.findChild(QLabel, "applicationTitle")
-    assert left.width() == right.width() == 320
+    assert left.width() == right.width() == 370
     title_center = title.mapTo(window, title.rect().center()).x()
     assert abs(title_center - window.rect().center().x()) <= 1
 
