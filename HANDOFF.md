@@ -5,7 +5,7 @@ Last updated: 2026-10-27
 ## Current state
 
 - **Release 27 + Phase 29** merged into `main` and pushed to
-  `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.27.0`, database schema **21**.
+  `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.27.0`, database schema **21** on `main` (**23** on `ui-concept-t`).
 - **Local AI providers:** bundled llama.cpp (recommended), existing GGUF, **Unsloth
   Studio (primary external server)**, **LM Studio (secondary)**. All share
   `dd_simulator.local_model.LocalModelClient`, selected by `provider=`
@@ -15,6 +15,21 @@ Last updated: 2026-10-27
   `--smoke-test`, `--smoke-test-release27`, `--smoke-test-release19`,
   `--smoke-test-preset-campaign`, `--smoke-test-character-creation`.
   `--smoke-test-release18` exits 18 on `main` too (Known issue 2).
+
+## In progress: Concept T redesign (branch `ui-concept-t`, not pushed)
+
+Plan: `docs/UI_REDESIGN_PLAN.md` (approved 2026-10-27; D5 icons from `Project Resources/assets`, D7 keep 320 cap).
+
+| Commit | Phase |
+| --- | --- |
+| `06e4772`, `15b05f9` | Plan, PROJECT.md Phases 30-32, reference mockups in `docs/design/` |
+| `ddee2bb` | 1: codex frames, markers, portrait fallbacks, Oxanium, theme tokens, packaging |
+| `a24cf02` | 2a: schema 22 `narrative_messages.speaker_npc_id`; dialogue and turn speakers |
+| `2dd587a` | 2b: schema 23 `turn_notes`; per-turn note tags; transcript pages of 40 whole turns |
+| `d440dd8` | 2c: skill descriptions, abilities/spells split with status, full inventory list, portrait path |
+
+Open items: `InventorySlotView` needs a bag `position` for Phase 6 drag and drop; turn notes are not yet written for combat ammo, potion and HP changes or for quests started from dialogue; the Phase 1 source frames include identical placeholder images (panel = tooltip = quest tracker).
+Icon library (28 supplied CraftPix packs + RPG Mega gap packs): `Y:\Games\D&D Simulator\Project Resourcesssets`.
 
 ## Phase 29 summary (branch `phase-29-unsloth`)
 
