@@ -106,7 +106,7 @@ Required behavior:
 
 ### Phase 30 — Concept T dashboard
 
-Status: complete except the README screenshots (Release 28, 0.28.0).
+Status: complete (Release 28, 0.28.0; README screenshots pushed).
 
 Rebuild the Adventure dashboard as the approved Concept T, following `docs/UI_REDESIGN_PLAN.md` (plan Phases 1–7b).
 
@@ -120,6 +120,8 @@ Required behavior:
 
 ### Phase 31 — RPG Mega item icons
 
+Status: complete on `integration-p8-p9` (1,686 records to 1,247 CraftPix library icons; review sheet `docs/design/item-icons.png`).
+
 Replace the SVG item icons with RPG Mega painted icons for every item category (plan Phase 8).
 
 Required behavior:
@@ -128,6 +130,8 @@ Required behavior:
 - Every catalog and preset item resolves to an existing icon; tests prove it.
 
 ### Phase 32 — Music
+
+Status: complete on `integration-p8-p9` (22 tracks, `docs/AUDIO.md`; tavern_inn still uses the village day placeholder).
 
 Add context-driven music and ambience (plan Phase 9).
 
