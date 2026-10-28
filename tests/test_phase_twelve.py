@@ -23,7 +23,7 @@ from dd_simulator.ui.widgets.quest_rewards_dialog import QuestRewardsDialog
 
 def phase_twelve_service(tmp_path: Path) -> tuple[GameStateDatabase, GameStateService]:
     database = GameStateDatabase(tmp_path / "phase-twelve.db")
-    assert database.initialize() == LATEST_SCHEMA_VERSION == 23
+    assert database.initialize() == LATEST_SCHEMA_VERSION == 24
     seed_demo_campaign(database)
     return database, GameStateService(database)
 

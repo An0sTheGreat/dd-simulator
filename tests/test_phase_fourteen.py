@@ -35,7 +35,7 @@ def test_schema_twelve_migrates_inventory_and_npc_conversations() -> None:
     database, service = phase_fourteen_service()
     dashboard = service.load_active_dashboard()
 
-    assert database.schema_version() == LATEST_SCHEMA_VERSION == 23
+    assert database.schema_version() == LATEST_SCHEMA_VERSION == 24
     assert len(dashboard.inventory_preview) == 36
     visible = {item.name for item in dashboard.inventory_preview if item.name}
     equipped = {slot.item_name for slot in dashboard.equipment if slot.item_name}

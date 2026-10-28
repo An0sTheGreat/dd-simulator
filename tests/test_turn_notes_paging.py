@@ -156,9 +156,9 @@ def test_schema_23_migration_backs_up_and_preserves_transcript(tmp_path) -> None
     with database.connect() as connection:
         before = connection.execute("SELECT COUNT(*) FROM narrative_messages").fetchone()[0]
         connection.execute("DROP TABLE turn_notes")
-        connection.execute("DELETE FROM schema_migrations WHERE version = 23")
+        connection.execute("DELETE FROM schema_migrations WHERE version >= 23")
 
-    assert GameStateDatabase(path).initialize() == 23
+    assert GameStateDatabase(path).initialize() == 24
     assert list((tmp_path / "backups" / "migrations").glob("pre-migration-v22-*.db"))
     with database.connect() as connection:
         assert connection.execute("SELECT COUNT(*) FROM narrative_messages").fetchone()[0] == before

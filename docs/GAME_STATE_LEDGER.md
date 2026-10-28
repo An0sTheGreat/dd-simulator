@@ -66,6 +66,12 @@ are discarded. The dashboard projection returns the newest whole turns up to 40
 messages plus `has_older_messages`, attaching each turn's notes to its last message;
 `GameStateService.older_messages(campaign_id, before_turn, limit=40)` pages back.
 
+Version 24 adds a nullable `turn_notes.sequence`: the sequence of the last message the
+claiming transaction wrote in that turn. A People exchange reuses the current turn
+number, so its notes now sit on the NPC reply while the action's notes stay on the
+action's response. Rows from before version 24 (NULL sequence) still attach to the
+last message of their turn.
+
 Without a schema change, the dashboard projection also carries the Concept T character
 data: skill descriptions from `SKILL_DESCRIPTIONS`, unlocked powers split into
 `abilities` and `spells` by `action_kind` with a short `status_label`, every occupied

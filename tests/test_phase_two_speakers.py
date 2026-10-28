@@ -46,7 +46,7 @@ def test_schema_21_transcript_migrates_with_null_speaker_and_backup(tmp_path: Pa
     connection.close()
 
     database = GameStateDatabase(path)
-    assert database.initialize() == LATEST_SCHEMA_VERSION == 23
+    assert database.initialize() == LATEST_SCHEMA_VERSION == 24
     with database.connect() as migrated:
         rows = migrated.execute(
             "SELECT id, kind, text, speaker_npc_id FROM narrative_messages ORDER BY sequence"

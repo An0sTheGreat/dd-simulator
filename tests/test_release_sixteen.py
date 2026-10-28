@@ -28,7 +28,7 @@ def _write_png(path: Path, color: str) -> None:
 def _file_service(tmp_path: Path) -> tuple[GameStateDatabase, GameStateService]:
     database = GameStateDatabase(tmp_path / "game_state.db")
     service = GameStateService(database)
-    assert service.initialize() == LATEST_SCHEMA_VERSION == 23
+    assert service.initialize() == LATEST_SCHEMA_VERSION == 24
     service.load_active_dashboard()
     return database, service
 

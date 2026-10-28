@@ -1523,6 +1523,12 @@ MIGRATIONS: tuple[tuple[int, str], ...] = (
         CREATE INDEX turn_note_order ON turn_notes(campaign_id, turn_number, id);
         """,
     ),
+    (
+        24,
+        """
+        ALTER TABLE turn_notes ADD COLUMN sequence INTEGER CHECK (sequence >= 0);
+        """,
+    ),
 )
 
 

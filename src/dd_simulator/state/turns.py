@@ -139,14 +139,20 @@ def record_turn_note(
 def claim_turn_notes(
     connection: sqlite3.Connection, campaign_id: str, turn_number: int
 ) -> None:
-    """Attach this transaction's buffered notes to the turn whose messages it wrote."""
+    """Attach this transaction's buffered notes to the message it last wrote.
+
+    Callers claim right after writing their messages, so the turn's highest sequence
+    is this transaction's last message; a People exchange that shares the turn number
+    of an earlier action keeps its notes off that action's response.
+    """
 
     connection.execute(_PENDING_NOTES_TABLE)
     connection.execute(
-        "INSERT INTO turn_notes(campaign_id, turn_number, kind, text) "
-        "SELECT campaign_id, ?, kind, text FROM temp.pending_turn_notes "
-        "WHERE campaign_id = ? ORDER BY rowid",
-        (turn_number, campaign_id),
+        "INSERT INTO turn_notes(campaign_id, turn_number, sequence, kind, text) "
+        "SELECT campaign_id, ?, (SELECT MAX(sequence) FROM narrative_messages "
+        "WHERE campaign_id = ? AND turn_number = ?), kind, text "
+        "FROM temp.pending_turn_notes WHERE campaign_id = ? ORDER BY rowid",
+        (turn_number, campaign_id, turn_number, campaign_id),
     )
     connection.execute(
         "DELETE FROM temp.pending_turn_notes WHERE campaign_id = ?", (campaign_id,)

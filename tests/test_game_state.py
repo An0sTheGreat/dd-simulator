@@ -108,7 +108,7 @@ def test_schema_v4_migrates_to_current_narrative_storage(tmp_path: Path) -> None
     connection.close()
 
     database = GameStateDatabase(path)
-    assert database.initialize() == LATEST_SCHEMA_VERSION == 23
+    assert database.initialize() == LATEST_SCHEMA_VERSION == 24
     with database.connect() as migrated:
         narrative_columns = {
             str(row[1]) for row in migrated.execute("PRAGMA table_info(narratives)")
@@ -148,7 +148,7 @@ def test_schema_v5_backfills_action_turns_into_transcript(tmp_path: Path) -> Non
     connection.close()
 
     database = GameStateDatabase(path)
-    assert database.initialize() == 23
+    assert database.initialize() == 24
     with database.connect() as migrated:
         messages = migrated.execute(
             "SELECT kind, text FROM narrative_messages "
@@ -183,7 +183,7 @@ def test_schema_v6_preserves_transcript_and_adds_combat_ledger(tmp_path: Path) -
     connection.close()
 
     database = GameStateDatabase(path)
-    assert database.initialize() == 23
+    assert database.initialize() == 24
     with database.connect() as migrated:
         assert migrated.execute(
             "SELECT text FROM narrative_messages WHERE id = 'old-message'"

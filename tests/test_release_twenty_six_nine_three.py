@@ -22,7 +22,7 @@ from dd_simulator.state.errors import GameStateError
 def initialized_demo() -> tuple[GameStateDatabase, GameStateService, str]:
     database = GameStateDatabase.in_memory()
     service = GameStateService(database)
-    assert service.initialize() == 23
+    assert service.initialize() == 24
     campaign_id = service.ensure_demo_campaign()
     return database, service, campaign_id
 

@@ -288,16 +288,22 @@ def message_page(
         ))
         if speaker_view is not None and speaker_view.path:
             portraits[speaker_id] = speaker_view.path
+    last_of_turn = {int(row["turn_number"]): index for index, row in enumerate(rows)}
+    index_of = {
+        (int(row["turn_number"]), int(row["sequence"])): index for index, row in enumerate(rows)
+    }
+    # A note sits on the message it was claimed with; notes from before schema 24
+    # (NULL sequence) fall back to the last message of their turn.
     notes: dict[int, list[TurnNoteView]] = {}
     for note in connection.execute(
-        "SELECT turn_number, kind, text FROM turn_notes WHERE campaign_id = ? "
+        "SELECT turn_number, sequence, kind, text FROM turn_notes WHERE campaign_id = ? "
         "AND turn_number >= ? AND turn_number < ? ORDER BY turn_number, id",
         (campaign_id, first_turn, before_turn),
     ):
-        notes.setdefault(int(note["turn_number"]), []).append(
-            TurnNoteView(str(note["kind"]), str(note["text"]))
-        )
-    last_of_turn = {int(row["turn_number"]): index for index, row in enumerate(rows)}
+        turn = int(note["turn_number"])
+        target = index_of.get((turn, note["sequence"]), last_of_turn.get(turn))
+        if target is not None:
+            notes.setdefault(target, []).append(TurnNoteView(str(note["kind"]), str(note["text"])))
     messages = tuple(
         NarrativeMessageView(
             str(row["kind"]),
@@ -306,11 +312,7 @@ def message_page(
             speaker_id=None if row["speaker_npc_id"] is None else str(row["speaker_npc_id"]),
             speaker_name=str(row["speaker_name"] or ""),
             speaker_portrait=portraits.get(str(row["speaker_npc_id"]), ""),
-            notes=(
-                tuple(notes.get(int(row["turn_number"]), ()))
-                if last_of_turn[int(row["turn_number"])] == index
-                else ()
-            ),
+            notes=tuple(notes.get(index, ())),
         )
         for index, row in enumerate(rows)
     )
