@@ -410,6 +410,8 @@ class InventorySlotWidget(QFrame):
         )
         self._place_well()
         self._refresh_artwork()
+        # ponytail: inner well art hidden for now; drop this line to bring it back
+        self.artwork_label.hide()
         self.icon_label = item_icon_label(
             item.name or "",
             rarity=item.rarity,
@@ -480,6 +482,8 @@ class InventorySlotWidget(QFrame):
     def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         super().resizeEvent(event)
         self._place_well()
+        # the hidden well gets no resize events of its own, so refit the icon here
+        self._fit_to_frame()
 
     def changeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         super().changeEvent(event)
