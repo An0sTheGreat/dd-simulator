@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import Qt as GuiQt
 from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
@@ -18,6 +19,7 @@ from dd_simulator.ui.models.presentation import (
     TravelRouteView,
     WorldMapView,
 )
+from dd_simulator.ui.widgets.codex_cards import codex_card
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_dialog import ThemedDialog
 
@@ -32,13 +34,13 @@ class WorldMapPanel(QFrame):
         self.world_map = world_map
         self.selected_route: TravelRouteView | None = None
         self.location_buttons: dict[str, SemanticButton] = {}
-        root = QHBoxLayout(self)
+        root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
-        root.setSpacing(10)
+        root.setSpacing(8)
 
-        canvas_frame = QFrame()
-        canvas_frame.setObjectName("worldMapCanvas")
-        canvas_layout = QVBoxLayout(canvas_frame)
+        locations = world_map.locations if world_map else ()
+        canvas_frame, canvas_layout = codex_card("World Map", "worldMapCanvas", count=len(locations))
+        canvas_layout.setAlignment(Qt.AlignmentFlag(0))
         compass = QLabel("NORTH")
         compass.setObjectName("mapCompass")
         compass.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -59,15 +61,17 @@ class WorldMapPanel(QFrame):
             self.map_grid.setRowStretch(row, 1)
         scroll.setWidget(map_content)
         canvas_layout.addWidget(scroll, 1)
-        root.addWidget(canvas_frame, 7)
+        root.addWidget(canvas_frame, 1)
 
-        details = QFrame()
-        details.setObjectName("travelDetailsPanel")
-        details.setMinimumWidth(330)
-        detail_layout = QVBoxLayout(details)
-        title = QLabel("TRAVEL ROUTE")
-        title.setObjectName("travelDetailsTitle")
-        detail_layout.addWidget(title)
+        # Route and camp sit in one band under the map, so neither card has an empty middle.
+        details, details_layout = codex_card("Travel Route", "travelDetailsPanel")
+        detail_columns = QHBoxLayout()
+        detail_columns.setSpacing(14)
+        details_layout.addLayout(detail_columns)
+        detail_layout = QVBoxLayout()
+        action_layout = QVBoxLayout()
+        detail_columns.addLayout(detail_layout, 3)
+        detail_columns.addLayout(action_layout, 2)
         self.destination_label = QLabel("Select a discovered location.")
         self.destination_label.setObjectName("travelDestinationName")
         self.destination_label.setWordWrap(True)
@@ -81,7 +85,7 @@ class WorldMapPanel(QFrame):
         self.route_stats = QLabel("")
         self.route_stats.setObjectName("travelRouteStats")
         self.route_stats.setWordWrap(True)
-        detail_layout.addWidget(self.route_stats)
+        action_layout.addWidget(self.route_stats)
         self.route_requirement = QLabel("")
         self.route_requirement.setObjectName("travelRouteRequirement")
         self.route_requirement.setWordWrap(True)
@@ -91,11 +95,11 @@ class WorldMapPanel(QFrame):
         )
         self.travel_button.setEnabled(False)
         self.travel_button.clicked.connect(self._emit_travel)
-        detail_layout.addWidget(self.travel_button)
+        action_layout.addWidget(self.travel_button)
+        action_layout.addStretch(1)
         detail_layout.addStretch(1)
-        camp_title = QLabel("CAMP")
-        camp_title.setObjectName("travelDetailsTitle")
-        detail_layout.addWidget(camp_title)
+        camp_card, camp_layout = codex_card("Camp", "mapCampCard")
+        detail_layout = camp_layout
         camp_help = QLabel(
             "Camping advances time and recovers resources. Eight hours also resets limited uses."
         )
@@ -116,7 +120,17 @@ class WorldMapPanel(QFrame):
             last.setObjectName("lastJourneyLabel")
             last.setWordWrap(True)
             detail_layout.addWidget(last)
-        root.addWidget(details, 3)
+        band = QHBoxLayout()
+        band.setSpacing(8)
+        band.addWidget(details, 3)
+        band.addWidget(camp_card, 2)
+        root.addLayout(band)
+
+        for label in (
+            self.destination_label, self.route_description, self.route_stats,
+            self.route_requirement, *self.findChildren(QLabel, "lastJourneyLabel"),
+        ):
+            label.setTextFormat(Qt.TextFormat.PlainText)
 
         if world_map is None or not world_map.locations:
             unavailable = QLabel("No discovered map locations are available.")
@@ -140,7 +154,9 @@ class WorldMapPanel(QFrame):
             button.setAccessibleName(
                 f"{location.name}, {'current location' if location.current else 'map location'}"
             )
-            button.setToolTip(f"{location.description}\nDanger: {location.danger}")
+            button.setToolTip(
+                GuiQt.convertFromPlainText(f"{location.description}\nDanger: {location.danger}")
+            )
             button.clicked.connect(
                 lambda _checked=False, location_id=location.id: self.select_location(location_id)
             )

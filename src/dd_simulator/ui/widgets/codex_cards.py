@@ -59,6 +59,57 @@ def _heading(title: str, count: int | None = None) -> QWidget:
     return row
 
 
+def plain_label(text: str, object_name: str, *, word_wrap: bool = False) -> QLabel:
+    """Game or model text, never interpreted as rich text."""
+
+    label = QLabel(text)
+    label.setObjectName(object_name)
+    label.setTextFormat(Qt.TextFormat.PlainText)
+    label.setWordWrap(word_wrap)
+    return label
+
+
+def codex_card(
+    title: str, object_name: str, *, count: int | None = None
+) -> tuple[QFrame, QVBoxLayout]:
+    """The shared page card: codex frame, small-caps heading with divider and optional count.
+
+    Styled by ``QFrame[codexCard="true"]`` and ``QFrame[pageCard="true"]`` in each theme.
+    """
+
+    card = QFrame()
+    card.setObjectName(object_name)
+    card.setProperty("codexCard", True)
+    card.setProperty("pageCard", True)
+    card.setAccessibleName(title)
+    layout = QVBoxLayout(card)
+    layout.setContentsMargins(8, 2, 8, 4)
+    layout.setSpacing(5)
+    layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+    layout.addWidget(_heading(title, count))
+    return card, layout
+
+
+def icon_row(icon: QWidget, name: str, meta: str, *, rarity: str = "") -> QWidget:
+    """Icon, name (rarity-coloured when given) and a muted meta line, as in the codex cards."""
+
+    row = QWidget()
+    row.setObjectName("pageCardRow")
+    layout = QHBoxLayout(row)
+    layout.setContentsMargins(0, 0, 0, 0)
+    layout.setSpacing(8)
+    layout.addWidget(icon)
+    text = QVBoxLayout()
+    text.setContentsMargins(0, 0, 0, 0)
+    text.setSpacing(0)
+    title = plain_label(name, "pageCardName", word_wrap=True)
+    title.setProperty("rarity", rarity)
+    text.addWidget(title)
+    text.addWidget(plain_label(meta, "pageCardMeta", word_wrap=True))
+    layout.addLayout(text, 1)
+    return row
+
+
 def bag_slots(items: tuple[InventorySlotView, ...], capacity: int) -> tuple[InventorySlotView, ...]:
     """Lay occupied items out by bag position: every row up to the last item, one spare row."""
 
@@ -247,7 +298,7 @@ def _power_detail(action: CombatActionOptionView) -> str:
 class PowerEntry(QFrame):
     activated = Signal(str)
 
-    def __init__(self, action: CombatActionOptionView) -> None:
+    def __init__(self, action: CombatActionOptionView, *, detail: str | None = None) -> None:
         super().__init__()
         self.action = action
         self.setObjectName("powerEntry")
@@ -274,7 +325,7 @@ class PowerEntry(QFrame):
         text.setSpacing(0)
         for object_name, value in (
             ("powerEntryName", action.name),
-            ("powerEntryDetail", _power_detail(action)),
+            ("powerEntryDetail", _power_detail(action) if detail is None else detail),
             ("powerEntryStatus", status),
         ):
             # Elides to the column's scroll viewport instead of running past its edge.

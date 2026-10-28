@@ -11,6 +11,7 @@ from PySide6.QtCore import QPoint, QThreadPool, Qt
 from PySide6.QtWidgets import (
     QAbstractScrollArea,
     QApplication,
+    QFrame,
     QLabel,
     QLineEdit,
     QPushButton,
@@ -477,6 +478,26 @@ def test_elided_text_keeps_its_full_text_as_the_accessible_name(large_font_windo
     assert scene.tabs.buttons["character_sheet"].accessibleName() == "Character Sheet tab"
     scene.time_chip.set_full_text("DAY 18 · EVENING")
     assert scene.time_chip.accessibleName() == "DAY 18 · EVENING"
+
+
+def test_character_sheet_and_map_use_the_shared_page_card(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.show()
+    app.processEvents()
+    sheet = window.navigation_pages["character_sheet"]
+    sheet_cards = [frame for frame in sheet.findChildren(QFrame) if frame.property("pageCard")]
+    assert {card.accessibleName() for card in sheet_cards} >= {
+        "Identity", "Ability Scores", "Combat Summary", "Skills", "Equipment",
+        "Abilities & Spells", "Possessions & Currency",
+    }
+    map_cards = {
+        frame.objectName()
+        for frame in window.navigation_pages["map"].findChildren(QFrame)
+        if frame.property("pageCard")
+    }
+    assert {"worldMapCanvas", "travelDetailsPanel", "mapCampCard"} <= map_cards
+    assert all(card.property("codexCard") for card in sheet_cards)
+    close(app, window)
 
 
 @pytest.mark.parametrize("size", [(1280, 720), (1600, 900)])

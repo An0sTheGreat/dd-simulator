@@ -28,6 +28,8 @@ from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.state.progression import saving_throw_proficiencies
 from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard, equipped_comparisons
+from dd_simulator.ui.widgets.codex_cards import PowerEntry, codex_card, icon_row, plain_label
+from dd_simulator.ui.widgets.codex_character import SkillDetailRow
 from dd_simulator.ui.widgets.quest_list import QuestListWidget
 from dd_simulator.ui.widgets.world_map import WorldMapPanel
 
@@ -52,7 +54,10 @@ class NavigationPage(ThemedFrame):
         header.addWidget(self.action_bar)
         self.layout.addLayout(header)
         self.layout.addWidget(
-            semantic_label(description, text_role="secondary", word_wrap=True)
+            semantic_label(
+                description, object_name="navigationPageSubtitle", text_role="secondary",
+                word_wrap=True,
+            )
         )
 
 
@@ -71,19 +76,29 @@ def page_action_bar(*buttons: QPushButton) -> QWidget:
     return bar
 
 
-def _sheet_section(title: str) -> tuple[ThemedFrame, QVBoxLayout]:
-    section = ThemedFrame("characterSheetSection", role="section")
-    section.setProperty("sheetSection", title.casefold().replace(" ", "_"))
-    layout = QVBoxLayout(section)
-    layout.setContentsMargins(9, 5, 9, 6)
-    layout.setSpacing(2)
-    layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-    layout.addWidget(
-        semantic_label(
-            title.upper(), object_name="characterSheetSectionTitle", text_role="accent"
-        )
-    )
-    return section, layout
+def _stack(*cards: QWidget) -> QVBoxLayout:
+    """One sheet column; its last card takes the spare height so columns end level."""
+
+    column = QVBoxLayout()
+    column.setSpacing(8)
+    for card in cards:
+        column.addWidget(card)
+    column.setStretch(len(cards) - 1, 1)
+    return column
+
+
+def _field(layout: QGridLayout, row: int, column: int, label: str, value: str, value_name: str) -> None:
+    layout.addWidget(plain_label(label.upper(), "pageCardLabel"), row, column)
+    # Vitals stay on one line so each column keeps its value's full width.
+    wrap = value_name != "characterSheetVitalValue"
+    layout.addWidget(plain_label(value, value_name, word_wrap=wrap), row + 1, column)
+    layout.setColumnStretch(column, 1)
+
+
+def _lines(layout: QVBoxLayout, rows: tuple[tuple[str, str], ...]) -> None:
+    for label, value in rows:
+        layout.addWidget(plain_label(label.upper(), "pageCardLabel"))
+        layout.addWidget(plain_label(value, "pageCardValue", word_wrap=True))
 
 
 class CharacterSheetPage(NavigationPage):
@@ -97,82 +112,61 @@ class CharacterSheetPage(NavigationPage):
             "CHARACTER SHEET",
             "A themed summary of the current character and their adventuring capabilities.",
         )
+        player = dashboard.player
         scroll = QScrollArea()
         scroll.setObjectName("characterSheetScroll")
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         scroll.setWidgetResizable(True)
-
         viewport = QWidget()
         viewport.setObjectName("characterSheetViewport")
-        centered = QGridLayout(viewport)
-        centered.setContentsMargins(0, 2, 0, 2)
-        centered.setColumnStretch(0, 1)
-        centered.setColumnStretch(1, 3)
-        centered.setColumnStretch(2, 1)
+        viewport_layout = QVBoxLayout(viewport)
+        viewport_layout.setContentsMargins(0, 2, 0, 2)
 
-        sheet = ThemedFrame("characterSheetSurface", role="section")
-        sheet.setAccessibleName(f"Character sheet for {dashboard.player.name}")
-        page = QVBoxLayout(sheet)
-        page.setContentsMargins(14, 12, 14, 14)
-        page.setSpacing(8)
+        sheet = QWidget()
+        sheet.setObjectName("characterSheetSurface")
+        sheet.setAccessibleName(f"Character sheet for {player.name}")
+        grid = QGridLayout(sheet)
+        grid.setContentsMargins(0, 0, 0, 0)
+        grid.setSpacing(8)
 
-        identity = ThemedFrame("characterSheetIdentity", role="section")
-        identity_grid = QGridLayout(identity)
-        identity_grid.setContentsMargins(10, 8, 10, 8)
-        identity_grid.setHorizontalSpacing(16)
-        fields = (
-            ("Character", dashboard.player.name),
-            ("Ancestry", dashboard.player.species or "Unknown"),
-            ("Class", dashboard.player.character_class),
-            ("Level", str(dashboard.player.level)),
-            ("Background", dashboard.player.background or "Unrecorded"),
-        )
-        for column, (label, value) in enumerate(fields):
-            identity_grid.addWidget(
-                semantic_label(label.upper(), text_role="muted"), 0, column
-            )
-            identity_grid.addWidget(
-                semantic_label(value, object_name="characterSheetIdentityValue", text_role="body", word_wrap=True),
-                1,
-                column,
-            )
-            identity_grid.setColumnStretch(column, 1)
-        page.addWidget(identity)
+        identity, identity_layout = codex_card("Identity", "characterSheetIdentity")
+        identity_grid = QGridLayout()
+        identity_grid.setHorizontalSpacing(14)
+        identity_grid.setVerticalSpacing(1)
+        for column, (label, value) in enumerate((
+            ("Character", player.name),
+            ("Ancestry", player.species or "Unknown"),
+            ("Class", player.character_class),
+            ("Level", str(player.level)),
+            ("Background", player.background or "Unrecorded"),
+        )):
+            _field(identity_grid, 0, column, label, value, "characterSheetIdentityValue")
+        identity_layout.addLayout(identity_grid)
+        grid.addWidget(identity, 0, 0, 1, 2)
 
-        attributes = QWidget()
-        attributes.setObjectName("characterSheetAttributes")
-        attribute_grid = QGridLayout(attributes)
-        attribute_grid.setContentsMargins(0, 0, 0, 0)
-        attribute_grid.setSpacing(5)
-        for column, attribute in enumerate(dashboard.player.attributes[:6]):
-            card = ThemedFrame("characterSheetAttribute", role="section")
-            card_layout = QVBoxLayout(card)
-            card_layout.setContentsMargins(5, 4, 5, 5)
-            card_layout.setSpacing(1)
-            name = semantic_label(attribute.name.upper(), text_role="muted")
-            name.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            value = semantic_label(str(attribute.value), object_name="characterSheetAttributeValue", text_role="heading")
-            value.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            modifier = semantic_label(f"{attribute.modifier:+d}", object_name="characterSheetModifier", text_role="accent")
-            modifier.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            card_layout.addWidget(name)
-            card_layout.addWidget(value)
-            card_layout.addWidget(modifier)
-            attribute_grid.addWidget(card, 0, column)
-            attribute_grid.setColumnStretch(column, 1)
-        page.addWidget(attributes)
+        attributes, attributes_layout = codex_card("Ability Scores", "characterSheetAttributes")
+        tiles = QHBoxLayout()
+        tiles.setSpacing(5)
+        for attribute in player.attributes[:6]:
+            tile = ThemedFrame("characterSheetAttribute", role="section")
+            tile_layout = QVBoxLayout(tile)
+            tile_layout.setContentsMargins(2, 1, 2, 1)
+            tile_layout.setSpacing(0)
+            for text, name in (
+                (attribute.name.upper(), "pageCardLabel"),
+                (str(attribute.value), "characterSheetAttributeValue"),
+                (f"{attribute.modifier:+d}", "characterSheetModifier"),
+            ):
+                label = plain_label(text, name)
+                label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                tile_layout.addWidget(label)
+            tiles.addWidget(tile, 1)
+        attributes_layout.addLayout(tiles)
+        grid.addWidget(attributes, 0, 2, 1, 2)
 
-        columns = QHBoxLayout()
-        columns.setSpacing(7)
-
-        left = QVBoxLayout()
-        vitals, vitals_layout = _sheet_section("Combat Summary")
+        vitals, vitals_layout = codex_card("Combat Summary", "characterSheetSection")
         health = next(
-            (
-                resource
-                for resource in dashboard.player.resources
-                if resource.resource_type == "health"
-            ),
+            (resource for resource in player.resources if resource.resource_type == "health"),
             None,
         )
         # Each value in its own equal-stretch column under its label, with a real gutter:
@@ -182,158 +176,120 @@ class CharacterSheetPage(NavigationPage):
         vitals_grid.setVerticalSpacing(0)
         for column, (label, value) in enumerate((
             ("Hit Points", f"{health.current} / {health.maximum}" if health else "—"),
-            ("Armor", str(dashboard.player.armor_class)),
-            ("Initiative", f"{dashboard.player.initiative_modifier:+d}"),
-            ("Speed", f"{dashboard.player.movement_feet} ft"),
-            ("Proficiency", f"+{dashboard.player.proficiency_bonus}"),
+            ("Armor", str(player.armor_class)),
+            ("Initiative", f"{player.initiative_modifier:+d}"),
+            ("Speed", f"{player.movement_feet} ft"),
+            ("Proficiency", f"+{player.proficiency_bonus}"),
         )):
-            vitals_grid.addWidget(semantic_label(label, text_role="muted"), 0, column)
-            vitals_grid.addWidget(
-                semantic_label(value, object_name="characterSheetVitalValue", text_role="heading"),
-                1,
-                column,
-            )
-            vitals_grid.setColumnStretch(column, 1)
+            _field(vitals_grid, 0, column, label, value, "characterSheetVitalValue")
         vitals_layout.addLayout(vitals_grid)
-        left.addWidget(vitals)
-
-        if dashboard.player.pending_ability_points:
-            pending = semantic_label(
-                f"LEVEL-UP CHOICE PENDING: "
-                f"{dashboard.player.pending_ability_points} ability-score points",
-                text_role="accent",
+        if player.pending_ability_points:
+            vitals_layout.addWidget(plain_label(
+                f"LEVEL-UP CHOICE PENDING: {player.pending_ability_points} ability-score points",
+                "pageCardNotice",
                 word_wrap=True,
-            )
-            left.addWidget(pending)
+            ))
 
-        saves, saves_layout = _sheet_section("Saving Throws")
-        proficient_saves = saving_throw_proficiencies(
-            dashboard.player.character_class
-        )
-        for attribute in dashboard.player.attributes[:6]:
+        saves, saves_layout = codex_card("Saving Throws", "characterSheetSection")
+        proficient_saves = saving_throw_proficiencies(player.character_class)
+        saves_grid = QGridLayout()
+        saves_grid.setHorizontalSpacing(14)
+        saves_grid.setVerticalSpacing(1)
+        for index, attribute in enumerate(player.attributes[:6]):
             proficient = attribute.name.casefold() in proficient_saves
-            save_bonus = attribute.modifier + (
-                dashboard.player.proficiency_bonus if proficient else 0
+            bonus = attribute.modifier + (player.proficiency_bonus if proficient else 0)
+            name = plain_label(attribute.name, "pageCardValue")
+            value = plain_label(
+                f"{bonus:+d}{' (proficient)' if proficient else ''}", "pageCardStat"
             )
-            saves_layout.addWidget(
-                semantic_label(
-                    f"{attribute.name}: {save_bonus:+d}"
-                    f"{' (proficient)' if proficient else ''}",
-                    text_role="body",
-                )
-            )
-        left.addWidget(saves)
+            value.setProperty("proficient", proficient)
+            saves_grid.addWidget(name, index % 3, (index // 3) * 2)
+            saves_grid.addWidget(value, index % 3, (index // 3) * 2 + 1)
+        saves_layout.addLayout(saves_grid)
 
-        appearance, appearance_layout = _sheet_section("Appearance & Biography")
-        appearance_rows = (
-            ("Age", str(dashboard.player.age) if dashboard.player.age else "Unrecorded"),
-            ("Gender", dashboard.player.gender_identity or "Unrecorded"),
-            ("Pronouns", dashboard.player.pronouns or "Unrecorded"),
-            ("Body", dashboard.player.body_description or "Unrecorded"),
-            ("Face", dashboard.player.face_description or "Unrecorded"),
-            ("Clothing", dashboard.player.clothing_style or "Unrecorded"),
-            ("Biography/Backstory", dashboard.player.biography or dashboard.player.backstory or "Unrecorded"),
-        )
-        for label, value in appearance_rows:
-            appearance_layout.addWidget(
-                semantic_label(f"{label}: {value}", text_role="body", word_wrap=True)
-            )
-        left.addWidget(appearance)
-        left.addStretch(1)
+        appearance, appearance_layout = codex_card("Appearance & Biography", "characterSheetSection")
+        _lines(appearance_layout, (
+            ("Age", str(player.age) if player.age else "Unrecorded"),
+            ("Gender", player.gender_identity or "Unrecorded"),
+            ("Pronouns", player.pronouns or "Unrecorded"),
+            ("Body", player.body_description or "Unrecorded"),
+            ("Face", player.face_description or "Unrecorded"),
+            ("Clothing", player.clothing_style or "Unrecorded"),
+            ("Biography/Backstory", player.biography or player.backstory or "Unrecorded"),
+        ))
 
-        middle = QVBoxLayout()
-        attacks, attacks_layout = _sheet_section("Weapon Attacks")
         weapons = tuple(
-            slot.item for slot in dashboard.equipment
-            if slot.item is not None and slot.item.damage
+            slot.item for slot in dashboard.equipment if slot.item is not None and slot.item.damage
         )
+        attacks, attacks_layout = codex_card("Weapon Attacks", "characterSheetSection", count=len(weapons))
         for weapon in weapons:
-            attacks_layout.addWidget(
-                semantic_label(
-                    f"{weapon.name}  •  {weapon.damage}", text_role="body", word_wrap=True
-                )
-            )
+            attacks_layout.addWidget(icon_row(
+                item_icon_label(str(weapon.name), rarity=weapon.rarity, category=weapon.item_type, size=30),
+                str(weapon.name), weapon.damage, rarity=weapon.rarity,
+            ))
         if not weapons:
-            attacks_layout.addWidget(semantic_label("No damaging weapon equipped.", text_role="muted"))
-        middle.addWidget(attacks)
+            attacks_layout.addWidget(plain_label("No damaging weapon equipped.", "pageCardMeta"))
 
-        abilities, abilities_layout = _sheet_section("Abilities & Spells")
+        powers, powers_layout = codex_card(
+            "Abilities & Spells", "characterSheetSection", count=len(dashboard.combat_skills)
+        )
         for action in dashboard.combat_skills:
             effect = next((value for key, value in action.stats if key == "Effect"), "")
-            abilities_layout.addWidget(
-                semantic_label(
-                    f"{action.name}  •  {effect or action.resource_label}",
-                    text_role="body",
-                    word_wrap=True,
-                )
-            )
+            powers_layout.addWidget(PowerEntry(action, detail=effect or None))
         if not dashboard.combat_skills:
-            abilities_layout.addWidget(semantic_label("No abilities unlocked.", text_role="muted"))
-        middle.addWidget(abilities)
+            powers_layout.addWidget(plain_label("No abilities unlocked.", "pageCardMeta"))
 
-        equipment, equipment_layout = _sheet_section("Equipment")
+        role, role_layout = codex_card("Role & Character", "characterSheetSection")
+        _lines(role_layout, (
+            ("Personality", ", ".join(player.personalities) or "Unrecorded"),
+            ("Strength", player.primary_strength or "Unrecorded"),
+            ("Flaw", player.meaningful_flaw or "Unrecorded"),
+            ("Motivation", player.motivation or "Unrecorded"),
+        ))
+
         equipped = tuple(slot for slot in dashboard.equipment if slot.item_name)
+        equipment, equipment_layout = codex_card("Equipment", "characterSheetSection", count=len(equipped))
         for slot in equipped:
-            equipment_layout.addWidget(
-                semantic_label(
-                    f"{slot.slot_name}: {slot.item_name}", text_role="body", word_wrap=True
-                )
-            )
+            rarity = slot.item.rarity if slot.item else "common"
+            category = slot.item.item_type if slot.item else "misc"
+            equipment_layout.addWidget(icon_row(
+                item_icon_label(str(slot.item_name), rarity=rarity, category=category, context=slot.slot_name, size=30),
+                str(slot.item_name), slot.slot_name, rarity=rarity,
+            ))
         if not equipped:
-            equipment_layout.addWidget(semantic_label("No equipment worn.", text_role="muted"))
-        middle.addWidget(equipment)
-        middle.addStretch(1)
+            equipment_layout.addWidget(plain_label("No equipment worn.", "pageCardMeta"))
 
-        right = QVBoxLayout()
-        skills, skills_layout = _sheet_section("Skills")
-        for skill in dashboard.skills:
-            skills_layout.addWidget(
-                semantic_label(
-                    f"{skill.name}: {skill.level + skill.bonus:+d}", text_role="body"
-                )
-            )
-        right.addWidget(skills)
-
-        role, role_layout = _sheet_section("Role & Character")
-        role_rows = (
-            ("Personality", ", ".join(dashboard.player.personalities) or "Unrecorded"),
-            ("Strength", dashboard.player.primary_strength or "Unrecorded"),
-            ("Flaw", dashboard.player.meaningful_flaw or "Unrecorded"),
-            ("Motivation", dashboard.player.motivation or "Unrecorded"),
+        carried = tuple(item for item in dashboard.inventory_preview if not item.is_empty)
+        possessions, possessions_layout = codex_card(
+            "Possessions & Currency", "characterSheetSection", count=len(carried)
         )
-        for label, value in role_rows:
-            role_layout.addWidget(
-                semantic_label(f"{label}: {value}", text_role="body", word_wrap=True)
-            )
-        right.addWidget(role)
-        right.addStretch(1)
-
-        left_host = QWidget(); left_host.setLayout(left)
-        middle_host = QWidget(); middle_host.setLayout(middle)
-        right_host = QWidget(); right_host.setLayout(right)
-        columns.addWidget(left_host, 2)
-        columns.addWidget(middle_host, 3)
-        columns.addWidget(right_host, 2)
-        page.addLayout(columns)
-
-        possessions, possessions_layout = _sheet_section("Possessions & Currency")
+        possessions_layout.addWidget(plain_label(f"{player.currency:,} gold", "pageCardPurse"))
         names = [
             f"{item.name} ×{item.quantity}" if item.quantity > 1 else str(item.name)
-            for item in dashboard.inventory_preview if not item.is_empty
+            for item in carried
         ]
         possessions_layout.addWidget(
-            semantic_label(
-                ", ".join(names) if names else "No carried items.",
-                text_role="body",
-                word_wrap=True,
-            )
+            plain_label(", ".join(names) if names else "No carried items.", "pageCardValue", word_wrap=True)
         )
-        possessions_layout.addWidget(
-            semantic_label(f"Gold: {dashboard.player.currency}", text_role="accent")
-        )
-        page.addWidget(possessions)
 
-        centered.addWidget(sheet, 0, 1)
+        skills, skills_layout = codex_card("Skills", "characterSheetSection", count=len(dashboard.skills))
+        for skill in dashboard.skills:
+            row = SkillDetailRow(skill)
+            # The sheet shows the total with bonuses, as it always has.
+            row.value_label.setText(f"{skill.level + skill.bonus:+d}")
+            skills_layout.addWidget(row)
+
+        for column, cards in enumerate((
+            (vitals, saves, appearance),
+            (attacks, powers, role),
+            (equipment, possessions),
+            (skills,),
+        )):
+            grid.addLayout(_stack(*cards), 1, column)
+            grid.setColumnStretch(column, 1)
+        grid.setRowStretch(1, 1)
+
+        viewport_layout.addWidget(sheet, 1)
         scroll.setWidget(viewport)
         self.layout.addWidget(scroll, 1)
         crafting = SemanticButton("Crafting", role="secondary")

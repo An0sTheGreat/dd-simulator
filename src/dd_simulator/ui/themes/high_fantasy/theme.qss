@@ -886,12 +886,6 @@ QFrame#worldMapPanel, QScrollArea#worldMapScroll, QWidget#worldMapContent {
     border: none;
 }
 
-QFrame#worldMapCanvas, QFrame#travelDetailsPanel {
-    background-color: {{colors.panel_surface}};
-    border: {{geometry.border_width}} solid {{colors.border_primary}};
-    border-radius: {{geometry.border_radius_medium}};
-}
-
 QLabel#mapCompass, QLabel#travelDetailsTitle {
     color: {{colors.accent_primary}};
     font-family: "{{typography.font_display}}";
@@ -999,13 +993,12 @@ QWidget#inventoryGrid, QScrollArea#characterSheetScroll,
 QScrollArea#characterSheetScroll QWidget#qt_scrollarea_viewport,
 QWidget#characterSheetViewport { background: transparent; border: none; }
 
-QFrame#characterSheetSurface, QFrame#characterCreationSheetSurface, QFrame#characterSheetIdentity,
-QFrame#characterSheetSection, QFrame#characterSheetAttribute {
+QFrame#characterCreationSheetSurface {
     background: {{colors.panel_surface}};
     border: 1px solid {{colors.border_primary}};
     border-radius: {{geometry.border_radius_small}};
 }
-QFrame#characterSheetSurface, QFrame#characterCreationSheetSurface { border: 2px solid {{colors.border_highlight}}; }
+QFrame#characterCreationSheetSurface { border: 2px solid {{colors.border_highlight}}; }
 QLabel#characterSheetAttributeValue, QLabel#characterSheetVitalValue,
 QLabel#characterSheetModifier { color: {{colors.accent_primary}}; font-weight: {{typography.weight_bold}}; }
 
@@ -1510,4 +1503,48 @@ QSlider#musicVolumeSlider:focus::handle:horizontal, QSlider#ambienceVolumeSlider
 
 QSlider#musicVolumeSlider:disabled::sub-page:horizontal, QSlider#ambienceVolumeSlider:disabled::sub-page:horizontal {
     background-color: {{colors.text_muted}};
+}
+
+/* Shared page cards: codex_cards.codex_card() frames, page headers */
+QFrame[pageCard="true"] QLabel, QFrame[pageCard="true"] QWidget#pageCardRow { background: transparent; border: none; }
+QLabel#pageCardLabel { font-family: "Oxanium"; font-size: 9px; font-weight: 600; letter-spacing: 0.8px; color: {{codex.muted}}; }
+QLabel#pageCardValue, QLabel#characterSheetIdentityValue { font-size: 12px; color: {{codex.ink}}; }
+QLabel#pageCardMeta { font-size: 10px; color: {{codex.muted}}; }
+QLabel#pageCardName { font-family: "Oxanium"; font-size: 12px; font-weight: 600; color: {{codex.ink}}; }
+QLabel#pageCardName[rarity="uncommon"] { color: {{colors.rarity_uncommon}}; }
+QLabel#pageCardName[rarity="rare"] { color: {{colors.rarity_rare}}; }
+QLabel#pageCardName[rarity="epic"] { color: {{colors.rarity_epic}}; }
+QLabel#pageCardName[rarity="legendary"] { color: {{colors.rarity_legendary}}; }
+QLabel#pageCardStat { font-family: "Oxanium"; font-size: 12px; font-weight: 600; color: {{codex.ink}}; }
+QLabel#pageCardStat[proficient="true"] { color: {{codex.gold}}; }
+QLabel#pageCardPurse { font-family: "Oxanium"; font-size: 14px; font-weight: 600; color: {{codex.gold}}; }
+QLabel#pageCardNotice { font-family: "Oxanium"; font-size: 10px; font-weight: 600; color: {{colors.warning}}; }
+QLabel#navigationPageSubtitle { font-family: "Oxanium"; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; color: {{codex.muted}}; background: transparent; }
+QLabel#characterSheetVitalValue { font-family: "Oxanium"; font-size: 16px; font-weight: 600; color: {{codex.gold}}; }
+QLabel#characterSheetModifier { font-family: "Oxanium"; font-size: 11px; font-weight: 600; color: {{codex.gold}}; }
+QLabel#mapCompass { font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 2px; color: {{codex.muted}}; background: transparent; }
+QLabel#travelRouteStats { font-family: "Oxanium"; font-size: 11px; font-weight: 600; color: {{codex.ink}}; }
+QLabel#travelRouteDescription, QLabel#lastJourneyLabel { color: {{codex.muted}}; }
+QPushButton#mapLocationNode {
+    min-width: 150px; min-height: 64px; padding: 4px 8px;
+    font-family: "Oxanium"; font-size: 11px; font-weight: 600; color: {{codex.ink}};
+}
+
+QLabel#navigationPageTitle { font-family: "Georgia"; font-size: 30px; font-weight: normal; color: #f6ead0; background: transparent; }
+QLabel#characterSheetAttributeValue, QLabel#travelDestinationName { font-family: "Georgia"; font-size: 22px; font-weight: normal; color: #f6ead0; }
+QFrame#characterSheetAttribute {
+    background: #15110c; border-width: 7px; border-style: solid; border-radius: 0;
+    border-image: url("../../assets/{{codex.frame_slot}}") 22 22 22 22 stretch stretch;
+}
+/* Map nodes wear the bronze slot frame; the current location the gold target line. */
+QPushButton#mapLocationNode {
+    background: #15110c; border-width: 8px; border-style: solid; border-radius: 0;
+    border-image: url("../../assets/{{codex.frame_slot}}") 22 22 22 22 stretch stretch;
+}
+QPushButton#mapLocationNode:hover, QPushButton#mapLocationNode:focus, QPushButton#mapLocationNode[selected="true"] {
+    background: #1d170f;
+    border-image: url("../../assets/{{codex.frame_slot_selected}}") 22 22 22 22 stretch stretch;
+}
+QPushButton#mapLocationNode[current="true"] {
+    border-image: none; border: 2px solid {{codex.gold}}; color: {{codex.gold}}; background: #1d170f;
 }

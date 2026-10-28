@@ -4,6 +4,12 @@ Last updated: 2026-10-28
 
 ## Current state
 
+- **Branch `page-nav-top` (unmerged):** page actions in a top-right `pageActionBar`; Character
+  Sheet and Map restyled as Concept T codex cards via the shared `codex_card()` /
+  `icon_row()` / `plain_label()` helpers in `ui/widgets/codex_cards.py` (QSS:
+  `QFrame[pageCard="true"]`, `pageCard*` labels, `navigationPageTitle/Subtitle`). People,
+  Journal, Settings and Crafting still use the old section frames (part 2).
+
 - **Release 28 + Phases 31-32** merged into `main` (`412212e`) and pushed to
   `github.com/An0sTheGreat/dd-simulator` (private). Package version `0.28.0`, database
   schema **24**. No other branches or worktrees remain.
