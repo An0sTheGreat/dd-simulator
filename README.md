@@ -7,6 +7,21 @@ campaign. A local language model acts as the narrator, but it never runs the rul
 roll, hit point, item, quest step, and coin is calculated and saved by the application
 itself. Nothing leaves your computer.
 
+## Screenshots
+
+![Adventure dashboard, high fantasy theme](docs/screenshots/adventure-fantasy.png)
+
+*The adventure dashboard: character, inventory, powers and scene.*
+
+| | |
+| --- | --- |
+| ![Dark theme](docs/screenshots/adventure-dark.png)<br>*Dark theme* | ![Combat](docs/screenshots/combat-fantasy.png)<br>*Two-enemy combat* |
+| ![Item tooltip with equipped comparison](docs/screenshots/tooltip-fantasy.png)<br>*Item tooltip with comparison* | ![Journal](docs/screenshots/journal-fantasy.png)<br>*Journal* |
+
+![Character sheet](docs/screenshots/character-sheet-fantasy.png)
+
+*The character sheet.*
+
 ## Description
 
 You create a character, pick or generate a campaign, and play by typing what you do.
@@ -55,10 +70,12 @@ named executable under `build` is a PyInstaller intermediate and cannot run on i
 - **Character Creation** has four tabs: Local AI Model Selection (required), Character
   Sheet (27-point buy, class hit dice), Campaign (premise, optional full-campaign
   generation), and Final Review with explicit confirmation.
-- **Adventure dashboard** — narrative and player action, six suggested actions,
-  objectives, Event Log, location artwork, inventory (36 slots per page), 3 x 3 equipment
-  board, skills, combat, crafting, and resource bars. All splitters are draggable and
-  saved.
+- **Adventure dashboard** — left: character strip, paperdoll, skills with descriptions,
+  a scrolling 5 x 5 inventory (up to 320 slots) and an Abilities & Spells card with Short
+  Rest. Right: tabs over the location art, a quest or encounter card, a conversation that
+  fades into the scene with scroll-back history, and a 2 x 3 choice grid. Item, ability
+  and skill tooltips share one card style. The Journal tab holds the event log and quests;
+  crafting is on the Character Sheet. Splitters are draggable and saved.
 - **People, Map, Character Sheet, Settings** — NPC conversations and trade, route travel,
   the live sheet, and model selection, evaluation, checkpoints, repair, diagnostics
   export, theme (Modern Fantasy Simple / Modern Dark Simple), and font scaling (75–150%).

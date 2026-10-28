@@ -14,8 +14,8 @@ from dd_simulator.state.migrations import LATEST_SCHEMA_VERSION
 from dd_simulator.state.seed import DEMO_CAMPAIGN_ID, DEMO_CHARACTER_ID
 from dd_simulator.ui.models.presentation import EquipmentSlotView, EventView, InventorySlotView
 from dd_simulator.ui.panels.activity_panels import EventLogPanel
-from dd_simulator.ui.panels.summary_panels import PlayerSummaryPanel
-from dd_simulator.ui.panels.utility_panels import MinimapPanel
+from dd_simulator.ui.widgets.codex_character import PaperdollPanel
+from dd_simulator.ui.widgets.scene_view import SceneView
 from dd_simulator.ui.widgets.inventory_grid import EquipmentGrid, ItemHoverCard
 
 
@@ -28,7 +28,7 @@ def _write_png(path: Path, color: str) -> None:
 def _file_service(tmp_path: Path) -> tuple[GameStateDatabase, GameStateService]:
     database = GameStateDatabase(tmp_path / "game_state.db")
     service = GameStateService(database)
-    assert service.initialize() == LATEST_SCHEMA_VERSION == 21
+    assert service.initialize() == LATEST_SCHEMA_VERSION == 24
     service.load_active_dashboard()
     return database, service
 
@@ -123,7 +123,7 @@ def test_visual_registry_versions_confirms_reuses_and_restores_exact_location(
     database.close()
 
 
-def test_confirmed_portrait_and_location_visuals_bind_to_summary_panels(
+def test_confirmed_portrait_and_location_visuals_bind_to_codex_and_scene(
     tmp_path: Path,
 ) -> None:
     app = QApplication.instance() or QApplication([])
@@ -145,15 +145,20 @@ def test_confirmed_portrait_and_location_visuals_bind_to_summary_panels(
         )
         service.visuals.confirm_asset(staged.id)
     dashboard = service.load_active_dashboard()
-    player_panel = PlayerSummaryPanel(dashboard.player)
-    location_panel = MinimapPanel(dashboard.location)
-    portrait = player_panel.findChild(QLabel, "portraitPlaceholder")
-    location = location_panel.findChild(QLabel, "locationVisualPlaceholder")
+    assert dashboard.player.visual is not None and dashboard.player.visual.status == "confirmed"
+    assert dashboard.location.visual is not None and dashboard.location.visual.status == "confirmed"
+    player_panel = PaperdollPanel(dashboard.player, dashboard.equipment)
+    location_panel = SceneView(dashboard.location, dashboard.quest)
+    portrait = player_panel.portrait
 
-    assert portrait.property("visualState") == "confirmed"
+    # The paperdoll shows the confirmed portrait itself, not the codex fallback.
+    assert dashboard.player.portrait_path == dashboard.player.visual.path
+    assert portrait.property("hasPortrait") is True
     assert portrait.pixmap() is not None and not portrait.pixmap().isNull()
-    assert location.property("visualState") == "confirmed"
-    assert location.pixmap() is not None and not location.pixmap().isNull()
+    center = portrait.pixmap().toImage().pixelColor(portrait.pixmap().rect().center())
+    assert center.name() == "#9f6a35"
+    # The scene paints the confirmed location art.
+    assert location_panel.image_path == Path(dashboard.location.visual.path)
 
     player_panel.deleteLater()
     location_panel.deleteLater()
@@ -255,7 +260,7 @@ def test_equipped_slots_keep_durability_in_hover_and_ammunition_badge() -> None:
         columns=2,
     )
     dagger_card = ItemHoverCard(dagger, grid)
-    assert "Durability: 82/100" in [label.text() for label in dagger_card.detail_labels]
+    assert dagger_card.rows["Durability"].text() == "82 / 100"
     assert "20" in [label.text() for label in grid.findChildren(QLabel, "itemQuantityBadge")]
     dagger_card.deleteLater()
     grid.deleteLater()

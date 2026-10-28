@@ -22,7 +22,7 @@ THEMES_ROOT = Path(__file__).parents[1] / "src" / "dd_simulator" / "ui" / "theme
 def _service() -> GameStateService:
     database = GameStateDatabase.in_memory()
     service = GameStateService(database)
-    assert service.initialize() == 21
+    assert service.initialize() == 24
     service.ensure_demo_campaign()
     return service
 
@@ -129,8 +129,16 @@ def test_crafting_ui_popup_and_people_splitter_layout(tmp_path: Path) -> None:
     window.controller.navigate("people")
     app.processEvents()
 
-    assert window.utility_panel.tabs.count() == 4
-    assert len(window.findChildren(QWidget, "craftRecipeButton")) == 3
+    # Crafting lives on the `crafting` page, opened from the Character Sheet and back.
+    assert window.crafting_page.parentWidget() is window.content_stack.widget(window.page_indices["crafting"])
+    assert len(window.crafting_page.findChildren(QWidget, "craftRecipeButton")) == 3
+    window.controller.navigate("character_sheet")
+    window.navigation_pages["character_sheet"].findChild(QWidget, "characterSheetCraftingButton").click()
+    assert window.current_page == "crafting"
+    window.findChild(QWidget, "craftingBackButton").click()
+    assert window.current_page == "character_sheet"
+    window.controller.navigate("people")
+    app.processEvents()
     dialog = window.findChild(CraftingResultsDialog, "craftingResultsDialog")
     assert dialog is not None and dialog.isVisible() and dialog.isModal()
     assert dialog.windowFlags() & Qt.WindowType.FramelessWindowHint
@@ -144,7 +152,7 @@ def test_crafting_ui_popup_and_people_splitter_layout(tmp_path: Path) -> None:
     conversation = window.findChild(QWidget, "peopleConversationRegion")
     assert splitter is not None and trade is not None and conversation is not None
     assert splitter.orientation().name == "Vertical"
-    assert splitter.handleWidth() == window.summary_splitter.handleWidth()
+    assert splitter.handleWidth() == window.concept_splitter.handleWidth()
     assert abs(trade.width() * 3 - window.navigation_pages["people"].width()) < 45
     assert conversation.width() > trade.width() * 2
 

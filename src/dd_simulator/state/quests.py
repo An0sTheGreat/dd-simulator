@@ -17,6 +17,7 @@ from dd_simulator.state.item_actions import (
 from dd_simulator.state.item_catalog import select_loot
 from dd_simulator.state.presets import advance_preset_after_quest
 from dd_simulator.state.progression import award_character_experience
+from dd_simulator.state.turns import record_turn_note
 
 
 TRIGGER_TYPES = {
@@ -219,6 +220,7 @@ def check_deadlines(
         if now <= deadline:
             continue
         summary = f"Quest failed: {row['title']} (deadline passed)."
+        record_turn_note(connection, campaign_id, "quest", f"Quest failed \u00b7 {row['title']}")
         connection.execute(
             "UPDATE quests SET status = 'failed', failed_at = CURRENT_TIMESTAMP, "
             "failure_reason = 'Deadline passed', selected = 0 WHERE id = ?",
@@ -277,12 +279,23 @@ def _refresh_quest(
         "UPDATE quests SET progress_current = ?, progress_maximum = ? WHERE id = ?",
         (complete, total, quest_id),
     )
-    if not required_total or required_complete != required_total:
-        return ""
     quest = connection.execute(
         "SELECT * FROM quests WHERE id = ? AND campaign_id = ?", (quest_id, campaign_id)
     ).fetchone()
-    if quest is None or str(quest["status"]) != "active":
+    if quest is None:
+        return ""
+    completing = (
+        bool(required_total)
+        and required_complete == required_total
+        and str(quest["status"]) == "active"
+    )
+    record_turn_note(
+        connection,
+        campaign_id,
+        "quest",
+        f"Quest {'completed' if completing else 'updated'} \u00b7 {quest['title']}",
+    )
+    if not completing:
         return ""
     connection.execute(
         "UPDATE quests SET status = 'completed', completed_at = CURRENT_TIMESTAMP, "

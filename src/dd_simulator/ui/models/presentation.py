@@ -64,7 +64,10 @@ class PlayerSummaryView:
     biography: str = ""
     backstory: str = ""
     proficiency_bonus: int = 2
+    attack_bonus: int | None = None
     pending_ability_points: int = 0
+    # Confirmed Visual Registry portrait, else a codex fallback; empty means initials.
+    portrait_path: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,6 +80,8 @@ class LocationSummaryView:
     route_status: str
     visual: VisualAssetView | None = None
     biome: str = "road"
+    day: int = 1
+    turn_number: int = 0  # campaign_clock.turn_number
 
 
 @dataclass(frozen=True, slots=True)
@@ -128,9 +133,20 @@ class NarrativeSegmentView:
 
 
 @dataclass(frozen=True, slots=True)
+class TurnNoteView:
+    kind: str  # xp, item, quest, relationship, travel, resource, other
+    text: str
+
+
+@dataclass(frozen=True, slots=True)
 class NarrativeMessageView:
     kind: str
     text: str
+    turn_number: int = 0
+    speaker_id: str | None = None
+    speaker_name: str = ""
+    speaker_portrait: str = ""
+    notes: tuple[TurnNoteView, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -143,6 +159,7 @@ class NarrativeView:
     player_action: str = ""
     response_segments: tuple[NarrativeSegmentView, ...] = ()
     messages: tuple[NarrativeMessageView, ...] = ()
+    has_older_messages: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -176,6 +193,7 @@ class SkillView:
     bonus: int = 0
     locked: bool = False
     recently_increased: bool = False
+    description: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -209,6 +227,7 @@ class InventorySlotView:
     bonuses: str = ""
     penalties: str = ""
     generated_difficulty: str = "Adventurer"
+    position: int | None = None  # bag position; None for padding and mock data
 
     @property
     def is_empty(self) -> bool:
@@ -273,6 +292,7 @@ class CombatActionOptionView:
     available: bool
     unavailable_reason: str = ""
     stats: tuple[tuple[str, str], ...] = ()
+    status_label: str = ""  # Ready, Cooldown n, n/m uses, or a short reason
 
 
 @dataclass(frozen=True, slots=True)
@@ -484,3 +504,8 @@ class DashboardView:
     pending_crafting_result: CraftingResultView | None = None
     campaign_name: str = "D&D SIMULATOR"
     is_preset_campaign: bool = False
+    abilities: tuple[CombatActionOptionView, ...] = ()
+    spells: tuple[CombatActionOptionView, ...] = ()
+    # Every occupied bag position in position order (no empty slots), up to the cap.
+    inventory: tuple[InventorySlotView, ...] = ()
+    inventory_capacity: int = 320

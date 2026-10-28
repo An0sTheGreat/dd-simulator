@@ -263,6 +263,9 @@ def sync_character_combat_catalog(
                 action_kind = excluded.action_kind,
                 spell_slot_cost = excluded.spell_slot_cost,
                 maximum_uses = excluded.maximum_uses,
+                -- An older save can hold more uses than a lowered maximum allows.
+                current_uses = CASE WHEN abilities.current_uses > excluded.maximum_uses
+                    THEN excluded.maximum_uses ELSE abilities.current_uses END,
                 display_order = excluded.display_order
             """,
             (

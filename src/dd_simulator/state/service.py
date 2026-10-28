@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from decimal import Decimal, InvalidOperation
 import json
 import re
@@ -74,6 +74,8 @@ from dd_simulator.state.turns import (
     ActionResolutionResult,
     NarrativeSegment,
     ProposedStateChange,
+    claim_turn_notes,
+    record_turn_note,
 )
 from dd_simulator.state.travel import (
     CampResult,
@@ -82,7 +84,7 @@ from dd_simulator.state.travel import (
     TravelService,
 )
 from dd_simulator.state.visuals import VisualRegistryService
-from dd_simulator.ui.models.presentation import DashboardView
+from dd_simulator.ui.models.presentation import DashboardView, NarrativeMessageView
 
 
 class GameStateService:
@@ -1411,7 +1413,28 @@ class GameStateService:
                 "SELECT name FROM locations WHERE campaign_id = ? AND is_current = 1",
                 (campaign_id,),
             ).fetchone()
-            response_segments = outcome.narrative_segments or (
+            present_npc_ids = {
+                str(row["id"])
+                for row in connection.execute(
+                    "SELECT npcs.id FROM npcs JOIN locations ON locations.id = npcs.location_id "
+                    "WHERE npcs.campaign_id = ? AND locations.is_current = 1 AND npcs.available = 1",
+                    (campaign_id,),
+                )
+            }
+            # Model-proposed speakers are untrusted: keep only NPCs present here.
+            response_segments = tuple(
+                replace(
+                    segment,
+                    speaker_id=(
+                        segment.speaker_id
+                        if segment.kind == "spoken"
+                        and isinstance(segment.speaker_id, str)
+                        and segment.speaker_id in present_npc_ids
+                        else None
+                    ),
+                )
+                for segment in outcome.narrative_segments
+            ) or (
                 NarrativeSegment("narrative", outcome.narration.strip()),
             )
             serialized_segments = json.dumps(
@@ -1479,6 +1502,7 @@ class GameStateService:
                     0,
                     "player",
                     normalized,
+                    None,
                 )
             ]
             transcript_messages.extend(
@@ -1489,15 +1513,17 @@ class GameStateService:
                     index,
                     segment.kind,
                     segment.text,
+                    segment.speaker_id,
                 )
                 for index, segment in enumerate(response_segments, start=1)
             )
             connection.executemany(
                 "INSERT INTO narrative_messages("
-                "id, campaign_id, turn_number, sequence, kind, text"
-                ") VALUES (?, ?, ?, ?, ?, ?)",
+                "id, campaign_id, turn_number, sequence, kind, text, speaker_npc_id"
+                ") VALUES (?, ?, ?, ?, ?, ?, ?)",
                 transcript_messages,
             )
+            claim_turn_notes(connection, campaign_id, turn_number)
             event_summary = " ".join(outcome.narration.split())[:500]
             self._record_turn_event(
                 connection,
@@ -1636,6 +1662,9 @@ class GameStateService:
                     summary = self._equip(connection, character_id, item).summary
                 else:
                     summary = self._drop(connection, character_id, item).summary
+                if operation != "equip_item":
+                    verb = "used" if operation == "use_item" else "dropped"
+                    record_turn_note(connection, campaign_id, "item", f"{item['name']} {verb}")
                 updates = progress_quests(
                     connection,
                     campaign_id,
@@ -1760,6 +1789,7 @@ class GameStateService:
             difficulty="Adventurer" if difficulty is None else str(difficulty[0]),
         )
         recalculate_character_item_totals(connection, character_id)
+        record_turn_note(connection, campaign_id, "item", f"{item.name} added")
         updates = progress_quests(
             connection, campaign_id, "item_collect", item.name, detail=item.description
         )
@@ -1839,6 +1869,7 @@ class GameStateService:
         recalculate_character_item_totals(connection, character_id)
         prefix = f"x{quantity} " if quantity > 1 else ""
         summary = f"Added {prefix}{name} to inventory."
+        record_turn_note(connection, campaign_id, "item", f"{prefix}{name} added")
         cls._record_inventory_event(connection, campaign_id, summary)
         updates = progress_quests(
             connection, campaign_id, "item_collect", name, detail=summary
@@ -1906,6 +1937,15 @@ class GameStateService:
         connection.execute(
             "UPDATE character_resources SET current_value = ? WHERE id = ?",
             (updated, resource["id"]),
+        )
+        sign = "\u2212" if updated < current else "+"
+        record_turn_note(
+            connection,
+            str(connection.execute(
+                "SELECT campaign_id FROM characters WHERE id = ?", (character_id,)
+            ).fetchone()[0]),
+            "resource",
+            f"{sign}{abs(updated - current)} {str(resource['name']).lower()}",
         )
         verb = "Spent" if change.operation == "spend_resource" else "Restored"
         return f"{verb} {amount} {resource['name']} ({current} to {updated})."
@@ -2366,6 +2406,13 @@ class GameStateService:
     def load_campaign(self, campaign_id: str) -> DashboardView:
         self._synchronize_current_location(campaign_id)
         return self.dashboard_projection.load(campaign_id)
+
+    def older_messages(
+        self, campaign_id: str, before_turn: int, limit: int = 40
+    ) -> tuple[NarrativeMessageView, ...]:
+        """Earlier transcript turns (with their notes) for scroll-back, oldest first."""
+
+        return self.dashboard_projection.older_messages(campaign_id, before_turn, limit)
 
     def load_active_dashboard(self) -> DashboardView:
         campaign_id = self.ensure_demo_campaign()

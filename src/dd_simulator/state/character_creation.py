@@ -100,6 +100,16 @@ SKILLS = (
     "Attack", "Strength", "Defense", "Ranged", "Survival", "Magic",
     "Herblore", "Crafting",
 )
+SKILL_DESCRIPTIONS = {
+    "Attack": "Melee hit chance",
+    "Strength": "Melee force, heavy lifting",
+    "Defense": "Blocking, armor use",
+    "Ranged": "Bows, thrown weapons",
+    "Survival": "Tracking, foraging, escape",
+    "Magic": "Spell power, arcane lore",
+    "Herblore": "Herbs, potions, remedies",
+    "Crafting": "Making, repairing gear",
+}
 ABILITY_NAMES = (
     "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma",
 )

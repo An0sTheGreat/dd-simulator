@@ -1500,6 +1500,35 @@ MIGRATIONS: tuple[tuple[int, str], ...] = (
         WHERE resource_type = 'experience';
         """,
     ),
+    (
+        22,
+        """
+        ALTER TABLE narrative_messages
+            ADD COLUMN speaker_npc_id TEXT REFERENCES npcs(id) ON DELETE SET NULL;
+        CREATE INDEX narrative_message_speaker ON narrative_messages(speaker_npc_id);
+        """,
+    ),
+    (
+        23,
+        """
+        CREATE TABLE turn_notes (
+            id INTEGER PRIMARY KEY,
+            campaign_id TEXT NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+            turn_number INTEGER NOT NULL CHECK (turn_number >= 0),
+            kind TEXT NOT NULL CHECK (
+                kind IN ('xp', 'item', 'quest', 'relationship', 'travel', 'resource', 'other')
+            ),
+            text TEXT NOT NULL CHECK (length(trim(text)) > 0)
+        );
+        CREATE INDEX turn_note_order ON turn_notes(campaign_id, turn_number, id);
+        """,
+    ),
+    (
+        24,
+        """
+        ALTER TABLE turn_notes ADD COLUMN sequence INTEGER CHECK (sequence >= 0);
+        """,
+    ),
 )
 
 

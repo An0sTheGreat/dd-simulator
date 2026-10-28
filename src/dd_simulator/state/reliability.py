@@ -98,6 +98,7 @@ _CAMPAIGN_FILTERS: tuple[tuple[str, str], ...] = (
     ("faction_reputation", "campaign_id = ?"),
     ("action_turns", "campaign_id = ?"),
     ("narrative_messages", "campaign_id = ?"),
+    ("turn_notes", "campaign_id = ?"),
     ("travel_routes", "campaign_id = ?"),
     ("travel_history", "campaign_id = ?"),
     ("camp_history", "campaign_id = ?"),

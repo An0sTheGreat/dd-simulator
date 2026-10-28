@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dnd-simulator"
-version = "0.27.0"
+version = "0.28.0"
 description = "Local-first D&D-style single-player adventure desktop application"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -31,8 +31,12 @@ where = ["src"]
 [tool.setuptools.package-data]
 dd_simulator = [
     "state/presets/*.json",
+    "ui/assets/codex/*.png",
+    "ui/assets/codex/markers/*.png",
+    "ui/assets/codex/portraits/*/*.png",
     "ui/assets/fonts/*",
     "ui/assets/icons/*",
+    "ui/assets/icons/powers/*/*.png",
     "ui/assets/icons/svg/*",
     "ui/assets/icons/ui_pack/*",
     "ui/assets/inventory/*",

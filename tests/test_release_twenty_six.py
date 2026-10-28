@@ -11,7 +11,10 @@ from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QScrollArea, QS
 from dd_simulator.ui.main_window import HTCAPTION, HTCLIENT, NATIVE_SNAP_STYLE, WS_THICKFRAME
 from dd_simulator.ui.widgets.themed_dialog import DraggableTitleBar
 
+from dataclasses import replace
+
 from dd_simulator.app import build_application
+from dd_simulator.ui.widgets.codex_cards import CARD_COLUMNS, CARD_VISIBLE_ROWS
 from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard
 from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
 
@@ -32,7 +35,7 @@ def test_release_26_6_character_sheet_is_centered_and_complete(tmp_path: Path) -
     app.processEvents()
 
     assert window.current_page == "character_sheet"
-    assert "character_sheet" in window.navigation_buttons
+    assert "character_sheet" in window.scene_view.tabs.buttons
     surface = window.findChild(QWidget, "characterSheetSurface")
     viewport = window.findChild(QWidget, "characterSheetViewport")
     assert surface is not None and viewport is not None
@@ -44,39 +47,44 @@ def test_release_26_6_character_sheet_is_centered_and_complete(tmp_path: Path) -
     app.processEvents()
 
 
-def test_inventory_uses_six_or_four_columns_and_scrolls_when_needed(
+def test_inventory_card_keeps_five_columns_and_scrolls_when_needed(
     tmp_path: Path,
 ) -> None:
     app, window, _themes = _window(tmp_path)
-    window.utility_panel.set_current_tab(2)
-    app.processEvents()
-
-    scroll = window.findChild(QScrollArea, "inventoryUtilityScroll")
-    assert scroll is not None
+    card = window.inventory_card
+    scroll = window.findChild(QScrollArea, "inventoryCardScroll")
+    assert scroll is card.scroll
     assert scroll.alignment() == (
-        Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+        Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
     )
-    window.main_splitter.setSizes([850, 750])
-    app.processEvents()
-    assert window.utility_panel.inventory_grid.columns == 6
-    assert len(window.utility_panel.inventory_grid.slots) == 36
-    assert scroll.verticalScrollBar().maximum() > 0
+    # The demo bag fits the 5x5 viewport; the card does not reflow with the splitter.
+    assert card.grid.columns == CARD_COLUMNS
+    assert len(card.grid.slots) == CARD_COLUMNS * CARD_VISIBLE_ROWS
+    assert scroll.verticalScrollBar().maximum() == 0
+    for sizes in ([850, 750], [1200, 360]):
+        window.concept_splitter.setSizes(sizes)
+        app.processEvents()
+        assert card.grid.columns == CARD_COLUMNS
 
-    window.main_splitter.setSizes([1200, 360])
+    # An item at a deep bag position grows the grid to that row plus one and scrolls.
+    item = next(value for value in window.dashboard.inventory_preview if not value.is_empty)
+    card.set_inventory((replace(item, position=40),), capacity=320)
     app.processEvents()
-    assert window.utility_panel.inventory_grid.columns == 4
+    assert card.grid.columns == CARD_COLUMNS
+    assert len(card.grid.slots) == (40 // CARD_COLUMNS + 2) * CARD_COLUMNS
+    assert card.grid.slots[40].item.name == item.name
     assert scroll.verticalScrollBar().maximum() > 0
 
     window.close()
     app.processEvents()
 
 
-def test_release_26_7_sidebar_splitter_and_restore_drag(tmp_path: Path) -> None:
+def test_release_26_7_concept_splitter_and_restore_drag(tmp_path: Path) -> None:
     app, window, _themes = _window(tmp_path)
-    sidebar = window.findChild(QSplitter, "sidebarUtilitySplitter")
-    assert sidebar is not None and sidebar.count() == 2
-    sidebar.setSizes([320, 470])
-    assert all(size > 0 for size in sidebar.sizes())
+    splitter = window.findChild(QSplitter, "conceptTSplitter")
+    assert splitter is window.concept_splitter and splitter.count() == 2
+    splitter.setSizes([720, 860])
+    assert all(size > 0 for size in splitter.sizes())
 
     title_bar = window.findChild(DraggableTitleBar, "topHeader")
     window.showMaximized()
@@ -129,17 +137,18 @@ def test_release_26_6_hover_cards_are_semantic(
     item_text = " ".join(label.text() for label in item_card.findChildren(QLabel))
     assert item_card.property("rarity") == "uncommon"
     assert "{" not in item_text and "remove_statuses" not in item_text
-    assert item_card.icon_label.width() == 88
-    surface = item_card.findChild(QWidget, "itemHoverSurface")
-    assert surface is not None and surface.isAncestorOf(item_card.description_label)
-    assert surface.property("rarity") == "uncommon"
+    assert item_card.icon_label.width() == 46
+    # The card is its own framed surface now; the rarity tone sits on the name.
+    assert item_card.findChild(QWidget, "itemHoverSurface") is None
+    assert item_card.isAncestorOf(item_card.description_label)
+    assert item_card.title_label.property("tone") == "uncommon"
 
     action = window.dashboard.combat_skills[0]
     assert action.stats
     ability_card = AbilityHoverCard(action, window)
-    ability_text = " ".join(label.text() for label in ability_card.findChildren(QLabel))
-    for required in ("Type:", "Cost:", "Effect:", "Range:"):
-        assert required in ability_text
+    assert dict(action.stats)["Type"] in ability_card.subtitle_label.text()
+    for required in ("Cost", "Effect", "Range"):
+        assert ability_card.rows[required].text()
 
     item_card.deleteLater()
     ability_card.deleteLater()

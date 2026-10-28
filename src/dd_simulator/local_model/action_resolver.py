@@ -97,6 +97,7 @@ TURN_RESPONSE_FORMAT: dict[str, Any] = {
                             "enum": ["narrative", "monologue", "spoken"],
                         },
                         "text": {"type": "string"},
+                        "speaker_id": {"type": "string"},
                     },
                     "required": ["kind", "text"],
                     "additionalProperties": False,
@@ -246,7 +247,8 @@ class LocalModelActionResolver:
             "state_changes array when the "
             "action only needs narration. Return the response as ordered narrative_segments: "
             "use narrative for scene description, monologue for internal thought, and spoken "
-            "for words said aloud. Choose the semantic kind for each complete passage and "
+            "for words said aloud. A spoken segment may include speaker_id: the id of a "
+            "present NPC who says this, or omit. Choose the semantic kind for each complete passage and "
             "preserve natural storytelling and punctuation without Markdown or code fences. "
             "Do not split a spoken passage merely because it contains narration. Keep the response "
             "at no more than 125 total words across all narrative segments. When possible, "
@@ -358,7 +360,14 @@ class LocalModelActionResolver:
                 or len(text) > 2000
             ):
                 raise LocalModelResponseError("A narrative segment contained invalid content.")
-            narrative_segments.extend(normalize_narrative_segment(str(kind), text))
+            speaker_id = raw_segment.get("speaker_id")
+            if kind != "spoken" or not isinstance(speaker_id, str) or not speaker_id.strip():
+                speaker_id = None
+            narrative_segments.extend(
+                normalize_narrative_segment(
+                    str(kind), text, None if speaker_id is None else speaker_id.strip()
+                )
+            )
         if len(narrative_segments) > 12:
             raise LocalModelResponseError(
                 "Turn narrative required too many semantic segments after normalization."

@@ -13,7 +13,7 @@ from dd_simulator.state.database import GameStateDatabase
 from dd_simulator.state.errors import GameStateError
 from dd_simulator.state.quests import progress_quests
 from dd_simulator.state.presets import active_preset_context
-from dd_simulator.state.turns import SkillCheckResult
+from dd_simulator.state.turns import SkillCheckResult, claim_turn_notes, record_turn_note
 
 
 LOGGER = logging.getLogger(__name__)
@@ -282,11 +282,15 @@ class DialogueService:
              context["player_text"], npc_text, monologue, check_type, context["roll"],
              context["modifier"], context["total"], context["difficulty"], outcome, delta),
         )
-        connection.execute(
+        relationship_update = connection.execute(
             "UPDATE relationships SET score = MAX(-100, MIN(100, score + ?)) "
             "WHERE campaign_id = ? AND source_entity_id = ? AND target_entity_id = ?",
             (delta, context["campaign_id"], character["id"], npc["id"]),
         )
+        if relationship_update.rowcount:
+            record_turn_note(
+                connection, context["campaign_id"], "relationship", f"{npc['name']} {delta:+d}"
+            )
         score = int(context["relationship_score"]) + delta
         status = "friendly" if score >= 25 else "suspicious" if score <= -20 else "neutral"
         connection.execute("UPDATE npcs SET status = ?, disposition = ? WHERE id = ?", (status, status, npc["id"]))
@@ -313,10 +317,17 @@ class DialogueService:
         if discovered:
             quest_updates.append(discovered)
         if npc.get("offers_quest_id"):
-            connection.execute(
+            started = connection.execute(
                 "UPDATE quests SET status = 'active', started_day = COALESCE(started_day, 1) "
                 "WHERE id = ? AND status = 'rumored'", (npc["offers_quest_id"],),
             )
+            if started.rowcount:
+                title = connection.execute(
+                    "SELECT title FROM quests WHERE id = ?", (npc["offers_quest_id"],)
+                ).fetchone()["title"]
+                record_turn_note(
+                    connection, context["campaign_id"], "quest", f"Quest started · {title}"
+                )
         if success and npc.get("reveals_location_id"):
             connection.execute(
                 "UPDATE locations SET discovered = 1, first_discovered_at = COALESCE(first_discovered_at, CURRENT_TIMESTAMP) "
@@ -345,28 +356,29 @@ class DialogueService:
         transcript = [
             (
                 f"{conversation_id}-player", context["campaign_id"], turn_number,
-                next_sequence, "player", context["player_text"],
+                next_sequence, "player", context["player_text"], None,
             )
         ]
         if monologue.strip():
             transcript.append(
                 (
                     f"{conversation_id}-monologue", context["campaign_id"], turn_number,
-                    next_sequence + len(transcript), "monologue", monologue,
+                    next_sequence + len(transcript), "monologue", monologue, None,
                 )
             )
         transcript.append(
             (
                 f"{conversation_id}-spoken", context["campaign_id"], turn_number,
-                next_sequence + len(transcript), "spoken", npc_text,
+                next_sequence + len(transcript), "spoken", npc_text, npc["id"],
             )
         )
         connection.executemany(
             "INSERT INTO narrative_messages("
-            "id, campaign_id, turn_number, sequence, kind, text"
-            ") VALUES (?, ?, ?, ?, ?, ?)",
+            "id, campaign_id, turn_number, sequence, kind, text, speaker_npc_id"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?)",
             transcript,
         )
+        claim_turn_notes(connection, context["campaign_id"], turn_number)
         sequence = int(connection.execute(
             "SELECT COALESCE(MAX(sequence), -1) + 1 FROM events WHERE campaign_id = ?",
             (context["campaign_id"],),
@@ -489,4 +501,5 @@ class DialogueService:
             "VALUES (?, ?, 'activated', ?)",
             (f"quest-update-{uuid4().hex}", quest_id, f"Quest discovered: {title}"),
         )
+        record_turn_note(connection, str(context["campaign_id"]), "quest", f"Quest started · {title}")
         return f"Quest discovered: {title}."

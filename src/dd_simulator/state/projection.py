@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -11,7 +12,8 @@ from dd_simulator.state.abilities import (
     CombatAbilityDefinition,
     scaled_definition,
 )
-from dd_simulator.state.character_creation import plain_name
+from dd_simulator.state.character_creation import SKILL_DESCRIPTIONS, plain_name
+from dd_simulator.state.combat import player_attack_bonus
 from dd_simulator.state.database import GameStateDatabase
 from dd_simulator.state.commerce import merchant_price
 from dd_simulator.state.dialogue import SUGGESTED_RESPONSES
@@ -43,6 +45,7 @@ from dd_simulator.ui.models.presentation import (
     NarrativeMessageView,
     NarrativeSegmentView,
     NarrativeView,
+    TurnNoteView,
     ObjectiveView,
     PlayerSummaryView,
     QuestListItemView,
@@ -61,6 +64,32 @@ from dd_simulator.state.visuals import (
     location_state_signature,
     resolve_visual_record,
 )
+
+
+CODEX_PORTRAIT_ROOT = Path(__file__).parents[1] / "ui" / "assets" / "codex" / "portraits"
+_PORTRAIT_PACKS = (
+    ("dwarf", ("dwarf",)),
+    ("goblin", ("goblin",)),
+    ("fairy", ("fairy", "fey")),
+    ("demon", ("tiefling", "infernal", "demon", "devil")),
+    ("undead", ("undead",)),
+)
+
+
+def fallback_portrait(character_id: str, ancestry: str) -> str:
+    """Pick a codex portrait from the ancestry's pack, stable per character id."""
+
+    lowered = ancestry.casefold()
+    pack = next(
+        (name for name, words in _PORTRAIT_PACKS if any(word in lowered for word in words)),
+        "fantasy",
+    )
+    count = len(list((CODEX_PORTRAIT_ROOT / pack).glob("*.png")))
+    if not count:
+        return ""
+    number = int(hashlib.sha256(character_id.encode()).hexdigest(), 16) % count + 1
+    path = CODEX_PORTRAIT_ROOT / pack / f"{number}.png"
+    return str(path) if path.is_file() else ""
 
 
 def _required(row: sqlite3.Row | None, label: str) -> sqlite3.Row:
@@ -196,14 +225,104 @@ def _narrative_segments(row: sqlite3.Row) -> tuple[NarrativeSegmentView, ...]:
     return tuple(segments)
 
 
+MESSAGE_PAGE_SIZE = 40
+
+
+def message_page(
+    connection: sqlite3.Connection,
+    assets_root: Path | None,
+    campaign_id: str,
+    *,
+    before_turn: int = 2**62,
+    limit: int = MESSAGE_PAGE_SIZE,
+) -> tuple[tuple[NarrativeMessageView, ...], bool]:
+    """Return the newest whole turns before ``before_turn`` (at most ``limit``
+    messages, but always at least one turn) and whether older turns exist.
+
+    Pages never split a turn, so ``before_turn`` paging loses nothing and each
+    turn's notes stay on its last message.
+    """
+
+    counts = connection.execute(
+        "SELECT turn_number, COUNT(*) AS total FROM narrative_messages "
+        "WHERE campaign_id = ? AND turn_number < ? "
+        "GROUP BY turn_number ORDER BY turn_number DESC",
+        (campaign_id, before_turn),
+    ).fetchall()
+    first_turn: int | None = None
+    taken = 0
+    has_older = False
+    for count in counts:
+        if first_turn is not None and taken + int(count["total"]) > limit:
+            has_older = True
+            break
+        first_turn = int(count["turn_number"])
+        taken += int(count["total"])
+    if first_turn is None:
+        return (), False
+    rows = connection.execute(
+        """
+        SELECT narrative_messages.*, npcs.name AS speaker_name
+        FROM narrative_messages
+        LEFT JOIN npcs ON npcs.id = narrative_messages.speaker_npc_id
+        WHERE narrative_messages.campaign_id = ?
+          AND narrative_messages.turn_number >= ? AND narrative_messages.turn_number < ?
+        ORDER BY narrative_messages.turn_number, narrative_messages.sequence
+        """,
+        (campaign_id, first_turn, before_turn),
+    ).fetchall()
+    portraits: dict[str, str] = {}
+    for speaker_id in {
+        str(row["speaker_npc_id"]) for row in rows if row["speaker_npc_id"] is not None
+    }:
+        # NPC portraits are keyed like character portraits; only a confirmed
+        # canonical record (signature "" never matches exactly) yields a path.
+        speaker_view = _visual_view(resolve_visual_record(
+            connection,
+            assets_root,
+            campaign_id=campaign_id,
+            asset_kind="portrait",
+            subject_type="character",
+            subject_id=speaker_id,
+            signature="",
+        ))
+        if speaker_view is not None and speaker_view.path:
+            portraits[speaker_id] = speaker_view.path
+    last_of_turn = {int(row["turn_number"]): index for index, row in enumerate(rows)}
+    index_of = {
+        (int(row["turn_number"]), int(row["sequence"])): index for index, row in enumerate(rows)
+    }
+    # A note sits on the message it was claimed with; notes from before schema 24
+    # (NULL sequence) fall back to the last message of their turn.
+    notes: dict[int, list[TurnNoteView]] = {}
+    for note in connection.execute(
+        "SELECT turn_number, sequence, kind, text FROM turn_notes WHERE campaign_id = ? "
+        "AND turn_number >= ? AND turn_number < ? ORDER BY turn_number, id",
+        (campaign_id, first_turn, before_turn),
+    ):
+        turn = int(note["turn_number"])
+        target = index_of.get((turn, note["sequence"]), last_of_turn.get(turn))
+        if target is not None:
+            notes.setdefault(target, []).append(TurnNoteView(str(note["kind"]), str(note["text"])))
+    messages = tuple(
+        NarrativeMessageView(
+            str(row["kind"]),
+            str(row["text"]),
+            turn_number=int(row["turn_number"]),
+            speaker_id=None if row["speaker_npc_id"] is None else str(row["speaker_npc_id"]),
+            speaker_name=str(row["speaker_name"] or ""),
+            speaker_portrait=portraits.get(str(row["speaker_npc_id"]), ""),
+            notes=tuple(notes.get(index, ())),
+        )
+        for index, row in enumerate(rows)
+    )
+    return messages, has_older
+
+
 def _narrative_messages(
     narrative: sqlite3.Row,
-    rows: list[sqlite3.Row],
+    messages: tuple[NarrativeMessageView, ...],
 ) -> tuple[NarrativeMessageView, ...]:
-    messages = tuple(
-        NarrativeMessageView(str(row["kind"]), str(row["text"]))
-        for row in rows
-    )
     if messages:
         return messages
     fallback: list[NarrativeMessageView] = []
@@ -225,6 +344,16 @@ class DashboardProjection:
             if isinstance(database.path, Path)
             else None
         )
+
+    def older_messages(
+        self, campaign_id: str, before_turn: int, limit: int = MESSAGE_PAGE_SIZE
+    ) -> tuple[NarrativeMessageView, ...]:
+        with self.database.connect() as connection:
+            messages, _has_older = message_page(
+                connection, self.assets_root, campaign_id,
+                before_turn=before_turn, limit=limit,
+            )
+        return messages
 
     def load(self, campaign_id: str) -> DashboardView:
         with self.database.connect() as connection:
@@ -265,7 +394,8 @@ class DashboardProjection:
             location = _required(
                 connection.execute(
                     """
-                    SELECT locations.*, campaign_clock.time_label
+                    SELECT locations.*, campaign_clock.time_label, campaign_clock.day AS clock_day,
+                        campaign_clock.turn_number AS clock_turn
                     FROM locations
                     JOIN campaign_clock ON campaign_clock.campaign_id = locations.campaign_id
                     WHERE locations.campaign_id = ? AND locations.is_current = 1
@@ -318,6 +448,21 @@ class DashboardProjection:
                     camera_style=camera_style,
                 ),
             )
+            player_portrait = _visual_view(player_visual)
+            portrait_path = "" if player_portrait is None else player_portrait.path
+            if not portrait_path:
+                canonical_portrait = _visual_view(resolve_visual_record(
+                    connection,
+                    self.assets_root,
+                    campaign_id=campaign_id,
+                    asset_kind="portrait",
+                    subject_type="character",
+                    subject_id=character_id,
+                    signature="",
+                ))
+                portrait_path = (
+                    canonical_portrait.path if canonical_portrait is not None else ""
+                ) or fallback_portrait(character_id, str(character["species"]))
             location_visual = resolve_visual_record(
                 connection,
                 self.assets_root,
@@ -363,18 +508,9 @@ class DashboardProjection:
                 ).fetchone(),
                 "narrative",
             )
-            message_rows = connection.execute(
-                """
-                SELECT * FROM (
-                    SELECT * FROM narrative_messages
-                    WHERE campaign_id = ?
-                    ORDER BY turn_number DESC, sequence DESC
-                    LIMIT 20
-                )
-                ORDER BY turn_number, sequence
-                """,
-                (campaign_id,),
-            ).fetchall()
+            recent_messages, has_older_messages = message_page(
+                connection, self.assets_root, campaign_id
+            )
             selected_quest = _required(
                 connection.execute(
                     "SELECT * FROM quests WHERE campaign_id = ? ORDER BY selected DESC, "
@@ -639,6 +775,7 @@ class DashboardProjection:
                 bonuses=str(row["bonuses_json"]),
                 penalties=str(row["penalties_json"]),
                 generated_difficulty=str(row["generated_difficulty"]),
+                position=index,
             )
             for index in range(capacity)
         )
@@ -654,8 +791,14 @@ class DashboardProjection:
                 continue
             definition = scaled_definition(definition, int(character["level"]))
             reason = ""
+            uses = (
+                "" if row["current_uses"] is None
+                else f"{row['current_uses']}/{row['maximum_uses']} uses"
+            )
+            status = uses or "Ready"
             if int(row["cooldown_remaining"]) > 0:
                 reason = f"Cooldown: {row['cooldown_remaining']} round(s)"
+                status = f"Cooldown {row['cooldown_remaining']}"
             elif row["current_uses"] is not None and int(row["current_uses"]) <= 0:
                 reason = "No uses remaining before rest"
             elif definition.resource_cost and (
@@ -663,6 +806,7 @@ class DashboardProjection:
                 or int(by_type[definition.resource_type]["current_value"]) < definition.resource_cost
             ):
                 reason = f"Requires {definition.resource_cost} {definition.resource_type.replace('_', ' ')}"
+                status = f"Needs {definition.resource_cost} {definition.resource_type.replace('_', ' ')}"
             costs: list[str] = []
             if definition.is_cantrip:
                 costs.append("Cantrip; no spell slot")
@@ -679,6 +823,7 @@ class DashboardProjection:
                 resource_label=" | ".join(costs), available=not reason,
                 unavailable_reason=reason,
                 stats=_ability_stats(definition, row),
+                status_label=status,
             ))
         combat_view = None
         if combat_encounter is not None:
@@ -1154,7 +1299,27 @@ class DashboardProjection:
                 biography=str(character["biography"] or ""),
                 backstory=str(character["backstory"] or ""),
                 proficiency_bonus=proficiency_bonus(int(character["level"])),
+                attack_bonus=player_attack_bonus(
+                    next(
+                        (
+                            int(row["modifier"])
+                            for row in attribute_rows
+                            if str(row["name"]).casefold() == "strength"
+                        ),
+                        0,
+                    ),
+                    next(
+                        (
+                            int(row["bonus"])
+                            for row in skill_rows
+                            if str(row["name"]).casefold() == "attack"
+                        ),
+                        0,
+                    ),
+                    character,
+                ),
                 pending_ability_points=int(character["pending_ability_points"]),
+                portrait_path=portrait_path,
             ),
             location=LocationSummaryView(
                 name=str(location["name"]),
@@ -1165,6 +1330,8 @@ class DashboardProjection:
                 route_status=str(location["route_status"]),
                 visual=_visual_view(location_visual),
                 biome=str(location["biome"]),
+                day=int(location["clock_day"]),
+                turn_number=int(location["clock_turn"]),
             ),
             narrative=NarrativeView(
                 title=str(narrative["title"]),
@@ -1176,7 +1343,8 @@ class DashboardProjection:
                 ),
                 player_action=str(narrative["player_action"]),
                 response_segments=_narrative_segments(narrative),
-                messages=_narrative_messages(narrative, message_rows),
+                messages=_narrative_messages(narrative, recent_messages),
+                has_older_messages=has_older_messages,
             ),
             quest=QuestView(
                 title=str(selected_quest["title"]),
@@ -1215,6 +1383,7 @@ class DashboardProjection:
                     bonus=int(row["bonus"]),
                     locked=bool(row["locked"]),
                     recently_increased=bool(row["recently_increased"]),
+                    description=SKILL_DESCRIPTIONS.get(str(row["name"]), ""),
                 )
                 for row in skill_rows
             ),
@@ -1270,6 +1439,11 @@ class DashboardProjection:
                     objectives=tuple(objectives_by_quest.get(str(row["id"]), ())),
                     reward_summary=(
                         f"{row['reward_experience']} XP, {row['reward_currency']} gold"
+                        + (
+                            f", {row['reward_faction']} {int(row['reward_reputation']):+d}"
+                            if row["reward_faction"] and int(row["reward_reputation"])
+                            else ""
+                        )
                     ),
                 )
                 for row in quest_rows
@@ -1292,4 +1466,10 @@ class DashboardProjection:
             pending_crafting_result=crafting_result_view,
             campaign_name=plain_name(str(campaign["name"])),
             is_preset_campaign=preset_flag is not None,
+            abilities=tuple(skill for skill in combat_skills if skill.kind == "ability"),
+            spells=tuple(skill for skill in combat_skills if skill.kind == "spell"),
+            inventory=tuple(slot for slot in inventory if not slot.is_empty)[
+                : int(character["inventory_capacity"])
+            ],
+            inventory_capacity=int(character["inventory_capacity"]),
         )

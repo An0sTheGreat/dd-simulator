@@ -3,6 +3,24 @@
 Per-release behavior notes moved from `README.md` on 2026-10-27. Release and canonical
 Workflow Step numbering is explained in `WORKFLOW_STATUS.md`.
 
+## Release 28 behavior
+
+Package version 0.28.0, database schema 24. The Adventure dashboard is the Concept T layout.
+
+- **Left column:** a character strip (vitals, experience), the paperdoll with nine equipment
+  slots, a skill list with descriptions, a scrolling 5 x 5 Inventory card holding up to
+  320 slots, and an Abilities & Spells card with a Short Rest button.
+- **Right column:** navigation tabs over the location art, a quest or encounter card (the
+  encounter card has a target picker when two or more enemies are active), a conversation
+  that fades into the scene with per-turn update tags and scroll-back history, and a 2 x 3
+  choice grid.
+- **Journal page** (quest list, event log, recent events) and **crafting** from the
+  Character Sheet.
+- **Shared tooltip cards** for items (with equipped comparison), abilities, spells and
+  skills; painted skill and ability icons.
+- **Schemas 22-24:** message speakers, per-turn notes, and the note's message sequence.
+- Packaged check: `--smoke-test-release28`.
+
 Character Sheet data, semantic icons, resource bars, and live splitters.
 
 ## Current inventory and equipment presentation

@@ -21,11 +21,13 @@ from dd_simulator.ui.models.presentation import (
     InventorySlotView,
 )
 from dd_simulator.ui.item_icons import item_icon_label
-from dd_simulator.ui.panels.common import highlight_recent_turn, semantic_label
+from dd_simulator.ui.panels.activity_panels import EventLogPanel, RecentEventsPanel
+from dd_simulator.ui.panels.common import DashboardPanel, highlight_recent_turn, semantic_label
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.state.progression import saving_throw_proficiencies
 from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard, equipped_comparisons
+from dd_simulator.ui.widgets.quest_list import QuestListWidget
 from dd_simulator.ui.widgets.world_map import WorldMapPanel
 
 
@@ -69,6 +71,8 @@ def _sheet_section(title: str) -> tuple[ThemedFrame, QVBoxLayout]:
 
 class CharacterSheetPage(NavigationPage):
     """Original, read-only 5E-inspired view of authoritative campaign state."""
+
+    crafting_requested = Signal()
 
     def __init__(self, dashboard: DashboardView) -> None:
         super().__init__(
@@ -154,29 +158,25 @@ class CharacterSheetPage(NavigationPage):
             ),
             None,
         )
+        # Each value in its own equal-stretch column under its label, with a real gutter:
+        # at the default 2 px spacing the five values ran together.
         vitals_grid = QGridLayout()
-        vitals_grid.addWidget(semantic_label("Hit Points", text_role="muted"), 0, 0)
-        vitals_grid.addWidget(
-            semantic_label(
-                f"{health.current} / {health.maximum}" if health else "—",
-                object_name="characterSheetVitalValue",
-                text_role="heading",
-            ),
-            1,
-            0,
-        )
-        for index, (label, value) in enumerate((
+        vitals_grid.setHorizontalSpacing(10)
+        vitals_grid.setVerticalSpacing(0)
+        for column, (label, value) in enumerate((
+            ("Hit Points", f"{health.current} / {health.maximum}" if health else "—"),
             ("Armor", str(dashboard.player.armor_class)),
             ("Initiative", f"{dashboard.player.initiative_modifier:+d}"),
             ("Speed", f"{dashboard.player.movement_feet} ft"),
             ("Proficiency", f"+{dashboard.player.proficiency_bonus}"),
-        ), start=1):
-            vitals_grid.addWidget(semantic_label(label, text_role="muted"), 0, index)
+        )):
+            vitals_grid.addWidget(semantic_label(label, text_role="muted"), 0, column)
             vitals_grid.addWidget(
                 semantic_label(value, object_name="characterSheetVitalValue", text_role="heading"),
                 1,
-                index,
+                column,
             )
+            vitals_grid.setColumnStretch(column, 1)
         vitals_layout.addLayout(vitals_grid)
         left.addWidget(vitals)
 
@@ -319,6 +319,12 @@ class CharacterSheetPage(NavigationPage):
         centered.addWidget(sheet, 0, 1)
         scroll.setWidget(viewport)
         self.layout.addWidget(scroll, 1)
+        crafting = SemanticButton("Crafting", role="secondary")
+        crafting.setObjectName("characterSheetCraftingButton")
+        crafting.setAccessibleName("Open crafting")
+        crafting.setToolTip("Craft items from known recipes")
+        crafting.clicked.connect(self.crafting_requested)
+        self.layout.addWidget(centered_third(crafting, "characterSheetCraftingFooter"))
         self.finish()
 
 
@@ -396,7 +402,9 @@ class CommerceHoverEntry(QWidget):
 
     def enterEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         hint = "Hold Left Ctrl: Compare Off Hand" if self.offhand_comparison else ""
-        self.hover_card = ItemHoverCard(self.item, self, comparison_hint=hint)
+        self.hover_card = ItemHoverCard(
+            self.item, self, comparison_hint=hint, compared_with=self.default_comparison,
+        )
         self.hover_card.show_near(QCursor.pos())
         self._show_comparison(False)
         app = QApplication.instance()
@@ -721,6 +729,31 @@ class NpcNavigationPage(NavigationPage):
         self.dialogue_status.style().polish(self.dialogue_status)
 
 
+class JournalPage(NavigationPage):
+    """Quest log beside the filtered event log and the most recent events."""
+
+    def __init__(self, dashboard: DashboardView) -> None:
+        super().__init__(
+            "journalNavigationPage",
+            "JOURNAL",
+            "Quests, objectives, and the recorded history of this campaign.",
+        )
+        self.quest_list = QuestListWidget(dashboard.quest_list)
+        self.event_log = EventLogPanel(dashboard.event_log)
+        self.recent_events = RecentEventsPanel(dashboard.recent_events)
+        # The tall Journal columns start their entries at the top (same order and scrolling).
+        for panel in (self.event_log, self.recent_events):
+            panel.scroll_area.widget().layout().setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.quest_panel = DashboardPanel("journalQuestPanel", "QUESTS")
+        self.quest_panel.content_layout.addWidget(self.quest_list, 1)
+        columns = QHBoxLayout()
+        columns.setSpacing(8)
+        for widget, stretch in ((self.quest_panel, 4), (self.event_log, 5), (self.recent_events, 3)):
+            columns.addWidget(widget, stretch)
+        self.layout.addLayout(columns, 1)
+        self.finish()
+
+
 def create_navigation_pages(dashboard: DashboardView) -> dict[str, NavigationPage]:
     pages: dict[str, NavigationPage] = {}
 
@@ -737,5 +770,6 @@ def create_navigation_pages(dashboard: DashboardView) -> dict[str, NavigationPag
     pages["people"] = people
 
     pages["character_sheet"] = CharacterSheetPage(dashboard)
+    pages["journal"] = JournalPage(dashboard)
 
     return pages

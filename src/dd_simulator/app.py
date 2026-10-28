@@ -232,6 +232,8 @@ def main() -> int:
     window.show()
     if "--smoke-test-preset-campaign" in sys.argv:
         QTimer.singleShot(50, lambda: _run_character_creation_smoke(app, window, preset=True))
+    elif "--smoke-test-release28" in sys.argv:
+        QTimer.singleShot(50, lambda: _run_release_twenty_eight_smoke(app, window))
     elif "--smoke-test-release27" in sys.argv:
         QTimer.singleShot(50, lambda: _run_release_twenty_six_smoke(app, window))
     elif "--smoke-test-release26-9-4" in sys.argv:
@@ -313,6 +315,45 @@ def main() -> int:
     return app.exec()
 
 
+def _run_release_twenty_eight_smoke(app: QApplication, window: MainWindow) -> None:
+    """Verify the packaged Concept T dashboard regions, conversation, journal and tooltips."""
+
+    try:
+        from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard
+        from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
+
+        service = window.game_state_service
+        if service is None or service.database.schema_version() != LATEST_SCHEMA_VERSION:
+            raise RuntimeError("Packaged Release 28 database startup check failed")
+        for region in (
+            "character_strip", "paperdoll_panel", "skill_detail_list", "inventory_card",
+            "powers_card", "scene_view", "conversation_view",
+        ):
+            if getattr(window, region, None) is None:
+                raise RuntimeError(f"Packaged Concept T region is missing: {region}")
+        messages = window.dashboard.narrative.messages
+        if not messages or len(window.conversation_view.messages) != len(messages):
+            raise RuntimeError("Packaged conversation does not show the demo messages")
+        window._show_navigation("journal")  # noqa: SLF001 - packaged smoke boundary
+        if window.current_page != "journal" or window.navigation_pages["journal"] is None:
+            raise RuntimeError("Packaged Journal page did not open")
+        item = next((slot for slot in window.dashboard.inventory if slot.name), None)
+        if item is None or not window.dashboard.abilities:
+            raise RuntimeError("Packaged dashboard has no item or ability for tooltips")
+        ItemHoverCard(item, window)
+        AbilityHoverCard(window.dashboard.abilities[0], window)
+        campaign_id = service.campaigns.active_campaign_id()
+        older = service.older_messages(campaign_id, window.dashboard.location.turn_number)
+        if not isinstance(older, tuple):
+            raise RuntimeError("Packaged older_messages did not return a tuple")
+    except Exception:
+        LOGGER.exception("Packaged Release 28 smoke test failed")
+        app.exit(28)
+        return
+    window.close()
+    app.quit()
+
+
 def _run_release_twenty_six_smoke(app: QApplication, window: MainWindow) -> None:
     """Verify both packaged simple themes and the current dashboard boundary."""
 
@@ -328,13 +369,9 @@ def _run_release_twenty_six_smoke(app: QApplication, window: MainWindow) -> None
                 raise RuntimeError(f"Packaged theme could not be applied: {theme_id}")
             if "QFrame#itemHoverSurface" not in app.styleSheet():
                 raise RuntimeError(f"Packaged item tooltip surface is missing: {theme_id}")
-        if window.utility_panel.tabs.count() != 4:
-            raise RuntimeError("Packaged equipment is not consolidated with inventory")
-        if len(window.utility_panel.inventory_grid.slots) != 36:
-            raise RuntimeError("Packaged inventory page does not contain 36 slots")
-        if window.utility_panel.inventory_grid.columns not in {4, 6}:
-            raise RuntimeError("Packaged inventory column adjustment is invalid")
-        if "character_sheet" not in window.navigation_buttons:
+        if len(window.inventory_card.grid.slots) < 25 or window.inventory_card.grid.columns != 5:
+            raise RuntimeError("Packaged inventory card does not show a 5x5 bag")
+        if "character_sheet" not in window.scene_view.tabs.buttons:
             raise RuntimeError("Packaged Character Sheet navigation is unavailable")
         if window.findChild(QWidget, "characterSheetSurface") is None:
             raise RuntimeError("Packaged Character Sheet is incomplete")
@@ -356,24 +393,8 @@ def _run_release_twenty_six_smoke(app: QApplication, window: MainWindow) -> None
             or "Gemma 4 E4B" not in window.local_ai_setup_panel.large_model_button.text()
         ):
             raise RuntimeError("Packaged local AI recommendations are incomplete")
-        location_visual = window.findChild(QLabel, "locationVisualPlaceholder")
-        if (
-            location_visual is None
-            or location_visual.property("visualState") not in {"catalog", "confirmed"}
-            or location_visual.pixmap() is None
-            or location_visual.pixmap().isNull()
-        ):
+        if window.scene_view.image_path is None:
             raise RuntimeError("Packaged location catalog image did not render")
-        minimap_panel = window.findChild(QWidget, "minimapPanel")
-        location_summary = window.findChild(QWidget, "locationSummaryPanel")
-        if (
-            minimap_panel is None
-            or minimap_panel.findChild(QLabel, "panelTitle") is not None
-            or location_summary is None
-            or location_summary.findChild(QLabel, "locationVisualPlaceholder") is not None
-            or location_visual.pixmap().size() != location_visual.contentsRect().size()
-        ):
-            raise RuntimeError("Packaged responsive location panel is incomplete")
         initial_point_size = app.font().pointSizeF()
         window.settings_panel.font_size_increase.click()
         app.processEvents()
@@ -389,14 +410,10 @@ def _run_release_twenty_six_smoke(app: QApplication, window: MainWindow) -> None
                 "Packaged location catalog is incomplete: "
                 + ", ".join(sorted(missing_location_art))
             )
-        if len(window.findChildren(QProgressBar, "resourceBar")) != 5:
+        if len(window.findChildren(QProgressBar, "codexResourceBar")) != 5:
             raise RuntimeError("Packaged resource bars are incomplete")
         if any(min(window_splitter.sizes()) <= 0 for window_splitter in (
-            window.main_splitter,
-            window.summary_splitter,
-            window.narrative_splitter,
-            window.dashboard_rows_splitter,
-            window.sidebar_utility_splitter,
+            window.concept_splitter,
         )):
             raise RuntimeError("Packaged splitters are not resizable")
     except Exception:
@@ -444,10 +461,7 @@ def _run_release_twenty_five_smoke(app: QApplication, window: MainWindow) -> Non
         if len(spoken) != 1 or spoken[0].kind != "spoken":
             raise RuntimeError("Packaged spoken narration was fragmented")
         if any(min(window_splitter.sizes()) <= 0 for window_splitter in (
-            window.main_splitter,
-            window.summary_splitter,
-            window.narrative_splitter,
-            window.dashboard_rows_splitter,
+            window.concept_splitter,
         )):
             raise RuntimeError("Packaged splitters are not resizable")
     except Exception:
@@ -514,14 +528,11 @@ def _run_release_twenty_two_smoke(app: QApplication, window: MainWindow) -> None
         service = window.game_state_service
         if service is None or service.database.schema_version() != LATEST_SCHEMA_VERSION:
             raise RuntimeError("Packaged Release 22 database startup check failed")
-        bars = window.utility_panel.findChildren(QProgressBar, "skillExperienceBar")
+        bars = window.skill_detail_list.findChildren(QProgressBar, "skillDetailXpBar")
         if len(bars) != len(window.dashboard.skills):
             raise RuntimeError("Packaged skill XP bars are incomplete")
-        placeholders = window.findChildren(QPushButton, "navigationPlaceholderButton")
-        if len(placeholders) != 2 or any(
-            button.isEnabled() or button.text() for button in placeholders
-        ):
-            raise RuntimeError("Packaged navigation placeholders are incorrect")
+        if window.findChild(QWidget, "bottomNavigationBar") is not None:
+            raise RuntimeError("Packaged bottom navigation was not retired")
         if {"skills", "quests", "campaigns"} & set(window.page_indices):
             raise RuntimeError("Redundant packaged navigation pages remain registered")
         if (
@@ -552,7 +563,6 @@ def _run_release_twenty_one_smoke(app: QApplication, window: MainWindow) -> None
         if dashboard.pending_crafting_result is None:
             raise RuntimeError("Packaged crafting result did not persist")
         window._reload_dashboard(dashboard, target_page="people")  # noqa: SLF001
-        window.utility_panel.set_current_tab(3)
         window._show_pending_crafting_result()  # noqa: SLF001
         app.processEvents()
         for object_name in (
@@ -746,11 +756,6 @@ def _run_release_sixteen_smoke(app: QApplication, window: MainWindow) -> None:
             raise RuntimeError("Packaged equipped durability display did not load")
         if not any("Quantity" in detail for detail in details):
             raise RuntimeError("Packaged equipped ammunition quantity did not load")
-        if any(
-            window.event_panel.entries.itemAt(index).spacerItem() is not None
-            for index in range(window.event_panel.entries.count())
-        ):
-            raise RuntimeError("Packaged Event Log retained a trailing spacer")
 
         with service.database.connect() as connection:
             current_location = connection.execute(
@@ -897,7 +902,7 @@ def _run_phase_fourteen_smoke(app: QApplication, window: MainWindow) -> None:
         dashboard = service.load_active_dashboard()
         if dashboard.world_map is None or dashboard.world_map.current_location_id != "location-greystone-keep":
             raise RuntimeError("Packaged map did not highlight Greystone Keep")
-        if "people" not in window.page_indices or window.utility_panel.tabs.count() != 3:
+        if "people" not in window.page_indices or "crafting" not in window.page_indices:
             raise RuntimeError("Packaged Phase 14 navigation did not load")
     except Exception:
         LOGGER.exception("Packaged Phase 14 smoke test failed")

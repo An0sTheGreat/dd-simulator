@@ -57,6 +57,7 @@ def build_phase_three_dashboard() -> DashboardView:
             initiative_modifier=2,
             movement_feet=15,
             proficiency_bonus=3,
+            attack_bonus=8,
         ),
         location=LocationSummaryView(
             name="Greystone Road",

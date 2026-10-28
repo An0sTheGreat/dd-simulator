@@ -5,6 +5,7 @@ from pathlib import Path
 
 project_root = Path(SPECPATH)
 theme_root = project_root / "src" / "dd_simulator" / "ui" / "themes"
+codex_root = project_root / "src" / "dd_simulator" / "ui" / "assets" / "codex"
 font_root = project_root / "src" / "dd_simulator" / "ui" / "assets" / "fonts"
 icon_root = project_root / "src" / "dd_simulator" / "ui" / "assets" / "icons"
 inventory_art_root = project_root / "src" / "dd_simulator" / "ui" / "assets" / "inventory"
@@ -20,6 +21,7 @@ a = Analysis(
     datas=[
         (str(theme_root / "high_fantasy"), "dd_simulator/ui/themes/high_fantasy"),
         (str(theme_root / "modern_proof"), "dd_simulator/ui/themes/modern_proof"),
+        (str(codex_root), "dd_simulator/ui/assets/codex"),
         (str(font_root), "dd_simulator/ui/assets/fonts"),
         (str(icon_root), "dd_simulator/ui/assets/icons"),
         (str(inventory_art_root), "dd_simulator/ui/assets/inventory"),

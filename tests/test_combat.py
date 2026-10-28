@@ -445,7 +445,7 @@ def test_class_ability_cooldown_limited_uses_and_short_rest_recovery() -> None:
 
 def test_phase_ten_schema_records_ability_and_effect_fields() -> None:
     database, service = combat_service(20, 1)
-    assert database.schema_version() == 21
+    assert database.schema_version() == 24
     service.start_combat(enemies=(training_enemy(),))
     with database.connect() as connection:
         ability_columns = {
@@ -505,4 +505,20 @@ def test_enemy_can_defeat_player_and_persist_unconscious_condition() -> None:
         assert connection.execute(
             "SELECT name FROM status_effects WHERE name = 'Unconscious'"
         ).fetchone()[0] == "Unconscious"
+    database.close()
+
+
+def test_projected_attack_bonus_matches_combat_player_attack_bonus() -> None:
+    database, service = combat_service(20, 1)
+    with database.transaction() as connection:
+        connection.execute(
+            "UPDATE characters SET equipment_attack_bonus = 2 WHERE is_player = 1"
+        )
+    projected = service.load_active_dashboard().player.attack_bonus
+    service.start_combat(enemies=(training_enemy(),))
+    with database.connect() as connection:
+        combat_value = connection.execute(
+            "SELECT attack_bonus FROM combatants WHERE side = 'player'"
+        ).fetchone()[0]
+    assert projected is not None and projected == combat_value
     database.close()

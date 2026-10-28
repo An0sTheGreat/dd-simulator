@@ -18,14 +18,14 @@ from PySide6.QtWidgets import (
 
 from dd_simulator.ui.models.presentation import EquipmentSlotView, InventorySlotView
 from dd_simulator.ui.item_icons import item_icon_label, refresh_item_icon
-from dd_simulator.ui.widgets.hover_card import PositionedHoverCard
+from dd_simulator.ui.widgets.hover_card import CARD_ICON_SIZE, TooltipCard, card_label
 
 import json
+import re
 
 
 INVENTORY_SLOT_MIME = "application/x-dd-inventory-slot"
 EQUIPMENT_SLOT_MIME = "application/x-dd-equipment-slot"
-INVENTORY_PAGE_SIZE = 36
 INVENTORY_SLOT_SIZE = 96
 EQUIPMENT_BOARD_SIZE = 735
 EQUIPMENT_SLOT_SIZE = 100
@@ -93,18 +93,6 @@ def _icon_context(item: InventorySlotView) -> str:
     )
 
 
-def _mechanic_detail(item: InventorySlotView) -> str:
-    if item.damage:
-        return f"Damage: {item.damage}"
-    if item.healing:
-        return f"Healing: {item.healing} health"
-    if item.armor:
-        return f"Armor: {item.armor}"
-    if item.effects:
-        return f"Effect: {_readable_effect(item.effects)}"
-    return "Effect: Utility item"
-
-
 def _readable_effect(raw: str) -> str:
     try:
         value = json.loads(raw)
@@ -127,34 +115,6 @@ def _readable_effect(raw: str) -> str:
     if isinstance(summary, str) and summary.strip() and not details:
         details.append(summary.strip())
     return "; ".join(details) or "Utility effect"
-
-
-def _durability_detail(item: InventorySlotView) -> str:
-    if item.durability is not None:
-        return f"Durability: {item.durability}/{item.maximum_durability or '?'}"
-    if item.charges is not None:
-        return f"Uses: {item.charges}/{item.maximum_charges or '?'}"
-    return "Durability: Not applicable"
-
-
-def _compatible_slot_detail(item: InventorySlotView) -> str:
-    if item.compatible_slots:
-        return f"Compatible slots: {', '.join(item.compatible_slots)}"
-    if item.equip_slot:
-        return f"Compatible slot: {item.equip_slot}"
-    return "Compatible slots: Not equippable"
-
-
-def _status_detail(item: InventorySlotView) -> str:
-    if item.status:
-        status = item.status
-    elif item.quest_item:
-        status = "Quest item"
-    elif item.can_equip:
-        status = "Unequipped"
-    else:
-        status = "In inventory"
-    return f"Status: {status}"
 
 
 def equipped_comparisons(
@@ -189,8 +149,109 @@ def equipped_comparisons(
     return default, alternate
 
 
-class ItemHoverCard(PositionedHoverCard):
-    """Persistent, theme-aware item card shown for the complete hover duration."""
+def _dice_average(text: str) -> float | None:
+    match = re.search(r"(\d+)\s*d\s*(\d+)(?:\s*([+-])\s*(\d+))?", text)
+    if match is None:
+        return None
+    count, sides, sign, bonus = match.groups()
+    flat = int(bonus or 0) * (-1 if sign == "-" else 1)
+    return int(count) * (int(sides) + 1) / 2 + flat
+
+
+def _first_int(text: str) -> int | None:
+    match = re.search(r"[+-]?\d+", text)
+    return int(match.group()) if match else None
+
+
+def _json_object(raw: str) -> dict | None:
+    try:
+        value = json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def _readable_pairs(raw: str, *, skip: tuple[str, ...] = ()) -> str:
+    """Bonus, penalty and requirement JSON ({"strength": 2}) as "Strength +2"."""
+
+    value = _json_object(raw)
+    if value is None:
+        return raw.strip()
+    return ", ".join(
+        f"{str(key).replace('_', ' ').title()} "
+        + (f"{amount:+d}" if isinstance(amount, int) else str(amount))
+        for key, amount in value.items()
+        if key not in skip
+    )
+
+
+def _attack_bonus(item: InventorySlotView) -> int | None:
+    value = _json_object(item.bonuses)
+    if value is not None:
+        attack = value.get("attack")
+        return attack if isinstance(attack, int) else None
+    match = re.search(r"([+-]\d+)\s*(?:to\s+)?attack", item.bonuses, re.IGNORECASE)
+    return int(match.group(1)) if match else None
+
+
+def comparison_deltas(
+    item: InventorySlotView, equipped: InventorySlotView,
+) -> list[tuple[str, bool]]:
+    """(text, better) for each stat that differs from the equipped item."""
+
+    deltas: list[tuple[str, bool]] = []
+    for name, mine, theirs, higher_is_better, spec in (
+        ("avg damage", _dice_average(item.damage), _dice_average(equipped.damage), True, "+.1f"),
+        ("attack", _attack_bonus(item), _attack_bonus(equipped), True, "+d"),
+        ("armor", _first_int(item.armor), _first_int(equipped.armor), True, "+d"),
+        ("lb", item.weight or None, equipped.weight or None, False, "+.1f"),
+    ):
+        if mine is None and theirs is None:
+            continue
+        delta = (mine or 0) - (theirs or 0)
+        if delta:
+            deltas.append((f"{format(delta, spec)} {name}", (delta > 0) == higher_is_better))
+    return deltas
+
+
+def _item_rows(item: InventorySlotView) -> list[tuple[str, str]]:
+    attack = _attack_bonus(item)
+    rows = [
+        ("Damage", item.damage),
+        ("Healing", f"{item.healing} health" if item.healing else ""),
+        ("Attack", f"{attack:+d}" if attack is not None else ""),
+        ("Armor", item.armor),
+        ("Effect", _readable_effect(item.effects) if _json_object(item.effects) != {} else ""),
+        # Attack and armor have their own rows.
+        ("Bonus", _readable_pairs(item.bonuses, skip=("attack", "armor"))),
+        ("Penalty", _readable_pairs(item.penalties)),
+        ("Durability", f"{item.durability} / {item.maximum_durability or '?'}"
+            if item.durability is not None else ""),
+        ("Charges", f"{item.charges} / {item.maximum_charges or '?'}"
+            if item.charges is not None else ""),
+        ("Quantity", str(item.quantity) if item.quantity > 1 else ""),
+        ("Weight", f"{item.weight:.1f} lb" if item.weight else ""),
+        ("Value", f"{item.value_gp} gold" if item.value_gp else ""),
+        ("Requires", _readable_pairs(item.requirements)),
+    ]
+    return [row for row in rows if row[1]] or [("Effect", "Utility item")]
+
+
+def _item_subtitle(item: InventorySlotView) -> str:
+    kind = item.category if item.category not in ("", "misc") else item.item_type
+    slots = item.compatible_slots or ((item.equip_slot,) if item.equip_slot else ())
+    parts = [item.rarity.title(), kind.title(), " or ".join(slots)]
+    if item.status == "Equipped":
+        parts.append("Equipped")
+    if item.quest_item:
+        parts.append("Quest item")
+    if not item.identified:
+        parts.append("Unidentified")
+    return " · ".join(part for part in parts if part)
+
+
+class ItemHoverCard(TooltipCard):
+    """Item card; ``compared_with`` adds green/red deltas against an equipped item."""
 
     def __init__(
         self,
@@ -199,120 +260,59 @@ class ItemHoverCard(PositionedHoverCard):
         *,
         equipped_comparison: bool = False,
         comparison_hint: str = "",
+        compared_with: InventorySlotView | None = None,
     ) -> None:
-        super().__init__(parent, object_name="itemHoverCard", card_kind="item")
-        self.item = item
-        self.setProperty("rarity", item.rarity.casefold())
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-        self.setMinimumWidth(560)
-        self.setMaximumWidth(680)
-
-        outer = QVBoxLayout(self)
-        outer.setContentsMargins(0, 0, 0, 0)
-        outer.setSpacing(0)
-
-        surface = QFrame(self)
-        surface.setObjectName("itemHoverSurface")
-        surface.setProperty("rarity", item.rarity.casefold())
-        outer.addWidget(surface)
-        content = QVBoxLayout(surface)
-        content.setContentsMargins(18, 14, 18, 16)
-        content.setSpacing(8)
-
-        if comparison_hint:
-            hint = QLabel(comparison_hint)
-            hint.setObjectName("itemComparisonHint")
-            hint.setAlignment(Qt.AlignmentFlag.AlignLeft)
-            content.addWidget(hint)
-
-        if equipped_comparison:
-            equipped_label = QLabel("EQUIPPED")
-            equipped_label.setObjectName("equippedComparisonLabel")
-            equipped_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            content.addWidget(equipped_label)
-
-        title = QLabel(item.name or "Empty slot")
-        title.setObjectName("hoverCardTitle")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        content.addWidget(title)
-        identified = "Identified" if item.identified else "Unidentified"
-        classification = QLabel(
-            f"{item.category.title()}  |  {item.rarity.title()}  |  {identified}"
-        )
-        classification.setObjectName("hoverCardClassification")
-        classification.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        content.addWidget(classification)
-
-        divider = QFrame()
-        divider.setObjectName("hoverCardDivider")
-        divider.setFrameShape(QFrame.Shape.HLine)
-        content.addWidget(divider)
-
-        table = QGridLayout()
-        table.setContentsMargins(0, 0, 0, 0)
-        table.setHorizontalSpacing(18)
-        table.setVerticalSpacing(4)
-        self.icon_label = item_icon_label(
+        rarity = item.rarity.casefold()
+        extras: list[QWidget] = []
+        comparison_block: QFrame | None = None
+        if compared_with is not None:
+            deltas = comparison_deltas(item, compared_with)
+            block = QFrame()
+            block.setObjectName("tooltipComparison")
+            block_layout = QGridLayout(block)
+            block_layout.setContentsMargins(0, 6, 0, 0)
+            block_layout.setHorizontalSpacing(10)
+            block_layout.setVerticalSpacing(2)
+            heading = card_label(f"Compared with {compared_with.name}", "tooltipComparisonTitle")
+            block_layout.addWidget(heading, 0, 0, 1, 3)
+            for index, (text, better) in enumerate(deltas or [("No stat changes", True)]):
+                delta = card_label(text, "tooltipDelta")
+                if deltas:
+                    delta.setProperty("better", better)
+                block_layout.addWidget(delta, 1 + index // 3, index % 3)
+            block_layout.setColumnStretch(3, 1)  # pack the deltas to the left
+            comparison_block = block
+            extras.append(block)
+        footer = comparison_hint
+        if not equipped_comparison and not footer:
+            footer = (
+                "Drag to an equipment slot to equip · Right-click for options"
+                if item.can_equip else "Right-click for options"
+            )
+        icon = item_icon_label(
             item.name or "Empty slot",
             rarity=item.rarity,
             category=item.category,
             context=_icon_context(item),
-            size=88,
+            size=CARD_ICON_SIZE,
+            object_name="tooltipIcon",
         )
-        table.addWidget(
-            self.icon_label,
-            0,
-            0,
-            4,
-            1,
-            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop,
+        super().__init__(
+            parent,
+            object_name="itemHoverCard",
+            card_kind="item",
+            title=item.name or "Empty slot",
+            tone=rarity,
+            subtitle=_item_subtitle(item),
+            icon=icon,
+            rows=_item_rows(item),
+            extras=extras,
+            description=item.description.strip() or "No additional description is available.",
+            footer=footer,
         )
-        left = (
-            f"Name: {item.name or 'Empty slot'}",
-            f"Type: {item.category.title()}",
-            _durability_detail(item),
-            f"Weight: {item.weight:g} each | Value: {item.value_gp} gp each",
-        )
-        right = (
-            f"Quantity: {item.quantity}",
-            _mechanic_detail(item),
-            _status_detail(item),
-            _compatible_slot_detail(item),
-        )
-        self.detail_labels: list[QLabel] = []
-        for row, (left_text, right_text) in enumerate(zip(left, right)):
-            for column, value in enumerate((left_text, right_text)):
-                label = QLabel(value)
-                label.setObjectName(
-                    "itemHoverName" if row == 0 and column == 0 else "itemHoverDetail"
-                )
-                label.setWordWrap(True)
-                label.setAlignment(
-                    Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-                )
-                table.addWidget(label, row, column + 1)
-                self.detail_labels.append(label)
-        table.setColumnStretch(1, 1)
-        table.setColumnStretch(2, 1)
-        content.addLayout(table)
-
-        divider = QFrame()
-        divider.setObjectName("hoverCardDivider")
-        divider.setFrameShape(QFrame.Shape.HLine)
-        content.addWidget(divider)
-
-        description = item.description.strip() or "No additional description is available."
-        self.description_label = QLabel(description)
-        self.description_label.setObjectName("itemHoverDescription")
-        self.description_label.setWordWrap(True)
-        self.description_label.setAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        )
-        font = self.description_label.font()
-        font.setItalic(True)
-        self.description_label.setFont(font)
-        content.addWidget(self.description_label)
+        self.item = item
+        self.comparison_block = comparison_block
+        self.setProperty("rarity", rarity)
 
 def _start_item_drag(
     widget: QWidget,
@@ -363,6 +363,8 @@ class InventorySlotWidget(QFrame):
         index: int,
         comparison_item: InventorySlotView | None = None,
         offhand_comparison_item: InventorySlotView | None = None,
+        *,
+        slot_size: int = INVENTORY_SLOT_SIZE,
     ) -> None:
         super().__init__()
         self.item = item
@@ -376,7 +378,7 @@ class InventorySlotWidget(QFrame):
             f"Inventory slot {index + 1}: {item.name or 'empty'}"
         )
         self.setAcceptDrops(True)
-        self.setFixedSize(INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE)
+        self.setFixedSize(slot_size, slot_size)
         self.setFocusPolicy(
             Qt.FocusPolicy.NoFocus if item.is_empty else Qt.FocusPolicy.StrongFocus
         )
@@ -394,7 +396,7 @@ class InventorySlotWidget(QFrame):
         self.artwork_label.setAttribute(
             Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
         )
-        self.artwork_label.setFixedSize(INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE)
+        self.artwork_label.setFixedSize(slot_size, slot_size)
         layout.addWidget(self.artwork_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
         self._refresh_artwork()
         self.icon_label = item_icon_label(
@@ -402,7 +404,7 @@ class InventorySlotWidget(QFrame):
             rarity=item.rarity,
             category=item.category,
             context=_icon_context(item),
-            size=68,
+            size=max(16, slot_size * 68 // INVENTORY_SLOT_SIZE),
         )
         if item.is_empty:
             self.icon_label.hide()
@@ -452,18 +454,23 @@ class InventorySlotWidget(QFrame):
         self.artwork_label.setPixmap(
             _themed_artwork(
                 "Inventory_Slot_1.png",
-                INVENTORY_SLOT_SIZE,
+                self.artwork_label.width(),
                 _current_theme_id(),
             )
         )
 
     def enterEvent(self, event) -> None:  # type: ignore[no-untyped-def]
-        if not self.item.is_empty and not self._hover_suppressed:
+        # A repeated enter while our card is up (showing or closing a card can
+        # synthesise one) must not stack a new card, or enter/close ping-pongs.
+        showing = self.hover_card is not None and self.hover_card.isVisible()
+        if not self.item.is_empty and not self._hover_suppressed and not showing:
             hint = (
                 "Hold Left Ctrl: Compare Off Hand"
                 if self.offhand_comparison_item is not None else ""
             )
-            self.hover_card = ItemHoverCard(self.item, self, comparison_hint=hint)
+            self.hover_card = ItemHoverCard(
+                self.item, self, comparison_hint=hint, compared_with=self.comparison_item,
+            )
             self.hover_card.show_near(QCursor.pos())
             self._show_comparison(False)
             application = QApplication.instance()
@@ -626,6 +633,7 @@ class InventoryGrid(QWidget):
     context_action_requested = Signal(int, str)
     move_requested = Signal(int, int)
     equipment_drop_requested = Signal(int, int)
+    focus_moved = Signal(int)
 
     def __init__(
         self,
@@ -635,9 +643,13 @@ class InventoryGrid(QWidget):
         slot_count: int | None = None,
         index_offset: int = 0,
         equipment: tuple[EquipmentSlotView, ...] = (),
+        slot_size: int = INVENTORY_SLOT_SIZE,
+        spacing: int = 0,
     ) -> None:
         super().__init__()
         self.setObjectName("inventoryGrid")
+        self.slot_size = slot_size
+        self.spacing = spacing
         self.columns = max(1, columns)
         self.slot_count = max(len(items), slot_count or len(items))
         self.index_offset = max(0, index_offset)
@@ -646,14 +658,15 @@ class InventoryGrid(QWidget):
         self.slots: list[InventorySlotWidget] = []
         self.grid = QGridLayout(self)
         self.grid.setContentsMargins(0, -50, 0, 0)
-        self.grid.setSpacing(0)
+        self.grid.setSpacing(spacing)
         self.set_items(items)
 
     def _refresh_geometry(self) -> None:
         rows = max(1, (self.slot_count + self.columns - 1) // self.columns)
+        pitch = self.slot_size + self.spacing
         self.setFixedSize(
-            self.columns * INVENTORY_SLOT_SIZE,
-            rows * INVENTORY_SLOT_SIZE,
+            self.columns * pitch - self.spacing,
+            rows * pitch - self.spacing,
         )
 
     def _relayout_slots(self) -> None:
@@ -689,7 +702,10 @@ class InventoryGrid(QWidget):
         for local_index, item in enumerate(padded):
             index = self.index_offset + local_index
             main_comparison, offhand_comparison = self._equipped_comparisons(item)
-            slot = InventorySlotWidget(item, index, main_comparison, offhand_comparison)
+            slot = InventorySlotWidget(
+                item, index, main_comparison, offhand_comparison,
+                slot_size=self.slot_size,
+            )
             slot.activated.connect(self.select_index)
             slot.navigation_requested.connect(self._move_focus)
             slot.context_action_requested.connect(self.context_action_requested)
@@ -735,6 +751,7 @@ class InventoryGrid(QWidget):
             slot = self.slots[candidate - self.index_offset]
             if not slot.item.is_empty:
                 slot.setFocus()
+                self.focus_moved.emit(candidate)
                 return
             candidate += offsets[direction]
 

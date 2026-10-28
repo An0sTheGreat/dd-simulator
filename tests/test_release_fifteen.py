@@ -18,7 +18,8 @@ from dd_simulator.state import (
     ItemCommand,
 )
 from dd_simulator.state.item_actions import build_item_metadata
-from dd_simulator.ui.panels.utility_panels import UtilityContentPanel
+from dd_simulator.ui.widgets.codex_cards import PowersCard
+from dd_simulator.ui.widgets.codex_character import SkillDetailList
 from dd_simulator.ui.widgets.inventory_grid import (
     INVENTORY_SLOT_MIME,
     EquipmentGrid,
@@ -113,23 +114,22 @@ def test_equipment_drop_widget_forwards_inventory_source_and_target() -> None:
     assert spy.at(0) == [39, 1]
 
 
-def test_adventurer_tools_preserves_skills_and_combat_columns() -> None:
+def test_codex_preserves_skills_and_ability_spell_columns() -> None:
     _app = QApplication.instance() or QApplication([])
     _database, service = release_fifteen_service()
     dashboard = service.load_active_dashboard()
-    panel = UtilityContentPanel(
-        dashboard.skills, dashboard.inventory_preview, dashboard.equipment,
-        dashboard.combat_skills, dashboard.combat, dashboard.crafting_recipes,
-    )
-    skill_cards = panel.findChildren(SkillGridItem)
-    combat_cards = panel.findChildren(CombatSkillGridItem)
-    compact_grid = panel.findChild(SkillsGrid)
-    combat_grid = panel.findChild(CombatSkillsGrid)
+    skills = SkillDetailList(dashboard.skills)
+    powers = PowersCard(dashboard.abilities, dashboard.spells)
 
-    assert compact_grid is not None and combat_grid is not None
-    assert skill_cards and combat_cards
-    assert compact_grid.columns == 2
-    assert combat_grid.columns == 2
+    assert dashboard.skills and dashboard.abilities
+    assert [row.skill.name for row in skills.rows] == [skill.name for skill in dashboard.skills]
+    # Abilities and spells sit in two columns; a column with no entries hides.
+    assert len(powers.ability_column.entries) == len(dashboard.abilities)
+    assert len(powers.spell_column.entries) == len(dashboard.spells)
+    assert not powers.ability_column.isHidden()
+    assert powers.spell_column.isHidden() == (not dashboard.spells)
+    skills.deleteLater()
+    powers.deleteLater()
 
 
 def test_item_hover_text_contains_mechanics_or_fallback_description() -> None:
@@ -142,10 +142,8 @@ def test_item_hover_text_contains_mechanics_or_fallback_description() -> None:
 
     dagger.enterEvent(QEnterEvent(QPointF(), QPointF(), QPointF()))
     charm.enterEvent(QEnterEvent(QPointF(), QPointF(), QPointF()))
-    dagger_details = [label.text() for label in dagger.hover_card.detail_labels]
-    charm_details = [label.text() for label in charm.hover_card.detail_labels]
-    assert "Damage: 1d4 piercing" in dagger_details
-    assert "Compatible slots: Main Hand, Off Hand" in dagger_details
-    assert "Name: Greenstone Charm" in charm_details
+    assert dagger.hover_card.rows["Damage"].text() == "1d4 piercing"
+    assert "Main Hand or Off Hand" in dagger.hover_card.subtitle_label.text()
+    assert charm.hover_card.title_label.text() == "Greenstone Charm"
     assert dagger.hover_card.description_label.font().italic()
     assert charm.slot.item is not None and charm.slot.item.description

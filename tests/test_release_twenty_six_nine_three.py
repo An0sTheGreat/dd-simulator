@@ -22,7 +22,7 @@ from dd_simulator.state.errors import GameStateError
 def initialized_demo() -> tuple[GameStateDatabase, GameStateService, str]:
     database = GameStateDatabase.in_memory()
     service = GameStateService(database)
-    assert service.initialize() == 21
+    assert service.initialize() == 24
     campaign_id = service.ensure_demo_campaign()
     return database, service, campaign_id
 
@@ -166,4 +166,25 @@ def test_final_quest_gate_rejects_investigation_until_outcome_is_resolved() -> N
             evidence=f"I destroy {objective['trigger_target']} and resolve the danger.",
         )
         assert "Completed objective" in summary
+    database.close()
+
+
+def test_sync_clamps_saved_uses_to_a_lowered_maximum() -> None:
+    database, service, _campaign_id = initialized_demo()
+    with database.transaction() as connection:
+        character = connection.execute(
+            "SELECT id, character_class, level FROM characters WHERE is_player = 1"
+        ).fetchone()
+        # An older save recorded 3/3 uses before the catalog lowered the maximum to 2.
+        connection.execute(
+            "UPDATE abilities SET current_uses = 3, maximum_uses = 3 "
+            "WHERE character_id = ? AND action_key = 'field_dressing'",
+            (character["id"],),
+        )
+        sync_character_combat_catalog(
+            connection, str(character["id"]),
+            character_class=str(character["character_class"]), level=int(character["level"]),
+        )
+    skills = {skill.name: skill for skill in service.load_active_dashboard().combat_skills}
+    assert "2/2 uses" in skills["Field Dressing"].resource_label.split(" | ")
     database.close()

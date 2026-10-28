@@ -18,7 +18,7 @@ from dd_simulator.state import (
 )
 from dd_simulator.state.migrations import LATEST_SCHEMA_VERSION
 from dd_simulator.state.seed import DEMO_CAMPAIGN_ID
-from dd_simulator.ui.panels.narrative_panels import NarrativePanel
+from dd_simulator.ui.widgets.scene_view import ChoiceGrid
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
 from dd_simulator.ui.widgets.inventory_grid import EQUIPMENT_SLOT_MIME, InventoryGrid
 
@@ -35,7 +35,7 @@ def test_schema_twelve_migrates_inventory_and_npc_conversations() -> None:
     database, service = phase_fourteen_service()
     dashboard = service.load_active_dashboard()
 
-    assert database.schema_version() == LATEST_SCHEMA_VERSION == 21
+    assert database.schema_version() == LATEST_SCHEMA_VERSION == 24
     assert len(dashboard.inventory_preview) == 36
     visible = {item.name for item in dashboard.inventory_preview if item.name}
     equipped = {slot.item_name for slot in dashboard.equipment if slot.item_name}
@@ -186,8 +186,9 @@ def test_story_location_is_discovered_and_highlighted_on_map() -> None:
 
 def test_suggested_narrative_response_submits_immediately() -> None:
     _app = QApplication.instance() or QApplication([])
-    panel = NarrativePanel(build_phase_three_dashboard().narrative)
+    panel = ChoiceGrid(build_phase_three_dashboard().narrative.suggested_actions)
     spy = QSignalSpy(panel.submission_requested)
-    panel.suggestion_buttons[0].click()
+    panel.choice_buttons[0].click()
     assert spy.count() == 1
-    assert spy.at(0)[0] == panel.suggestion_buttons[0].text()
+    assert spy.at(0)[0] == panel.choice_buttons[0].text_label.full_text
+    assert spy.at(0)[0] == build_phase_three_dashboard().narrative.suggested_actions[0]

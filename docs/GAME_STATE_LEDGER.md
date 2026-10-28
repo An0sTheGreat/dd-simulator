@@ -48,6 +48,38 @@ inventory rows are discarded or renumbered. Default, rarity, type, and value sor
 reassign only visible bag positions in a single audited transaction; equipped rows are
 excluded and stable source order resolves equal keys.
 
+Version 22 adds nullable `narrative_messages.speaker_npc_id`, a foreign key to
+`npcs(id)` with `ON DELETE SET NULL`. Existing transcript rows keep a NULL speaker.
+People dialogue stores its NPC on the spoken line. Free-form turns may propose an
+optional `speaker_id` on spoken segments; the application keeps it only when it names
+an available NPC at the current location and otherwise stores NULL without rejecting
+the turn. The dashboard projection exposes each message's turn number, speaker id,
+speaker name, and the speaker's confirmed canonical Visual Registry portrait path.
+
+Version 23 adds `turn_notes(campaign_id, turn_number, kind, text)`, short player-facing
+tags (`xp`, `item`, `quest`, `relationship`, `travel`, `resource`, `other`) for the
+turn that caused them. State helpers buffer notes in a connection-scoped TEMP table;
+the flow that writes the turn's transcript messages (free-form action, combat, People
+dialogue, travel, camp) moves them into `turn_notes` in the same transaction, and
+notes from flows without a transcript message (panel item actions, trading, crafting)
+are discarded. The dashboard projection returns the newest whole turns up to 40
+messages plus `has_older_messages`, attaching each turn's notes to its last message;
+`GameStateService.older_messages(campaign_id, before_turn, limit=40)` pages back.
+
+Version 24 adds a nullable `turn_notes.sequence`: the sequence of the last message the
+claiming transaction wrote in that turn. A People exchange reuses the current turn
+number, so its notes now sit on the NPC reply while the action's notes stay on the
+action's response. Rows from before version 24 (NULL sequence) still attach to the
+last message of their turn.
+
+Without a schema change, the dashboard projection also carries the Concept T character
+data: skill descriptions from `SKILL_DESCRIPTIONS`, unlocked powers split into
+`abilities` and `spells` by `action_kind` with a short `status_label`, every occupied
+bag position in order (`inventory`, up to `inventory_capacity`, 320) beside the paged
+`inventory_preview`, and `portrait_path`: the confirmed Visual Registry portrait, else
+a codex portrait picked from the ancestry's pack by a hash of the character id, else
+empty so the initials show.
+
 Version 12 adds nullable visible inventory positions while retaining stable
 legacy item keys, migrates equipped items out of the bag, doubles existing
 capacity with a 40-slot minimum, and adds NPC status, availability, personality,

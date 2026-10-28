@@ -38,7 +38,12 @@ from dd_simulator.state.progression import (
     award_character_experience,
     proficiency_bonus,
 )
-from dd_simulator.state.turns import NarrativeSegment, SkillCheckResult
+from dd_simulator.state.turns import (
+    NarrativeSegment,
+    SkillCheckResult,
+    claim_turn_notes,
+    record_turn_note,
+)
 
 
 class CombatAction(str, Enum):
@@ -149,6 +154,17 @@ WEAPON_PROFILES: dict[str, tuple[int, int, int]] = {
     "light crossbow": (1, 8, 80),
     "heavy crossbow": (1, 10, 100),
 }
+
+
+def player_attack_bonus(strength: int, attack_skill: int, character: sqlite3.Row) -> int:
+    """The player's weapon attack modifier, shared by combat and the paperdoll caption."""
+
+    return (
+        strength
+        + attack_skill
+        + proficiency_bonus(int(character["level"]))
+        + int(character["equipment_attack_bonus"])
+    )
 
 
 class CombatService:
@@ -363,6 +379,7 @@ class CombatService:
             if intro_complete:
                 summaries.extend(self._run_until_player(connection, encounter_id, {}))
             turn_number = self._next_campaign_turn(connection, campaign_id)
+            self._record_combat_notes(connection, campaign_id, encounter_id, (-1, None))
             self._append_messages(
                 connection,
                 campaign_id,
@@ -377,6 +394,7 @@ class CombatService:
             status = self._encounter_status(connection, encounter_id)
             if status != "active":
                 summaries.extend(self._finalize_encounter(connection, encounter_id))
+                claim_turn_notes(connection, campaign_id, turn_number)
             self._refresh_narrative_prompt(
                 connection, campaign_id, active=status == "active"
             )
@@ -399,6 +417,7 @@ class CombatService:
             if encounter is None:
                 raise CombatError("There is no active combat encounter.")
             encounter_id = str(encounter["id"])
+            marks = self._combat_marks(connection, encounter_id)
             if not bool(encounter["intro_complete"]):
                 if command.action is not CombatAction.PREPARE:
                     raise CombatError("Choose an encounter preparation before acting.")
@@ -413,6 +432,7 @@ class CombatService:
                 )
                 summaries.extend(self._run_until_player(connection, encounter_id, {}))
                 status = self._encounter_status(connection, encounter_id)
+                self._record_combat_notes(connection, campaign_id, encounter_id, marks)
                 if status != "active":
                     summaries.extend(self._finalize_encounter(connection, encounter_id))
                 turn_number = self._next_campaign_turn(connection, campaign_id)
@@ -467,6 +487,7 @@ class CombatService:
                     self._run_until_player(connection, encounter_id, intents)
                 )
             status = self._encounter_status(connection, encounter_id)
+            self._record_combat_notes(connection, campaign_id, encounter_id, marks)
             if status != "active":
                 summaries.extend(self._finalize_encounter(connection, encounter_id))
             action_text = self._command_text(command, connection, encounter_id)
@@ -620,11 +641,8 @@ class CombatService:
             "current_health": int(health["current_value"]),
             "maximum_health": int(health["maximum_value"]),
             "armor_class": 10 + attributes.get("dexterity", 0) + int(character["equipment_armor_bonus"]),
-            "attack_bonus": (
-                attributes.get("strength", 0)
-                + skills.get("attack", 0)
-                + proficiency_bonus(int(character["level"]))
-                + int(character["equipment_attack_bonus"])
+            "attack_bonus": player_attack_bonus(
+                attributes.get("strength", 0), skills.get("attack", 0), character
             ),
             "damage_dice_count": dice_count,
             "damage_die_size": die_size,
@@ -1153,6 +1171,7 @@ class CombatService:
             "WHERE character_id = ?",
             (character_id,),
         )
+        record_turn_note(connection, campaign_id, "resource", "Short rest \u00b7 recovered")
         turn_number = self._next_campaign_turn(connection, campaign_id)
         summary = "The party completes a short rest; combat resources and limited uses recover."
         self._append_messages(
@@ -1261,6 +1280,62 @@ class CombatService:
         )
         self._check_encounter_end(connection, str(encounter["id"]))
         return summary
+
+    @staticmethod
+    def _combat_marks(
+        connection: sqlite3.Connection, encounter_id: str
+    ) -> tuple[int, tuple[str, str, int] | None]:
+        """Snapshot the combat log position and the player's equipped ammunition."""
+
+        sequence = int(
+            connection.execute(
+                "SELECT COALESCE(MAX(sequence), -1) FROM combat_turns WHERE encounter_id = ?",
+                (encounter_id,),
+            ).fetchone()[0]
+        )
+        ammo = connection.execute(
+            "SELECT inventory_items.id, inventory_items.name, inventory_items.quantity "
+            "FROM combatants JOIN equipment_slots "
+            "ON equipment_slots.character_id = combatants.character_id "
+            "JOIN inventory_items ON inventory_items.id = equipment_slots.inventory_item_id "
+            "WHERE combatants.encounter_id = ? AND combatants.side = 'player' "
+            "AND lower(equipment_slots.slot_name) = 'ammunition'",
+            (encounter_id,),
+        ).fetchone()
+        return sequence, (
+            None if ammo is None
+            else (str(ammo["id"]), str(ammo["name"]), int(ammo["quantity"]))
+        )
+
+    @staticmethod
+    def _record_combat_notes(
+        connection: sqlite3.Connection,
+        campaign_id: str,
+        encounter_id: str,
+        marks: tuple[int, tuple[str, str, int] | None],
+    ) -> None:
+        sequence, ammo = marks
+        row = connection.execute(
+            "SELECT "
+            "COALESCE(SUM(CASE WHEN actor.side = 'player' THEN turns.damage END), 0) AS dealt, "
+            "COALESCE(SUM(CASE WHEN target.side = 'player' THEN turns.damage END), 0) AS taken "
+            "FROM combat_turns AS turns "
+            "JOIN combatants AS actor ON actor.id = turns.actor_id "
+            "LEFT JOIN combatants AS target ON target.id = turns.target_id "
+            "WHERE turns.encounter_id = ? AND turns.sequence > ?",
+            (encounter_id, sequence),
+        ).fetchone()
+        if int(row["dealt"]) > 0:
+            record_turn_note(connection, campaign_id, "other", f"Dealt {int(row['dealt'])} damage")
+        if int(row["taken"]) > 0:
+            record_turn_note(connection, campaign_id, "resource", f"−{int(row['taken'])} HP")
+        if ammo is not None:
+            left = connection.execute(
+                "SELECT quantity FROM inventory_items WHERE id = ?", (ammo[0],)
+            ).fetchone()
+            used = ammo[2] - (0 if left is None else int(left["quantity"]))
+            if used > 0:
+                record_turn_note(connection, campaign_id, "item", f"−{used} {ammo[1]}")
 
     @staticmethod
     def _consume_ammunition(
@@ -1568,6 +1643,7 @@ class CombatService:
             f"({new_health}/{maximum} HP)."
         )
         self._log_turn(connection, encounter, actor, actor, "use_item", summary)
+        record_turn_note(connection, str(encounter["campaign_id"]), "item", f"{item['name']} used")
         return summary
 
     @staticmethod
@@ -2229,6 +2305,7 @@ class CombatService:
                 if text.strip()
             ),
         )
+        claim_turn_notes(connection, campaign_id, turn_number)
 
     @staticmethod
     def _append_event(

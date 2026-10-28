@@ -38,17 +38,21 @@ def _window(tmp_path: Path) -> tuple[QApplication, MainWindow, ThemeManager]:
 def test_skill_xp_bars_use_authoritative_progress_and_theme_accent(tmp_path: Path) -> None:
     app, window, themes = _window(tmp_path)
 
-    bars = window.utility_panel.findChildren(QProgressBar, "skillExperienceBar")
+    bars = window.skill_detail_list.findChildren(QProgressBar, "skillDetailXpBar")
     assert len(bars) == 8
     survival = next(
         bar for bar in bars if bar.accessibleName().startswith("Survival experience")
     )
     assert (survival.value(), survival.maximum(), survival.height()) == (410, 460, 3)
 
-    for theme_id, accent in (("high_fantasy", "#d5a936"), ("modern_proof", "#c0c0c4")):
+    # Concept T: a gold gradient in High Fantasy, the experience token in Modern Proof.
+    for theme_id, fill in (
+        ("high_fantasy", "stop:0 #9a7436, stop:1 #e2bd6c"),
+        ("modern_proof", "background: #8ab8ff"),
+    ):
         stylesheet = themes.load_theme(theme_id).stylesheet
-        start = stylesheet.index("QProgressBar#skillExperienceBar::chunk")
-        assert f"background-color: {accent}" in stylesheet[start:start + 180]
+        start = stylesheet.index("QProgressBar#skillDetailXpBar::chunk")
+        assert fill in stylesheet[start:start + 180]
 
     window.close()
     app.processEvents()
@@ -58,13 +62,14 @@ def test_redundant_navigation_is_blank_and_campaigns_live_in_settings(tmp_path: 
     app, window, _themes = _window(tmp_path)
 
     assert window.current_page == "settings"
-    assert set(window.navigation_buttons) == {
-        "map", "people", "character_sheet", "settings"
-    }
+    tabs = window.scene_view.tabs.buttons
+    assert list(tabs) == [
+        "dashboard", "map", "people", "character_sheet", "settings", "journal"
+    ]
     assert not {"skills", "quests", "campaigns"} & set(window.page_indices)
-    placeholders = window.findChildren(QPushButton, "navigationPlaceholderButton")
-    assert len(placeholders) == 2
-    assert all(not button.isEnabled() and not button.text() for button in placeholders)
+    # Every tab opens a page; blank placeholder buttons are gone.
+    assert set(tabs) <= set(window.page_indices)
+    assert not window.findChildren(QPushButton, "navigationPlaceholderButton")
     assert window.settings_page.isAncestorOf(window.campaign_browser)
     assert abs(window.settings_panel.width() - window.campaign_browser.width()) < 40
 

@@ -20,7 +20,7 @@ THEMES_ROOT = Path(__file__).parents[1] / "src" / "dd_simulator" / "ui" / "theme
 def _service() -> GameStateService:
     database = GameStateDatabase.in_memory()
     service = GameStateService(database)
-    assert service.initialize() == 21
+    assert service.initialize() == 24
     service.ensure_demo_campaign()
     return service
 

@@ -1,4 +1,5 @@
 import os
+from dataclasses import replace
 from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -7,8 +8,8 @@ from PySide6.QtWidgets import QApplication, QLabel
 
 from dd_simulator.ui.location_images import resolve_location_image
 from dd_simulator.ui.models.presentation import LocationSummaryView
-from dd_simulator.ui.panels.summary_panels import LocationSummaryPanel
-from dd_simulator.ui.panels.utility_panels import MinimapPanel
+from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
+from dd_simulator.ui.widgets.scene_view import SceneView
 
 
 def _touch(root: Path, archetype: str, variant: str) -> Path:
@@ -62,7 +63,7 @@ def test_location_resolver_supports_mountain_and_swamp_variants(tmp_path: Path) 
     ) == swamp_night
 
 
-def test_location_visual_panel_renders_packaged_catalog_art() -> None:
+def test_scene_view_renders_packaged_catalog_art() -> None:
     app = QApplication.instance() or QApplication([])
     location = LocationSummaryView(
         name="The Lantern & Sheaf",
@@ -73,20 +74,25 @@ def test_location_visual_panel_renders_packaged_catalog_art() -> None:
         route_status="Open",
         biome="tavern",
     )
-    summary = LocationSummaryPanel(location)
-    panel = MinimapPanel(location)
+    quest = build_phase_three_dashboard().quest
+    panel = SceneView(location, quest)
+    # No registry visual, so the packaged catalog variant is chosen.
+    assert location.visual is None
+    assert panel.image_path is not None and panel.image_path.stem == "tavern_base"
+    assert panel.findChild(QLabel, "locationVisualPlaceholder") is None
 
-    preview = panel.findChild(QLabel, "locationVisualPlaceholder")
-    assert preview is not None
-    assert preview.property("visualState") == "catalog"
-    assert preview.pixmap() is not None and not preview.pixmap().isNull()
-    assert "tavern_base" in preview.toolTip()
-    assert summary.findChild(QLabel, "locationVisualPlaceholder") is None
-    panel.resize(640, 300)
-    panel.show()
-    app.processEvents()
-    assert preview.pixmap().size() == preview.contentsRect().size()
+    # The art covers the whole scene: every quadrant differs from a scene with no art.
+    blank = SceneView(replace(location, biome="void"), quest)
+    assert blank.image_path is None
+    images = []
+    for scene in (panel, blank):
+        scene.resize(640, 300)
+        scene.show()
+        app.processEvents()
+        images.append(scene.grab().toImage())
+    for x, y in ((160, 75), (480, 75), (160, 225), (480, 225)):
+        assert images[0].pixelColor(x, y) != images[1].pixelColor(x, y)
 
-    summary.deleteLater()
     panel.deleteLater()
+    blank.deleteLater()
     app.processEvents()

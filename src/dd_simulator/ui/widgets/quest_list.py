@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QKeyEvent, QMouseEvent, QResizeEvent
+from PySide6.QtGui import Qt as GuiQt, QKeyEvent, QMouseEvent, QResizeEvent
 from PySide6.QtWidgets import (
     QFrame,
     QGridLayout,
@@ -55,6 +55,7 @@ class QuestListItem(QFrame):
         header = QHBoxLayout()
         title = QLabel(quest.title)
         title.setObjectName("questListTitle")
+        title.setTextFormat(Qt.TextFormat.PlainText)
         header.addWidget(title, 1)
         state = "Completed" if self.completed else quest.status.title()
         self.state_label = QLabel(f"{state}  {'›' if not self.completed else ''}".rstrip())
@@ -66,9 +67,17 @@ class QuestListItem(QFrame):
         progress.setObjectName("questProgress")
         progress.setRange(0, max(1, quest.progress_maximum))
         progress.setValue(quest.progress_current)
-        progress.setFormat(f"{state}: %v / {quest.progress_maximum}")
-        progress.setTextVisible(not self.completed)
-        layout.addWidget(progress)
+        # The count sits beside the bar: drawn over it, the fill covered half the text.
+        progress.setTextVisible(False)
+        self.progress_label = QLabel(f"{state}: {quest.progress_current} / {quest.progress_maximum}")
+        self.progress_label.setObjectName("questProgressLabel")
+        self.progress_label.setTextFormat(Qt.TextFormat.PlainText)
+        self.progress_label.setVisible(not self.completed)
+        progress_row = QHBoxLayout()
+        progress_row.setSpacing(6)
+        progress_row.addWidget(progress, 1)
+        progress_row.addWidget(self.progress_label)
+        layout.addLayout(progress_row)
 
         self.details = QWidget()
         self.details.setObjectName("questObjectiveDropdown")
@@ -78,6 +87,7 @@ class QuestListItem(QFrame):
         if quest.summary:
             summary = QLabel(quest.summary)
             summary.setObjectName("questExpandedSummary")
+            summary.setTextFormat(Qt.TextFormat.PlainText)
             summary.setWordWrap(True)
             detail_layout.addWidget(summary)
         objective_title = QLabel("OBJECTIVES")
@@ -89,6 +99,7 @@ class QuestListItem(QFrame):
                 optional = " Optional:" if objective.optional else ""
                 label = QLabel(f"{marker}{optional} {objective.text}")
                 label.setObjectName("questObjectiveEntry")
+                label.setTextFormat(Qt.TextFormat.PlainText)
                 label.setProperty("objectiveComplete", objective.completed)
                 label.setWordWrap(True)
                 detail_layout.addWidget(label)
@@ -99,10 +110,12 @@ class QuestListItem(QFrame):
         if quest.deadline:
             deadline = QLabel(f"Deadline: {quest.deadline}")
             deadline.setObjectName("questDeadline")
+            deadline.setTextFormat(Qt.TextFormat.PlainText)
             detail_layout.addWidget(deadline)
         if quest.reward_summary:
             reward = QLabel(f"Reward: {quest.reward_summary}")
             reward.setObjectName("questRewardPreview")
+            reward.setTextFormat(Qt.TextFormat.PlainText)
             detail_layout.addWidget(reward)
         self.details.setVisible(False)
         layout.addWidget(self.details)
@@ -112,7 +125,7 @@ class QuestListItem(QFrame):
             tooltip.append(f"Deadline: {quest.deadline}")
         if not self.completed:
             tooltip.append("Click to view objectives")
-        self.setToolTip("\n".join(tooltip))
+        self.setToolTip(GuiQt.convertFromPlainText("\n".join(tooltip)))
         self._set_expanded(expanded and not self.completed, emit=False)
 
     def _set_expanded(self, expanded: bool, *, emit: bool = True) -> None:
@@ -181,8 +194,6 @@ class QuestListWidget(QScrollArea):
         self.grid.setHorizontalSpacing(4)
         self.grid.setVerticalSpacing(6)
         self.grid.setAlignment(Qt.AlignmentFlag.AlignTop)
-        for column in range(self.MAX_COLUMNS):
-            self.grid.setColumnStretch(column, 1)
         self.setWidget(self.content)
         self._populate(max(1, len(quests)))
 
@@ -194,6 +205,10 @@ class QuestListWidget(QScrollArea):
                 widget.setParent(None)
                 widget.deleteLater()
         self._row_capacity = max(1, row_capacity)
+        # Only occupied columns stretch, so one column of quests fills the width.
+        used = min(self.MAX_COLUMNS, max(1, -(-len(self.quests) // self._row_capacity)))
+        for column in range(self.MAX_COLUMNS):
+            self.grid.setColumnStretch(column, 1 if column < used else 0)
         if not self.quests:
             empty = QLabel("No known quests")
             empty.setObjectName("questListEmptyState")
