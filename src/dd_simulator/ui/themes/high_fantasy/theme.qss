@@ -1350,3 +1350,70 @@ QScrollArea#conversationView QScrollBar::add-page:vertical,
 QScrollArea#conversationView QScrollBar::sub-page:vertical {
     background: transparent;
 }
+/* Concept T: scene, quest, choices */
+QWidget#sceneView { qproperty-overlayColor: #120e0a; }
+QWidget#sceneNavTabs, QFrame#sceneConversationPlaceholder, QWidget#choiceGrid { background: transparent; border: none; }
+QPushButton#sceneNavTab {
+    font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 1.4px;
+    padding: 6px 16px; min-height: 0; border-radius: 0;
+    color: {{codex.muted}}; background-color: rgba(14, 11, 8, 178); border: 1px solid #3a2e1d;
+}
+QPushButton#sceneNavTab:hover, QPushButton#sceneNavTab:focus { color: {{codex.ink}}; border-color: {{codex.gold_dark}}; }
+QPushButton#sceneNavTab:checked { color: {{codex.gold}}; border-color: {{codex.gold}}; }
+QLabel#sceneClockLabel { font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; color: {{codex.muted}}; background: transparent; }
+QLabel#sceneLocationTitle { font-family: "Georgia"; font-size: 38px; color: #f6ead0; background: transparent; }
+QLabel#sceneLocationSubtitle { font-family: "Oxanium"; font-size: 11px; font-weight: 600; letter-spacing: 1.7px; color: #e8d9b8; background: transparent; }
+QLabel#sceneChip {
+    font-family: "Oxanium"; font-size: 10px; font-weight: 600; padding: 3px 9px;
+    background-color: rgba(12, 9, 6, 199); border: 1px solid {{codex.gold_dark}}; color: #e8d6ae;
+}
+QLabel#sceneChip[dangerLevel="low"] { color: {{codex.success}}; }
+QLabel#sceneChip[dangerLevel="elevated"] { color: {{colors.warning}}; }
+QFrame[sceneCard="true"] { background-color: rgba(14, 11, 8, 209); border: 1px solid #4a3a22; }
+QFrame[sceneCard="true"] QLabel, QFrame#encounterCombatant { background: transparent; border: none; }
+QLabel#sceneCardHeading { font-family: "Oxanium"; font-size: 10px; font-weight: 600; letter-spacing: 2px; color: {{codex.gold}}; }
+QWidget#questProgressRing {
+    font-family: "Oxanium"; font-size: 12px; font-weight: 600;
+    qproperty-ringColor: {{codex.gold}}; qproperty-trackColor: #3a2e1d;
+    qproperty-holeColor: #16120d; qproperty-textColor: {{codex.ink}};
+}
+QLabel#questCardTitle { font-family: "Georgia"; font-size: 15px; color: #f6ead0; }
+QLabel#questCardSummary { font-size: 11px; color: {{codex.muted}}; }
+QLabel#questObjective { font-size: 12px; color: {{codex.ink}}; }
+QLabel#questObjective[completed="true"] { color: {{codex.success}}; }
+QWidget#questObjectiveMarker { color: {{codex.gold}}; background: transparent; }
+QWidget#questObjectiveMarker[completed="true"] { color: {{codex.success}}; }
+QFrame[sceneCard="true"] QLabel#questRewardChip { font-family: "Oxanium"; font-size: 9px; font-weight: 600; padding: 1px 6px; color: {{codex.gold}}; border: 1px solid {{codex.gold_dark}}; }
+QLabel#encounterCombatantName { font-family: "Oxanium"; font-size: 12px; font-weight: 600; color: {{codex.ink}}; }
+QFrame#encounterCombatant[activeTurn="true"] QLabel#encounterCombatantName { color: {{codex.gold}}; }
+QLabel#encounterCombatantStats { font-family: "Oxanium"; font-size: 9px; font-weight: 600; color: {{codex.muted}}; }
+QLabel#encounterIntent { font-size: 11px; font-style: italic; color: {{colors.warning}}; }
+QProgressBar#encounterHealthBar { min-height: 5px; max-height: 5px; background: #16120d; border: 1px solid #3a2e1d; border-radius: 2px; }
+QProgressBar#encounterHealthBar::chunk { border-radius: 1px; background: {{colors.success}}; }
+QProgressBar#encounterHealthBar[combatSide="enemy"]::chunk { background: {{colors.danger}}; }
+QPushButton#sceneChoiceButton {
+    min-height: 20px; padding: 0; text-align: left;
+    border-width: 9px; border-style: solid; border-radius: 0; background: transparent;
+    border-image: url("../../assets/{{codex.frame_button_normal}}") 18 18 18 18 stretch stretch;
+}
+QPushButton#sceneChoiceButton:hover, QPushButton#sceneChoiceButton:focus {
+    border-image: url("../../assets/{{codex.frame_button_hover}}") 18 18 18 18 stretch stretch;
+}
+QPushButton#sceneChoiceButton:disabled QLabel { color: {{colors.text_muted}}; }
+QLabel#sceneChoiceIcon, QLabel#sceneChoiceKey { background: transparent; border: none; }
+QLabel#sceneChoiceText { font-family: "Georgia"; font-size: 12px; color: {{codex.ink}}; background: transparent; }
+QLabel#sceneChoiceKey { font-family: "Oxanium"; font-size: 10px; font-weight: 600; color: {{codex.gold}}; }
+QLineEdit#sceneActionInput {
+    font-family: "Georgia"; font-style: italic; font-size: 13px; padding: 7px 2px;
+    color: {{codex.ink}}; background: transparent; border: none; border-bottom: 1px solid {{codex.gold_dark}}; border-radius: 0;
+}
+QLineEdit#sceneActionInput:focus { border-bottom-color: {{codex.gold}}; }
+QLineEdit#sceneActionInput:disabled { color: {{colors.text_muted}}; }
+QLineEdit#sceneActionInput[validationState="error"] { border-bottom-color: {{colors.danger}}; }
+QPushButton#sceneActButton {
+    font-family: "Oxanium"; font-size: 12px; font-weight: 600; letter-spacing: 1.7px;
+    padding: 8px 22px; border: none; border-radius: 0;
+    color: #1a140c; background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e7c27a, stop:1 #b48a45);
+}
+QPushButton#sceneActButton:hover, QPushButton#sceneActButton:focus { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f0d08c, stop:1 #c49a55); }
+QPushButton#sceneActButton:disabled { color: {{colors.text_muted}}; background: #3a2e1d; }
