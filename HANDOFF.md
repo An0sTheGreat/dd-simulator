@@ -29,7 +29,7 @@ Plan: `docs/UI_REDESIGN_PLAN.md` (approved 2026-10-27; D5 icons from `Project Re
 | `d440dd8` | 2c: skill descriptions, abilities/spells split with status, full inventory list, portrait path |
 
 Open items: `InventorySlotView` needs a bag `position` for Phase 6 drag and drop; turn notes are not yet written for combat ammo, potion and HP changes or for quests started from dialogue; the Phase 1 source frames include identical placeholder images (panel = tooltip = quest tracker).
-Icon library (28 supplied CraftPix packs + RPG Mega gap packs): `Y:\Games\D&D Simulator\Project Resourcesssets`.
+Icon library (28 supplied CraftPix packs + RPG Mega gap packs): `Y:/Games/D&D Simulator/Project Resources/assets`.
 
 ## Phase 29 summary (branch `phase-29-unsloth`)
 
