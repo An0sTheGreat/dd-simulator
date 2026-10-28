@@ -1090,6 +1090,7 @@ QProgressBar#resourceBar[resourceType="spell_slots"]::chunk {
     background-color: #b05fd3;
 }
 
+<<<<<<< HEAD
 /* Concept T: character strip, paperdoll, skills */
 QFrame#characterStrip { background: transparent; border: none; }
 QLabel#characterStripName { font-family: "Georgia"; font-size: 22px; color: #f4e6c6; }
@@ -1140,3 +1141,146 @@ QFrame#skillDetailRow[recentlyIncreased="true"] QLabel#skillDetailValue { color:
 QFrame#skillDetailRow[locked="true"] QLabel { color: {{codex.muted}}; }
 QProgressBar#skillDetailXpBar { min-height: 3px; max-height: 3px; background: #2a2116; border: none; border-radius: 0; }
 QProgressBar#skillDetailXpBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #9a7436, stop:1 #e2bd6c); }
+=======
+/* Concept T: inventory and powers */
+QFrame[codexCard="true"] {
+    border-width: 14px;
+    border-style: solid;
+    border-image: url("../../assets/codex/ui_panel_large.png") 26 26 26 26 stretch stretch;
+    background: transparent;
+}
+QFrame#inventoryCard QFrame#inventorySlot {
+    border-width: 7px;
+    border-style: solid;
+    border-image: url("../../assets/codex/ui_slot_frame.png") 22 22 22 22 stretch stretch;
+    background-color: #15110c;
+}
+QFrame#inventoryCard QFrame#inventorySlot[empty="true"] {
+    border-image: url("../../assets/codex/ui_slot_frame.png") 22 22 22 22 stretch stretch;
+    background-color: rgba(21, 17, 12, 150);
+}
+QFrame#inventoryCard QFrame#inventorySlot[rarity="uncommon"] {
+    border-image: url("../../assets/codex/ui_rarity_uncommon.png") 22 22 22 22 stretch stretch;
+}
+QFrame#inventoryCard QFrame#inventorySlot[rarity="rare"] {
+    border-image: url("../../assets/codex/ui_rarity_rare.png") 22 22 22 22 stretch stretch;
+}
+QFrame#inventoryCard QFrame#inventorySlot[rarity="epic"] {
+    border-image: url("../../assets/codex/ui_rarity_epic.png") 22 22 22 22 stretch stretch;
+}
+QFrame#inventoryCard QFrame#inventorySlot[rarity="legendary"] {
+    border-image: url("../../assets/codex/ui_rarity_legendary.png") 22 22 22 22 stretch stretch;
+}
+
+QFrame[codexCard="true"] QWidget#codexCardHeadingRow,
+QFrame[codexCard="true"] QWidget#powersColumn,
+QFrame[codexCard="true"] QWidget#powersColumnEntries,
+QScrollArea#inventoryCardScroll, QScrollArea#inventoryCardScroll > QWidget > QWidget,
+QScrollArea#powersColumnScroll, QScrollArea#powersColumnScroll > QWidget > QWidget {
+    background: transparent;
+    border: none;
+}
+QLabel#codexCardHeading {
+    font-family: "Oxanium";
+    font-size: 10px;
+    font-weight: 600;
+    color: {{codex.gold}};
+}
+QLabel#codexCardCount, QLabel#inventoryCardCount {
+    font-family: "Oxanium";
+    font-size: 10px;
+    font-weight: 600;
+    color: {{codex.muted}};
+}
+QFrame#codexCardDivider {
+    background-color: {{codex.gold_dark}};
+    border: none;
+}
+QToolButton#inventoryCardAutoSort {
+    font-family: "Oxanium";
+    font-size: 10px;
+    font-weight: 600;
+    color: {{codex.muted}};
+    background: transparent;
+    border: none;
+    padding: 0 2px;
+}
+QToolButton#inventoryCardAutoSort:hover, QToolButton#inventoryCardAutoSort:focus {
+    color: {{codex.gold}};
+}
+QScrollArea#inventoryCardScroll QScrollBar:vertical,
+QScrollArea#powersColumnScroll QScrollBar:vertical {
+    background-color: #2a2116;
+    width: 5px;
+    border-radius: 2px;
+    margin: 0;
+}
+QScrollArea#inventoryCardScroll QScrollBar::handle:vertical,
+QScrollArea#powersColumnScroll QScrollBar::handle:vertical {
+    background-color: {{codex.gold_dark}};
+    border-radius: 2px;
+    min-height: 24px;
+}
+QScrollArea#inventoryCardScroll QScrollBar::add-line:vertical,
+QScrollArea#inventoryCardScroll QScrollBar::sub-line:vertical,
+QScrollArea#powersColumnScroll QScrollBar::add-line:vertical,
+QScrollArea#powersColumnScroll QScrollBar::sub-line:vertical,
+QScrollArea#inventoryCardScroll QScrollBar::add-page:vertical,
+QScrollArea#inventoryCardScroll QScrollBar::sub-page:vertical,
+QScrollArea#powersColumnScroll QScrollBar::add-page:vertical,
+QScrollArea#powersColumnScroll QScrollBar::sub-page:vertical {
+    height: 0;
+    background: transparent;
+}
+QFrame#inventoryCard QLabel#itemQuantityBadge {
+    background: transparent;
+    border: none;
+    font-family: "Oxanium";
+    font-size: 10px;
+    font-weight: 600;
+    color: {{codex.ink}};
+}
+QFrame#powerEntry {
+    border: 1px solid #33281a;
+    background-color: rgba(0, 0, 0, 46);
+}
+QFrame#powerEntry:hover, QFrame#powerEntry:focus {
+    border-color: {{codex.gold_dark}};
+}
+QLabel#powerEntryIcon {
+    border: 1px solid {{codex.gold_dark}};
+    border-radius: 5px;
+    background: transparent;
+}
+QLabel#powerEntryName {
+    font-family: "Oxanium";
+    font-size: 12px;
+    font-weight: 600;
+    color: {{codex.ink}};
+    background: transparent;
+}
+QLabel#powerEntryDetail {
+    font-size: 10px;
+    color: {{codex.muted}};
+    background: transparent;
+}
+QLabel#powerEntryStatus {
+    font-family: "Oxanium";
+    font-size: 9px;
+    font-weight: 600;
+    color: {{colors.warning}};
+    background: transparent;
+}
+QLabel#powerEntryStatus[ready="true"] {
+    color: {{codex.success}};
+}
+QFrame#powerEntry[available="false"] QLabel#powerEntryName,
+QFrame#powerEntry[available="false"] QLabel#powerEntryDetail {
+    color: {{colors.text_muted}};
+}
+QLabel#powersCardEmpty {
+    color: {{codex.muted}};
+    font-style: italic;
+    background: transparent;
+}
+>>>>>>> p3c-inventory-powers
