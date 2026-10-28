@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import os
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtTest import QSignalSpy, QTest
 from PySide6.QtWidgets import QApplication
 
-from dd_simulator.state import CombatAction, CombatCommand
+from dd_simulator.state import CombatAction, CombatCommand, GameStateDatabase, GameStateService
 from dd_simulator.ui.location_images import LOCATION_ART_ROOT
 from dd_simulator.ui.models.presentation import (
     CombatantView,
@@ -24,6 +25,7 @@ from dd_simulator.ui.widgets.scene_view import (
     COMBAT_ACTIONS,
     NAV_TABS,
     SceneView,
+    reward_chips,
 )
 
 
@@ -65,7 +67,7 @@ def location(**changes: str) -> LocationSummaryView:
     return LocationSummaryView(**values)  # type: ignore[arg-type]
 
 
-def encounter(player_turn: bool = True) -> CombatEncounterView:
+def encounter(player_turn: bool = True, wolf: str | None = None) -> CombatEncounterView:
     def combatant(id_: str, name: str, side: str, initiative: int, **extra) -> CombatantView:  # type: ignore[no-untyped-def]
         return CombatantView(
             id=id_, name=name, side=side, status="active", current_health=8, maximum_health=12,
@@ -78,6 +80,7 @@ def encounter(player_turn: bool = True) -> CombatEncounterView:
         combatants=(
             combatant("hero", "Kaelen", "player", 15, active_turn=player_turn),
             combatant("bandit", "Bandit", "enemy", 18, declared_intent="Flank and strike"),
+            *((replace(combatant("wolf", "Wolf", "enemy", 12), status=wolf),) if wolf else ()),
         ),
     )
 
@@ -245,3 +248,59 @@ def test_controls_have_accessible_names() -> None:
     ]
     assert all(widget.accessibleName() for widget in named)
     assert view.choice_grid.choice_buttons[2].accessibleName() == f"Choice 3: {SUGGESTIONS[2]}"
+
+
+def test_enemy_row_click_picks_the_target_and_keeps_it_across_rebuilds() -> None:
+    view = scene(combat=encounter(wolf="active"))
+    grid = view.choice_grid
+    card = view.encounter_card
+    assert card is not None
+    assert grid.target_id == "bandit"  # highest initiative is the automatic target
+    assert card.rows["bandit"].property("targetSelected") is True
+    assert not card.rows["hero"].property("targetable")
+
+    QTest.mouseClick(card.rows["wolf"], Qt.MouseButton.LeftButton)
+    assert grid.target_id == "wolf"
+    assert card.rows["wolf"].property("targetSelected") is True
+    assert card.rows["bandit"].property("targetSelected") is False
+    spy = QSignalSpy(grid.combat_action_requested)
+    grid.activate_choice(1)
+    assert spy.at(0)[0] == CombatCommand(CombatAction.ATTACK, target_id="wolf")
+
+    card.rows["bandit"].setFocus()
+    QTest.keyClick(card.rows["bandit"], Qt.Key.Key_Space)
+    assert grid.target_id == "bandit"
+    QTest.mouseClick(card.rows["wolf"], Qt.MouseButton.LeftButton)
+
+    view.set_combat(encounter(wolf="active"))
+    assert grid.target_id == "wolf"
+    assert view.encounter_card.rows["wolf"].property("targetSelected") is True
+    view.set_combat(encounter(wolf="defeated"))
+    assert grid.target_id == "bandit"
+    assert not view.encounter_card.rows["bandit"].property("targetable")
+    QTest.mouseClick(view.encounter_card.rows["wolf"], Qt.MouseButton.LeftButton)
+    assert grid.target_id == "bandit"
+
+
+def test_selected_target_has_a_style_in_both_themes(tmp_path: Path) -> None:
+    manager = ThemeManager(
+        themes_root=THEMES_ROOT, preferences_path=tmp_path / "prefs.json",
+        default_theme_id="high_fantasy",
+    )
+    for theme_id in ("high_fantasy", "modern_proof"):
+        stylesheet = manager.load_theme(theme_id).stylesheet
+        assert 'QFrame#encounterCombatant[targetSelected="true"]' in stylesheet
+
+
+def test_quest_reward_chips_include_faction_reputation() -> None:
+    database = GameStateDatabase.in_memory()
+    service = GameStateService(database)
+    service.initialize()
+    service.ensure_demo_campaign()
+    with database.transaction() as connection:
+        connection.execute(
+            "UPDATE quests SET reward_faction = 'Lord Aric', reward_reputation = 1 WHERE selected = 1"
+        )
+    chips = reward_chips(service.load_active_dashboard().quest_list)
+    assert "LORD ARIC +1" in chips
+    database.close()

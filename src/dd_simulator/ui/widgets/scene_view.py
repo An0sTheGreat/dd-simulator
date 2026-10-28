@@ -321,24 +321,66 @@ class QuestProgressCard(_SceneCard):
         self.rewards_layout.addStretch(1)
 
 
+class _CombatantRow(QFrame):
+    """One combatant; an enemy row is a target button when several enemies are active (D2)."""
+
+    clicked = Signal()
+
+    def mousePressEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        if self.property("targetable"):
+            self.clicked.emit()
+        super().mousePressEvent(event)
+
+    def keyPressEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        if self.property("targetable") and event.key() in (
+            Qt.Key.Key_Return, Qt.Key.Key_Enter, Qt.Key.Key_Space,
+        ):
+            self.clicked.emit()
+            return
+        super().keyPressEvent(event)
+
+
+def active_enemy_ids(encounter: CombatEncounterView) -> tuple[str, ...]:
+    """Active enemies by initiative; the first is the automatic target."""
+
+    return tuple(
+        c.id
+        for c in sorted(encounter.combatants, key=lambda c: -c.initiative)
+        if c.side == "enemy" and c.status == "active"
+    )
+
+
 class EncounterCard(_SceneCard):
-    def __init__(self, encounter: CombatEncounterView) -> None:
+    target_selected = Signal(str)
+
+    def __init__(self, encounter: CombatEncounterView, target_id: str | None = None) -> None:
         super().__init__("encounterCard", "Encounter")
         self.rows_layout = QVBoxLayout()
         self.rows_layout.setSpacing(5)
         self.body.addLayout(self.rows_layout)
-        self.set_encounter(encounter)
+        self.set_encounter(encounter, target_id)
 
-    def set_encounter(self, encounter: CombatEncounterView) -> None:
+    def set_encounter(self, encounter: CombatEncounterView, target_id: str | None = None) -> None:
         self.heading.setText(f"ENCOUNTER · ROUND {encounter.round_number}")
         self.setAccessibleName(f"Encounter, round {encounter.round_number}: {encounter.environment}")
         _clear_layout(self.rows_layout)
         self.health_bars: dict[str, QProgressBar] = {}
+        self.rows: dict[str, _CombatantRow] = {}
+        enemy_ids = active_enemy_ids(encounter)
+        pickable = len(enemy_ids) > 1
         for combatant in sorted(encounter.combatants, key=lambda c: -c.initiative):
-            row = QFrame()
+            row = _CombatantRow()
             row.setObjectName("encounterCombatant")
             row.setProperty("combatSide", combatant.side)
             row.setProperty("activeTurn", combatant.active_turn)
+            targetable = pickable and combatant.id in enemy_ids
+            row.setProperty("targetable", targetable)
+            row.setProperty("targetSelected", targetable and combatant.id == target_id)
+            if targetable:
+                row.setCursor(Qt.CursorShape.PointingHandCursor)
+                row.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+                row.setToolTip(f"Target {combatant.name}")
+                row.clicked.connect(lambda cid=combatant.id: self.target_selected.emit(cid))
             grid = QGridLayout(row)
             grid.setContentsMargins(0, 0, 0, 0)
             grid.setHorizontalSpacing(8)
@@ -369,6 +411,14 @@ class EncounterCard(_SceneCard):
             )
             self.rows_layout.addWidget(row)
             self.health_bars[combatant.id] = bar
+            self.rows[combatant.id] = row
+
+    def mark_target(self, target_id: str | None) -> None:
+        for combatant_id, row in self.rows.items():
+            row.setProperty(
+                "targetSelected", bool(row.property("targetable")) and combatant_id == target_id
+            )
+            _repolish(row)
 
 
 class ElidedLabel(QLabel):
@@ -757,18 +807,17 @@ class SceneView(QWidget):
         """Active encounter: Encounter card and combat actions. Otherwise: quest card and choices (D2)."""
 
         if encounter is not None and encounter.status == "active":
+            enemy_ids = active_enemy_ids(encounter)
+            if self.choice_grid.target_id not in enemy_ids:
+                self.choice_grid.target_id = enemy_ids[0] if enemy_ids else None
             if self.encounter_card is None:
-                self.encounter_card = EncounterCard(encounter)
+                self.encounter_card = EncounterCard(encounter, self.choice_grid.target_id)
+                self.encounter_card.target_selected.connect(self.select_target)
                 self.card_slot.addWidget(self.encounter_card)
             else:
-                self.encounter_card.set_encounter(encounter)
+                self.encounter_card.set_encounter(encounter, self.choice_grid.target_id)
             self.encounter_card.show()
             self.quest_card.hide()
-            enemies = sorted(
-                (c for c in encounter.combatants if c.side == "enemy" and c.status == "active"),
-                key=lambda c: -c.initiative,
-            )
-            self.choice_grid.target_id = enemies[0].id if enemies else None
             if encounter.generated and not encounter.intro_complete:
                 self.choice_grid.set_combat_actions(
                     tuple((label, CombatAction.PREPARE) for label, _key in PREPARATION_CHOICES)
@@ -782,6 +831,17 @@ class SceneView(QWidget):
         self.quest_card.show()
         self.choice_grid.target_id = None
         self.choice_grid.set_choices(self._suggestions)
+
+    def select_target(self, target_id: str | None) -> None:
+        """Pick the enemy for attacks and casts; ignored unless it is an active, pickable enemy."""
+
+        card = self.encounter_card
+        if card is None or card.isHidden() or target_id not in card.rows:
+            return
+        if not card.rows[target_id].property("targetable"):
+            return
+        self.choice_grid.target_id = target_id
+        card.mark_target(target_id)
 
     def set_conversation(self, widget: QWidget) -> None:
         """Phase 6 puts the ConversationView here, replacing the placeholder."""

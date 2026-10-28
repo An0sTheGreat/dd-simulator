@@ -8,7 +8,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import Qt
-from PySide6.QtTest import QSignalSpy
+from PySide6.QtTest import QSignalSpy, QTest
 from PySide6.QtWidgets import QApplication, QLabel, QLineEdit, QProgressBar, QWidget
 
 from dd_simulator.app import build_application
@@ -251,7 +251,7 @@ def test_active_combat_tab_binds_targets_actions_and_locks_freeform_input(
         service.load_active_dashboard(),
         game_state_service=service,
     )
-    # Target: first active enemy (no picker yet); actions: six combat choices;
+    # One enemy: automatic target (no picking); actions: six combat choices;
     # class abilities: the PowersCard; Short Rest hidden while the encounter runs.
     grid = window.scene_view.choice_grid
     assert window.scene_view.encounter_card is not None
@@ -268,6 +268,54 @@ def test_active_combat_tab_binds_targets_actions_and_locks_freeform_input(
     assert spy.count() == 1
     assert spy.at(0)[0].action is CombatAction.ATTACK
     assert spy.at(0)[0].target_id == goblin.id
+    window.close()
+    window.deleteLater()
+    app.processEvents()
+    database.close()
+
+
+def test_picked_enemy_is_the_power_target_and_survives_a_dashboard_reload(
+    tmp_path: Path,
+) -> None:
+    app = QApplication.instance() or QApplication([])
+    theme_manager = ThemeManager(
+        themes_root=THEMES_ROOT,
+        preferences_path=tmp_path / "combat-preferences.json",
+        default_theme_id="high_fantasy",
+    )
+    database = GameStateDatabase.in_memory()
+    service = GameStateService(database)
+    service.initialize()
+    service.ensure_demo_campaign()
+    rolls = iter((20, 10, 1))
+    service.combat = CombatService(database, roll=lambda _a, _b: next(rolls))
+    service.start_combat(
+        enemies=(
+            EnemySpec("Training Goblin", 10, 10, 2, 4, distance_feet=5),
+            EnemySpec("Training Wolf", 10, 10, 2, 4, distance_feet=5),
+        )
+    )
+    window = MainWindow(
+        theme_manager.available_themes(),
+        service.load_active_dashboard(),
+        game_state_service=service,
+    )
+    commands: list = []
+    window._resolve_combat_action = commands.append  # type: ignore[method-assign]
+    grid = window.scene_view.choice_grid
+    enemies = [c.id for c in window.dashboard.combat.combatants if c.side == "enemy"]
+    picked = next(e for e in enemies if e != grid.target_id)
+    QTest.mouseClick(
+        window.scene_view.encounter_card.rows[picked], Qt.MouseButton.LeftButton
+    )
+    assert grid.target_id == picked
+    key = window.dashboard.abilities[0].key
+    window.powers_card.action_activated.emit(key)
+    assert commands[-1].target_id == picked and commands[-1].ability_key == key
+
+    window._reload_dashboard(service.load_active_dashboard())
+    assert window.scene_view.choice_grid.target_id == picked
+    assert window.scene_view.encounter_card.rows[picked].property("targetSelected") is True
     window.close()
     window.deleteLater()
     app.processEvents()

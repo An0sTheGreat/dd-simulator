@@ -1387,6 +1387,7 @@ QWidget#questObjectiveMarker[completed="true"] { color: {{codex.success}}; }
 QFrame[sceneCard="true"] QLabel#questRewardChip { font-family: "Oxanium"; font-size: 9px; font-weight: 600; padding: 1px 6px; color: {{codex.gold}}; border: 1px solid {{codex.gold_dark}}; }
 QLabel#encounterCombatantName { font-family: "Oxanium"; font-size: 12px; font-weight: 600; color: {{codex.ink}}; }
 QFrame#encounterCombatant[activeTurn="true"] QLabel#encounterCombatantName { color: {{codex.gold}}; }
+QFrame#encounterCombatant[targetSelected="true"] { border: 1px solid {{codex.gold}}; border-radius: 4px; padding: 2px 4px; }
 QLabel#encounterCombatantStats { font-family: "Oxanium"; font-size: 9px; font-weight: 600; color: {{codex.muted}}; }
 QLabel#encounterIntent { font-size: 11px; font-style: italic; color: {{colors.warning}}; }
 QProgressBar#encounterHealthBar { min-height: 5px; max-height: 5px; background: {{colors.background_secondary}}; border: 1px solid #303033; border-radius: 2px; }

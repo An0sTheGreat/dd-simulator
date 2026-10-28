@@ -2108,6 +2108,7 @@ class MainWindow(QMainWindow):
         people_page = self.navigation_pages.get("people")
         selected_npc_id = getattr(people_page, "selected_id", "")
         previous_resource_values = self._resource_values()
+        combat_target = self.scene_view.choice_grid.target_id
         old_stack = self.content_stack
         self.root_layout.removeWidget(old_stack)
         old_stack.setParent(None)
@@ -2117,6 +2118,7 @@ class MainWindow(QMainWindow):
         self._update_application_title()
         self._build_content_stack()
         self._resource_animation_starts = {}
+        self.scene_view.select_target(combat_target)
         sizes = self._valid_sizes(splitter_sizes.get("concept_t"), self.concept_splitter.count())
         if sizes:
             self.concept_splitter.setSizes(sizes)
