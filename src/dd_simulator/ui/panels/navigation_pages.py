@@ -31,7 +31,7 @@ from dd_simulator.ui.widgets.semantic_button import SemanticButton
 from dd_simulator.ui.widgets.themed_frame import ThemedFrame
 from dd_simulator.state.progression import saving_throw_proficiencies
 from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard, equipped_comparisons
-from dd_simulator.ui.widgets.codex_cards import PowerEntry, codex_card, icon_row, plain_label
+from dd_simulator.ui.widgets.codex_cards import PowerEntry, _heading, codex_card, icon_row, plain_label
 from dd_simulator.ui.widgets.codex_character import SkillDetailRow
 from dd_simulator.ui.widgets.conversation_view import ConversationView as ConversationThread
 from dd_simulator.ui.widgets.quest_list import QuestListWidget
@@ -158,7 +158,6 @@ class CharacterSheetPage(NavigationPage):
         )):
             _field(identity_grid, 0, column, label, value, "characterSheetIdentityValue")
         identity_layout.addLayout(identity_grid)
-        grid.addWidget(identity, 0, 0, 1, 2)
 
         attributes, attributes_layout = codex_card("Ability Scores", "characterSheetAttributes")
         tiles = QHBoxLayout()
@@ -178,7 +177,7 @@ class CharacterSheetPage(NavigationPage):
                 tile_layout.addWidget(label)
             tiles.addWidget(tile, 1)
         attributes_layout.addLayout(tiles)
-        grid.addWidget(attributes, 0, 2, 1, 2)
+        grid.addLayout(_stack(identity, attributes), 0, 0, 1, 2)
 
         vitals, vitals_layout = codex_card("Combat Summary", "characterSheetSection")
         health = next(
@@ -246,9 +245,14 @@ class CharacterSheetPage(NavigationPage):
         if not weapons:
             attacks_layout.addWidget(plain_label("No damaging weapon equipped.", "pageCardMeta"))
 
-        powers, powers_layout = codex_card(
-            "Abilities & Spells", "characterSheetSection", count=len(dashboard.combat_skills)
-        )
+        # Lives inside the Skills card, beneath the skill rows.
+        powers = QWidget()
+        powers.setObjectName("characterSheetPowers")
+        powers.setAccessibleName("Abilities & Spells")
+        powers_layout = QVBoxLayout(powers)
+        powers_layout.setContentsMargins(0, 4, 0, 0)
+        powers_layout.setSpacing(5)
+        powers_layout.addWidget(_heading("Abilities & Spells", len(dashboard.combat_skills)))
         for action in dashboard.combat_skills:
             effect = next((value for key, value in action.stats if key == "Effect"), "")
             powers_layout.addWidget(PowerEntry(action, detail=effect or None))
@@ -294,11 +298,14 @@ class CharacterSheetPage(NavigationPage):
             # The sheet shows the total with bonuses, as it always has.
             row.value_label.setText(f"{skill.level + skill.bonus:+d}")
             skills_layout.addWidget(row)
+        skills_layout.addWidget(powers)
 
+        grid.addWidget(attacks, 0, 2)
+        grid.addWidget(vitals, 0, 3)
         for column, cards in enumerate((
-            (vitals, saves, appearance),
-            (attacks, powers, role),
-            (equipment, possessions),
+            (saves, appearance),
+            (role, possessions),
+            (equipment,),
             (skills,),
         )):
             grid.addLayout(_stack(*cards), 1, column)

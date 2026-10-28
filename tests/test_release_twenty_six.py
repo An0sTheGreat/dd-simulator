@@ -48,6 +48,41 @@ def test_release_26_6_character_sheet_is_centered_and_complete(tmp_path: Path) -
     app.processEvents()
 
 
+def test_character_sheet_card_order_at_1600x900(tmp_path: Path) -> None:
+    app, window, _themes = _window(tmp_path)
+    window.controller.navigate("character_sheet")
+    app.processEvents()
+    surface = window.findChild(QWidget, "characterSheetSurface")
+
+    def card(name: str) -> tuple:
+        found = next(
+            w for w in surface.findChildren(QWidget) if w.accessibleName() == name and w.isVisible()
+        )
+        top_left = found.mapTo(surface, found.rect().topLeft())
+        return found, top_left, found.mapTo(surface, found.rect().bottomRight())
+
+    _, identity, identity_end = card("Identity")
+    _, scores, _ = card("Ability Scores")
+    assert scores.x() == identity.x() and scores.y() >= identity_end.y()
+    _, attacks, attacks_end = card("Weapon Attacks")
+    _, vitals, _ = card("Combat Summary")
+    _, equipment, _ = card("Equipment")
+    skills_widget, skills, _ = card("Skills")
+    half = surface.width() / 2
+    assert attacks.x() >= half - 4 and attacks_end.x() <= vitals.x()
+    assert attacks.y() == vitals.y()
+    assert equipment.y() >= attacks_end.y() and equipment.x() == attacks.x()
+    assert skills.y() > vitals.y() and skills.x() == vitals.x()
+    powers = skills_widget.findChild(QWidget, "characterSheetPowers")
+    assert powers is not None and powers.mapTo(surface, powers.rect().topLeft()).y() > skills.y() + 40
+    _, role, role_end = card("Role & Character")
+    _, possessions, _ = card("Possessions & Currency")
+    assert possessions.x() == role.x() and possessions.y() >= role_end.y()
+
+    window.close()
+    app.processEvents()
+
+
 def test_inventory_card_keeps_five_columns_and_scrolls_when_needed(
     tmp_path: Path,
 ) -> None:

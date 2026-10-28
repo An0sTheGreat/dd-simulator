@@ -601,8 +601,10 @@ def test_character_sheet_and_map_use_the_shared_page_card(tmp_path: Path) -> Non
     sheet_cards = [frame for frame in sheet.findChildren(QFrame) if frame.property("pageCard")]
     assert {card.accessibleName() for card in sheet_cards} >= {
         "Identity", "Ability Scores", "Combat Summary", "Skills", "Equipment",
-        "Abilities & Spells", "Possessions & Currency",
+        "Possessions & Currency",
     }
+    # Abilities & Spells is a section inside the Skills card, not a card of its own.
+    assert sheet.findChild(QWidget, "characterSheetPowers").accessibleName() == "Abilities & Spells"
     map_cards = {
         frame.objectName()
         for frame in window.navigation_pages["map"].findChildren(QFrame)
