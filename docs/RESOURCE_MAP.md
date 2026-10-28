@@ -80,8 +80,9 @@ structurally inspected before implementation.
   unsupported field before the form changes. Name and appearance suggestions retain
   explicit user approval, and the form uses compact centered responsive controls.
 - Release 24 adds the supplied `dnd_ui_source` concept as an isolated Default theme.
-  `Icons_svg/manifest.json` and `Icons_original_sheet.png` are the deterministic runtime
-  item source; `UI_pack_3` supplies only the Map, People, and Settings navigation icons.
+  `Icons_svg/manifest.json` and `Icons_original_sheet.png` were the deterministic runtime
+  item source until Phase 8; the runtime source is now the library manifest
+  (`item_icon_manifest.json` and the CraftPix PNGs in `ui/assets/icons/library`); `UI_pack_3` supplies only the Map, People, and Settings navigation icons.
   Existing themes and all splitter behavior remain independent of those assets.
 - Phase 4 adds navigation, real tab switching, keyboard-accessible selection,
   local action validation, context-action requests, settings, and UI preference

@@ -278,6 +278,8 @@ def main(argv: list[str]) -> int:
     sources: dict[str, str] = {}
     records: dict[str, str] = {}
     for pool, members in sorted(groups.items()):
+        # ponytail: byte size depends on the Qt/zlib PNG encoder, so a PySide6 upgrade may
+        # reshuffle pools; switch to a source-derived metric if that happens.
         icons = sorted(
             pack_icons(source_root, pool),
             key=lambda path: (len(_downscaled_png(path, ICON_SIZE)), _icon_number(path)),
@@ -287,7 +289,8 @@ def main(argv: list[str]) -> int:
             icon = icons[rank * len(icons) // len(members)]
             relative = icon.relative_to(source_root)
             name = packaged_name(relative)
-            sources[name] = relative.as_posix()
+            if sources.setdefault(name, relative.as_posix()) != relative.as_posix():
+                raise SystemExit(f"{name} names two icons: {sources[name]}, {relative.as_posix()}")
             records[str(record["index"])] = name
     manifest = {
         "sources": dict(sorted(sources.items())),

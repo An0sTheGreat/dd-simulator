@@ -44,6 +44,20 @@ EXACT_ICON_INDEX = {
     "healing potion": 919,
     "minor healing vial": 920,
     "restorative draught": 919,
+    # Preset quest rewards carry no category, so name them here (The Last Orrery of Sol).
+    "gravline bracer": 756,
+    "jovian aegis": 601,
+    "lunar lens": 1199,
+    "map of roads not taken": 1184,
+    "martian vector": 1177,
+    "meridian harness earth state": 760,
+    "meridian harness solar state": 745,
+    "nullglass edge": 334,
+    "orrery key": 1194,
+    "pelagic ampoule": 929,
+    "starlight injector": 941,
+    "stormsilk mantle": 817,
+    "vector splitter": 1085,
 }
 SKILL_ICON_INDEX = {
     "attack": 1612,

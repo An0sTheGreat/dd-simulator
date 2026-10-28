@@ -23,13 +23,14 @@ Release 24 uses only assets currently present under
 - Retired: the numbered SVGs and the `item_icons.png` atlas are no longer packaged. Only the
   semantic data in `item_manifest.json` (names, categories, tiers) remains, for the catalog.
 - Source: `Icons_svg` and its semantic manifest.
-- Runtime copies: the numbered SVG files and `item_manifest.json` beneath
-  `src/dd_simulator/ui/assets/icons`.
+- Runtime copies: only `item_manifest.json` beneath `src/dd_simulator/ui/assets/icons`;
+  the numbered SVG files are no longer packaged.
 - Supplied terms: free for personal and commercial use; credit appreciated but not
   required; do not redistribute, resell, or reupload the asset files as a standalone
   pack or claim them as original work.
-- The application packages and resolves the 1,686 numbered SVGs as integrated game
-  assets rather than redistributing them as a standalone pack.
+- Until Phase 8 the application packaged the 1,686 numbered SVGs as integrated game
+  assets; it no longer packages them. Item art now comes from the CraftPix library
+  icons mapped by `item_icon_manifest.json`.
 
 ## CraftPix skill, ability and spell icons
 

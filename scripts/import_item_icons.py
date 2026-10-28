@@ -33,6 +33,12 @@ def import_jobs(source_root: Path) -> list[tuple[Path, Path]]:
     unknown = sorted(set(manifest["records"].values()) - set(manifest["sources"]))
     if unknown:
         raise SystemExit("Records map to icons without a source:\n  " + "\n  ".join(unknown))
+    for name in manifest["sources"]:
+        target = LIBRARY_ROOT / name
+        if Path(name).is_absolute() or ".." in Path(name).parts or (
+            target.resolve().parent != LIBRARY_ROOT.resolve()
+        ):
+            raise SystemExit(f"Icon name escapes the library folder: {name}")
     return [
         (source_root / relative, LIBRARY_ROOT / name)
         for name, relative in manifest["sources"].items()

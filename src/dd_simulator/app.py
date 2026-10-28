@@ -425,7 +425,7 @@ def _run_release_twenty_six_smoke(app: QApplication, window: MainWindow) -> None
 
 
 def _run_release_twenty_five_smoke(app: QApplication, window: MainWindow) -> None:
-    """Verify packaged semantic SVGs, natural narration, and live splitters."""
+    """Verify packaged semantic item icons, natural narration, and live splitters."""
 
     try:
         service = window.game_state_service
