@@ -631,7 +631,7 @@ def test_phase_five_database_migrates_to_character_creation_schema(tmp_path: Pat
     connection.close()
 
     database = GameStateDatabase(path)
-    assert database.initialize() == LATEST_SCHEMA_VERSION == 22
+    assert database.initialize() == LATEST_SCHEMA_VERSION == 23
     with database.connect() as migrated:
         campaign = migrated.execute(
             "SELECT creation_complete FROM campaigns WHERE id = 'existing'"

@@ -43,6 +43,7 @@ from dd_simulator.ui.models.presentation import (
     NarrativeMessageView,
     NarrativeSegmentView,
     NarrativeView,
+    TurnNoteView,
     ObjectiveView,
     PlayerSummaryView,
     QuestListItemView,
@@ -196,12 +197,79 @@ def _narrative_segments(row: sqlite3.Row) -> tuple[NarrativeSegmentView, ...]:
     return tuple(segments)
 
 
-def _narrative_messages(
-    narrative: sqlite3.Row,
-    rows: list[sqlite3.Row],
-    portraits: dict[str, str] | None = None,
-) -> tuple[NarrativeMessageView, ...]:
-    portraits = portraits or {}
+MESSAGE_PAGE_SIZE = 40
+
+
+def message_page(
+    connection: sqlite3.Connection,
+    assets_root: Path | None,
+    campaign_id: str,
+    *,
+    before_turn: int = 2**62,
+    limit: int = MESSAGE_PAGE_SIZE,
+) -> tuple[tuple[NarrativeMessageView, ...], bool]:
+    """Return the newest whole turns before ``before_turn`` (at most ``limit``
+    messages, but always at least one turn) and whether older turns exist.
+
+    Pages never split a turn, so ``before_turn`` paging loses nothing and each
+    turn's notes stay on its last message.
+    """
+
+    counts = connection.execute(
+        "SELECT turn_number, COUNT(*) AS total FROM narrative_messages "
+        "WHERE campaign_id = ? AND turn_number < ? "
+        "GROUP BY turn_number ORDER BY turn_number DESC",
+        (campaign_id, before_turn),
+    ).fetchall()
+    first_turn: int | None = None
+    taken = 0
+    has_older = False
+    for count in counts:
+        if first_turn is not None and taken + int(count["total"]) > limit:
+            has_older = True
+            break
+        first_turn = int(count["turn_number"])
+        taken += int(count["total"])
+    if first_turn is None:
+        return (), False
+    rows = connection.execute(
+        """
+        SELECT narrative_messages.*, npcs.name AS speaker_name
+        FROM narrative_messages
+        LEFT JOIN npcs ON npcs.id = narrative_messages.speaker_npc_id
+        WHERE narrative_messages.campaign_id = ?
+          AND narrative_messages.turn_number >= ? AND narrative_messages.turn_number < ?
+        ORDER BY narrative_messages.turn_number, narrative_messages.sequence
+        """,
+        (campaign_id, first_turn, before_turn),
+    ).fetchall()
+    portraits: dict[str, str] = {}
+    for speaker_id in {
+        str(row["speaker_npc_id"]) for row in rows if row["speaker_npc_id"] is not None
+    }:
+        # NPC portraits are keyed like character portraits; only a confirmed
+        # canonical record (signature "" never matches exactly) yields a path.
+        speaker_view = _visual_view(resolve_visual_record(
+            connection,
+            assets_root,
+            campaign_id=campaign_id,
+            asset_kind="portrait",
+            subject_type="character",
+            subject_id=speaker_id,
+            signature="",
+        ))
+        if speaker_view is not None and speaker_view.path:
+            portraits[speaker_id] = speaker_view.path
+    notes: dict[int, list[TurnNoteView]] = {}
+    for note in connection.execute(
+        "SELECT turn_number, kind, text FROM turn_notes WHERE campaign_id = ? "
+        "AND turn_number >= ? AND turn_number < ? ORDER BY turn_number, id",
+        (campaign_id, first_turn, before_turn),
+    ):
+        notes.setdefault(int(note["turn_number"]), []).append(
+            TurnNoteView(str(note["kind"]), str(note["text"]))
+        )
+    last_of_turn = {int(row["turn_number"]): index for index, row in enumerate(rows)}
     messages = tuple(
         NarrativeMessageView(
             str(row["kind"]),
@@ -210,9 +278,21 @@ def _narrative_messages(
             speaker_id=None if row["speaker_npc_id"] is None else str(row["speaker_npc_id"]),
             speaker_name=str(row["speaker_name"] or ""),
             speaker_portrait=portraits.get(str(row["speaker_npc_id"]), ""),
+            notes=(
+                tuple(notes.get(int(row["turn_number"]), ()))
+                if last_of_turn[int(row["turn_number"])] == index
+                else ()
+            ),
         )
-        for row in rows
+        for index, row in enumerate(rows)
     )
+    return messages, has_older
+
+
+def _narrative_messages(
+    narrative: sqlite3.Row,
+    messages: tuple[NarrativeMessageView, ...],
+) -> tuple[NarrativeMessageView, ...]:
     if messages:
         return messages
     fallback: list[NarrativeMessageView] = []
@@ -234,6 +314,16 @@ class DashboardProjection:
             if isinstance(database.path, Path)
             else None
         )
+
+    def older_messages(
+        self, campaign_id: str, before_turn: int, limit: int = MESSAGE_PAGE_SIZE
+    ) -> tuple[NarrativeMessageView, ...]:
+        with self.database.connect() as connection:
+            messages, _has_older = message_page(
+                connection, self.assets_root, campaign_id,
+                before_turn=before_turn, limit=limit,
+            )
+        return messages
 
     def load(self, campaign_id: str) -> DashboardView:
         with self.database.connect() as connection:
@@ -372,37 +462,9 @@ class DashboardProjection:
                 ).fetchone(),
                 "narrative",
             )
-            message_rows = connection.execute(
-                """
-                SELECT recent.*, npcs.name AS speaker_name FROM (
-                    SELECT * FROM narrative_messages
-                    WHERE campaign_id = ?
-                    ORDER BY turn_number DESC, sequence DESC
-                    LIMIT 20
-                ) AS recent
-                LEFT JOIN npcs ON npcs.id = recent.speaker_npc_id
-                ORDER BY recent.turn_number, recent.sequence
-                """,
-                (campaign_id,),
-            ).fetchall()
-            speaker_portraits: dict[str, str] = {}
-            for speaker_id in {
-                str(row["speaker_npc_id"]) for row in message_rows
-                if row["speaker_npc_id"] is not None
-            }:
-                # NPC portraits are keyed like character portraits; only a confirmed
-                # canonical record (signature "" never matches exactly) yields a path.
-                speaker_view = _visual_view(resolve_visual_record(
-                    connection,
-                    self.assets_root,
-                    campaign_id=campaign_id,
-                    asset_kind="portrait",
-                    subject_type="character",
-                    subject_id=speaker_id,
-                    signature="",
-                ))
-                if speaker_view is not None and speaker_view.path:
-                    speaker_portraits[speaker_id] = speaker_view.path
+            recent_messages, has_older_messages = message_page(
+                connection, self.assets_root, campaign_id
+            )
             selected_quest = _required(
                 connection.execute(
                     "SELECT * FROM quests WHERE campaign_id = ? ORDER BY selected DESC, "
@@ -1204,7 +1266,8 @@ class DashboardProjection:
                 ),
                 player_action=str(narrative["player_action"]),
                 response_segments=_narrative_segments(narrative),
-                messages=_narrative_messages(narrative, message_rows, speaker_portraits),
+                messages=_narrative_messages(narrative, recent_messages),
+                has_older_messages=has_older_messages,
             ),
             quest=QuestView(
                 title=str(selected_quest["title"]),

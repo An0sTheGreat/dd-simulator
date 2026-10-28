@@ -128,6 +128,12 @@ class NarrativeSegmentView:
 
 
 @dataclass(frozen=True, slots=True)
+class TurnNoteView:
+    kind: str  # xp, item, quest, relationship, travel, resource, other
+    text: str
+
+
+@dataclass(frozen=True, slots=True)
 class NarrativeMessageView:
     kind: str
     text: str
@@ -135,6 +141,7 @@ class NarrativeMessageView:
     speaker_id: str | None = None
     speaker_name: str = ""
     speaker_portrait: str = ""
+    notes: tuple[TurnNoteView, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,6 +154,7 @@ class NarrativeView:
     player_action: str = ""
     response_segments: tuple[NarrativeSegmentView, ...] = ()
     messages: tuple[NarrativeMessageView, ...] = ()
+    has_older_messages: bool = False
 
 
 @dataclass(frozen=True, slots=True)

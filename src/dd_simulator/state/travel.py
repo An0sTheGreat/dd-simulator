@@ -10,6 +10,7 @@ from uuid import uuid4
 from dd_simulator.state.database import GameStateDatabase
 from dd_simulator.state.errors import GameStateError
 from dd_simulator.state.quests import check_deadlines, progress_quests
+from dd_simulator.state.turns import claim_turn_notes, record_turn_note
 
 
 class TravelNarrationProvider(Protocol):
@@ -160,6 +161,19 @@ class TravelService:
                 "last_visited_at = CURRENT_TIMESTAMP, visit_count = visit_count + 1 WHERE id = ?",
                 (destination_id,),
             )
+            hours, minutes = divmod(int(route["travel_minutes"]), 60)
+            duration = " ".join(
+                part for part in (f"{hours} h" if hours else "", f"{minutes} min" if minutes else "")
+                if part
+            ) or "0 min"
+            record_turn_note(
+                connection,
+                campaign_id,
+                "travel",
+                f"Travelled {float(route['distance_miles']):g} mi \u00b7 {duration}",
+            )
+            if stamina_cost:
+                record_turn_note(connection, campaign_id, "resource", f"\u2212{stamina_cost} stamina")
 
             fallback = (
                 f"The party travels {route['distance_miles']} miles from {current['name']} "
@@ -286,6 +300,10 @@ class TravelService:
                     history_id, campaign_id, location["id"], started_day,
                     started_minute, duration_minutes, prose,
                 ),
+            )
+            record_turn_note(
+                connection, campaign_id, "resource",
+                f"Rested {duration_minutes // 60} h \u00b7 recovered",
             )
             self._append_messages(
                 connection,
@@ -414,6 +432,7 @@ class TravelService:
                 "VALUES (?, ?, ?, ?, ?, ?)",
                 (f"message-{uuid4().hex}", campaign_id, turn, sequence, kind, value),
             )
+        claim_turn_notes(connection, campaign_id, turn)
 
     @staticmethod
     def _append_event(

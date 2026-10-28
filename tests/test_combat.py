@@ -445,7 +445,7 @@ def test_class_ability_cooldown_limited_uses_and_short_rest_recovery() -> None:
 
 def test_phase_ten_schema_records_ability_and_effect_fields() -> None:
     database, service = combat_service(20, 1)
-    assert database.schema_version() == 22
+    assert database.schema_version() == 23
     service.start_combat(enemies=(training_enemy(),))
     with database.connect() as connection:
         ability_columns = {

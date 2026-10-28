@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import re
+import sqlite3
 from typing import Any, Protocol
 
 
@@ -109,3 +110,44 @@ class ActionOutcomeProvider(Protocol):
         action: str,
         context: dict[str, Any],
     ) -> ActionOutcome: ...
+
+
+_PENDING_NOTES_TABLE = (
+    "CREATE TEMP TABLE IF NOT EXISTS pending_turn_notes("
+    "campaign_id TEXT NOT NULL, kind TEXT NOT NULL, text TEXT NOT NULL)"
+)
+
+
+def record_turn_note(
+    connection: sqlite3.Connection, campaign_id: str, kind: str, text: str
+) -> None:
+    """Buffer a short player-facing note for the turn this transaction writes.
+
+    The buffer is a connection-scoped TEMP table, and each transaction uses its own
+    connection, so notes from flows that write no transcript message (panel actions,
+    trading, crafting) are discarded with the connection instead of leaking into a
+    later turn.
+    """
+
+    connection.execute(_PENDING_NOTES_TABLE)
+    connection.execute(
+        "INSERT INTO temp.pending_turn_notes(campaign_id, kind, text) VALUES (?, ?, ?)",
+        (campaign_id, kind, text[:120]),
+    )
+
+
+def claim_turn_notes(
+    connection: sqlite3.Connection, campaign_id: str, turn_number: int
+) -> None:
+    """Attach this transaction's buffered notes to the turn whose messages it wrote."""
+
+    connection.execute(_PENDING_NOTES_TABLE)
+    connection.execute(
+        "INSERT INTO turn_notes(campaign_id, turn_number, kind, text) "
+        "SELECT campaign_id, ?, kind, text FROM temp.pending_turn_notes "
+        "WHERE campaign_id = ? ORDER BY rowid",
+        (turn_number, campaign_id),
+    )
+    connection.execute(
+        "DELETE FROM temp.pending_turn_notes WHERE campaign_id = ?", (campaign_id,)
+    )

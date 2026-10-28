@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import sqlite3
 
 from dd_simulator.state.character_creation import CLASS_DETAILS, ability_modifier
+from dd_simulator.state.turns import record_turn_note
 
 
 MAX_LEVEL = 20
@@ -74,7 +75,7 @@ def award_character_experience(
     if amount < 0:
         raise ValueError("Experience awards cannot be negative.")
     character = connection.execute(
-        "SELECT id, level, character_class, pending_ability_points "
+        "SELECT id, campaign_id, level, character_class, pending_ability_points "
         "FROM characters WHERE id = ?",
         (character_id,),
     ).fetchone()
@@ -128,6 +129,11 @@ def award_character_experience(
         "UPDATE character_resources SET current_value = ?, maximum_value = ? WHERE id = ?",
         (value, xp_to_next(level), experience["id"]),
     )
+    campaign_id = str(character["campaign_id"])
+    if amount:
+        record_turn_note(connection, campaign_id, "xp", f"+{int(amount)} XP")
+    for gained_level in gained:
+        record_turn_note(connection, campaign_id, "other", f"Reached level {gained_level}")
 
     # Import locally to avoid making the static ability catalog depend on SQLite.
     from dd_simulator.state.abilities import sync_character_combat_catalog

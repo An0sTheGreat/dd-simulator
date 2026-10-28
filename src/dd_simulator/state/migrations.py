@@ -1508,6 +1508,21 @@ MIGRATIONS: tuple[tuple[int, str], ...] = (
         CREATE INDEX narrative_message_speaker ON narrative_messages(speaker_npc_id);
         """,
     ),
+    (
+        23,
+        """
+        CREATE TABLE turn_notes (
+            id INTEGER PRIMARY KEY,
+            campaign_id TEXT NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+            turn_number INTEGER NOT NULL CHECK (turn_number >= 0),
+            kind TEXT NOT NULL CHECK (
+                kind IN ('xp', 'item', 'quest', 'relationship', 'travel', 'resource', 'other')
+            ),
+            text TEXT NOT NULL CHECK (length(trim(text)) > 0)
+        );
+        CREATE INDEX turn_note_order ON turn_notes(campaign_id, turn_number, id);
+        """,
+    ),
 )
 
 

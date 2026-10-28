@@ -56,6 +56,16 @@ an available NPC at the current location and otherwise stores NULL without rejec
 the turn. The dashboard projection exposes each message's turn number, speaker id,
 speaker name, and the speaker's confirmed canonical Visual Registry portrait path.
 
+Version 23 adds `turn_notes(campaign_id, turn_number, kind, text)`, short player-facing
+tags (`xp`, `item`, `quest`, `relationship`, `travel`, `resource`, `other`) for the
+turn that caused them. State helpers buffer notes in a connection-scoped TEMP table;
+the flow that writes the turn's transcript messages (free-form action, combat, People
+dialogue, travel, camp) moves them into `turn_notes` in the same transaction, and
+notes from flows without a transcript message (panel item actions, trading, crafting)
+are discarded. The dashboard projection returns the newest whole turns up to 40
+messages plus `has_older_messages`, attaching each turn's notes to its last message;
+`GameStateService.older_messages(campaign_id, before_turn, limit=40)` pages back.
+
 Version 12 adds nullable visible inventory positions while retaining stable
 legacy item keys, migrates equipped items out of the bag, doubles existing
 capacity with a 40-slot minimum, and adds NPC status, availability, personality,

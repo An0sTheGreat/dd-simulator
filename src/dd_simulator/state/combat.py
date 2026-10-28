@@ -38,7 +38,12 @@ from dd_simulator.state.progression import (
     award_character_experience,
     proficiency_bonus,
 )
-from dd_simulator.state.turns import NarrativeSegment, SkillCheckResult
+from dd_simulator.state.turns import (
+    NarrativeSegment,
+    SkillCheckResult,
+    claim_turn_notes,
+    record_turn_note,
+)
 
 
 class CombatAction(str, Enum):
@@ -377,6 +382,7 @@ class CombatService:
             status = self._encounter_status(connection, encounter_id)
             if status != "active":
                 summaries.extend(self._finalize_encounter(connection, encounter_id))
+                claim_turn_notes(connection, campaign_id, turn_number)
             self._refresh_narrative_prompt(
                 connection, campaign_id, active=status == "active"
             )
@@ -1153,6 +1159,7 @@ class CombatService:
             "WHERE character_id = ?",
             (character_id,),
         )
+        record_turn_note(connection, campaign_id, "resource", "Short rest \u00b7 recovered")
         turn_number = self._next_campaign_turn(connection, campaign_id)
         summary = "The party completes a short rest; combat resources and limited uses recover."
         self._append_messages(
@@ -2229,6 +2236,7 @@ class CombatService:
                 if text.strip()
             ),
         )
+        claim_turn_notes(connection, campaign_id, turn_number)
 
     @staticmethod
     def _append_event(

@@ -13,7 +13,7 @@ from dd_simulator.state.database import GameStateDatabase
 from dd_simulator.state.errors import GameStateError
 from dd_simulator.state.quests import progress_quests
 from dd_simulator.state.presets import active_preset_context
-from dd_simulator.state.turns import SkillCheckResult
+from dd_simulator.state.turns import SkillCheckResult, claim_turn_notes, record_turn_note
 
 
 LOGGER = logging.getLogger(__name__)
@@ -282,11 +282,15 @@ class DialogueService:
              context["player_text"], npc_text, monologue, check_type, context["roll"],
              context["modifier"], context["total"], context["difficulty"], outcome, delta),
         )
-        connection.execute(
+        relationship_update = connection.execute(
             "UPDATE relationships SET score = MAX(-100, MIN(100, score + ?)) "
             "WHERE campaign_id = ? AND source_entity_id = ? AND target_entity_id = ?",
             (delta, context["campaign_id"], character["id"], npc["id"]),
         )
+        if relationship_update.rowcount:
+            record_turn_note(
+                connection, context["campaign_id"], "relationship", f"{npc['name']} {delta:+d}"
+            )
         score = int(context["relationship_score"]) + delta
         status = "friendly" if score >= 25 else "suspicious" if score <= -20 else "neutral"
         connection.execute("UPDATE npcs SET status = ?, disposition = ? WHERE id = ?", (status, status, npc["id"]))
@@ -367,6 +371,7 @@ class DialogueService:
             ") VALUES (?, ?, ?, ?, ?, ?, ?)",
             transcript,
         )
+        claim_turn_notes(connection, context["campaign_id"], turn_number)
         sequence = int(connection.execute(
             "SELECT COALESCE(MAX(sequence), -1) + 1 FROM events WHERE campaign_id = ?",
             (context["campaign_id"],),

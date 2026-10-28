@@ -47,7 +47,7 @@ def visible_slot(service: GameStateService, name: str) -> int:
 
 def test_schema_v3_adds_item_rules_and_stable_equipment_links() -> None:
     database, _service = seeded_service()
-    assert database.schema_version() == LATEST_SCHEMA_VERSION == 22
+    assert database.schema_version() == LATEST_SCHEMA_VERSION == 23
 
     potion = inventory_row(database, 2)
     assert potion["item_type"] == "consumable"
@@ -91,7 +91,7 @@ def test_existing_schema_v2_inventory_migrates_without_data_loss(tmp_path: Path)
     connection.close()
 
     database = GameStateDatabase(path)
-    assert database.initialize() == 22
+    assert database.initialize() == 23
     with database.connect() as migrated:
         potion = migrated.execute(
             "SELECT quantity, item_type, consumable, use_effect_json "

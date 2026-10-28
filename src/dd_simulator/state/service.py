@@ -74,6 +74,8 @@ from dd_simulator.state.turns import (
     ActionResolutionResult,
     NarrativeSegment,
     ProposedStateChange,
+    claim_turn_notes,
+    record_turn_note,
 )
 from dd_simulator.state.travel import (
     CampResult,
@@ -82,7 +84,7 @@ from dd_simulator.state.travel import (
     TravelService,
 )
 from dd_simulator.state.visuals import VisualRegistryService
-from dd_simulator.ui.models.presentation import DashboardView
+from dd_simulator.ui.models.presentation import DashboardView, NarrativeMessageView
 
 
 class GameStateService:
@@ -1521,6 +1523,7 @@ class GameStateService:
                 ") VALUES (?, ?, ?, ?, ?, ?, ?)",
                 transcript_messages,
             )
+            claim_turn_notes(connection, campaign_id, turn_number)
             event_summary = " ".join(outcome.narration.split())[:500]
             self._record_turn_event(
                 connection,
@@ -1659,6 +1662,9 @@ class GameStateService:
                     summary = self._equip(connection, character_id, item).summary
                 else:
                     summary = self._drop(connection, character_id, item).summary
+                if operation != "equip_item":
+                    verb = "used" if operation == "use_item" else "dropped"
+                    record_turn_note(connection, campaign_id, "item", f"{item['name']} {verb}")
                 updates = progress_quests(
                     connection,
                     campaign_id,
@@ -1783,6 +1789,7 @@ class GameStateService:
             difficulty="Adventurer" if difficulty is None else str(difficulty[0]),
         )
         recalculate_character_item_totals(connection, character_id)
+        record_turn_note(connection, campaign_id, "item", f"{item.name} added")
         updates = progress_quests(
             connection, campaign_id, "item_collect", item.name, detail=item.description
         )
@@ -1862,6 +1869,7 @@ class GameStateService:
         recalculate_character_item_totals(connection, character_id)
         prefix = f"x{quantity} " if quantity > 1 else ""
         summary = f"Added {prefix}{name} to inventory."
+        record_turn_note(connection, campaign_id, "item", f"{prefix}{name} added")
         cls._record_inventory_event(connection, campaign_id, summary)
         updates = progress_quests(
             connection, campaign_id, "item_collect", name, detail=summary
@@ -1929,6 +1937,15 @@ class GameStateService:
         connection.execute(
             "UPDATE character_resources SET current_value = ? WHERE id = ?",
             (updated, resource["id"]),
+        )
+        sign = "\u2212" if updated < current else "+"
+        record_turn_note(
+            connection,
+            str(connection.execute(
+                "SELECT campaign_id FROM characters WHERE id = ?", (character_id,)
+            ).fetchone()[0]),
+            "resource",
+            f"{sign}{abs(updated - current)} {str(resource['name']).lower()}",
         )
         verb = "Spent" if change.operation == "spend_resource" else "Restored"
         return f"{verb} {amount} {resource['name']} ({current} to {updated})."
@@ -2389,6 +2406,13 @@ class GameStateService:
     def load_campaign(self, campaign_id: str) -> DashboardView:
         self._synchronize_current_location(campaign_id)
         return self.dashboard_projection.load(campaign_id)
+
+    def older_messages(
+        self, campaign_id: str, before_turn: int, limit: int = 40
+    ) -> tuple[NarrativeMessageView, ...]:
+        """Earlier transcript turns (with their notes) for scroll-back, oldest first."""
+
+        return self.dashboard_projection.older_messages(campaign_id, before_turn, limit)
 
     def load_active_dashboard(self) -> DashboardView:
         campaign_id = self.ensure_demo_campaign()
