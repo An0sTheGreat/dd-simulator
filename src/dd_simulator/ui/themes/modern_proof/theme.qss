@@ -1199,10 +1199,6 @@ QFrame#inventoryCard QFrame#inventorySlot[empty="true"] {
     border: 1px solid #3a3a3f;
     background-color: transparent;
 }
-QFrame#inventoryCard QFrame#inventorySlot[rarity="uncommon"] { border-color: {{codex.rarity_uncommon}}; }
-QFrame#inventoryCard QFrame#inventorySlot[rarity="rare"] { border-color: {{codex.rarity_rare}}; }
-QFrame#inventoryCard QFrame#inventorySlot[rarity="epic"] { border-color: {{codex.rarity_epic}}; }
-QFrame#inventoryCard QFrame#inventorySlot[rarity="legendary"] { border-color: {{codex.rarity_legendary}}; }
 
 QFrame[codexCard="true"] QWidget#codexCardHeadingRow,
 QFrame[codexCard="true"] QWidget#powersColumn,

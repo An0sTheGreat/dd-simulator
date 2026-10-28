@@ -5,10 +5,11 @@ from functools import lru_cache
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QMimeData, QPoint, Qt, Signal
-from PySide6.QtGui import QCursor, QDrag, QPixmap
+from PySide6.QtGui import QColor, QCursor, QDrag, QPixmap
 from PySide6.QtWidgets import (
     QApplication,
     QFrame,
+    QGraphicsDropShadowEffect,
     QGridLayout,
     QLabel,
     QMenu,
@@ -51,6 +52,32 @@ def _current_theme_id() -> str:
     if application is None:
         return "high_fantasy"
     return str(application.property("themeId") or "high_fantasy")
+
+
+@lru_cache(maxsize=4)
+def _rarity_colours(theme_id: str) -> dict[str, str]:
+    path = Path(__file__).resolve().parents[1] / "themes" / theme_id / "theme.json"
+    try:
+        codex = json.loads(path.read_text(encoding="utf-8"))["tokens"]["codex"]
+    except (OSError, KeyError, json.JSONDecodeError):
+        return {}
+    return {key.removeprefix("rarity_"): value for key, value in codex.items() if key.startswith("rarity_")}
+
+
+def apply_rarity_glow(icon: QLabel, rarity: str) -> None:
+    """Glow outline in the rarity colour around the icon's shape; none for common items."""
+
+    colour = _rarity_colours(_current_theme_id()).get(rarity.casefold())
+    if not colour or rarity.casefold() == "common":
+        icon.setGraphicsEffect(None)
+        return
+    glow = icon.graphicsEffect()
+    if not isinstance(glow, QGraphicsDropShadowEffect):
+        glow = QGraphicsDropShadowEffect(icon)
+        glow.setOffset(0, 0)
+        glow.setBlurRadius(9)
+        icon.setGraphicsEffect(glow)
+    glow.setColor(QColor(colour))
 
 
 @lru_cache(maxsize=16)
@@ -421,6 +448,8 @@ class InventorySlotWidget(QFrame):
         )
         if item.is_empty:
             self.icon_label.hide()
+        else:
+            apply_rarity_glow(self.icon_label, item.rarity)
         layout.addWidget(self.icon_label, 0, 0, Qt.AlignmentFlag.AlignCenter)
         self.artwork_label.installEventFilter(self)
         if item.durability is not None and item.maximum_durability:
@@ -440,6 +469,7 @@ class InventorySlotWidget(QFrame):
         if self.item.is_empty:
             self.icon_label.hide()
             return
+        apply_rarity_glow(self.icon_label, self.item.rarity)
         refresh_item_icon(
             self.icon_label,
             self.item.name or "Empty",

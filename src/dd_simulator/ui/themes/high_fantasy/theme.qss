@@ -1210,18 +1210,6 @@ QFrame#inventoryCard QFrame#inventorySlot[empty="true"] {
     border-image: url("../../assets/codex/ui_slot_frame.png") 22 22 22 22 stretch stretch;
     background-color: rgba(21, 17, 12, 150);
 }
-QFrame#inventoryCard QFrame#inventorySlot[rarity="uncommon"] {
-    border-image: url("../../assets/codex/ui_rarity_uncommon.png") 22 22 22 22 stretch stretch;
-}
-QFrame#inventoryCard QFrame#inventorySlot[rarity="rare"] {
-    border-image: url("../../assets/codex/ui_rarity_rare.png") 22 22 22 22 stretch stretch;
-}
-QFrame#inventoryCard QFrame#inventorySlot[rarity="epic"] {
-    border-image: url("../../assets/codex/ui_rarity_epic.png") 22 22 22 22 stretch stretch;
-}
-QFrame#inventoryCard QFrame#inventorySlot[rarity="legendary"] {
-    border-image: url("../../assets/codex/ui_rarity_legendary.png") 22 22 22 22 stretch stretch;
-}
 
 QFrame[codexCard="true"] QWidget#codexCardHeadingRow,
 QFrame[codexCard="true"] QWidget#powersColumn,
