@@ -530,8 +530,12 @@ class NpcNavigationPage(NavigationPage):
             self.selection_buttons[npc.id] = button
         if not conversations:
             selector.addWidget(plain_label("No known NPCs are present.", "pageCardMeta", word_wrap=True))
-        self.selector_card.setFixedWidth(260)
-        body.addWidget(self.selector_card)
+        # People list above Speaking with, both in one left column.
+        side = QVBoxLayout()
+        side.setContentsMargins(0, 0, 0, 0)
+        side.setSpacing(8)
+        side.addWidget(self.selector_card, 1)
+        body.addLayout(side)
         # Cards keep their heading; _render_selected refills the inner hosts.
         self.conversation_card, card = codex_card("Conversation", "npcConversationCard")
         card.setAlignment(Qt.AlignmentFlag(0))  # the thread takes the height
@@ -545,8 +549,9 @@ class NpcNavigationPage(NavigationPage):
         self.identity_layout = QVBoxLayout(self.identity_host)
         self.identity_layout.setContentsMargins(0, 0, 0, 0)
         card.addWidget(self.identity_host)
-        self.identity_card.setFixedWidth(260)
-        body.addWidget(self.identity_card)
+        side.addWidget(self.identity_card)
+        for column_card in (self.selector_card, self.identity_card):
+            column_card.setFixedWidth(260)
         body_host.setMinimumHeight(180)
         self.people_splitter.addWidget(body_host)
         self.people_splitter.setStretchFactor(0, 2)
