@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import replace
 import ctypes
 from pathlib import Path
 import re
@@ -497,10 +498,10 @@ class MainWindow(QMainWindow):
             self.game_state_service, npc_id, response, self.dialogue_narrator
         )
         self._dialogue_task = task
-        self._show_status_message("Resolving conversation with local LM Studio...")
+        self._show_status_message("Resolving conversation with the local model...")
         people_page = self.navigation_pages.get("people")
         if people_page is not None and hasattr(people_page, "show_dialogue_status"):
-            people_page.show_dialogue_status("Waiting for LM Studio to answer...")
+            people_page.show_dialogue_status("Waiting for the local model to answer...")
         task.signals.succeeded.connect(
             lambda result, current=task: self._dialogue_resolution_succeeded(current, result)
         )
@@ -1621,10 +1622,19 @@ class MainWindow(QMainWindow):
             configuration = LocalAiConfiguration(
                 mode="llama_cpp", model_directory=str(folder), model_path=str(path)
             )
-        elif mode == "lm_studio":
+        elif mode == "unsloth":
+            api_key = self.local_ai_setup_panel.api_key.text().strip()
+            if not api_key:
+                self.local_ai_setup_panel.show_status(
+                    "Enter the API key created in Unsloth Studio (Settings -> API).", error=True
+                )
+                return
             self.local_ai_runtime.stop()
             configuration = LocalAiConfiguration(
-                mode="lm_studio", model_directory=str(folder)
+                mode="unsloth",
+                model_directory=str(folder),
+                unsloth_port=self.local_ai_setup_panel.unsloth_port.value(),
+                api_key=api_key,
             )
         else:
             self.local_ai_setup_panel.show_status("Unknown local AI setup option.", error=True)
@@ -1649,7 +1659,7 @@ class MainWindow(QMainWindow):
             True,
             "Starting and testing the local model..."
             if configuration.mode == "llama_cpp"
-            else "Checking LM Studio and its loaded model...",
+            else "Checking Unsloth Studio and its loaded model...",
         )
         task = LocalAiActivationTask(configuration, self.local_ai_runtime)
         self._local_ai_activation_task = task
@@ -1676,14 +1686,11 @@ class MainWindow(QMainWindow):
             configuration, LocalAiConfiguration
         ):
             return
-        completed = LocalAiConfiguration(
-            mode=configuration.mode,
-            setup_complete=True,
-            model_directory=configuration.model_directory,
-            model_path=configuration.model_path,
-            model_id=model_id,
+        completed = replace(configuration, setup_complete=True, model_id=model_id)
+        client = LocalModelClient(
+            endpoint, timeout_seconds=90, model_id=model_id,
+            api_key=configuration.api_key or None,
         )
-        client = LocalModelClient(endpoint, timeout_seconds=90, model_id=model_id)
         self._finish_local_ai_setup(completed, client)
 
     def _finish_local_ai_setup(
@@ -1712,7 +1719,7 @@ class MainWindow(QMainWindow):
         if self.preferences_store is not None:
             self.preferences_store.save_local_ai(configuration.to_mapping())
             if client is not None:
-                self.preferences_store.save_lm_studio({"model_id": configuration.model_id})
+                self.preferences_store.save_unsloth({"model_id": configuration.model_id})
         self.character_creation_panel.randomizer = self.character_randomizer
         self.local_ai_setup_panel.configuration = configuration
         self.local_ai_setup_panel.cancel_button.show()
@@ -1758,7 +1765,7 @@ class MainWindow(QMainWindow):
         if self.lm_client is None:
             for panel in self._model_panels():
                 panel.show_model_status(  # type: ignore[attr-defined]
-                    "LM Studio integration is unavailable in this application session.",
+                    "Local model integration is unavailable in this application session.",
                     error=True,
                 )
             return
@@ -1773,7 +1780,7 @@ class MainWindow(QMainWindow):
             return
         for panel in self._model_panels():
             panel.set_model_busy(  # type: ignore[attr-defined]
-                True, "Scanning the local LM Studio server..."
+                True, "Scanning the local model server..."
             )
         task = ModelDiscoveryTask(self.lm_client)
         self._model_discovery_task = task
@@ -1827,12 +1834,12 @@ class MainWindow(QMainWindow):
             return
         self.lm_client.select_model(model_id)
         if self.preferences_store is not None:
-            self.preferences_store.save_lm_studio({"model_id": model_id})
+            self.preferences_store.save_unsloth({"model_id": model_id})
         for panel in self._model_panels():
             panel.show_model_status(  # type: ignore[attr-defined]
-                f"Selected {model_id}. All LM Studio generation paths will use this model."
+                f"Selected {model_id}. All local generation paths will use this model."
             )
-        self._show_model_status_message(f"LM Studio model selected: {model_id}")
+        self._show_model_status_message(f"Local model selected: {model_id}")
 
     def _load_lm_model(self, model_id: str) -> None:
         if self.lm_client is None or any(
@@ -1846,7 +1853,7 @@ class MainWindow(QMainWindow):
             return
         for panel in self._model_panels():
             panel.set_model_busy(  # type: ignore[attr-defined]
-                True, f"Unloading other models and loading {model_id} into LM Studio..."
+                True, f"Unloading other models and loading {model_id} into the local model server..."
             )
         task = ModelLoadTask(self.lm_client, model_id)
         self._model_load_task = task
@@ -1870,7 +1877,7 @@ class MainWindow(QMainWindow):
         self._select_lm_model(instance_id)
         for panel in self._model_panels():
             panel.show_model_status(  # type: ignore[attr-defined]
-                f"Loaded {instance_id}. Refreshing LM Studio status..."
+                f"Loaded {instance_id}. Refreshing model status..."
             )
 
     def _model_load_finished(self, task: ModelLoadTask) -> None:
@@ -2017,7 +2024,7 @@ class MainWindow(QMainWindow):
             CharacterRandomizationService.fallback_intro(task.draft),
         )
         self._show_status_message(
-            f"LM Studio opening unavailable; a local opening was saved. {message}"
+            f"Local model opening unavailable; a local opening was saved. {message}"
         )
 
     def _campaign_intro_finished(self, campaign_id: str) -> None:

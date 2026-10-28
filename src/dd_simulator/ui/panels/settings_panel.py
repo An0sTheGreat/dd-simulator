@@ -50,27 +50,27 @@ class SettingsPanel(DashboardPanel):
         )
         self.content_layout.addWidget(
             semantic_label(
-                "Review the model provided by llama.cpp or LM Studio before evaluation or play.",
+                "Review the model provided by llama.cpp or Unsloth Studio before evaluation or play.",
                 text_role="secondary",
                 word_wrap=True,
             )
         )
         model_controls = QVBoxLayout()
         self.model_selector = QComboBox()
-        self.model_selector.setObjectName("lmStudioModelSelector")
+        self.model_selector.setObjectName("localModelSelector")
         self.model_selector.setAccessibleName("Local AI model")
         self.model_selector.addItem("Refresh to discover models", "")
         self.model_selector.currentIndexChanged.connect(self._model_changed)
         model_controls.addWidget(self.model_selector)
         self.model_refresh_button = SemanticButton("Refresh Models", role="secondary")
-        self.model_refresh_button.setObjectName("refreshLmStudioModelsButton")
+        self.model_refresh_button.setObjectName("refreshLocalModelsButton")
         self.model_refresh_button.clicked.connect(self.model_refresh_requested)
         self.model_load_button = SemanticButton("Load Selected Model", role="primary")
-        self.model_load_button.setObjectName("loadLmStudioModelButton")
+        self.model_load_button.setObjectName("loadLocalModelButton")
         self.model_load_button.clicked.connect(self._load_model)
         self.model_load_button.setEnabled(False)
         self.model_evaluate_button = SemanticButton("Run 3-Sample Evaluation", role="primary")
-        self.model_evaluate_button.setObjectName("evaluateLmStudioModelButton")
+        self.model_evaluate_button.setObjectName("evaluateLocalModelButton")
         self.model_evaluate_button.clicked.connect(self._evaluate_model)
         self.model_evaluate_button.setEnabled(False)
         model_controls.addWidget(self.model_refresh_button)
@@ -79,7 +79,7 @@ class SettingsPanel(DashboardPanel):
         self.content_layout.addLayout(model_controls)
         self.model_status = semantic_label(
             "The local AI provider has not been scanned in this session.",
-            object_name="lmStudioModelStatus",
+            object_name="localModelStatus",
             text_role="muted",
             word_wrap=True,
         )
@@ -170,7 +170,7 @@ class SettingsPanel(DashboardPanel):
         self.content_layout.addWidget(
             semantic_label(
                 "Campaign state is continuously persisted. Named checkpoints provide "
-                "verified rollback points; repair and replay operate without LM Studio.",
+                "verified rollback points; repair and replay operate without the local model.",
                 text_role="secondary",
                 word_wrap=True,
             )

@@ -381,7 +381,7 @@ class CharacterCreationPanel(DashboardPanel):
     ) -> QWidget:
         button = SemanticButton("Randomize", role="secondary")
         button.setObjectName(f"randomize{section.title().replace('_', '')}Button")
-        button.setToolTip("Generate three options with the loaded local LM Studio model")
+        button.setToolTip("Generate three options with the loaded local model")
         button.clicked.connect(
             lambda _checked=False, target=section: self._request_randomization(target)
         )
@@ -489,7 +489,7 @@ class CharacterCreationPanel(DashboardPanel):
             )
         )
         self.model_selector = FullClickComboBox()
-        self.model_selector.setObjectName("creationLmStudioModelSelector")
+        self.model_selector.setObjectName("creationLocalModelSelector")
         self.model_selector.setAccessibleName("Character creation local AI model")
         self.model_selector.addItem("Refresh to discover models", "")
         self.model_selector.currentIndexChanged.connect(self._model_changed)
@@ -515,7 +515,7 @@ class CharacterCreationPanel(DashboardPanel):
         form.addRow("", self.model_evaluate_button)
         self.model_status = semantic_label(
             "Refresh the model list, then load one model to unlock character creation.",
-            object_name="creationLmStudioModelStatus",
+            object_name="creationLocalModelStatus",
             text_role="muted",
             word_wrap=True,
         )
@@ -1240,12 +1240,12 @@ class CharacterCreationPanel(DashboardPanel):
         button = self.randomize_buttons[section]
         if self.randomizer is None:
             self.error_label.setText(
-                "LM Studio randomization is unavailable in this application session."
+                "Local model randomization is unavailable in this application session."
             )
             return
         button.setEnabled(False)
         button.setText("Generating...")
-        self.error_label.setText("Generating three local options with LM Studio...")
+        self.error_label.setText("Generating three local options with the local model...")
         task = RandomizationTask(self.randomizer, section, self.draft())
         self._randomization_tasks.add(task)
         task.signals.succeeded.connect(self._show_generated_options)
@@ -1258,7 +1258,7 @@ class CharacterCreationPanel(DashboardPanel):
     def _request_campaign_randomization(self) -> None:
         if self.randomizer is None:
             self.error_label.setText(
-                "LM Studio randomization is unavailable in this application session."
+                "Local model randomization is unavailable in this application session."
             )
             return
         if self._campaign_randomization_task is not None:
@@ -1277,7 +1277,7 @@ class CharacterCreationPanel(DashboardPanel):
 
     def _apply_generated_campaign(self, generated: object) -> None:
         if not isinstance(generated, CharacterCreationDraft):
-            self._campaign_randomization_failed("LM Studio returned an invalid campaign.")
+            self._campaign_randomization_failed("The local model returned an invalid campaign.")
             return
         self.campaign_name.setText(generated.campaign_name)
         self.campaign_description.setPlainText(generated.campaign_description)
@@ -1298,7 +1298,7 @@ class CharacterCreationPanel(DashboardPanel):
 
     def _show_generated_options(self, section: str, raw_options: object) -> None:
         if not isinstance(raw_options, tuple) or len(raw_options) != 3:
-            self._randomization_failed(section, "LM Studio returned invalid options.")
+            self._randomization_failed(section, "The local model returned invalid options.")
             return
         labels = {
             "campaign_name": "Campaign Name",

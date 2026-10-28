@@ -127,7 +127,7 @@ def test_committed_turn_reopens_and_return_to_adventure_keeps_latest_state(
     tmp_path: Path,
 ) -> None:
     UiPreferencesStore(tmp_path / "preferences.json").save_local_ai({
-        "mode": "lm_studio", "setup_complete": True,
+        "mode": "unsloth", "setup_complete": True, "api_key": "test-key",
         "model_directory": str(tmp_path / "models"), "model_path": "",
     })
     app, window, _manager = build_application([], config_dir=tmp_path)

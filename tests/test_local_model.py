@@ -39,7 +39,7 @@ def test_client_rejects_non_local_endpoints() -> None:
     with pytest.raises(ValueError, match="localhost"):
         LocalModelClient("https://example.com/v1")
     with pytest.raises(ValueError, match="end at /v1"):
-        LocalModelClient("http://localhost:1234/api")
+        LocalModelClient("http://localhost:8888/api")
 
 
 def test_client_discovers_model_and_requests_plain_json_options(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -325,31 +325,80 @@ def test_campaign_introduction_is_capped_at_220_words() -> None:
     assert len(LocalModelClient._parse_introduction(response).split()) == 220
 
 
-def test_loading_a_model_unloads_other_active_instances(monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    client = LocalModelClient(model_id="old")
+def test_loading_a_model_unloads_other_loaded_models_then_loads(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    client = LocalModelClient(model_id="old", api_key="test-key")
     requests: list[tuple[str, str, object]] = []
+    loaded = {"old": True, "target": False, "installed": False}
 
     def fake_request(url, *, method="GET", payload=None, timeout_seconds=None):  # type: ignore[no-untyped-def]
-        requests.append((url, method, payload))
-        if url.endswith("/api/v1/models"):
+        requests.append((url.removeprefix("http://localhost:8888"), method, payload))
+        if url.endswith("/v1/models"):
             return {
-                "models": [
-                    {"key": "old", "loaded_instances": [{"id": "old-instance"}]},
-                    {"key": "target", "loaded_instances": []},
+                "data": [
+                    {"id": name, "loaded": state, "context_length": 4096}
+                    for name, state in loaded.items()
                 ]
             }
-        if url.endswith("/unload"):
-            return {"status": "unloaded"}
-        if url.endswith("/load"):
-            return {"status": "loaded", "instance_id": "target-instance"}
+        if url.endswith("/api/inference/unload"):
+            loaded[payload["model_path"]] = False
+            return {"status": "unloaded", "model": payload["model_path"]}
+        if url.endswith("/api/inference/load"):
+            loaded[payload["model_path"]] = True
+            return {
+                "status": "loaded", "model": payload["model_path"],
+                "display_name": "Target", "inference": {},
+            }
         raise AssertionError(url)
 
     monkeypatch.setattr(client, "_json_request_url", fake_request)
-    assert client.load_exclusive_model("target") == "target-instance"
-    assert any(
-        url.endswith("/unload") and payload == {"instance_id": "old-instance"}
-        for url, _method, payload in requests
+    assert client.load_exclusive_model("target") == "target"
+    assert requests == [
+        ("/v1/models", "GET", None),
+        ("/api/inference/unload", "POST", {"model_path": "old"}),
+        ("/api/inference/load", "POST", {"model_path": "target"}),
+        ("/v1/models", "GET", None),
+    ]
+
+
+def test_client_sends_bearer_key_only_when_configured(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    headers: list[dict[str, str]] = []
+
+    def fake_urlopen(request, timeout):  # type: ignore[no-untyped-def]
+        headers.append(dict(request.header_items()))
+        return FakeResponse({"data": [{"id": "local-model"}]})
+
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", fake_urlopen)
+    LocalModelClient(api_key="sk-unsloth-test-key").discover_models()
+    keyed = list(headers)
+    headers.clear()
+    LocalModelClient("http://127.0.0.1:5000/v1").discover_models()
+
+    assert keyed and all(
+        item["Authorization"] == "Bearer sk-unsloth-test-key" for item in keyed
     )
+    assert headers and all("Authorization" not in item for item in headers)
+
+
+def test_rejected_key_raises_authentication_error_without_the_key(monkeypatch, caplog) -> None:  # type: ignore[no-untyped-def]
+    import io
+    from urllib.error import HTTPError
+
+    from dd_simulator.local_model import LocalModelAuthenticationError
+
+    secret = "sk-unsloth-secret-marker"
+
+    def unauthorized(request, timeout):  # type: ignore[no-untyped-def]
+        body = b'{"error":{"message":"Not authenticated","type":"authentication_error"}}'
+        raise HTTPError(request.full_url, 401, "Unauthorized", {}, io.BytesIO(body))
+
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", unauthorized)
+    client = LocalModelClient(api_key=secret)
+    with pytest.raises(LocalModelAuthenticationError, match="Settings -> API") as raised:
+        client.discover_models()
+
+    assert secret not in str(raised.value)
+    assert secret not in caplog.text
+    assert secret not in repr(client)
 
 
 def test_client_preserves_fields_on_connection_and_schema_failures(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -357,7 +406,7 @@ def test_client_preserves_fields_on_connection_and_schema_failures(monkeypatch) 
         "dd_simulator.local_model.client.urlopen",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(URLError("offline")),
     )
-    with pytest.raises(LocalModelConnectionError, match="localhost:1234"):
+    with pytest.raises(LocalModelConnectionError, match="localhost:8888"):
         LocalModelClient(model_id="model").generate_options(
             section="backstory", context={}
         )
@@ -526,11 +575,15 @@ def test_action_resolver_remembers_plain_json_after_schema_channel_failure(monke
     client = LocalModelClient(model_id="model")
     payloads: list[dict[str, object]] = []
 
-    def request(_path, *, method="GET", payload=None):  # type: ignore[no-untyped-def]
+    def request(path, *, method="GET", payload=None):  # type: ignore[no-untyped-def]
+        if method == "GET":
+            # The resolver checks whether a channel error means the model was unloaded.
+            assert path == "/models"
+            return {"data": [{"id": "model", "loaded": True, "context_length": 4096}]}
         assert method == "POST"
         payloads.append(payload)
         if len(payloads) == 1:
-            raise LocalModelConnectionError("LM Studio returned HTTP 400. Channel Error")
+            raise LocalModelConnectionError("The local model server returned HTTP 400. Channel Error")
         return {
             "choices": [{"message": {"content": json.dumps(valid_turn_content())}}]
         }

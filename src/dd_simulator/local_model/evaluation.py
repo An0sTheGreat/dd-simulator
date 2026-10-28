@@ -1,4 +1,4 @@
-"""Non-destructive LM Studio evaluation and local report generation."""
+"""Non-destructive local model evaluation and local report generation."""
 
 from __future__ import annotations
 
@@ -128,11 +128,11 @@ class ModelEvaluationService:
             if model_id in {item.model_id, item.instance_id}:
                 if not item.loaded:
                     raise LocalModelResponseError(
-                        f"{item.display_name} is installed but not loaded in LM Studio."
+                        f"{item.display_name} is installed but not loaded on the local model server."
                     )
                 return item
         raise LocalModelResponseError(
-            "The selected model is no longer available. Refresh the LM Studio model list."
+            "The selected model is no longer available. Refresh the model list."
         )
 
     @staticmethod
@@ -197,11 +197,11 @@ class ModelEvaluationService:
         memory = (
             f"{result.memory_bytes / (1024 ** 3):.1f} GiB"
             if result.memory_bytes is not None
-            else "Not reported by LM Studio"
+            else "Not reported by the model server"
         )
-        context = str(result.context_length or "Not reported by LM Studio")
+        context = str(result.context_length or "Not reported by the model server")
         markdown_path.write_text(
-            "# Latest LM Studio Model Evaluation\n\n"
+            "# Latest Local Model Evaluation\n\n"
             f"- Model: `{result.model_id}`\n"
             f"- Evaluated: {result.evaluated_at}\n"
             f"- Valid schema responses: {result.valid_responses}/{result.samples}\n"

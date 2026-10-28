@@ -140,11 +140,13 @@ def build_application(
             local_ai_configuration = LocalAiConfiguration(
                 model_directory=local_ai_configuration.model_directory
             )
-    elif local_ai_configuration.mode == "lm_studio" and local_ai_configuration.setup_complete:
-        model_preference = preferences_store.load_lm_studio().get("model_id")
+    elif local_ai_configuration.usable() and local_ai_configuration.mode == "unsloth":
+        model_preference = preferences_store.load_unsloth().get("model_id")
         lm_client = LocalModelClient(
+            local_ai_configuration.unsloth_base_url,
             timeout_seconds=90,
             model_id=model_preference if isinstance(model_preference, str) else None,
+            api_key=local_ai_configuration.api_key,
         )
     window = MainWindow(
         theme_manager.available_themes(),
@@ -622,8 +624,8 @@ def _run_release_nineteen_smoke(app: QApplication, window: MainWindow) -> None:
         if abs(window.settings_panel.width() * 2 - window.settings_page.width()) >= 30:
             raise RuntimeError("Settings page is not constrained to the left half")
         for object_name in (
-            "lmStudioModelSelector",
-            "loadLmStudioModelButton",
+            "localModelSelector",
+            "loadLocalModelButton",
             "startupReadinessStatus",
             "settingsScrollArea",
         ):
@@ -641,14 +643,14 @@ def _run_release_eighteen_smoke(app: QApplication, window: MainWindow) -> None:
 
     try:
         if window.lm_client is None or window.model_evaluator is None:
-            raise RuntimeError("Packaged Release 18 LM Studio services are unavailable")
+            raise RuntimeError("Packaged Release 18 local model services are unavailable")
         window.lm_client.select_model("release-18-smoke-model")
         if window.lm_client.preferred_model_id() != "release-18-smoke-model":
             raise RuntimeError("Explicit model selection did not reach the shared client")
         for object_name in (
-            "lmStudioModelSelector",
-            "refreshLmStudioModelsButton",
-            "evaluateLmStudioModelButton",
+            "localModelSelector",
+            "refreshLocalModelsButton",
+            "evaluateLocalModelButton",
         ):
             if window.findChild(QWidget, object_name) is None:
                 raise RuntimeError(f"Packaged model control is missing: {object_name}")

@@ -1,4 +1,4 @@
-"""Thread-pool adapters for LM Studio discovery and evaluation."""
+"""Thread-pool adapters for local model discovery and evaluation."""
 
 from __future__ import annotations
 
@@ -30,8 +30,8 @@ class ModelDiscoveryTask(QRunnable):
         except LocalModelError as exc:
             self._emit(self.signals.failed, str(exc))
         except Exception:
-            LOGGER.exception("Unexpected LM Studio discovery failure")
-            self._emit(self.signals.failed, "LM Studio model discovery failed unexpectedly.")
+            LOGGER.exception("Unexpected local model discovery failure")
+            self._emit(self.signals.failed, "Local model discovery failed unexpectedly.")
         else:
             self._emit(self.signals.succeeded, result)
         finally:
@@ -59,7 +59,7 @@ class ModelEvaluationTask(QRunnable):
         except (LocalModelError, OSError) as exc:
             ModelDiscoveryTask._emit(self.signals.failed, str(exc))
         except Exception:
-            LOGGER.exception("Unexpected LM Studio evaluation failure")
+            LOGGER.exception("Unexpected local model evaluation failure")
             ModelDiscoveryTask._emit(
                 self.signals.failed, "Model evaluation failed unexpectedly."
             )
@@ -82,9 +82,9 @@ class ModelLoadTask(QRunnable):
         except LocalModelError as exc:
             ModelDiscoveryTask._emit(self.signals.failed, str(exc))
         except Exception:
-            LOGGER.exception("Unexpected LM Studio model-load failure")
+            LOGGER.exception("Unexpected local model model-load failure")
             ModelDiscoveryTask._emit(
-                self.signals.failed, "LM Studio model loading failed unexpectedly."
+                self.signals.failed, "Local model loading failed unexpectedly."
             )
         else:
             ModelDiscoveryTask._emit(self.signals.succeeded, instance_id)

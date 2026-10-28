@@ -1,4 +1,4 @@
-"""Constrained LM Studio narration and enemy intent for resolved combat turns."""
+"""Constrained local model narration and enemy intent for resolved combat turns."""
 
 from __future__ import annotations
 
@@ -55,7 +55,7 @@ class LocalModelCombatNarrator:
                     remember(model)
         assert last_error is not None
         raise LocalModelResponseError(
-            "LM Studio did not return usable combat narration after one retry."
+            "The local model did not return usable combat narration after one retry."
         ) from last_error
 
     @staticmethod

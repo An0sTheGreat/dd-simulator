@@ -15,6 +15,7 @@ from dd_simulator.state import GameStateDatabase, GameStateService
 from dd_simulator.state.commerce import merchant_price
 from dd_simulator.state.seed import DEMO_CAMPAIGN_ID, seed_demo_campaign
 from dd_simulator.ui import main_window as main_window_module
+from dd_simulator.ui.services.ui_preferences import UiPreferencesStore
 
 
 def test_first_run_explains_setup_and_key_controls_are_accessible(tmp_path: Path) -> None:
@@ -72,6 +73,11 @@ def test_diagnostic_export_contains_logs_but_not_campaign_data(
     (log_dir / "application.log").write_text("startup ok", encoding="utf-8")
     (evaluation_dir / "model.json").write_text('{"valid": true}', encoding="utf-8")
     destination = tmp_path / "diagnostics.zip"
+    secret = "sk-unsloth-export-marker"
+    UiPreferencesStore(tmp_path / "preferences.json").save_local_ai({
+        "mode": "unsloth", "setup_complete": True, "api_key": secret,
+        "model_directory": str(tmp_path / "models"), "model_path": "",
+    })
 
     app, window, _themes = build_application([], config_dir=tmp_path)
     monkeypatch.setattr(
@@ -83,7 +89,9 @@ def test_diagnostic_export_contains_logs_but_not_campaign_data(
 
     with zipfile.ZipFile(destination) as archive:
         names = set(archive.namelist())
+        contents = b"".join(archive.read(name) for name in names)
     assert names == {"logs/application.log", "model-evaluations/model.json"}
+    assert secret.encode() not in contents
     assert "game_state.db" not in names
     assert "preferences.json" not in names
 

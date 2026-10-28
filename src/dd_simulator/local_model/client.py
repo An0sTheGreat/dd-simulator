@@ -1,4 +1,4 @@
-"""Small localhost-only client for LM Studio's OpenAI-compatible API."""
+"""Small localhost-only client for OpenAI-compatible local model servers."""
 
 from __future__ import annotations
 
@@ -6,13 +6,14 @@ import json
 import logging
 import re
 import socket
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 
 from dd_simulator.local_model.errors import (
+    LocalModelAuthenticationError,
     LocalModelConnectionError,
     LocalModelError,
     LocalModelModelError,
@@ -28,7 +29,7 @@ LOGGER = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True)
 class LocalModelModelInfo:
-    """Presentation-safe model metadata reported by the local LM Studio server."""
+    """Presentation-safe model metadata reported by the local model server."""
 
     model_id: str
     display_name: str
@@ -39,6 +40,14 @@ class LocalModelModelInfo:
     context_length: int | None = None
     size_bytes: int | None = None
     memory_bytes: int | None = None
+
+
+def _positive_int(value: Any) -> int | None:
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed > 0 else None
 
 
 OPTION_RESPONSE_FORMAT: dict[str, Any] = {
@@ -137,10 +146,11 @@ INTRODUCTION_RESPONSE_FORMAT: dict[str, Any] = {
 class LocalModelClient:
     def __init__(
         self,
-        base_url: str = "http://localhost:1234/v1",
+        base_url: str = "http://localhost:8888/v1",
         *,
         model_id: str | None = None,
         timeout_seconds: float = 30.0,
+        api_key: str | None = None,
     ) -> None:
         normalized = base_url.rstrip("/")
         parsed = urlparse(normalized)
@@ -149,13 +159,19 @@ class LocalModelClient:
             "127.0.0.1",
             "::1",
         }:
-            raise ValueError("LM Studio must use a localhost HTTP(S) endpoint")
+            raise ValueError("The local model server must use a localhost HTTP(S) endpoint")
         if parsed.path not in {"", "/v1"}:
-            raise ValueError("LM Studio base URL must end at /v1")
+            raise ValueError("The local model server base URL must end at /v1")
         self.base_url = normalized if parsed.path == "/v1" else normalized + "/v1"
+        self.server_address = parsed.netloc
         self.model_id = model_id
         self.timeout_seconds = max(1.0, float(timeout_seconds))
+        self._api_key = (api_key or "").strip() or None
         self._plain_json_models: set[str] = set()
+
+    @property
+    def _root(self) -> str:
+        return self.base_url[:-3]
 
     def select_model(self, model_id: str | None) -> None:
         """Select one explicit model for every generation path sharing this client."""
@@ -164,70 +180,62 @@ class LocalModelClient:
         self.model_id = normalized or None
 
     def load_model(self, model_id: str) -> str:
-        """Load one installed model through LM Studio's native management API."""
+        """Load one installed model through Unsloth Studio's inference API."""
 
         normalized = " ".join(model_id.split())
         if not normalized:
             raise LocalModelModelError("Select an installed model before loading.")
-        native_root = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
-        try:
-            response = self._json_request_url(
-                native_root + "/api/v1/models/load",
-                method="POST",
-                payload={"model": normalized},
-                timeout_seconds=max(300.0, self.timeout_seconds),
-            )
-        except LocalModelConnectionError as exc:
-            raise LocalModelModelError(
-                "LM Studio could not load the model. Native model loading requires "
-                f"LM Studio 0.4 or newer. Details: {exc}"
-            ) from exc
-        if response.get("status") != "loaded":
-            raise LocalModelModelError("LM Studio did not confirm that the model loaded.")
-        return str(response.get("instance_id") or normalized).strip()
+        response = self._management_request(
+            "/api/inference/load", {"model_path": normalized}, max(300.0, self.timeout_seconds)
+        )
+        reported = str(response.get("model") or "").strip()
+        loaded = {model.model_id for model in self.discover_model_details() if model.loaded}
+        for candidate in (normalized, reported):
+            if candidate and candidate in loaded:
+                return candidate
+        raise LocalModelModelError("Unsloth Studio did not confirm that the model loaded.")
 
     def load_exclusive_model(self, model_id: str) -> str:
-        """Keep one selected model loaded and unload every other active instance."""
+        """Keep one selected model loaded and unload every other loaded model."""
 
         normalized = " ".join(model_id.split())
         if not normalized:
             raise LocalModelModelError("Select an installed model before loading.")
-        native_root = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
         try:
-            response = self._json_request_url(native_root + "/api/v1/models")
-            raw_models = response.get("models", [])
-            retained_instance = ""
-            if isinstance(raw_models, list):
-                for raw in raw_models:
-                    if not isinstance(raw, dict):
-                        continue
-                    key = str(raw.get("key") or raw.get("id") or "").strip()
-                    instances = raw.get("loaded_instances", [])
-                    if not isinstance(instances, list):
-                        continue
-                    for instance in instances:
-                        if not isinstance(instance, dict):
-                            continue
-                        instance_id = str(instance.get("id") or "").strip()
-                        if not instance_id:
-                            continue
-                        if key == normalized and not retained_instance:
-                            retained_instance = instance_id
-                            continue
-                        self._json_request_url(
-                            native_root + "/api/v1/models/unload",
-                            method="POST",
-                            payload={"instance_id": instance_id},
-                            timeout_seconds=max(120.0, self.timeout_seconds),
-                        )
-            if retained_instance:
-                return retained_instance
-            return self.load_model(normalized)
-        except LocalModelError as exc:
+            already_loaded = False
+            for model in self.discover_model_details():
+                if not model.loaded:
+                    continue
+                if model.model_id == normalized:
+                    already_loaded = True
+                    continue
+                self._management_request(
+                    "/api/inference/unload",
+                    {"model_path": model.model_id},
+                    max(120.0, self.timeout_seconds),
+                )
+            return normalized if already_loaded else self.load_model(normalized)
+        except (LocalModelConnectionError, LocalModelResponseError) as exc:
             raise LocalModelModelError(
-                "LM Studio could not switch models cleanly. Check the local server log. "
+                "Unsloth Studio could not switch models cleanly. Check its server log. "
                 f"Details: {exc}"
             ) from exc
+
+    def _management_request(
+        self, path: str, payload: dict[str, Any], timeout_seconds: float
+    ) -> dict[str, Any]:
+        try:
+            return self._json_request_url(
+                self._root + path, method="POST", payload=payload, timeout_seconds=timeout_seconds
+            )
+        except LocalModelConnectionError as exc:
+            cause = exc.__cause__
+            if isinstance(cause, HTTPError) and cause.code in {404, 405}:
+                raise LocalModelModelError(
+                    "This Unsloth Studio build does not expose model loading. Load the model "
+                    "in Unsloth Studio, then press Refresh Models."
+                ) from exc
+            raise
 
     def uses_plain_json(self, model_id: str) -> bool:
         return model_id in self._plain_json_models
@@ -267,12 +275,10 @@ class LocalModelClient:
         timeout_seconds: float | None = None,
     ) -> dict[str, Any]:
         body = None if payload is None else json.dumps(payload).encode("utf-8")
-        request = Request(
-            url,
-            data=body,
-            method=method,
-            headers={"Content-Type": "application/json"},
-        )
+        headers = {"Content-Type": "application/json"}
+        if self._api_key:
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        request = Request(url, data=body, method=method, headers=headers)
         try:
             with urlopen(  # noqa: S310 - URL is localhost-validated
                 request,
@@ -280,6 +286,11 @@ class LocalModelClient:
             ) as response:
                 raw = response.read().decode("utf-8")
         except HTTPError as exc:
+            if exc.code == 401:
+                raise LocalModelAuthenticationError(
+                    "Unsloth Studio rejected the API key. Create a key in Unsloth Studio "
+                    "(Settings -> API) and enter it in Local AI Setup."
+                ) from exc
             try:
                 detail = exc.read().decode("utf-8", errors="replace")
             except OSError:
@@ -287,139 +298,98 @@ class LocalModelClient:
             detail = re.sub(r"\s+", " ", detail).strip()[:600]
             if detail:
                 LOGGER.warning(
-                    "LM Studio HTTP %s response body: %s", exc.code, detail,
+                    "Local model server HTTP %s response body: %s", exc.code, detail,
                 )
             raise LocalModelConnectionError(
-                f"LM Studio returned HTTP {exc.code}. Check the loaded model and server log."
+                f"The local model server returned HTTP {exc.code}. "
+                "Check the loaded model and server log."
                 + (f" Server detail: {detail}" if detail else "")
             ) from exc
         except (URLError, TimeoutError, socket.timeout, OSError) as exc:
             raise LocalModelConnectionError(
-                "Could not reach LM Studio at localhost:1234. Start its local server and load a model."
+                f"Could not reach the local model server at {self.server_address}. "
+                "Make sure it is running and a model is loaded."
             ) from exc
         try:
             parsed = json.loads(raw)
         except json.JSONDecodeError as exc:
-            raise LocalModelResponseError("LM Studio returned invalid JSON.") from exc
+            raise LocalModelResponseError("The local model server returned invalid JSON.") from exc
         if not isinstance(parsed, dict):
-            raise LocalModelResponseError("LM Studio returned an unexpected response object.")
+            raise LocalModelResponseError(
+                "The local model server returned an unexpected response object."
+            )
         return parsed
 
     def is_model_loaded(self, model_id: str) -> bool:
-        """Check native LM Studio state without changing the selected model."""
+        """Check server state without changing the selected model."""
 
         normalized = " ".join(model_id.split())
         return any(
-            model.loaded and (
-                model.model_id == normalized or model.instance_id == normalized
-            )
+            model.loaded and model.model_id == normalized
             for model in self.discover_model_details()
         )
 
     def preferred_model_id(self) -> str:
-        """Use the model LM Studio reports as loaded before installed-model fallback."""
+        """Use the selected model, otherwise the first model the server reports as loaded."""
 
         if self.model_id:
             return self.model_id
-        native_root = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
-        try:
-            response = self._json_request_url(native_root + "/api/v1/models")
-            models = response.get("models")
-            if isinstance(models, list):
-                for model in models:
-                    if not isinstance(model, dict):
-                        continue
-                    instances = model.get("loaded_instances")
-                    if not isinstance(instances, list) or not instances:
-                        continue
-                    first = instances[0]
-                    if isinstance(first, dict) and str(first.get("id", "")).strip():
-                        return str(first["id"]).strip()
-                    if str(model.get("key", "")).strip():
-                        return str(model["key"]).strip()
-        except (LocalModelConnectionError, LocalModelResponseError):
-            LOGGER.warning("LM Studio native loaded-model discovery was unavailable")
         return self.discover_models()[0]
 
     def discover_model_details(self) -> tuple[LocalModelModelInfo, ...]:
         """Return installed models and their loaded state without loading anything."""
 
-        native_root = self.base_url[:-3] if self.base_url.endswith("/v1") else self.base_url
-        try:
-            response = self._json_request_url(native_root + "/api/v1/models")
-            raw_models = response.get("models")
-            if isinstance(raw_models, list):
-                details = tuple(
-                    info
-                    for raw in raw_models
-                    if isinstance(raw, dict)
-                    for info in (self._model_info(raw),)
-                    if info is not None
-                )
-                if details:
-                    return details
-        except (LocalModelConnectionError, LocalModelResponseError):
-            LOGGER.warning("LM Studio native model metadata was unavailable")
-
-        # The OpenAI-compatible endpoint normally lists only inference-ready models.
-        return tuple(
-            LocalModelModelInfo(model_id=value, display_name=value, loaded=True, instance_id=value)
-            for value in self.discover_models()
-        )
-
-    @staticmethod
-    def _model_info(raw: dict[str, Any]) -> LocalModelModelInfo | None:
-        key = str(raw.get("key") or raw.get("id") or "").strip()
-        if not key:
-            return None
-        instances = raw.get("loaded_instances")
-        loaded_instances = instances if isinstance(instances, list) else []
-        first = next((value for value in loaded_instances if isinstance(value, dict)), {})
-        instance_id = str(first.get("id") or "").strip()
-        context_value = (
-            first.get("context_length")
-            or first.get("contextLength")
-            or raw.get("context_length")
-            or raw.get("max_context_length")
-        )
-        size_value = raw.get("size_bytes") or raw.get("sizeBytes")
-        memory_value = (
-            first.get("memory_size_bytes")
-            or first.get("estimated_vram_bytes")
-            or first.get("memory_bytes")
-        )
-
-        def positive_int(value: Any) -> int | None:
-            try:
-                parsed = int(value)
-            except (TypeError, ValueError):
-                return None
-            return parsed if parsed > 0 else None
-
-        return LocalModelModelInfo(
-            model_id=key,
-            display_name=str(raw.get("display_name") or raw.get("name") or key).strip(),
-            loaded=bool(loaded_instances),
-            instance_id=instance_id,
-            architecture=str(raw.get("architecture") or raw.get("arch") or "").strip(),
-            quantization=str(raw.get("quantization") or raw.get("quantization_name") or "").strip(),
-            context_length=positive_int(context_value),
-            size_bytes=positive_int(size_value),
-            memory_bytes=positive_int(memory_value),
-        )
-
-    def discover_models(self) -> tuple[str, ...]:
         response = self._json_request("/models")
         data = response.get("data")
         if not isinstance(data, list):
-            raise LocalModelResponseError("LM Studio's model list is malformed.")
-        models = tuple(
-            str(item["id"]).strip()
-            for item in data
-            if isinstance(item, dict) and str(item.get("id", "")).strip()
+            raise LocalModelResponseError("The local model server's model list is malformed.")
+        details = tuple(
+            info
+            for raw in data
+            if isinstance(raw, dict)
+            for info in (self._model_info(raw),)
+            if info is not None
         )
+        return tuple(
+            replace(info, context_length=self._status_context_length(info.model_id))
+            if self._api_key and info.loaded and info.context_length is None
+            else info
+            for info in details
+        )
+
+    def _status_context_length(self, model_id: str) -> int | None:
+        # Best effort, keyed (Unsloth Studio) servers only: llama-server has no such route.
+        try:
+            status = self._json_request_url(
+                self._root + "/api/inference/status?" + urlencode({"model": model_id})
+            )
+        except LocalModelError:
+            return None
+        return _positive_int(status.get("context_length"))
+
+    @staticmethod
+    def _model_info(raw: dict[str, Any]) -> LocalModelModelInfo | None:
+        key = str(raw.get("id") or "").strip()
+        if not key:
+            return None
+        return LocalModelModelInfo(
+            model_id=key,
+            display_name=str(raw.get("display_name") or raw.get("name") or key).strip(),
+            loaded=raw.get("loaded", True) is not False,
+            architecture=str(raw.get("architecture") or raw.get("arch") or "").strip(),
+            quantization=str(raw.get("quantization") or "").strip(),
+            context_length=_positive_int(
+                raw.get("context_length") or raw.get("max_context_length")
+            ),
+            size_bytes=_positive_int(raw.get("size_bytes")),
+        )
+
+    def discover_models(self) -> tuple[str, ...]:
+        """Return the ids of models that are loaded and ready for inference."""
+
+        models = tuple(model.model_id for model in self.discover_model_details() if model.loaded)
         if not models:
-            raise LocalModelModelError("LM Studio is running, but no model is loaded.")
+            raise LocalModelModelError("The local model server is running, but no model is loaded.")
         return models
 
     def generate_options(
@@ -446,7 +416,7 @@ class LocalModelClient:
             except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
-                    "LM Studio option response rejected: section=%s model=%s attempt=%s reason=%s",
+                    "Local model option response rejected: section=%s model=%s attempt=%s reason=%s",
                     section,
                     model,
                     2 if retry else 1,
@@ -459,7 +429,7 @@ class LocalModelClient:
                     raise
         assert last_error is not None
         raise LocalModelResponseError(
-            "LM Studio did not return three usable options after one retry. "
+            "The local model did not return three usable options after one retry. "
             f"Last response: {last_error}"
         ) from last_error
 
@@ -479,7 +449,7 @@ class LocalModelClient:
             except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
-                    "LM Studio character profile rejected: model=%s attempt=%s reason=%s",
+                    "Local model character profile rejected: model=%s attempt=%s reason=%s",
                     model, 2 if retry else 1, exc,
                 )
                 if (
@@ -489,7 +459,7 @@ class LocalModelClient:
                     raise
         assert last_error is not None
         raise LocalModelResponseError(
-            "LM Studio did not return a valid character profile after one retry. "
+            "The local model did not return a valid character profile after one retry. "
             f"Last response: {last_error}"
         ) from last_error
 
@@ -515,7 +485,7 @@ class LocalModelClient:
             except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
-                    "LM Studio campaign details rejected: model=%s attempt=%s reason=%s",
+                    "Local model campaign details rejected: model=%s attempt=%s reason=%s",
                     model, 2 if retry else 1, exc,
                 )
                 if (
@@ -525,7 +495,7 @@ class LocalModelClient:
                     raise
         assert last_error is not None
         raise LocalModelResponseError(
-            "LM Studio did not return valid campaign details after one retry. "
+            "The local model did not return valid campaign details after one retry. "
             f"Last response: {last_error}"
         ) from last_error
 
@@ -547,7 +517,7 @@ class LocalModelClient:
             except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
-                    "LM Studio campaign introduction rejected: model=%s attempt=%s reason=%s",
+                    "Local model campaign introduction rejected: model=%s attempt=%s reason=%s",
                     model, 2 if retry else 1, exc,
                 )
                 if (
@@ -557,7 +527,7 @@ class LocalModelClient:
                     raise
         assert last_error is not None
         raise LocalModelResponseError(
-            "LM Studio did not return a usable campaign introduction after one retry. "
+            "The local model did not return a usable campaign introduction after one retry. "
             f"Last response: {last_error}"
         ) from last_error
 
@@ -771,10 +741,10 @@ class LocalModelClient:
                 "The completion JSON did not contain an options array."
             )
         if not isinstance(raw_options, list) or len(raw_options) != 3:
-            raise LocalModelResponseError("LM Studio must return exactly three options.")
+            raise LocalModelResponseError("The local model must return exactly three options.")
         option_text = tuple(cls._option_text(option) for option in raw_options)
         if any(option is None for option in option_text):
-            raise LocalModelResponseError("LM Studio options must contain text.")
+            raise LocalModelResponseError("Local model options must contain text.")
         options = tuple(
             cls._normalize_option(option, section)
             for option in option_text
@@ -791,9 +761,9 @@ class LocalModelClient:
             or option.casefold() in placeholders
             for option in options
         ):
-            raise LocalModelResponseError("LM Studio returned an empty or oversized option.")
+            raise LocalModelResponseError("The local model returned an empty or oversized option.")
         if len({option.casefold() for option in options}) != 3:
-            raise LocalModelResponseError("LM Studio returned duplicate options.")
+            raise LocalModelResponseError("The local model returned duplicate options.")
         if section == "body_description" and any(
             not re.search(r"\bheight\s*:", option, re.IGNORECASE)
             or not re.search(r"\bbuild\s*:", option, re.IGNORECASE)

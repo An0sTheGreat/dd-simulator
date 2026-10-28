@@ -1,4 +1,4 @@
-"""User-safe LM Studio integration failures."""
+"""User-safe local model integration failures."""
 
 
 class LocalModelError(RuntimeError):
@@ -7,6 +7,10 @@ class LocalModelError(RuntimeError):
 
 class LocalModelConnectionError(LocalModelError):
     """The local server could not be reached in time."""
+
+
+class LocalModelAuthenticationError(LocalModelError):
+    """The local server rejected the configured API key (HTTP 401)."""
 
 
 class LocalModelModelError(LocalModelError):

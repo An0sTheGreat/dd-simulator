@@ -1,4 +1,4 @@
-"""Optional LM Studio phrasing for already-resolved NPC dialogue facts."""
+"""Optional local model phrasing for already-resolved NPC dialogue facts."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ class LocalModelDialogueNarrator:
             except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
-                    "LM Studio dialogue response rejected: model=%s attempt=%s reason=%s",
+                    "Local model dialogue response rejected: model=%s attempt=%s reason=%s",
                     model,
                     attempt + 1,
                     exc,
@@ -60,10 +60,10 @@ class LocalModelDialogueNarrator:
         assert last_error is not None
         if model_reported_unloaded:
             raise LocalModelResponseError(
-                "The selected LM Studio model appears to be unloaded. Reload it in Settings."
+                "The selected local model appears to be unloaded. Reload it in Settings."
             ) from last_error
         raise LocalModelResponseError(
-            "LM Studio did not return usable NPC dialogue after bounded compatibility recovery. "
+            "The local model did not return usable NPC dialogue after bounded compatibility recovery. "
             f"Last response: {last_error}"
         ) from last_error
 

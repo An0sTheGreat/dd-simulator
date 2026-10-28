@@ -9,7 +9,7 @@ import socket
 import subprocess
 import sys
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from threading import Event
 from typing import Any, Callable
@@ -17,6 +17,7 @@ from urllib.request import Request, urlopen
 
 
 LOCAL_MODEL_ALIAS = "dnd-simulator-local"
+UNSLOTH_DEFAULT_PORT = 8888
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,17 +63,31 @@ class LocalAiConfiguration:
     model_directory: str = ""
     model_path: str = ""
     model_id: str = LOCAL_MODEL_ALIAS
+    unsloth_port: int = UNSLOTH_DEFAULT_PORT
+    api_key: str = field(default="", repr=False)
+
+    @property
+    def unsloth_base_url(self) -> str:
+        return f"http://127.0.0.1:{self.unsloth_port}/v1"
 
     @classmethod
     def from_mapping(cls, raw: dict[str, Any]) -> "LocalAiConfiguration":
         mode = str(raw.get("mode") or "")
-        valid_mode = mode in {"llama_cpp", "lm_studio"}
+        if mode == "lm_studio":  # Phase 29: the external-server mode moved to Unsloth Studio.
+            mode = "unsloth"
+        valid_mode = mode in {"llama_cpp", "unsloth"}
+        try:
+            port = int(raw.get("unsloth_port") or UNSLOTH_DEFAULT_PORT)
+        except (TypeError, ValueError):
+            port = UNSLOTH_DEFAULT_PORT
         return cls(
             mode=mode if valid_mode else "",
             setup_complete=bool(raw.get("setup_complete")) and valid_mode,
             model_directory=str(raw.get("model_directory") or default_model_directory()),
             model_path=str(raw.get("model_path") or ""),
             model_id=str(raw.get("model_id") or LOCAL_MODEL_ALIAS),
+            unsloth_port=port if 0 < port < 65536 else UNSLOTH_DEFAULT_PORT,
+            api_key=str(raw.get("api_key") or ""),
         )
 
     def to_mapping(self) -> dict[str, Any]:
@@ -83,7 +98,7 @@ class LocalAiConfiguration:
             return False
         if self.mode == "llama_cpp":
             return Path(self.model_path).is_file() and bool(runtime_executables())
-        return self.mode == "lm_studio"
+        return self.mode == "unsloth" and bool(self.api_key.strip())
 
 
 class LocalAiError(RuntimeError):

@@ -98,7 +98,7 @@ class DialogueService:
             except Exception as exc:
                 LOGGER.warning("NPC dialogue generation failed before commit: %s", exc)
                 raise GameStateError(
-                    "LM Studio could not generate this NPC response. Your input was not "
+                    "The local model could not generate this NPC response. Your input was not "
                     f"committed; check the loaded model and retry. Details: {exc}"
                 ) from exc
 

@@ -30,27 +30,50 @@ def _themes(tmp_path: Path):  # type: ignore[no-untyped-def]
     ).available_themes()
 
 
-def test_client_loads_installed_model_through_native_api(monkeypatch) -> None:
-    client = LocalModelClient()
+def test_client_loads_installed_model_through_unsloth_inference_api(monkeypatch) -> None:
+    client = LocalModelClient(api_key="test-key")
     calls: list[tuple[str, str, dict[str, object] | None, float | None]] = []
 
     def request(  # type: ignore[no-untyped-def]
         url: str, *, method: str = "GET", payload=None, timeout_seconds=None
     ):
         calls.append((url, method, payload, timeout_seconds))
-        return {"status": "loaded", "instance_id": "gemma-loaded"}
+        if url.endswith("/api/inference/load"):
+            return {
+                "status": "loaded", "model": "gemma-model",
+                "display_name": "Gemma", "inference": {},
+            }
+        if url.endswith("/v1/models"):
+            return {"data": [{"id": "gemma-model", "loaded": True, "context_length": 8192}]}
+        raise AssertionError(url)
 
     monkeypatch.setattr(client, "_json_request_url", request)
 
-    assert client.load_model("gemma-model") == "gemma-loaded"
+    assert client.load_model("gemma-model") == "gemma-model"
     assert calls == [
         (
-            "http://localhost:1234/api/v1/models/load",
+            "http://localhost:8888/api/inference/load",
             "POST",
-            {"model": "gemma-model"},
+            {"model_path": "gemma-model"},
             300.0,
-        )
+        ),
+        ("http://localhost:8888/v1/models", "GET", None, None),
     ]
+
+
+def test_missing_load_route_tells_user_to_load_in_unsloth_studio(monkeypatch) -> None:
+    from urllib.error import HTTPError
+
+    import pytest
+
+    from dd_simulator.local_model import LocalModelModelError
+
+    def missing(request, timeout):  # type: ignore[no-untyped-def]
+        raise HTTPError(request.full_url, 404, "Not Found", {}, None)
+
+    monkeypatch.setattr("dd_simulator.local_model.client.urlopen", missing)
+    with pytest.raises(LocalModelModelError, match="does not expose model loading"):
+        LocalModelClient(api_key="test-key").load_model("gemma-model")
 
 
 def test_unloaded_model_is_selectable_and_emits_explicit_load(tmp_path: Path) -> None:

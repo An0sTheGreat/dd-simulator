@@ -1,4 +1,4 @@
-"""Optional LM Studio prose for mechanically resolved travel and camping."""
+"""Optional local model prose for mechanically resolved travel and camping."""
 
 from __future__ import annotations
 
@@ -82,7 +82,7 @@ class LocalModelTravelNarrator:
                     remember(model)
         assert last_error is not None
         raise LocalModelResponseError(
-            "LM Studio did not return usable travel narration after one compatibility retry."
+            "The local model did not return usable travel narration after one compatibility retry."
         ) from last_error
 
     @staticmethod

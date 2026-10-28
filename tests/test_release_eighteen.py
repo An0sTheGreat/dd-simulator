@@ -27,37 +27,38 @@ def _app() -> QApplication:
 
 
 def test_model_discovery_lists_loaded_and_installed_metadata(monkeypatch) -> None:
-    client = LocalModelClient()
-    monkeypatch.setattr(
-        client,
-        "_json_request_url",
-        lambda _url: {
-            "models": [
-                {"key": "installed-model", "display_name": "Installed", "loaded_instances": []},
-                {
-                    "key": "gemma-model",
-                    "display_name": "Gemma 4 E4B",
-                    "architecture": "gemma",
-                    "quantization": "Q4_K_M",
-                    "size_bytes": 4_000_000_000,
-                    "loaded_instances": [
-                        {
-                            "id": "gemma-loaded",
-                            "context_length": 62_000,
-                            "estimated_vram_bytes": 6_000_000_000,
-                        }
-                    ],
-                },
-            ]
-        },
-    )
+    client = LocalModelClient(api_key="test-key")
+
+    def request(url, **_kwargs):  # type: ignore[no-untyped-def]
+        if url.endswith("/v1/models"):
+            return {
+                "data": [
+                    {"id": "installed-model", "display_name": "Installed", "loaded": False},
+                    {
+                        "id": "gemma-model",
+                        "display_name": "Gemma 4 E4B",
+                        "architecture": "gemma",
+                        "quantization": "Q4_K_M",
+                        "size_bytes": 4_000_000_000,
+                        "loaded": True,
+                    },
+                    {"id": "llama-server-model", "context_length": 32_768},
+                ]
+            }
+        assert url == "http://localhost:8888/api/inference/status?model=gemma-model"
+        return {"context_length": 62_000}
+
+    monkeypatch.setattr(client, "_json_request_url", request)
 
     models = client.discover_model_details()
 
-    assert [model.loaded for model in models] == [False, True]
-    assert models[1].instance_id == "gemma-loaded"
+    # A missing "loaded" field means loaded: llama-server lists only its served model.
+    assert [model.loaded for model in models] == [False, True, True]
+    assert models[1].model_id == "gemma-model"
+    assert models[1].size_bytes == 4_000_000_000
     assert models[1].context_length == 62_000
-    assert models[1].memory_bytes == 6_000_000_000
+    assert models[2].context_length == 32_768
+    assert client.discover_models() == ("gemma-model", "llama-server-model")
 
 
 def test_settings_model_picker_selects_loaded_model_by_default() -> None:
@@ -86,12 +87,12 @@ def test_settings_model_picker_selects_loaded_model_by_default() -> None:
 
 def test_selected_model_preference_survives_ui_reset(tmp_path: Path) -> None:
     store = UiPreferencesStore(tmp_path / "preferences.json")
-    store.save_lm_studio({"model_id": "gemma-loaded"})
+    store.save_unsloth({"model_id": "gemma-loaded"})
     store.save_ui({"font_size": "large"})
     store.reset_ui()
 
     assert store.load_ui() == {}
-    assert store.load_lm_studio() == {"model_id": "gemma-loaded"}
+    assert store.load_unsloth() == {"model_id": "gemma-loaded"}
 
 
 def test_model_evaluation_isolated_metrics_and_report(monkeypatch, tmp_path: Path) -> None:

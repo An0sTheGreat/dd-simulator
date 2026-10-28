@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QFileDialog, QHBoxLayout, QLineEdit, QProgressBar, QVBoxLayout
+from PySide6.QtWidgets import (
+    QFileDialog, QHBoxLayout, QLineEdit, QProgressBar, QSpinBox, QVBoxLayout,
+)
 
 from dd_simulator.local_ai import (
     GEMMA_4_E4B_DISPLAY_NAME,
@@ -31,7 +33,7 @@ class LocalAiSetupPanel(DashboardPanel):
         ))
         self.content_layout.addWidget(semantic_label("BEFORE YOU START", text_role="heading"))
         self.content_layout.addWidget(semantic_label(
-            "1. Choose the recommended 2.5 GB model for most systems, or connect LM Studio.\n"
+            "1. Choose the recommended 2.5 GB model for most systems, or connect Unsloth Studio.\n"
             "2. Keep at least 5 GB of storage free and close other GPU-heavy applications.\n"
             "3. After setup, run the 3-sample evaluation in Settings before creating a campaign.",
             text_role="secondary", word_wrap=True,
@@ -64,32 +66,48 @@ class LocalAiSetupPanel(DashboardPanel):
             )
         )
         self.large_model_button = SemanticButton(
-            f"Use {GEMMA_4_E4B_DISPLAY_NAME} via LM Studio — Suggested",
+            f"Use {GEMMA_4_E4B_DISPLAY_NAME} via Unsloth Studio — Suggested",
             role="secondary",
         )
         self.large_model_button.setObjectName("installLargeLocalAiButton")
         self.large_model_button.clicked.connect(
             lambda: self.configuration_requested.emit(
-                "lm_studio", self.model_directory.text().strip(), ""
+                "unsloth", self.model_directory.text().strip(), ""
             )
         )
         self.existing_button = SemanticButton("Select Existing GGUF Model", role="secondary")
         self.existing_button.setObjectName("selectExistingGgufButton")
         self.existing_button.clicked.connect(self._select_existing_model)
-        self.lm_studio_button = SemanticButton("Connect to LM Studio", role="secondary")
-        self.lm_studio_button.setObjectName("connectLmStudioButton")
-        self.lm_studio_button.clicked.connect(
+        self.unsloth_button = SemanticButton("Connect to Unsloth Studio", role="secondary")
+        self.unsloth_button.setObjectName("connectUnslothButton")
+        self.unsloth_button.clicked.connect(
             lambda: self.configuration_requested.emit(
-                "lm_studio", self.model_directory.text().strip(), ""
+                "unsloth", self.model_directory.text().strip(), ""
             )
         )
         self.choice_buttons = (
             self.recommended_button, self.large_model_button, self.existing_button,
-            self.lm_studio_button,
+            self.unsloth_button,
         )
         for button in self.choice_buttons:
             choices.addWidget(button)
         self.content_layout.addLayout(choices)
+
+        self.content_layout.addWidget(semantic_label("UNSLOTH STUDIO", text_role="heading"))
+        unsloth_row = QHBoxLayout()
+        self.unsloth_port = QSpinBox()
+        self.unsloth_port.setObjectName("unslothPort")
+        self.unsloth_port.setAccessibleName("Unsloth Studio port")
+        self.unsloth_port.setRange(1, 65535)
+        self.unsloth_port.setValue(configuration.unsloth_port)
+        unsloth_row.addWidget(self.unsloth_port)
+        self.api_key = QLineEdit(configuration.api_key)
+        self.api_key.setObjectName("unslothApiKey")
+        self.api_key.setAccessibleName("Unsloth Studio API key")
+        self.api_key.setPlaceholderText("API key from Unsloth Studio (Settings -> API)")
+        self.api_key.setEchoMode(QLineEdit.EchoMode.Password)
+        unsloth_row.addWidget(self.api_key, 1)
+        self.content_layout.addLayout(unsloth_row)
 
         self.progress = QProgressBar()
         self.progress.setObjectName("localAiSetupProgress")
@@ -135,6 +153,8 @@ class LocalAiSetupPanel(DashboardPanel):
     def set_busy(self, busy: bool, message: str, *, downloading: bool = False) -> None:
         self.model_directory.setEnabled(not busy)
         self.browse_button.setEnabled(not busy)
+        self.unsloth_port.setEnabled(not busy)
+        self.api_key.setEnabled(not busy)
         for button in self.choice_buttons:
             button.setEnabled(not busy)
         self.progress.setVisible(downloading)

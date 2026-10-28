@@ -1,4 +1,4 @@
-"""Structured non-combat turn generation through LM Studio."""
+"""Structured non-combat turn generation through the local model."""
 
 from __future__ import annotations
 
@@ -186,7 +186,7 @@ class LocalModelActionResolver:
             except LocalModelError as exc:
                 last_error = exc
                 LOGGER.warning(
-                    "LM Studio turn response rejected: model=%s attempt=%s reason=%s shape=%s",
+                    "Local model turn response rejected: model=%s attempt=%s reason=%s shape=%s",
                     model,
                     attempt + 1,
                     exc,
@@ -204,10 +204,10 @@ class LocalModelActionResolver:
         assert last_error is not None
         if model_reported_unloaded:
             raise LocalModelResponseError(
-                "The selected LM Studio model appears to be unloaded. Reload it in Settings."
+                "The selected local model appears to be unloaded. Reload it in Settings."
             ) from last_error
         raise LocalModelResponseError(
-            "LM Studio did not return a usable turn after bounded compatibility recovery. "
+            "The local model did not return a usable turn after bounded compatibility recovery. "
             f"Last response: {last_error}"
         ) from last_error
 

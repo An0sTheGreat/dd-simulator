@@ -236,7 +236,7 @@ class NarrativePanel(DashboardPanel):
         action_input.setAccessibleName("Player action")
         action_input.setPlaceholderText("Type your action...")
         action_input.setMaxLength(2000)
-        action_input.setToolTip("Submit a non-combat action for local LM Studio resolution")
+        action_input.setToolTip("Submit a non-combat action for local model resolution")
         action_input.returnPressed.connect(self._request_submission)
         submit = SemanticButton(
             "Send",
@@ -326,7 +326,7 @@ class NarrativePanel(DashboardPanel):
         self.cancel_button.setVisible(True)
         self.retry_button.setVisible(False)
         self.feedback.setProperty("feedbackState", "warning")
-        self.feedback.setText("Resolving this non-combat action with local LM Studio...")
+        self.feedback.setText("Resolving this non-combat action with the local model...")
         self._refresh_feedback_style()
 
     def show_resolution_error(self, message: str) -> None:

@@ -183,7 +183,7 @@ def test_noncombat_turn_is_rejected_while_encounter_is_active() -> None:
 
     class Provider:
         def resolve_action(self, **_kwargs):  # type: ignore[no-untyped-def]
-            raise AssertionError("LM Studio must not be called during active combat")
+            raise AssertionError("The local model must not be called during active combat")
 
     with pytest.raises(Exception, match="Combat is active"):
         service.resolve_player_action("Look around", Provider())
