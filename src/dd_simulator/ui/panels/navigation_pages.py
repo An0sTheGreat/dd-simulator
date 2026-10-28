@@ -300,15 +300,16 @@ class CharacterSheetPage(NavigationPage):
             skills_layout.addWidget(row)
         skills_layout.addWidget(powers)
 
-        grid.addWidget(attacks, 0, 2)
-        grid.addWidget(vitals, 0, 3)
+        # The right half runs top to bottom on its own, so its columns are not held to
+        # the height of the Identity and Ability Scores stack on the left.
         for column, cards in enumerate((
             (saves, appearance),
             (role, possessions),
-            (equipment,),
-            (skills,),
         )):
             grid.addLayout(_stack(*cards), 1, column)
+            grid.setColumnStretch(column, 1)
+        for column, cards in ((2, (attacks, equipment)), (3, (vitals, skills))):
+            grid.addLayout(_stack(*cards), 0, column, 2, 1)
             grid.setColumnStretch(column, 1)
         grid.setRowStretch(1, 1)
 
