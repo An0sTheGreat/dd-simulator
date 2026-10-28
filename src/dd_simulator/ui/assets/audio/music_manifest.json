@@ -1,0 +1,123 @@
+{
+  "contexts": {
+    "battle": [
+      {
+        "file": "battle/combat_1_better_tomorrow_metal.ogg"
+      },
+      {
+        "file": "battle/combat_2_better_tomorrow.ogg"
+      },
+      {
+        "file": "battle/combat_3_last_day_long.ogg"
+      },
+      {
+        "file": "battle/combat_4_last_day.ogg"
+      },
+      {
+        "file": "battle/combat_5_revenge.ogg"
+      },
+      {
+        "file": "battle/combat_6_ready.ogg"
+      },
+      {
+        "file": "battle/combat_7_survive.ogg"
+      }
+    ],
+    "boss": [
+      {
+        "file": "boss/music_boss.wav"
+      }
+    ],
+    "travel_road": [
+      {
+        "file": "menu/music_menu.mp3"
+      }
+    ],
+    "forest_wilderness": [
+      {
+        "file": "forest_wilderness/music_forest_day.mp3",
+        "time": "day"
+      },
+      {
+        "file": "forest_wilderness/music_forest_night.mp3",
+        "time": "night"
+      }
+    ],
+    "town": [
+      {
+        "file": "town/music_village_day.mp3",
+        "time": "day"
+      },
+      {
+        "file": "town/music_village_night.mp3",
+        "time": "night"
+      }
+    ],
+    "tavern_inn": [
+      {
+        "file": "town/music_village_day.mp3"
+      }
+    ],
+    "exploration_cave": [
+      {
+        "file": "exploration_cave/music_cave.wav"
+      }
+    ],
+    "menu": [
+      {
+        "file": "menu/music_menu.mp3"
+      }
+    ]
+  },
+  "ambience": {
+    "weather": {
+      "rain": [
+        {
+          "file": "ambience/amb_rain.wav"
+        }
+      ]
+    },
+    "biome": {
+      "forest": [
+        {
+          "file": "ambience/amb_forest_day.wav",
+          "time": "day"
+        },
+        {
+          "file": "ambience/amb_forest_night.wav",
+          "time": "night"
+        }
+      ],
+      "swamp": [
+        {
+          "file": "ambience/amb_forest_day.wav",
+          "time": "day"
+        },
+        {
+          "file": "ambience/amb_forest_night.wav",
+          "time": "night"
+        }
+      ],
+      "village": [
+        {
+          "file": "ambience/amb_village.wav"
+        }
+      ],
+      "castle": [
+        {
+          "file": "ambience/amb_village.wav"
+        }
+      ],
+      "cave": [
+        {
+          "file": "ambience/amb_cave.wav"
+        }
+      ],
+      "dungeon": [
+        {
+          "file": "ambience/amb_cave.wav"
+        }
+      ]
+    }
+  }
+}

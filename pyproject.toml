@@ -31,6 +31,8 @@ where = ["src"]
 [tool.setuptools.package-data]
 dd_simulator = [
     "state/presets/*.json",
+    "ui/assets/audio/*.json",
+    "ui/assets/audio/*/*",
     "ui/assets/codex/*.png",
     "ui/assets/codex/markers/*.png",
     "ui/assets/codex/portraits/*/*.png",
