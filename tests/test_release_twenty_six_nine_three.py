@@ -167,3 +167,24 @@ def test_final_quest_gate_rejects_investigation_until_outcome_is_resolved() -> N
         )
         assert "Completed objective" in summary
     database.close()
+
+
+def test_sync_clamps_saved_uses_to_a_lowered_maximum() -> None:
+    database, service, _campaign_id = initialized_demo()
+    with database.transaction() as connection:
+        character = connection.execute(
+            "SELECT id, character_class, level FROM characters WHERE is_player = 1"
+        ).fetchone()
+        # An older save recorded 3/3 uses before the catalog lowered the maximum to 2.
+        connection.execute(
+            "UPDATE abilities SET current_uses = 3, maximum_uses = 3 "
+            "WHERE character_id = ? AND action_key = 'field_dressing'",
+            (character["id"],),
+        )
+        sync_character_combat_catalog(
+            connection, str(character["id"]),
+            character_class=str(character["character_class"]), level=int(character["level"]),
+        )
+    skills = {skill.name: skill for skill in service.load_active_dashboard().combat_skills}
+    assert "2/2 uses" in skills["Field Dressing"].resource_label.split(" | ")
+    database.close()
