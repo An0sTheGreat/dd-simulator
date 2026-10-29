@@ -58,3 +58,24 @@ def test_scaled_displays_get_the_backdrop_at_device_resolution() -> None:
     # drawn 1:1 on a 125 % display, so no rescale smooths the dither away
     assert (pixmap.width(), pixmap.height()) == (2000, 1125)
     assert pixmap.devicePixelRatio() == 1.25
+
+
+def test_shipped_backgrounds_are_painted_without_the_jpg_staircase() -> None:
+    from dd_simulator.ui.widgets import backdrop
+
+    QApplication.instance() or QApplication([])
+    size = QSize(1720, 720)
+    truth = backdrop._paint_recipe("background_stone", size)  # 16-bit reference gradient
+    smooth = dithered(str(BACKGROUND), size).toImage()
+
+    def patch_error(x0: int, y0: int, n: int = 32) -> float:
+        cells = [(x, y) for x in range(x0, x0 + n) for y in range(y0, y0 + n // 2)]
+        shown = sum(smooth.pixelColor(x, y).red() for x, y in cells) / len(cells)
+        true = sum(truth.pixelColor(x, y).redF() for x, y in cells) / len(cells) * 255
+        return abs(shown - true)
+
+    # Averaged over a patch, the dithered 8-bit image tracks the true gradient to a small
+    # fraction of a step. The stretched JPG's bands were off by up to a whole step, and
+    # noise rounded to whole steps (an 8-bit tile) still left about a third of one.
+    errors = [patch_error(860, y) for y in range(0, 690, 30)] + [patch_error(x, 150) for x in range(0, 1680, 60)]
+    assert max(errors) < 0.15

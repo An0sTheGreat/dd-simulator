@@ -63,6 +63,7 @@ def top_glow(p: QPainter, w: int, h: int, stops: tuple[tuple[float, QColor], ...
     p.restore()
 
 
+# ui/widgets/backdrop.py RECIPES repaints these two at runtime; keep them in step.
 def stone(out: Path) -> None:
     """High Fantasy: smooth dark umber lit by candlelight from the top.
 
