@@ -95,6 +95,12 @@
       "summary": "22 tracks by context with a replaceable manifest (`docs/AUDIO.md`); tavern_inn still uses the village day placeholder."
     },
     {
+      "id": "UI",
+      "title": "Dashboard polish round",
+      "status": "done",
+      "summary": "Rarity glow, wrapping inventory, hotbar, power levels, interface sounds, HDR-safe backdrop, app icon, parallel test suite (247 s to ~45 s). Merged to main at fef7e2d; work now continues directly on main."
+    },
+    {
       "id": "P33",
       "title": "Target hardware profile and final model selection",
       "status": "next",
@@ -171,7 +177,7 @@
       "label": "Test suite",
       "value": "465 passed, 0 failed",
       "status": "healthy",
-      "detail": "Full suite, offscreen, 2026-10-28 (HANDOFF.md)."
+      "detail": "Full suite, offscreen, 2026-10-28 (HANDOFF.md). Now runs in parallel via pytest-xdist (~45 s); routine changes run only the covering tests."
     },
     {
       "label": "Packaged smoke",
@@ -190,6 +196,12 @@
       "value": "Unverified",
       "status": "warning",
       "detail": "MP3/OGG tracks supplied as CC0; verify before public release (ASSET_CREDITS.md)."
+    },
+    {
+      "label": "Hotbar in live combat",
+      "value": "Not tried",
+      "status": "warning",
+      "detail": "Covered by tests only; not yet used in a real encounter."
     }
   ],
   "systems": [
@@ -264,18 +276,25 @@
     {
       "name": "Concept T UI",
       "status": "active",
-      "summary": "Main window, codex widgets, scene and conversation views, themes.",
+      "summary": "Main window, codex widgets, scene and conversation views, themes. Recent on main: 1-0 quick-access hotbar with full power cards, abilities/spells grouped by level, wrapping bag grid (min 36 slots), full-width paperdoll and skill columns, font-size slider with Apply, 16-bit dithered backdrop (no banding on HDR/ultrawide), app icon.",
       "paths": [
         "src/dd_simulator/ui/main_window.py",
         "src/dd_simulator/ui/widgets/*",
         "src/dd_simulator/ui/panels/*",
-        "src/dd_simulator/ui/themes/*"
+        "src/dd_simulator/ui/themes/*",
+        "src/dd_simulator/ui/widgets/hotbar.py",
+        "src/dd_simulator/ui/widgets/backdrop.py"
+      ],
+      "tags": [
+        "hotbar",
+        "HDR dither",
+        "Concept B chrome"
       ]
     },
     {
       "name": "Item and power icons",
       "status": "active",
-      "summary": "Library icon manifests and resolvers.",
+      "summary": "Library icon manifests and resolvers; rarity shown as a masked glow behind every item icon, with an optional pulse (Settings).",
       "paths": [
         "src/dd_simulator/ui/item_icons.py",
         "src/dd_simulator/ui/power_icons.py",
@@ -286,11 +305,13 @@
     {
       "name": "Music and ambience",
       "status": "active",
-      "summary": "Context music with crossfades, ambience by biome and weather.",
+      "summary": "Context music with crossfades, ambience by biome and weather, plus interface sounds (hover, click, page, pick-up/drop, equip, coins, deny) with their own volume; no ability or spell sounds.",
       "paths": [
         "src/dd_simulator/ui/audio.py",
         "src/dd_simulator/ui/assets/audio/*",
-        "scripts/import_audio.py"
+        "scripts/import_audio.py",
+        "src/dd_simulator/ui/assets/audio/ui/*",
+        "scripts/import_ui_sfx.py"
       ]
     },
     {
