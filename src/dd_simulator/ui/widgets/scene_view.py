@@ -627,6 +627,9 @@ class ChoiceGrid(QWidget):
         self.setObjectName("choiceGrid")
         self.combat_actions: tuple[tuple[str, CombatAction], ...] = ()
         self.target_id: str | None = None
+        # set by the window: while it returns True (in combat) the number keys belong
+        # to the hotbar instead of the choices
+        self.keys_deferred = lambda: False
         self._placeholder = f"Or write what {actor} does…" if actor else "Or describe your action…"
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -750,6 +753,7 @@ class ChoiceGrid(QWidget):
             and watched.window() is self.window()
             and self.isVisible()
             and not isinstance(QApplication.focusWidget(), TEXT_ENTRY_WIDGETS)
+            and not self.keys_deferred()
         ):
             self.activate_choice(CHOICE_KEYS[event.key()])
             return True

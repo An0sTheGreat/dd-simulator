@@ -11,7 +11,7 @@ import re
 import sys
 import zipfile
 
-from PySide6.QtCore import QPoint, QSize, QThreadPool, QTimer, Qt, Signal
+from PySide6.QtCore import QEvent, QPoint, QSize, QThreadPool, QTimer, Qt, Signal
 from PySide6.QtGui import QCloseEvent, QFont, QGuiApplication
 from PySide6.QtWidgets import (
     QComboBox,
@@ -121,6 +121,7 @@ from dd_simulator.ui.widgets.codex_character import (
     SkillDetailList,
 )
 from dd_simulator.ui.widgets.backdrop import BackdropRoot
+from dd_simulator.ui.widgets.hotbar import ATTACK_KEY, Hotbar, default_slots, hotbar_actions
 from dd_simulator.ui.widgets.conversation_view import ConversationView
 from dd_simulator.ui.widgets.crafting_page import CraftingPage
 from dd_simulator.ui.widgets.scene_view import ElidedLabel, SceneView
@@ -178,31 +179,45 @@ class RatioSplitter(QSplitter):
         total = sum(self.sizes())
         if total > 0:
             first = round(total * self.ratio)
-            self.setSizes([first, total - first])
+            QSplitter.setSizes(self, [first, total - first])  # keeps self.ratio as is
 
     def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         super().resizeEvent(event)
         self.apply_ratio()
+
+    def setSizes(self, sizes) -> None:  # type: ignore[no-untyped-def]
+        # sizes set from code become the ratio to keep (not a user choice to save)
+        super().setSizes(sizes)
+        total = sum(self.sizes())
+        if total > 0:
+            self.ratio = self.sizes()[0] / total
+
+    def event(self, event) -> bool:  # type: ignore[no-untyped-def]
+        # A child's new size hint makes QSplitter redistribute; keep the ratio instead.
+        handled = super().event(event)
+        if event.type() == QEvent.Type.LayoutRequest:
+            self.apply_ratio()
+        return handled
 
 
 class CodexColumn(QWidget):
     """Left column: the skills row is tall enough for every skill, with the paperdoll
     scaled to match; the inventory and powers cards take what is left."""
 
-    def bind(self, strip, paperdoll, skills, inventory) -> None:  # type: ignore[no-untyped-def]
-        self._parts = (strip, paperdoll, skills, inventory)
+    def bind(self, strip, paperdoll, skills, hotbar, inventory) -> None:  # type: ignore[no-untyped-def]
+        self._parts = (strip, paperdoll, skills, hotbar, inventory)
 
     def fit(self) -> None:
         parts = getattr(self, "_parts", None)
         if parts is None:
             return
-        strip, paperdoll, skills, inventory = parts
+        strip, paperdoll, skills, hotbar, inventory = parts
         margins = self.layout().contentsMargins()
         spacing = self.layout().spacing()
         card_chrome = inventory.sizeHint().height() - inventory.scroll.height()
         free = (
-            self.height() - margins.top() - margins.bottom() - 2 * spacing
-            - strip.sizeHint().height() - card_chrome
+            self.height() - margins.top() - margins.bottom() - 3 * spacing
+            - strip.sizeHint().height() - hotbar.sizeHint().height() - card_chrome
         )
         # five bag rows, linear in the scale
         rows = CARD_VISIBLE_ROWS * CARD_SLOT_SIZE
@@ -348,6 +363,7 @@ class MainWindow(QMainWindow):
         self.font_size_preference = 100
         self.reduced_motion_preference = False
         self.glow_pulse_preference = True
+        self.hotbar_preference: list[str | None] | None = None  # None: first-run defaults
         self.music_volume_preference = DEFAULT_MUSIC_VOLUME
         self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
         self.audio_muted_preference = False
@@ -984,6 +1000,13 @@ class MainWindow(QMainWindow):
         row.addWidget(self.paperdoll_panel)
         row.addWidget(self.skill_detail_list, 1)
         layout.addLayout(row)
+        # one row of ten quick slots across the column, above the bag and powers
+        self.hotbar = Hotbar()
+        choices = hotbar_actions(dashboard.abilities, dashboard.spells)
+        self.hotbar.set_actions(choices, self.hotbar_preference or default_slots(choices))
+        self.hotbar.slot_used.connect(self._use_hotbar)
+        self.hotbar.slots_changed.connect(self._on_hotbar_changed)
+        layout.addWidget(self.hotbar)
         self.inventory_card = InventoryCard(
             dashboard.inventory,
             capacity=dashboard.inventory_capacity,
@@ -993,7 +1016,8 @@ class MainWindow(QMainWindow):
         self.codex_card_row = CodexCardRow(self.inventory_card, self.powers_card)
         layout.addWidget(self.codex_card_row, 1)
         codex.bind(
-            self.character_strip, self.paperdoll_panel, self.skill_detail_list, self.inventory_card
+            self.character_strip, self.paperdoll_panel, self.skill_detail_list, self.hotbar,
+            self.inventory_card,
         )
 
         self.scene_view = SceneView(
@@ -1005,6 +1029,10 @@ class MainWindow(QMainWindow):
             actor=(dashboard.player.name.split() or [None])[0],
         )
         self.scene_view.set_clock(dashboard.location.day, dashboard.location.turn_number)
+        # in combat the number keys use the hotbar; otherwise 1-6 pick a choice
+        self.scene_view.choice_grid.keys_deferred = lambda: (
+            self.dashboard.combat is not None and self.dashboard.combat.status == "active"
+        )
         self.conversation_view = ConversationView(
             reduced_motion=self.reduced_motion_preference
         )
@@ -1064,6 +1092,35 @@ class MainWindow(QMainWindow):
         self.crafting_page.craft_requested.connect(self._request_crafting)
         page.layout.addWidget(self.crafting_page, 1)
         return page
+
+    def _use_hotbar(self, key: str) -> None:
+        if key != ATTACK_KEY:
+            self._activate_power(key)
+            return
+        combat = self.dashboard.combat
+        if combat is None or combat.status != "active":
+            self._show_status_message("Attacks are used during combat")
+            return
+        self._resolve_combat_action(
+            CombatCommand(CombatAction.ATTACK, target_id=self.scene_view.choice_grid.target_id)
+        )
+
+    def _on_hotbar_changed(self, keys: list) -> None:
+        self.hotbar_preference = keys
+        self.save_ui_preferences()
+
+    def keyPressEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        # Number keys reach the window only when no text field took them.
+        hotbar = getattr(self, "hotbar", None)
+        if (
+            hotbar is not None
+            and self.current_page == "dashboard"
+            and event.modifiers() in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.KeypadModifier)
+            and hotbar.use_key(event.text())
+        ):
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     def _activate_power(self, key: str) -> None:
         combat = self.dashboard.combat
@@ -2421,6 +2478,11 @@ class MainWindow(QMainWindow):
         if isinstance(reduced_motion, bool):
             self.reduced_motion_preference = reduced_motion
             self.settings_panel.select_reduced_motion(reduced_motion)
+        hotbar = ui.get("hotbar")
+        if isinstance(hotbar, list) and all(key is None or isinstance(key, str) for key in hotbar):
+            self.hotbar_preference = hotbar[:10]
+            if getattr(self, "hotbar", None) is not None:
+                self.hotbar.set_actions(tuple(self.hotbar.actions.values()), self.hotbar_preference)
         glow_pulse = ui.get("glow_pulse")
         if isinstance(glow_pulse, bool):
             self._on_glow_pulse_changed(glow_pulse, save=False)
@@ -2461,6 +2523,7 @@ class MainWindow(QMainWindow):
                 "font_size": self.font_size_preference,
                 "reduced_motion": self.reduced_motion_preference,
                 "glow_pulse": self.glow_pulse_preference,
+                "hotbar": self.hotbar_preference,
                 "event_filter": self.navigation_pages["journal"].event_log.current_filter(),
                 "music_volume": self.music_volume_preference,
                 "ambience_volume": self.ambience_volume_preference,

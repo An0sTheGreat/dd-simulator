@@ -179,9 +179,9 @@ def _ability_stats(
         f"{definition.save_type} DC {definition.save_dc}"
         if definition.save_type else "None"
     )
-    return (
+    stats = (
         ("Type", definition.kind.title()),
-        ("Level", "Cantrip" if definition.is_cantrip else f"Unlock {definition.unlock_level}"),
+        ("Level", "Cantrip" if definition.is_cantrip else str(definition.unlock_level)),
         ("Cost", cost),
         ("Effect", effect),
         ("Range", f"{definition.range_feet} ft"),
@@ -191,6 +191,10 @@ def _ability_stats(
         ("Duration", duration),
         ("Save", save),
     )
+    # a power on yourself has no distance to show
+    if definition.target == "self":
+        stats = tuple(stat for stat in stats if stat[0] != "Range")
+    return stats
 
 
 def _narrative_segments(row: sqlite3.Row) -> tuple[NarrativeSegmentView, ...]:
@@ -816,7 +820,8 @@ class DashboardProjection:
                 costs.append(f"{definition.spell_slot_cost} spell slot")
             if row["current_uses"] is not None:
                 costs.append(f"{row['current_uses']}/{row['maximum_uses']} uses")
-            costs.append(f"Range {definition.range_feet} ft")
+            if definition.target != "self":  # a power on yourself has no distance
+                costs.append(f"Range {definition.range_feet} ft")
             combat_skills.append(CombatActionOptionView(
                 key=definition.key, name=definition.name, kind=definition.kind,
                 description=definition.description,

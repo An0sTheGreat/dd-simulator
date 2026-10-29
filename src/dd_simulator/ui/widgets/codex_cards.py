@@ -360,6 +360,16 @@ class InventoryCard(QFrame):
         bar.setValue(bar.value() + self._drag_direction() * DRAG_SCROLL_STEP)
 
 
+def power_level(action: CombatActionOptionView) -> str:
+    """"Cantrip" or the unlock level as a number; "" when the catalog gives none."""
+
+    return next((value for name, value in action.stats if name == "Level"), "")
+
+
+def _level_order(level: str) -> tuple[int, int]:
+    return (0, 0) if level == "Cantrip" else (1, int(level) if level.isdigit() else 0)
+
+
 def _power_detail(action: CombatActionOptionView) -> str:
     distance = next((value for name, value in action.stats if name == "Range"), "")
     label = action.resource_label
@@ -492,6 +502,25 @@ class PowersCard(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(6)
         layout.addWidget(_heading(title, len(actions)))
+        levels = sorted({power_level(action) for action in actions} - {""}, key=_level_order)
+        column.level_buttons = {}  # type: ignore[attr-defined]
+        if len(levels) > 1:
+            # one level at a time, or All; replaces the old per-power "Unlock n" row
+            picker = QHBoxLayout()
+            picker.setContentsMargins(0, 0, 0, 0)
+            picker.setSpacing(4)
+            for level in ("All", *levels):
+                button = QToolButton()
+                button.setObjectName("powerLevelButton")
+                button.setText(level if level in ("All", "Cantrip") else f"Lv {level}")
+                button.setAccessibleName(f"Show {title.lower()}: {level if level in ('All', 'Cantrip') else f'level {level}'}")
+                button.setCheckable(True)
+                button.setChecked(level == "All")
+                button.clicked.connect(lambda _c=False, c=column, value=level: self._show_level(c, value))
+                picker.addWidget(button)
+                column.level_buttons[level] = button  # type: ignore[attr-defined]
+            picker.addStretch(1)
+            layout.addLayout(picker)
         scroll = QScrollArea()
         scroll.setObjectName("powersColumnScroll")
         scroll.setFrameShape(QFrame.Shape.NoFrame)
@@ -512,6 +541,13 @@ class PowersCard(QFrame):
         scroll.setWidget(entries)
         layout.addWidget(scroll, 1)
         return column
+
+    @staticmethod
+    def _show_level(column: QWidget, level: str) -> None:
+        for value, button in column.level_buttons.items():  # type: ignore[attr-defined]
+            button.setChecked(value == level)
+        for entry in column.entries:  # type: ignore[attr-defined]
+            entry.setVisible(level == "All" or power_level(entry.action) == level)
 
 
 class CodexCardRow(QWidget):

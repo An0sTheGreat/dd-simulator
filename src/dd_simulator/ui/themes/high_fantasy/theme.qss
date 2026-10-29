@@ -1624,3 +1624,40 @@ QPushButton#npcSelectionButton {
 QPushButton#npcSelectionButton:hover, QPushButton#npcSelectionButton:focus, QPushButton#npcSelectionButton[selected="true"] {
     background: #1d170f; border-color: {{codex.gold}}; color: {{codex.gold}};
 }
+
+/* Abilities / Spells level picker */
+QToolButton#powerLevelButton {
+    font-family: "Oxanium";
+    font-size: 10px;
+    font-weight: 600;
+    color: {{codex.muted}};
+    background: transparent;
+    border: 1px solid {{codex.gold_dark}};
+    border-radius: 3px;
+    padding: 1px 6px;
+}
+QToolButton#powerLevelButton:hover { color: {{codex.ink}}; }
+QToolButton#powerLevelButton:checked {
+    color: {{codex.gold}};
+    border-color: {{codex.gold}};
+}
+
+/* Quick-access hotbar */
+QFrame#hotbar { background: transparent; border: none; }
+QFrame#hotbarSlot {
+    min-height: 40px;
+    background-color: rgba(21, 17, 12, 170);
+    border: 1px solid {{codex.gold_dark}};
+    border-radius: 4px;
+}
+QFrame#hotbarSlot:hover { border-color: {{codex.gold}}; }
+QFrame#hotbarSlot[empty="true"] { background-color: rgba(21, 17, 12, 90); }
+QFrame#hotbarSlot[empty="false"][available="false"] { border-color: {{codex.muted}}; }
+QLabel#hotbarSlotIcon { background: transparent; border: none; }
+QLabel#hotbarSlotKey {
+    background: transparent;
+    font-family: "Oxanium";
+    font-size: 10px;
+    font-weight: 600;
+    color: {{codex.gold}};
+}
