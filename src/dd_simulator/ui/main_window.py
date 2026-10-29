@@ -210,9 +210,11 @@ class CodexColumn(QWidget):
         skills.set_columns(-(-width // SKILL_COLUMN_MAX_WIDTH))
         # every skill row while the bag keeps five rows at its smallest scale
         # (otherwise the list scrolls)
+        skills.fit_icons(0)  # measure at the smallest icons, then grow them to fit
         wanted = skills.widget().sizeHint().height()
         top = max(paperdoll.height(), min(wanted, free - fixed - round(rows * PAPERDOLL_MIN_SCALE)))
         skills.setFixedHeight(top)
+        skills.fit_icons(top)
         inventory.set_scale(math.floor(20 * (free - top - fixed) / rows) / 20)
 
     def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]

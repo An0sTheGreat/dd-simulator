@@ -334,10 +334,10 @@ class _RarityGlow(QGraphicsDropShadowEffect):
         self.setColor(colour)
 
     def draw(self, painter) -> None:  # type: ignore[no-untyped-def]
-        # A half-opacity pass first, then the full pass: the glow is about 1.5x as
-        # strong and the item itself is drawn last, on top, untinted.
+        # A near-full-opacity pass first, then the full pass: the glow is about twice
+        # as strong and the item itself is drawn last, on top, untinted.
         painter.save()
-        painter.setOpacity(0.5)
+        painter.setOpacity(0.95)
         super().draw(painter)
         painter.restore()
         super().draw(painter)
@@ -398,8 +398,8 @@ def apply_rarity_glow(icon: QLabel, rarity: str) -> None:
         glow = _RarityGlow(icon)
         glow.setOffset(0, 0)
         icon.setGraphicsEffect(glow)
-    # 27 px blur at the 59 px inventory icon; smaller icons get a tighter outline
-    glow.setBlurRadius(max(20, icon.width() * 27 // 59))
+    # 65 px blur at the 59 px inventory icon; never under 45 px on small icons
+    glow.setBlurRadius(max(45, icon.width() * 65 // 59))
     glow.set_base(QColor(colour))
 
 

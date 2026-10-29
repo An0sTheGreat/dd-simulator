@@ -111,6 +111,7 @@ PAPERDOLL_MAX_SCALE = 1.5
 # a column never wider than this, so a skill's value sits close to its name
 SKILL_COLUMN_MAX_WIDTH = 420
 SKILL_MAX_COLUMNS = 4
+SKILL_ICON_MIN_SIZE, SKILL_ICON_MAX_SIZE = 30, 72
 # name, caption, (x, y), (column, row) for keyboard navigation
 PAPERDOLL_LAYOUT = (
     ("Ring", "Ring", (4, 4), (0, 0)),
@@ -276,16 +277,8 @@ class SkillDetailRow(HoverCardHost, QFrame):
         self.setAccessibleName(f"{skill.name}, level {skill.level}")
         self.icon_label = QLabel()
         self.icon_label.setObjectName("skillDetailIcon")
-        self.icon_label.setFixedSize(30, 30)
-        self.icon_label.setPixmap(
-            QPixmap(str(skill_icon_path(skill.name))).scaled(
-                28,
-                28,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation,
-            )
-        )
         self.icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.set_icon_size(SKILL_ICON_MIN_SIZE)
         self.name_label = _label(skill.name, "skillDetailName")
         self.value_label = _label(str(skill.level), "skillDetailValue")
         self.description_label = _label(skill.description, "skillDetailDescription")
@@ -315,6 +308,19 @@ class SkillDetailRow(HoverCardHost, QFrame):
         layout.setSpacing(9)
         layout.addWidget(self.icon_label)
         layout.addLayout(details, 1)
+
+    def set_icon_size(self, size: int) -> None:
+        if self.icon_label.width() == size:
+            return
+        self.icon_label.setFixedSize(size, size)
+        self.icon_label.setPixmap(
+            QPixmap(str(skill_icon_path(self.skill.name))).scaled(
+                size - 2,
+                size - 2,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+        )
 
     def build_hover_card(self) -> SkillHoverCard:
         return SkillHoverCard(self.skill, self)
@@ -362,7 +368,17 @@ class SkillDetailList(QScrollArea):
             self.grid.addWidget(row, 1 + index % per_column, index // per_column)
         for column in range(SKILL_MAX_COLUMNS):
             self.grid.setColumnStretch(column, 1 if column < columns else 0)
-        self.grid.setRowStretch(0, 1)
-        self.grid.setRowStretch(per_column + 1, 1)
-        for row in range(per_column + 2, len(self.rows) + 2):
-            self.grid.setRowStretch(row, 0)
+        # only the spacer rows above and below stretch; a stretch left on a skill row
+        # by an earlier wrap would make that row taller than the rest
+        for row in range(len(self.rows) + 2):
+            self.grid.setRowStretch(row, 1 if row in (0, per_column + 1) else 0)
+
+    def fit_icons(self, height: int) -> None:
+        """Grow the icons (30 to 72 px) to share the given height between the rows."""
+
+        per_column = -(-len(self.rows) // self.columns) if self.rows else 1
+        spacing = self.grid.verticalSpacing()
+        share = (height - spacing * (per_column - 1)) // per_column - 4
+        size = max(SKILL_ICON_MIN_SIZE, min(SKILL_ICON_MAX_SIZE, share))
+        for row in self.rows:
+            row.set_icon_size(size)
