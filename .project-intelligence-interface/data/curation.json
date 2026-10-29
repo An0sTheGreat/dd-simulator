@@ -326,6 +326,41 @@
   ],
   "captures": [
     {
+      "source": ".project-intelligence-interface/captures/dashboard-1600x900.png",
+      "title": "Dashboard, polish round",
+      "caption": "Hotbar (1-0) above inventory and abilities, wrapping bag grid with rarity glow, ability level chips, uniform skill rows. 1600x900, High Fantasy."
+    },
+    {
+      "source": ".project-intelligence-interface/captures/hotbar-hover-card.png",
+      "title": "Hotbar hover card",
+      "caption": "A hotbar slot shows the power's full card: level, cost, effect, range, target, uses, cooldown."
+    },
+    {
+      "source": ".project-intelligence-interface/captures/dashboard-ultrawide-2560x1080.png",
+      "title": "Ultrawide layout",
+      "caption": "2560x1080: full-width paperdoll and skill columns, bag wraps to 8 columns, band-free 16-bit backdrop."
+    },
+    {
+      "source": ".project-intelligence-interface/captures/settings-sound-and-display.png",
+      "title": "Settings: display and sound",
+      "caption": "Font-size slider with Apply, rarity glow pulse toggle, restyled music, ambience and interface-sound sliders, Mute all sound."
+    },
+    {
+      "source": ".project-intelligence-interface/captures/character-sheet.png",
+      "title": "Character sheet",
+      "caption": "Rarity glow on equipment and items."
+    },
+    {
+      "source": ".project-intelligence-interface/captures/dashboard-modern-dark.png",
+      "title": "Modern Dark dashboard",
+      "caption": "Same layout in the Modern Dark theme."
+    },
+    {
+      "source": "src/dd_simulator/ui/assets/icons/app/dd_simulator.png",
+      "title": "App icon",
+      "caption": "d20 on a crimson tile (scripts/generate_app_icon.py)."
+    },
+    {
       "source": "docs/screenshots/adventure-fantasy.png",
       "title": "Adventure dashboard",
       "caption": "Concept T, High Fantasy theme."
@@ -372,8 +407,8 @@
     }
   ],
   "banner": {
-    "source": "docs/screenshots/adventure-fantasy.png",
+    "source": ".project-intelligence-interface/captures/dashboard-1600x900.png",
     "title": "Adventure dashboard",
-    "caption": "Release 28"
+    "caption": "Polish round on main"
   }
 }

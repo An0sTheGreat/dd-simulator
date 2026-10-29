@@ -42,6 +42,16 @@
         "group": "Technology"
       },
       {
+        "label": "Interface sounds",
+        "value": "QSoundEffect WAVs (Kenney and 80-CC0, CC0): hover, click, page, pick-up/drop, equip, coins, deny",
+        "group": "Technology"
+      },
+      {
+        "label": "Display",
+        "value": "Backdrop painted live at 16 bits with triangular dither; band-free on HDR and ultrawide",
+        "group": "Technology"
+      },
+      {
         "label": "Target",
         "value": "Windows desktop .exe",
         "group": "Build"
@@ -53,7 +63,7 @@
       },
       {
         "label": "Tests",
-        "value": "pytest + Qt offscreen + packaged smoke switches",
+        "value": "pytest + pytest-xdist (parallel, ~45 s) + Qt offscreen + packaged smoke switches",
         "group": "Build"
       },
       {
@@ -79,6 +89,11 @@
       {
         "label": "Preset",
         "value": "Authored campaign, e.g. The Last Orrery of Sol",
+        "group": "Terminology"
+      },
+      {
+        "label": "Hotbar",
+        "value": "Quick-access bar, keys 1-0, for the weapon attack, abilities and spells",
         "group": "Terminology"
       }
     ]
@@ -167,7 +182,7 @@
     }
   },
   "capturesFolder": "",
-  "banner": "docs/screenshots/adventure-fantasy.png",
+  "banner": ".project-intelligence-interface/captures/dashboard-1600x900.png",
   "size": {
     "enabled": true,
     "groups": [
