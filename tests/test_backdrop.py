@@ -50,3 +50,11 @@ def test_backdrop_path_comes_from_the_application_root_rule() -> None:
     qss = 'QWidget#applicationRoot {\n  border-image: url("C:/x/bg.jpg") 0 0 0 0 stretch stretch;\n}'
     assert stylesheet_backdrop(qss) == "C:/x/bg.jpg"
     assert stylesheet_backdrop("QLabel { color: red; }") is None
+
+
+def test_scaled_displays_get_the_backdrop_at_device_resolution() -> None:
+    QApplication.instance() or QApplication([])
+    pixmap = dithered(str(BACKGROUND), QSize(1600, 900), 1.25)
+    # drawn 1:1 on a 125 % display, so no rescale smooths the dither away
+    assert (pixmap.width(), pixmap.height()) == (2000, 1125)
+    assert pixmap.devicePixelRatio() == 1.25

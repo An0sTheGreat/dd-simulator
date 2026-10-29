@@ -22,6 +22,8 @@ def skill_icon_path(name: str) -> Path:
 def action_icon_path(key: str) -> Path:
     """Return the packaged icon for an ability or spell catalog key, or the fallback."""
 
+    if key == "attack":  # the hotbar's weapon attack wears the Attack skill's icon
+        return skill_icon_path("Attack")
     return _resolve("actions", key)
 
 

@@ -10,11 +10,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QCursor, QIcon
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QMenu, QVBoxLayout
 
 from dd_simulator.ui.models.presentation import CombatActionOptionView
 from dd_simulator.ui.power_icons import action_icon_path, skill_icon_path
+from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
 
 HOTBAR_SLOTS = 10
 HOTBAR_KEYS = tuple(str((index + 1) % 10) for index in range(HOTBAR_SLOTS))  # 1..9, 0
@@ -32,12 +33,35 @@ class HotbarAction:
     option: CombatActionOptionView | None = None
 
 
+def weapon_attack_option(
+    weapons: tuple[tuple[str, str], ...] = (), attack_bonus: int | None = None
+) -> CombatActionOptionView:
+    """The weapon attack as a power, so its hover card reads like the abilities'."""
+
+    names = ", ".join(name for name, _damage in weapons) or "Unarmed strike"
+    stats = [("Type", "Weapon attack"), ("Weapon", names)]
+    stats += [("Damage", damage if len(weapons) == 1 else f"{name}: {damage}") for name, damage in weapons]
+    if attack_bonus is not None:
+        stats.append(("Attack bonus", f"{attack_bonus:+d}"))
+    stats += [("Cost", "None"), ("Target", "One enemy"), ("Uses", "Unlimited")]
+    return CombatActionOptionView(
+        key=ATTACK_KEY, name="Weapon Attack", kind="attack",
+        description="Strike the selected enemy with your equipped weapon.",
+        resource_label="No cost", available=True, stats=tuple(stats), status_label="Ready",
+    )
+
+
 def hotbar_actions(
-    abilities: tuple[CombatActionOptionView, ...], spells: tuple[CombatActionOptionView, ...]
+    abilities: tuple[CombatActionOptionView, ...],
+    spells: tuple[CombatActionOptionView, ...],
+    attack: CombatActionOptionView | None = None,
 ) -> tuple[HotbarAction, ...]:
     """Everything a slot can hold: the weapon attack, then abilities, then spells."""
 
-    attack = HotbarAction(ATTACK_KEY, "Weapon Attack", "Attack", skill_icon_path("Attack"))
+    attack = HotbarAction(
+        ATTACK_KEY, "Weapon Attack", "Attack", skill_icon_path("Attack"),
+        option=attack or weapon_attack_option(),
+    )
     return (
         attack,
         *(HotbarAction(a.key, a.name, "Abilities", action_icon_path(a.key), a.available, a) for a in abilities),
@@ -61,6 +85,8 @@ class HotbarSlot(QFrame):
         self.index = index
         self.action: HotbarAction | None = None
         self.choices: tuple[HotbarAction, ...] = ()
+        self.hover_card: AbilityHoverCard | None = None
+        self._closing = False
         self.setObjectName("hotbarSlot")
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         layout = QVBoxLayout(self)
@@ -85,12 +111,35 @@ class HotbarSlot(QFrame):
         )
         self.icon_label.setEnabled(action is not None and action.available)
         name = action.name if action else "Empty"
-        self.setToolTip(f"{HOTBAR_KEYS[self.index]}: {name}" + ("" if action else " (right-click to assign)"))
+        # a filled slot shows the power's full hover card instead (enterEvent)
+        self.setToolTip("" if action else f"{HOTBAR_KEYS[self.index]}: empty (right-click to assign)")
         self.setAccessibleName(f"Hotbar slot {HOTBAR_KEYS[self.index]}: {name}")
         self.style().unpolish(self)
         self.style().polish(self)
 
+    def _close_hover_card(self) -> None:
+        card, self.hover_card = self.hover_card, None
+        if card is not None:
+            # closing can synthesise an Enter on this slot; ignore it, or enter and
+            # close ping-pong
+            self._closing = True
+            card.close()
+            card.deleteLater()
+            self._closing = False
+
+    def enterEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        showing = self.hover_card is not None and self.hover_card.isVisible()
+        if self.action is not None and self.action.option is not None and not showing and not self._closing:
+            self.hover_card = AbilityHoverCard(self.action.option, self)
+            self.hover_card.show_near(QCursor.pos())
+        super().enterEvent(event)
+
+    def leaveEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        self._close_hover_card()
+        super().leaveEvent(event)
+
     def mousePressEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        self._close_hover_card()
         if event.button() == Qt.MouseButton.LeftButton and self.action is not None:
             self.activated.emit(self.index)
         super().mousePressEvent(event)

@@ -152,3 +152,28 @@ def test_window_builds_with_interface_sounds_enabled(tmp_path: Path, monkeypatch
         window.close()
         window.deleteLater()
         app.processEvents()
+
+
+def test_hotbar_slots_show_the_full_power_card_on_hover() -> None:
+    from PySide6.QtCore import QEvent, QPointF
+    from PySide6.QtGui import QEnterEvent
+
+    from dd_simulator.ui.widgets.hotbar import weapon_attack_option
+
+    QApplication.instance() or QApplication([])
+    power = CombatActionOptionView(
+        key="field_dressing", name="Field Dressing", kind="ability", description="Treat wounds.",
+        resource_label="4 stamina", available=True,
+        stats=(("Level", "2"), ("Cost", "4 Stamina"), ("Target", "Self")), status_label="2/2 uses",
+    )
+    attack = weapon_attack_option((("Iron Dagger", "1d4 piercing"),), 8)
+    bar = Hotbar()
+    bar.set_actions(hotbar_actions((power,), (), attack), [ATTACK_KEY, "field_dressing"])
+    bar.show()
+    for slot, rows in ((bar.slots[1], {"Level", "Cost", "Target"}), (bar.slots[0], {"Weapon", "Damage", "Attack bonus"})):
+        QApplication.sendEvent(slot, QEnterEvent(QPointF(5, 5), QPointF(5, 5), QPointF(5, 5)))
+        assert slot.hover_card is not None and rows <= set(slot.hover_card.rows), rows
+        QApplication.sendEvent(slot, QEvent(QEvent.Type.Leave))
+        assert slot.hover_card is None
+    assert dict(attack.stats)["Damage"] == "1d4 piercing" and dict(attack.stats)["Attack bonus"] == "+8"
+    bar.deleteLater()

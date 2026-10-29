@@ -122,7 +122,13 @@ from dd_simulator.ui.widgets.codex_character import (
     SkillDetailList,
 )
 from dd_simulator.ui.widgets.backdrop import BackdropRoot
-from dd_simulator.ui.widgets.hotbar import ATTACK_KEY, Hotbar, default_slots, hotbar_actions
+from dd_simulator.ui.widgets.hotbar import (
+    ATTACK_KEY,
+    Hotbar,
+    default_slots,
+    hotbar_actions,
+    weapon_attack_option,
+)
 from dd_simulator.ui.widgets.conversation_view import ConversationView
 from dd_simulator.ui.widgets.crafting_page import CraftingPage
 from dd_simulator.ui.widgets.scene_view import ElidedLabel, SceneView
@@ -1003,7 +1009,15 @@ class MainWindow(QMainWindow):
         layout.addLayout(row)
         # one row of ten quick slots across the column, above the bag and powers
         self.hotbar = Hotbar()
-        choices = hotbar_actions(dashboard.abilities, dashboard.spells)
+        weapons = tuple(
+            (str(slot.item.name), slot.item.damage)
+            for slot in dashboard.equipment
+            if slot.item is not None and slot.item.damage
+        )
+        choices = hotbar_actions(
+            dashboard.abilities, dashboard.spells,
+            weapon_attack_option(weapons, dashboard.player.attack_bonus),
+        )
         self.hotbar.set_actions(choices, self.hotbar_preference or default_slots(choices))
         self.hotbar.slot_used.connect(self._use_hotbar)
         self.hotbar.slots_changed.connect(self._on_hotbar_changed)
