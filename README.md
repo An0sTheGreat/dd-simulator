@@ -90,9 +90,12 @@ From PowerShell in this folder:
 ```powershell
 .\scripts\setup.ps1   # create .venv and install the package with dev extras
 .\scripts\run.ps1     # run from source
-.\scripts\test.ps1    # full pytest suite, ~2 min (offscreen Qt, temp dirs under %TEMP%)
+.\scripts\test.ps1    # full pytest suite in parallel, under 1 min (offscreen Qt, temp dirs under %TEMP%)
 .\scripts\build.ps1   # PyInstaller one-folder build -> dist\DnDSimulator
 ```
+
+The suite runs on every CPU core through pytest-xdist (a dev extra). Pass `-n 0` to
+run it serially, for example when debugging one test.
 
 The bundled llama.cpp runtime lives in `vendor\llama_cpp\{cpu,vulkan}` and is packaged
 by `DnDSimulator.spec`. Models are never bundled.

@@ -164,6 +164,8 @@ def test_auto_sort_menu_emits_the_existing_sort_modes() -> None:
 def test_powers_card_splits_hides_and_shows_empty_state() -> None:
     app()
     card = PowersCard((action("quick_shot", "ability"), action("volley", "ability")), (action("ember", "spell"),))
+    # wide enough for the detail line, whatever font an earlier test left applied
+    card.resize(600, 300)
     card.show()
     assert [e.action.key for e in card.ability_column.entries] == ["quick_shot", "volley"]
     assert [e.action.key for e in card.spell_column.entries] == ["ember"]

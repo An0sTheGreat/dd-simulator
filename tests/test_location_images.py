@@ -4,11 +4,12 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtWidgets import QApplication, QLabel
+from PySide6.QtWidgets import QApplication, QLabel, QWidget
 
 from dd_simulator.ui.location_images import resolve_location_image
 from dd_simulator.ui.models.presentation import LocationSummaryView
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
+from dd_simulator.ui.themes.theme_manager import ThemeManager
 from dd_simulator.ui.widgets.scene_view import SceneView
 
 
@@ -63,8 +64,16 @@ def test_location_resolver_supports_mountain_and_swamp_variants(tmp_path: Path) 
     ) == swamp_night
 
 
-def test_scene_view_renders_packaged_catalog_art() -> None:
+def test_scene_view_renders_packaged_catalog_art(tmp_path: Path) -> None:
     app = QApplication.instance() or QApplication([])
+    # The theme makes the card scroll translucent; the quest card itself is hidden below,
+    # since it overlays the art rather than being part of it.
+    manager = ThemeManager(
+        themes_root=Path(__file__).resolve().parents[1] / "src" / "dd_simulator" / "ui" / "themes",
+        preferences_path=tmp_path / "prefs.json",
+        default_theme_id="high_fantasy",
+    )
+    manager.apply_loaded_theme(app, manager.load_theme("high_fantasy"), persist=False)
     location = LocationSummaryView(
         name="The Lantern & Sheaf",
         region="Wheatmarch",
@@ -86,6 +95,7 @@ def test_scene_view_renders_packaged_catalog_art() -> None:
     assert blank.image_path is None
     images = []
     for scene in (panel, blank):
+        scene.findChild(QWidget, "questProgressCard").hide()
         scene.resize(640, 300)
         scene.show()
         app.processEvents()

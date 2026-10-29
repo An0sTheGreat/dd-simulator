@@ -6,6 +6,7 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QSignalSpy, QTest
 from PySide6.QtGui import Qt as GuiQt, QTextDocument
@@ -60,6 +61,17 @@ QUEST_LIST = (
 
 def app() -> QApplication:
     return QApplication.instance() or QApplication([])
+
+
+@pytest.fixture(autouse=True)
+def _fantasy_theme(tmp_path: Path) -> None:
+    """Every test starts themed, whatever an earlier test in this worker left applied."""
+
+    manager = ThemeManager(
+        themes_root=THEMES_ROOT, preferences_path=tmp_path / "prefs.json",
+        default_theme_id="high_fantasy",
+    )
+    manager.apply_loaded_theme(app(), manager.load_theme("high_fantasy"), persist=False)
 
 
 def location(**changes: str) -> LocationSummaryView:

@@ -184,3 +184,23 @@ def test_font_scale_applies_live_and_survives_theme_change(tmp_path: Path) -> No
     theme_manager.apply_theme(target, "modern_proof")
     assert "font-size: 15px" in target.stylesheet
     assert "font-size: 10px; /* font-scale-fixed */" in target.stylesheet
+
+
+def test_unchanged_font_scale_does_not_reapply_the_stylesheet(tmp_path: Path) -> None:
+    class CountingTarget:
+        calls = 0
+
+        def setStyleSheet(self, stylesheet: str) -> None:
+            self.calls += 1
+
+    theme_manager = manager(tmp_path)
+    target = CountingTarget()
+    theme_manager.apply_loaded_theme(target, theme_manager.load_theme("high_fantasy"), persist=False)
+    theme_manager.set_font_scale(target, 1.0)  # startup: same scale, nothing to re-polish
+    assert target.calls == 1
+    theme_manager.set_font_scale(target, 1.15)
+    theme_manager.set_font_scale(target, 1.15)
+    assert target.calls == 2
+    other = CountingTarget()  # a different application still gets the stylesheet
+    theme_manager.set_font_scale(other, 1.15)
+    assert other.calls == 1

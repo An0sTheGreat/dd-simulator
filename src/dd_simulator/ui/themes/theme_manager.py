@@ -55,6 +55,7 @@ class ThemeManager:
         self.current_theme_id: str | None = None
         self.font_scale = 1.0
         self._current_theme: LoadedTheme | None = None
+        self._applied: tuple[object, float, object] | None = None  # theme, scale, target
         self._change_listeners: list[Callable[[LoadedTheme], None]] = []
 
     def _read_theme(self, directory: Path) -> LoadedTheme:
@@ -244,6 +245,7 @@ class ThemeManager:
         persist: bool,
     ) -> None:
         application.setStyleSheet(self.scale_font_sizes(loaded.stylesheet, self.font_scale))
+        self._applied = (loaded, self.font_scale, application)
         if hasattr(application, "setProperty"):
             application.setProperty("themeId", loaded.definition.theme_id)
         self.current_theme_id = loaded.definition.theme_id
@@ -285,8 +287,13 @@ class ThemeManager:
     ) -> None:
         """Apply a live font scale and retain it across later theme changes."""
 
-        self.font_scale = min(1.5, max(0.75, float(scale)))
+        scale = min(1.5, max(0.75, float(scale)))
+        # re-applying an unchanged stylesheet re-polishes every widget for nothing
+        if self._current_theme is not None and self._applied == (self._current_theme, scale, application):
+            return
+        self.font_scale = scale
         if self._current_theme is not None:
             application.setStyleSheet(
                 self.scale_font_sizes(self._current_theme.stylesheet, self.font_scale)
             )
+            self._applied = (self._current_theme, self.font_scale, application)
