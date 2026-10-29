@@ -110,7 +110,7 @@ PAPERDOLL_MIN_SCALE = 0.6
 PAPERDOLL_MAX_SCALE = 1.5
 # a column never wider than this, so a skill's value sits close to its name
 SKILL_COLUMN_MAX_WIDTH = 420
-SKILL_MAX_COLUMNS = 4
+SKILL_MAX_COLUMNS = 2  # 8 skills sit in 4 rows beside the paperdoll
 SKILL_ICON_MIN_SIZE, SKILL_ICON_MAX_SIZE = 30, 72
 # name, caption, (x, y), (column, row) for keyboard navigation
 PAPERDOLL_LAYOUT = (

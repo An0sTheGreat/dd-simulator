@@ -117,6 +117,7 @@ from dd_simulator.ui.widgets.codex_character import (
     PaperdollPanel,
     SkillDetailList,
 )
+from dd_simulator.ui.widgets.backdrop import BackdropRoot
 from dd_simulator.ui.widgets.conversation_view import ConversationView
 from dd_simulator.ui.widgets.crafting_page import CraftingPage
 from dd_simulator.ui.widgets.scene_view import ElidedLabel, SceneView
@@ -370,7 +371,7 @@ class MainWindow(QMainWindow):
         self.controller.context_action_requested.connect(self._handle_context_action)
         self.controller.action_submitted.connect(self._handle_player_action_submission)
 
-        self.root = QWidget()
+        self.root = BackdropRoot()
         self.root.setObjectName("applicationRoot")
         self.root_layout = QVBoxLayout(self.root)
         self.root_layout.setContentsMargins(8, 8, 8, 8)
