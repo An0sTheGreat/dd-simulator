@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from dd_simulator.ui.audio import play_ui_sound
 from dd_simulator.ui.models.presentation import EquipmentSlotView, InventorySlotView
 from dd_simulator.ui.item_icons import item_icon_label, refresh_item_icon
 from dd_simulator.ui.widgets.hover_card import CARD_ICON_SIZE, TooltipCard, card_label
@@ -323,6 +324,7 @@ def _start_item_drag(
 ) -> None:  # type: ignore[no-untyped-def]
     """Start a move drag using only the item's transparent icon."""
 
+    play_ui_sound("pickup")
     mime = QMimeData()
     mime.setData(mime_type, str(value).encode("ascii"))
     drag = QDrag(widget)

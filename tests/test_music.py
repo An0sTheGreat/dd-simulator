@@ -141,7 +141,7 @@ def test_audio_settings_round_trip_and_reset(tmp_path: Path) -> None:
     assert window.music.players == []
     assert panel.music_volume_slider.accessibleName() == "Music volume"
     assert panel.ambience_volume_slider.accessibleName() == "Ambience volume"
-    assert panel.mute_checkbox.accessibleName() == "Mute music and ambience"
+    assert panel.mute_checkbox.accessibleName() == "Mute all sound"
     panel.music_volume_slider.setValue(25)
     panel.ambience_volume_slider.setValue(70)
     panel.mute_checkbox.setChecked(True)
@@ -290,3 +290,50 @@ def test_audio_slots_swallow_errors() -> None:
     controller._fade_step()
     controller.set_volumes(1, 2, False)
     controller.stop()
+
+
+class _Effect:
+    def __init__(self) -> None:
+        self.plays = 0
+        self.volume = None
+
+    def play(self) -> None:
+        self.plays += 1
+
+    def stop(self) -> None:
+        pass
+
+    def setVolume(self, volume: float) -> None:  # noqa: N802 - Qt name
+        self.volume = volume
+
+
+def test_every_interface_sound_ships_as_a_wav_with_its_source() -> None:
+    sources = json.loads((audio.UI_SFX_ROOT / "sources.json").read_text(encoding="utf-8"))
+    for name in audio.UI_SOUNDS:
+        assert (audio.UI_SFX_ROOT / f"{name}.wav").is_file(), name
+        assert sources[f"{name}.wav"]["license"] in {"CC0-1.0", "original"}, name
+    # interface feedback only: no ability, spell or combat clips
+    assert not any(word in " ".join(audio.UI_SOUNDS) for word in ("spell", "cast", "attack", "ability"))
+
+
+def test_ui_sounds_play_throttle_and_mute() -> None:
+    from PySide6.QtCore import QElapsedTimer
+    from PySide6.QtWidgets import QApplication
+
+    QApplication.instance() or QApplication([])
+    sounds = audio.UiSounds(enabled=False)
+    sounds.enabled = True
+    sounds._clock = QElapsedTimer()
+    sounds._clock.start()
+    sounds.effects = {name: _Effect() for name in audio.UI_SOUNDS}
+    sounds.set_volume(50, False)
+    assert sounds.effects["click"].volume > 0
+
+    audio.play_ui_sound("equip")  # the module hook reaches the live instance
+    assert sounds.effects["equip"].plays == 1
+    for _ in range(5):  # sweeping across buttons plays one hover, not five
+        sounds.play("hover")
+    assert sounds.effects["hover"].plays == 1
+    sounds.set_volume(50, True)
+    sounds.play("coins")
+    assert sounds.effects["coins"].plays == 0 and sounds.effects["coins"].volume == 0.0

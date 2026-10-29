@@ -59,3 +59,15 @@ every ambience file and prints its media status.
 `scripts/import_audio.py [UNTITLED_RPG_AUDIO_ROOT]` copies the Untitled RPG tracks
 unchanged into the context folders. It checks every source first and skips files whose
 bytes already match.
+
+## Interface sounds
+
+`UiSounds` (`ui/audio.py`) plays short WAVs from `ui/assets/audio/ui/` on QSoundEffect:
+`hover` and `click` for every enabled button, checkbox, combo box and slider (an app-wide
+event filter; hover also on occupied item slots), `page` on page changes, `pickup` when an
+item drag starts, `drop` for a bag move or a dropped stack, `equip`/`unequip`, `coins` for
+a completed trade and `deny` when an item action or trade is refused. Code elsewhere calls
+`play_ui_sound(name)`. Repeated hovers and clicks within 70/40 ms play once. Settings has
+an Interface sounds volume (default 50, saved as `sfx_volume`); Mute all sound silences
+them with the music. No ability, spell, skill-check or combat sounds are played.
+`scripts/import_ui_sfx.py` rebuilds the WAVs from the Untitled RPG assets.

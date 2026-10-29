@@ -84,6 +84,9 @@ from dd_simulator.ui.audio import (
     DEFAULT_AMBIENCE_VOLUME,
     DEFAULT_MUSIC_VOLUME,
     MusicController,
+    UiSounds,
+    DEFAULT_SFX_VOLUME,
+    play_ui_sound,
 )
 from dd_simulator.ui.services.action_resolution_worker import ActionResolutionTask
 from dd_simulator.ui.services.combat_resolution_worker import CombatResolutionTask
@@ -349,6 +352,10 @@ class MainWindow(QMainWindow):
         self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
         self.audio_muted_preference = False
         self.music = MusicController(self)
+        self.ui_sounds = UiSounds(self)
+        self.sfx_volume_preference = DEFAULT_SFX_VOLUME
+        if self.ui_sounds.enabled and QApplication.instance() is not None:
+            QApplication.instance().installEventFilter(self.ui_sounds)
         self._audio_save_timer = QTimer(self)
         self._audio_save_timer.setSingleShot(True)
         self._audio_save_timer.setInterval(400)
@@ -446,6 +453,7 @@ class MainWindow(QMainWindow):
         self.settings_panel.glow_pulse_requested.connect(self._on_glow_pulse_changed)
         self._on_glow_pulse_changed(self.glow_pulse_preference, save=False)
         self.settings_panel.audio_requested.connect(self._on_audio_changed)
+        self.settings_panel.sfx_volume_requested.connect(self._on_sfx_volume_changed)
         self._apply_audio_preferences()
         self.settings_panel.checkpoint_create_requested.connect(self._create_checkpoint)
         self.settings_panel.checkpoint_load_requested.connect(self._load_checkpoint)
@@ -587,8 +595,10 @@ class MainWindow(QMainWindow):
             result = self.game_state_service.complete_trade(npc_id, action, item_id)
             dashboard = self.game_state_service.load_active_dashboard()
         except GameStateError as exc:
+            play_ui_sound("deny")
             self._show_status_message(str(exc))
             return
+        play_ui_sound("coins")
         self._reload_dashboard(dashboard, target_page="people")
         self._show_status_message(
             f"{result.summary} {result.remaining_currency} gold remains."
@@ -1166,8 +1176,10 @@ class MainWindow(QMainWindow):
             summary = self.game_state_service.move_inventory_item(source, destination)
             dashboard = self.game_state_service.load_active_dashboard()
         except (GameStateError, ItemActionError) as exc:
+            play_ui_sound("deny")
             self._show_status_message(str(exc))
             return
+        play_ui_sound("drop")
         self._refresh_item_views(dashboard)
         self._show_status_message(summary)
 
@@ -1180,8 +1192,10 @@ class MainWindow(QMainWindow):
             )
             dashboard = self.game_state_service.load_active_dashboard()
         except (GameStateError, ItemActionError) as exc:
+            play_ui_sound("deny")
             self._show_status_message(str(exc))
             return
+        play_ui_sound("unequip")
         self._refresh_item_views(dashboard)
         self._show_status_message(
             f"{result.summary} Placed in inventory slot {destination + 1}."
@@ -1196,8 +1210,10 @@ class MainWindow(QMainWindow):
             )
             dashboard = self.game_state_service.load_active_dashboard()
         except (GameStateError, ItemActionError) as exc:
+            play_ui_sound("deny")
             self._show_status_message(str(exc))
             return
+        play_ui_sound("equip")
         self._selected_inventory_item_id = None
         self._refresh_item_views(dashboard)
         self._show_status_message(result.summary)
@@ -1262,8 +1278,13 @@ class MainWindow(QMainWindow):
             )
             dashboard = self.game_state_service.load_active_dashboard()
         except (GameStateError, ItemActionError, IndexError) as exc:
+            play_ui_sound("deny")
             self._show_status_message(str(exc))
             return
+        # interface feedback only: using a consumable makes no sound here
+        sound = {ItemAction.EQUIP: "equip", ItemAction.UNEQUIP: "unequip", ItemAction.DROP: "drop"}
+        if item_action in sound:
+            play_ui_sound(sound[item_action])
         if item_action in {ItemAction.EQUIP, ItemAction.UNEQUIP}:
             self._refresh_item_views(dashboard)
         else:
@@ -1683,6 +1704,8 @@ class MainWindow(QMainWindow):
         if target not in self.page_indices:
             self._show_status_message(f"Unknown navigation target: {target}")
             return
+        if target != self.current_page:
+            play_ui_sound("page")
         self.current_page = target
         self.content_stack.setCurrentIndex(self.page_indices[target])
         self.scene_view.tabs.set_current(target)
@@ -2407,6 +2430,7 @@ class MainWindow(QMainWindow):
         for key, attribute in (
             ("music_volume", "music_volume_preference"),
             ("ambience_volume", "ambience_volume_preference"),
+            ("sfx_volume", "sfx_volume_preference"),
         ):
             value = ui.get(key)
             if isinstance(value, int) and not isinstance(value, bool):
@@ -2440,6 +2464,7 @@ class MainWindow(QMainWindow):
                 "event_filter": self.navigation_pages["journal"].event_log.current_filter(),
                 "music_volume": self.music_volume_preference,
                 "ambience_volume": self.ambience_volume_preference,
+                "sfx_volume": self.sfx_volume_preference,
                 "audio_muted": self.audio_muted_preference,
             }
         )
@@ -2577,6 +2602,7 @@ class MainWindow(QMainWindow):
         self.navigation_pages["journal"].event_log.set_current_filter(0)
         self.music_volume_preference = DEFAULT_MUSIC_VOLUME
         self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
+        self.sfx_volume_preference = DEFAULT_SFX_VOLUME
         self.audio_muted_preference = False
         self._apply_audio_preferences()
         self.font_size_requested.emit(100)
@@ -2615,7 +2641,14 @@ class MainWindow(QMainWindow):
         self.ambience_volume_preference = ambience
         self.audio_muted_preference = muted
         self.music.set_volumes(music, ambience, muted)
+        self.ui_sounds.set_volume(self.sfx_volume_preference, muted)
         self._audio_save_timer.start()  # debounce: sliders emit on every tick
+
+    def _on_sfx_volume_changed(self, volume: int) -> None:
+        self.sfx_volume_preference = volume
+        self.ui_sounds.set_volume(volume, self.audio_muted_preference)
+        self.ui_sounds.play("click")  # a sample at the new level
+        self._audio_save_timer.start()
 
     def _flush_ui_preferences(self) -> None:
         if self._audio_save_timer.isActive():
@@ -2633,6 +2666,8 @@ class MainWindow(QMainWindow):
             self.ambience_volume_preference,
             self.audio_muted_preference,
         )
+        self.settings_panel.select_sfx_volume(self.sfx_volume_preference)
+        self.ui_sounds.set_volume(self.sfx_volume_preference, self.audio_muted_preference)
 
     def _on_glow_pulse_changed(self, enabled: bool, *, save: bool = True) -> None:
         self.glow_pulse_preference = bool(enabled)

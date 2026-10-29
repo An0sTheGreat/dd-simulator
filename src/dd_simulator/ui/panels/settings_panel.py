@@ -30,6 +30,7 @@ class SettingsPanel(QWidget):
     reduced_motion_requested = Signal(bool)
     glow_pulse_requested = Signal(bool)
     audio_requested = Signal(int, int, bool)  # music volume, ambience volume, muted
+    sfx_volume_requested = Signal(int)
     reset_requested = Signal()
     back_requested = Signal()
     checkpoint_create_requested = Signal()
@@ -196,9 +197,17 @@ class SettingsPanel(QWidget):
         audio_form.addRow(
             _row_label("Ambience volume"), self._with_value(self.ambience_volume_slider)
         )
-        self.mute_checkbox = QCheckBox("Mute music and ambience")
+        self.sfx_volume_slider = self._volume_slider("sfxVolumeSlider", "Interface sound volume")
+        self.sfx_volume_slider.valueChanged.disconnect(self._audio_changed)
+        # once per drag or step: every tick would replay the sample click
+        self.sfx_volume_slider.sliderReleased.connect(self._sfx_changed)
+        self.sfx_volume_slider.valueChanged.connect(
+            lambda _value: None if self.sfx_volume_slider.isSliderDown() else self._sfx_changed()
+        )
+        audio_form.addRow(_row_label("Interface sounds"), self._with_value(self.sfx_volume_slider))
+        self.mute_checkbox = QCheckBox("Mute all sound")
         self.mute_checkbox.setObjectName("muteAudioPreference")
-        self.mute_checkbox.setAccessibleName("Mute music and ambience")
+        self.mute_checkbox.setAccessibleName("Mute all sound")
         self.mute_checkbox.toggled.connect(self._audio_changed)
         audio_form.addRow(_row_label("Mute"), self.mute_checkbox)
         audio_layout.addLayout(audio_form)
@@ -292,6 +301,15 @@ class SettingsPanel(QWidget):
             self.ambience_volume_slider.value(),
             self.mute_checkbox.isChecked(),
         )
+
+    def _sfx_changed(self) -> None:
+        self.sfx_volume_requested.emit(self.sfx_volume_slider.value())
+
+    def select_sfx_volume(self, volume: int) -> None:
+        self.sfx_volume_slider.blockSignals(True)
+        self.sfx_volume_slider.setValue(int(volume))
+        self.sfx_volume_slider.blockSignals(False)
+        self.sfx_volume_slider.property("valueLabel").setText(f"{self.sfx_volume_slider.value()}%")
 
     def select_audio(self, music: int, ambience: int, muted: bool) -> None:
         for widget, value in (

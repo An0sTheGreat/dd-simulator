@@ -1,0 +1,65 @@
+{
+  "hover.wav": {
+    "source": "Audio/SFX/UI/ui_hover_1.wav",
+    "sha256": "4fd4d001a5e8ef6be4256c56d440c9ef514a6dad5d188e0ad72b0093b441e3a7",
+    "author": "Untitled RPG project, original synthesis (generate_audio.py)",
+    "url": "",
+    "license": "original"
+  },
+  "click.wav": {
+    "source": "Audio/SFX/Supplied/UI/ui_click_1.ogg",
+    "sha256": "6bc6388090de39b576d18e6b76526298ed255e5ec5cdd0db2e8182d666b2b341",
+    "author": "80-CC0-RPG-SFX via Untitled RPG Tools/build_sfx_pack.py",
+    "url": "",
+    "license": "CC0-1.0"
+  },
+  "page.wav": {
+    "source": ".CC0 Assets/Audio/SFX/KenneyRPGAudio/bookFlip1.ogg",
+    "sha256": "fa81ac2fedc8c641661b87e349630a36c9800e795e0c800e029214efdbe26a7d",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets/rpg-audio",
+    "license": "CC0-1.0"
+  },
+  "pickup.wav": {
+    "source": ".CC0 Assets/Audio/SFX/KenneyRPGAudio/handleSmallLeather.ogg",
+    "sha256": "ae3cbf695aa0a8b98b5a80a835be5a3ccbd5446a24db2235cd4c3cd6fc92ed96",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets/rpg-audio",
+    "license": "CC0-1.0"
+  },
+  "drop.wav": {
+    "source": ".CC0 Assets/Audio/SFX/KenneyRPGAudio/dropLeather.ogg",
+    "sha256": "097e1d3b74949b0145fda0519d40b7e0773ab82ec4858727f95be830927e1a45",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets/rpg-audio",
+    "license": "CC0-1.0"
+  },
+  "equip.wav": {
+    "source": ".CC0 Assets/Audio/SFX/KenneyRPGAudio/beltHandle1.ogg",
+    "sha256": "2ef665bd8b65dbe669f4560be38a6d8f04a162e618b15a49e3e71b58e558aab0",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets/rpg-audio",
+    "license": "CC0-1.0"
+  },
+  "unequip.wav": {
+    "source": ".CC0 Assets/Audio/SFX/KenneyRPGAudio/cloth2.ogg",
+    "sha256": "8a7451193c38bc05483aec25dd193e163a15d44cf7fff04ac7912573231b0201",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets/rpg-audio",
+    "license": "CC0-1.0"
+  },
+  "coins.wav": {
+    "source": ".CC0 Assets/Audio/SFX/KenneyRPGAudio/handleCoins.ogg",
+    "sha256": "8a91f969e932df709df80ee124d86a51389eed9b67f22e5e716bc2bbf60d8dab",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets/rpg-audio",
+    "license": "CC0-1.0"
+  },
+  "deny.wav": {
+    "source": "Audio/SFX/Supplied/UI/ui_deny_1.ogg",
+    "sha256": "7a2cc0a561c8a6da54c4f8dca548555f0c79e993c9da6aa438055f48ec8f852d",
+    "author": "80-CC0-RPG-SFX via Untitled RPG Tools/build_sfx_pack.py",
+    "url": "",
+    "license": "CC0-1.0"
+  }
+}

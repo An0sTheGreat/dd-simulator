@@ -1504,21 +1504,21 @@ QScrollArea#sceneCardScroll, QWidget#sceneCardHost {
 }
 
 /* Settings sliders: volume and font size */
-QSlider#musicVolumeSlider, QSlider#ambienceVolumeSlider, QSlider#fontSizeSlider {
+QSlider#musicVolumeSlider, QSlider#ambienceVolumeSlider, QSlider#fontSizeSlider, QSlider#sfxVolumeSlider {
     min-height: 22px;
     background: transparent;
     border: none;
 }
 
 QSlider#musicVolumeSlider::groove:horizontal, QSlider#ambienceVolumeSlider::groove:horizontal,
-QSlider#fontSizeSlider::groove:horizontal {
+QSlider#fontSizeSlider::groove:horizontal, QSlider#sfxVolumeSlider::groove:horizontal {
     height: 4px;
     background: transparent;  /* the two pages draw the track */
     border: none;
 }
 
 QSlider#musicVolumeSlider::sub-page:horizontal, QSlider#ambienceVolumeSlider::sub-page:horizontal,
-QSlider#fontSizeSlider::sub-page:horizontal {
+QSlider#fontSizeSlider::sub-page:horizontal, QSlider#sfxVolumeSlider::sub-page:horizontal {
     height: 4px;
     background-color: {{colors.accent_primary}};
     border: none;
@@ -1527,7 +1527,7 @@ QSlider#fontSizeSlider::sub-page:horizontal {
 
 /* both pages need an explicit height, or Qt stretches them over the whole widget */
 QSlider#musicVolumeSlider::add-page:horizontal, QSlider#ambienceVolumeSlider::add-page:horizontal,
-QSlider#fontSizeSlider::add-page:horizontal {
+QSlider#fontSizeSlider::add-page:horizontal, QSlider#sfxVolumeSlider::add-page:horizontal {
     height: 4px;
     background-color: {{colors.border_primary}};
     border: none;
@@ -1535,7 +1535,7 @@ QSlider#fontSizeSlider::add-page:horizontal {
 }
 
 QSlider#musicVolumeSlider::handle:horizontal, QSlider#ambienceVolumeSlider::handle:horizontal,
-QSlider#fontSizeSlider::handle:horizontal {
+QSlider#fontSizeSlider::handle:horizontal, QSlider#sfxVolumeSlider::handle:horizontal {
     width: 16px;
     height: 16px;
     margin: -6px 0;
@@ -1545,9 +1545,9 @@ QSlider#fontSizeSlider::handle:horizontal {
 }
 
 QSlider#musicVolumeSlider::handle:horizontal:hover, QSlider#ambienceVolumeSlider::handle:horizontal:hover,
-QSlider#fontSizeSlider::handle:horizontal:hover,
+QSlider#fontSizeSlider::handle:horizontal:hover, QSlider#sfxVolumeSlider::handle:horizontal:hover,
 QSlider#musicVolumeSlider::handle:horizontal:focus, QSlider#ambienceVolumeSlider::handle:horizontal:focus,
-QSlider#fontSizeSlider::handle:horizontal:focus {
+QSlider#fontSizeSlider::handle:horizontal:focus, QSlider#sfxVolumeSlider::handle:horizontal:focus {
     border: 2px solid {{colors.border_highlight}};
 }
 

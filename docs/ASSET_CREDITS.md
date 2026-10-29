@@ -41,6 +41,20 @@ Release 24 uses only assets currently present under
   game is permitted; do not redistribute, resell, or reupload the files as a standalone pack.
 - The application packages them only as integrated in-game icons.
 
+## Interface sound effects
+
+- Runtime copies: `src/dd_simulator/ui/assets/audio/ui/<event>.wav` (44.1 kHz mono,
+  peak-levelled), decoded by `scripts/import_ui_sfx.py`; per-file source, SHA-256, author
+  and license in `audio/ui/sources.json`.
+- Kenney, RPG Audio (https://kenney.nl/assets/rpg-audio), CC0-1.0: `page` (bookFlip1),
+  `pickup` (handleSmallLeather), `drop` (dropLeather), `equip` (beltHandle1), `unequip`
+  (cloth2), `coins` (handleCoins). Source copies under `Untitled RPG/Assets/.CC0 Assets/Audio/SFX/KenneyRPGAudio`.
+- 80-CC0-RPG-SFX, CC0-1.0, as levelled by Untitled RPG `Tools/build_sfx_pack.py`: `click`
+  (item_wood_02), `deny` (lock_01).
+- Original synthesis by the Untitled RPG project: `hover` (`Audio/SFX/UI/ui_hover_1.wav`).
+- Not used: the "Sound FX Starter Pack" (royalty-free, not CC0) and every combat, spell
+  and creature clip; interface sounds only.
+
 ## Music and ambience (Untitled RPG)
 
 - Source: `Untitled RPG/Assets/Audio/Music` and `Audio/Ambience`; provenance in that

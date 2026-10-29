@@ -320,3 +320,104 @@ class MusicController(QObject):
         self._fade_timer.stop()
         for media in self.players:
             media.stop()
+
+
+UI_SFX_ROOT = AUDIO_ROOT / "ui"
+UI_SOUNDS = ("hover", "click", "page", "pickup", "drop", "equip", "unequip", "coins", "deny")
+DEFAULT_SFX_VOLUME = 50
+# a burst of the same sound (sweeping across buttons, a slider drag) plays once
+UI_SOUND_MIN_GAP_MS = {"hover": 70, "click": 40}
+_ui_sounds: "UiSounds | None" = None
+
+
+def play_ui_sound(name: str) -> None:
+    """Play an interface sound from anywhere; silent until the window installs UiSounds."""
+
+    if _ui_sounds is not None:
+        _ui_sounds.play(name)
+
+
+class UiSounds(QObject):
+    """Short interface sounds (hover, click, page, item moves) on low-latency QSoundEffect.
+
+    No ability, spell or combat sounds: interface feedback only.
+    """
+
+    def __init__(self, parent: QObject | None = None, *, enabled: bool | None = None) -> None:
+        super().__init__(parent)
+        global _ui_sounds
+        _ui_sounds = self
+        self.enabled = (not audio_disabled()) if enabled is None else enabled
+        self.volume = DEFAULT_SFX_VOLUME
+        self.muted = False
+        self.effects: dict[str, Any] = {}
+        self._last_played: dict[str, Any] = {}
+        if not self.enabled:
+            return
+        try:
+            from PySide6.QtCore import QElapsedTimer
+            from PySide6.QtMultimedia import QSoundEffect
+
+            self._clock = QElapsedTimer()
+            self._clock.start()
+            for name in UI_SOUNDS:
+                path = UI_SFX_ROOT / f"{name}.wav"
+                if path.is_file():
+                    effect = QSoundEffect(self)
+                    effect.setSource(QUrl.fromLocalFile(str(path)))
+                    self.effects[name] = effect
+        except Exception:  # noqa: BLE001 - audio must never take the UI down
+            LOGGER.exception("Interface sounds unavailable; continuing silently")
+            self.enabled = False
+            self.effects = {}
+        self._apply_volume()
+
+    @_guarded
+    def play(self, name: str) -> None:
+        effect = self.effects.get(name)
+        if not self.enabled or self.muted or effect is None or self.volume <= 0:
+            return
+        now = self._clock.elapsed()
+        if now - self._last_played.get(name, -10_000) < UI_SOUND_MIN_GAP_MS.get(name, 0):
+            return
+        self._last_played[name] = now
+        if name == "page":  # the page turn replaces the tab's own click
+            click = self.effects.get("click")
+            if click is not None:
+                click.stop()
+        effect.play()
+
+    @_guarded
+    def set_volume(self, volume: int, muted: bool) -> None:
+        self.volume = min(100, max(0, int(volume)))
+        self.muted = bool(muted)
+        self._apply_volume()
+
+    def _apply_volume(self) -> None:
+        gain = 0.0 if self.muted else output_gain(self.volume)
+        for effect in self.effects.values():
+            effect.setVolume(gain)
+
+    def eventFilter(self, watched: QObject, event: Any) -> bool:
+        """Hover and click for every enabled button, checkbox and tab in the app."""
+
+        from PySide6.QtCore import QEvent, Qt
+        from PySide6.QtWidgets import QAbstractButton, QAbstractSlider, QComboBox
+
+        kind = event.type()
+        if kind == QEvent.Type.Enter and watched.isWidgetType() and watched.isEnabled():
+            item_slot = (
+                watched.objectName() in ("inventorySlot", "equipmentSlot")
+                and not watched.property("empty")
+            )
+            if item_slot or isinstance(watched, (QAbstractButton, QComboBox)):
+                self.play("hover")
+        elif (
+            kind == QEvent.Type.MouseButtonRelease
+            and isinstance(watched, (QAbstractButton, QComboBox, QAbstractSlider))
+            and event.button() == Qt.MouseButton.LeftButton
+            and watched.isEnabled()
+            and watched.rect().contains(event.position().toPoint())
+        ):
+            self.play("click")
+        return False
