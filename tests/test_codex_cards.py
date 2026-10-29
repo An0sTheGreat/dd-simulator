@@ -288,7 +288,9 @@ def test_inventory_card_lays_out_whole_square_rows_clear_of_the_scrollbar(tmp_pa
                 card.set_scale(scale)
                 row.resize(724, height)
                 row.show()
-                QApplication.processEvents()
+                # a rewrap rebuilds the slots, which lay out over the next few passes
+                for _ in range(4):
+                    QApplication.processEvents()
                 where = f"{theme_id} scale={scale} height={height}"
                 viewport = _rect_in(card.scroll.viewport(), card)
                 bar = _rect_in(card.scroll.verticalScrollBar(), card)
@@ -299,8 +301,12 @@ def test_inventory_card_lays_out_whole_square_rows_clear_of_the_scrollbar(tmp_pa
                     if slot.y() + slot.height() > top and slot.y() < top + viewport.height()
                 ]
                 rows = {rect.y() for _slot, rect in visible}
-                assert 1 <= len(rows) <= 5 and len(visible) == 5 * len(rows), where
-                assert len(rows) == 5 or height < 530, where  # 5 rows whenever they fit
+                columns = card.grid.columns
+                assert columns >= CARD_COLUMNS, where
+                assert len(rows) == card.visible_rows and len(visible) == columns * len(rows), where
+                assert len(rows) >= 5 or height < 530, where  # every row that fits, 5 or more
+                # whole rectangle, never fewer than 36 slots
+                assert len(card.grid.slots) % columns == 0 and len(card.grid.slots) >= 36, where
                 assert {rect.width() for _s, rect in visible} == {card.grid.slot_size}, where
                 for index, (slot, rect) in enumerate(visible):
                     assert rect.width() == rect.height(), where
@@ -320,7 +326,7 @@ def test_inventory_card_lays_out_whole_square_rows_clear_of_the_scrollbar(tmp_pa
                 # even gutters: one column pitch and one row pitch
                 xs = sorted({rect.x() for _s, rect in visible})
                 ys = sorted(rows)
-                assert len(xs) == CARD_COLUMNS, where
+                assert len(xs) == card.grid.columns, where
                 assert len({b - a for a, b in zip(xs, xs[1:])}) == 1, where
                 assert len({b - a for a, b in zip(ys, ys[1:])}) <= 1, where
                 # grid centred vertically between heading and footer, within a pixel

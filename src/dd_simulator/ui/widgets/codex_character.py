@@ -107,6 +107,10 @@ PAPERDOLL_ICON_SIZE = 34
 PORTRAIT_GEOMETRY = (76, 76, 168, 228)
 PORTRAIT_FRAME = 12
 PAPERDOLL_MIN_SCALE = 0.6
+PAPERDOLL_MAX_SCALE = 1.5
+# a column never wider than this, so a skill's value sits close to its name
+SKILL_COLUMN_MAX_WIDTH = 420
+SKILL_MAX_COLUMNS = 4
 # name, caption, (x, y), (column, row) for keyboard navigation
 PAPERDOLL_LAYOUT = (
     ("Ring", "Ring", (4, 4), (0, 0)),
@@ -165,9 +169,9 @@ class PaperdollPanel(EquipmentGrid):
         return round(value * self.scale)
 
     def set_scale(self, scale: float) -> None:
-        """Shrink slots, captions and portrait together; 1.0 is the mockup geometry."""
+        """Scale slots, captions and portrait together; 1.0 is the mockup geometry."""
 
-        self.scale = max(PAPERDOLL_MIN_SCALE, min(1.0, scale))
+        self.scale = max(PAPERDOLL_MIN_SCALE, min(PAPERDOLL_MAX_SCALE, scale))
         self.setFixedSize(self._px(PAPERDOLL_WIDTH), self._px(PAPERDOLL_HEIGHT))
         self.portrait.setGeometry(*(self._px(value) for value in PORTRAIT_GEOMETRY))
         frame = self._px(PORTRAIT_FRAME)
@@ -319,7 +323,8 @@ class SkillDetailRow(HoverCardHost, QFrame):
 class SkillDetailList(QScrollArea):
     """One row per skill: icon, name, value, one-line description and XP bar.
 
-    Takes the paperdoll's height and scrolls when the rows do not fit (1280x720, large fonts).
+    The codex column gives it room for every row when it can; it scrolls when the rows
+    do not fit (1280x720, large fonts).
     """
 
     def __init__(self, skills: tuple[SkillView, ...]) -> None:
@@ -334,10 +339,30 @@ class SkillDetailList(QScrollArea):
         body.setObjectName("skillDetailListBody")
         body.setAutoFillBackground(False)
         self.setWidget(body)
-        layout = QVBoxLayout(body)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(5)
+        self.grid = QGridLayout(body)
+        self.grid.setContentsMargins(0, 0, 0, 0)
+        self.grid.setHorizontalSpacing(18)
+        self.grid.setVerticalSpacing(5)
         self.rows = [SkillDetailRow(skill) for skill in skills]
+        self.columns = 0
+        self.set_columns(1)
+
+    def set_columns(self, columns: int) -> None:
+        """Short rows side by side, filled top to bottom then left to right, centred
+        vertically beside a paperdoll taller than them."""
+
+        columns = max(1, min(SKILL_MAX_COLUMNS, columns, len(self.rows) or 1))
+        if columns == self.columns:
+            return
+        self.columns = columns
         for row in self.rows:
-            layout.addWidget(row)
-        layout.addStretch(1)
+            self.grid.removeWidget(row)
+        per_column = -(-len(self.rows) // columns)
+        for index, row in enumerate(self.rows):
+            self.grid.addWidget(row, 1 + index % per_column, index // per_column)
+        for column in range(SKILL_MAX_COLUMNS):
+            self.grid.setColumnStretch(column, 1 if column < columns else 0)
+        self.grid.setRowStretch(0, 1)
+        self.grid.setRowStretch(per_column + 1, 1)
+        for row in range(per_column + 2, len(self.rows) + 2):
+            self.grid.setRowStretch(row, 0)

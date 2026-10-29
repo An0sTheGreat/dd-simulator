@@ -28,6 +28,7 @@ class SettingsPanel(QWidget):
     theme_requested = Signal(str)
     font_size_requested = Signal(int)
     reduced_motion_requested = Signal(bool)
+    glow_pulse_requested = Signal(bool)
     audio_requested = Signal(int, int, bool)  # music volume, ambience volume, muted
     reset_requested = Signal()
     back_requested = Signal()
@@ -148,6 +149,14 @@ class SettingsPanel(QWidget):
         )
         self.reduced_motion_checkbox.toggled.connect(self.reduced_motion_requested)
         form.addRow(_row_label("Motion"), self.reduced_motion_checkbox)
+
+        self.glow_pulse_checkbox = QCheckBox("Pulse item rarity glow")
+        self.glow_pulse_checkbox.setObjectName("glowPulsePreference")
+        self.glow_pulse_checkbox.setAccessibleName("Pulse item rarity glow")
+        self.glow_pulse_checkbox.setToolTip("Let the rarity glow behind items gently pulse")
+        self.glow_pulse_checkbox.setChecked(True)
+        self.glow_pulse_checkbox.toggled.connect(self.glow_pulse_requested)
+        form.addRow(_row_label("Rarity glow"), self.glow_pulse_checkbox)
 
         self.high_contrast_checkbox = QCheckBox("Increase interface contrast")
         self.high_contrast_checkbox.setObjectName("highContrastPreference")
@@ -392,6 +401,11 @@ class SettingsPanel(QWidget):
         self.font_size_value.setText(f"{self._font_size_percent}%")
         self.font_size_decrease.setEnabled(self._font_size_percent > 75)
         self.font_size_increase.setEnabled(self._font_size_percent < 150)
+
+    def select_glow_pulse(self, enabled: bool) -> None:
+        self.glow_pulse_checkbox.blockSignals(True)
+        self.glow_pulse_checkbox.setChecked(enabled)
+        self.glow_pulse_checkbox.blockSignals(False)
 
     def select_reduced_motion(self, enabled: bool) -> None:
         if self.reduced_motion_checkbox.isChecked() == enabled:

@@ -67,7 +67,7 @@ from dd_simulator.local_ai import (
 )
 from dd_simulator.ui.controllers.ui_controller import UiController
 from dd_simulator.ui.models.presentation import DashboardView
-from dd_simulator.ui.item_icons import ui_icon
+from dd_simulator.ui.item_icons import set_rarity_glow_pulse, ui_icon
 from dd_simulator.ui.panels.campaign_panels import (
     CampaignBrowserPanel,
     CharacterCreationPanel,
@@ -111,6 +111,8 @@ from dd_simulator.ui.widgets.codex_cards import (
 )
 from dd_simulator.ui.widgets.codex_character import (
     PAPERDOLL_HEIGHT,
+    PAPERDOLL_MIN_SCALE,
+    SKILL_COLUMN_MAX_WIDTH,
     CharacterStrip,
     PaperdollPanel,
     SkillDetailList,
@@ -180,16 +182,17 @@ class RatioSplitter(QSplitter):
 
 
 class CodexColumn(QWidget):
-    """Left column; scales the paperdoll and bag slots together to fit its height."""
+    """Left column: the skills row is tall enough for every skill, with the paperdoll
+    scaled to match; the inventory and powers cards take what is left."""
 
-    def bind(self, strip, paperdoll, inventory) -> None:  # type: ignore[no-untyped-def]
-        self._parts = (strip, paperdoll, inventory)
+    def bind(self, strip, paperdoll, skills, inventory) -> None:  # type: ignore[no-untyped-def]
+        self._parts = (strip, paperdoll, skills, inventory)
 
     def fit(self) -> None:
         parts = getattr(self, "_parts", None)
         if parts is None:
             return
-        strip, paperdoll, inventory = parts
+        strip, paperdoll, skills, inventory = parts
         margins = self.layout().contentsMargins()
         spacing = self.layout().spacing()
         card_chrome = inventory.sizeHint().height() - inventory.scroll.height()
@@ -197,12 +200,20 @@ class CodexColumn(QWidget):
             self.height() - margins.top() - margins.bottom() - 2 * spacing
             - strip.sizeHint().height() - card_chrome
         )
-        # paperdoll height plus five bag rows, both linear in the scale
+        # five bag rows, linear in the scale
         rows = CARD_VISIBLE_ROWS * CARD_SLOT_SIZE
         fixed = CARD_VISIBLE_ROWS * CARD_SLOT_SPACING - CARD_SLOT_SPACING
-        scale = math.floor(20 * (free - fixed) / (PAPERDOLL_HEIGHT + rows)) / 20
-        paperdoll.set_scale(scale)
-        inventory.set_scale(scale)
+        # paperdoll and five bag rows grow together, both linear in the scale
+        paperdoll.set_scale(math.floor(20 * (free - fixed) / (PAPERDOLL_HEIGHT + rows)) / 20)
+        row_spacing = self.layout().itemAt(1).layout().spacing()
+        width = self.width() - margins.left() - margins.right() - row_spacing - paperdoll.width()
+        skills.set_columns(-(-width // SKILL_COLUMN_MAX_WIDTH))
+        # every skill row while the bag keeps five rows at its smallest scale
+        # (otherwise the list scrolls)
+        wanted = skills.widget().sizeHint().height()
+        top = max(paperdoll.height(), min(wanted, free - fixed - round(rows * PAPERDOLL_MIN_SCALE)))
+        skills.setFixedHeight(top)
+        inventory.set_scale(math.floor(20 * (free - top - fixed) / rows) / 20)
 
     def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         super().resizeEvent(event)
@@ -330,6 +341,7 @@ class MainWindow(QMainWindow):
         self._selected_inventory_item_id: str | None = None
         self.font_size_preference = 100
         self.reduced_motion_preference = False
+        self.glow_pulse_preference = True
         self.music_volume_preference = DEFAULT_MUSIC_VOLUME
         self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
         self.audio_muted_preference = False
@@ -428,6 +440,8 @@ class MainWindow(QMainWindow):
             self._on_reduced_motion_changed
         )
         self.settings_panel.select_reduced_motion(self.reduced_motion_preference)
+        self.settings_panel.glow_pulse_requested.connect(self._on_glow_pulse_changed)
+        self._on_glow_pulse_changed(self.glow_pulse_preference, save=False)
         self.settings_panel.audio_requested.connect(self._on_audio_changed)
         self._apply_audio_preferences()
         self.settings_panel.checkpoint_create_requested.connect(self._create_checkpoint)
@@ -965,7 +979,9 @@ class MainWindow(QMainWindow):
         self.powers_card = PowersCard(dashboard.abilities, dashboard.spells)
         self.codex_card_row = CodexCardRow(self.inventory_card, self.powers_card)
         layout.addWidget(self.codex_card_row, 1)
-        codex.bind(self.character_strip, self.paperdoll_panel, self.inventory_card)
+        codex.bind(
+            self.character_strip, self.paperdoll_panel, self.skill_detail_list, self.inventory_card
+        )
 
         self.scene_view = SceneView(
             dashboard.location,
@@ -2379,6 +2395,9 @@ class MainWindow(QMainWindow):
         if isinstance(reduced_motion, bool):
             self.reduced_motion_preference = reduced_motion
             self.settings_panel.select_reduced_motion(reduced_motion)
+        glow_pulse = ui.get("glow_pulse")
+        if isinstance(glow_pulse, bool):
+            self._on_glow_pulse_changed(glow_pulse, save=False)
         event_filter = ui.get("event_filter")
         if isinstance(event_filter, int):
             self.navigation_pages["journal"].event_log.set_current_filter(event_filter)
@@ -2414,6 +2433,7 @@ class MainWindow(QMainWindow):
                 "page": self.current_page,
                 "font_size": self.font_size_preference,
                 "reduced_motion": self.reduced_motion_preference,
+                "glow_pulse": self.glow_pulse_preference,
                 "event_filter": self.navigation_pages["journal"].event_log.current_filter(),
                 "music_volume": self.music_volume_preference,
                 "ambience_volume": self.ambience_volume_preference,
@@ -2550,6 +2570,7 @@ class MainWindow(QMainWindow):
         self.select_font_size(100)
         self.reduced_motion_preference = False
         self.settings_panel.select_reduced_motion(False)
+        self._on_glow_pulse_changed(True, save=False)
         self.navigation_pages["journal"].event_log.set_current_filter(0)
         self.music_volume_preference = DEFAULT_MUSIC_VOLUME
         self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
@@ -2609,6 +2630,13 @@ class MainWindow(QMainWindow):
             self.ambience_volume_preference,
             self.audio_muted_preference,
         )
+
+    def _on_glow_pulse_changed(self, enabled: bool, *, save: bool = True) -> None:
+        self.glow_pulse_preference = bool(enabled)
+        self.settings_panel.select_glow_pulse(self.glow_pulse_preference)
+        set_rarity_glow_pulse(self.glow_pulse_preference)
+        if save:
+            self.save_ui_preferences()
 
     def _on_reduced_motion_changed(self, enabled: bool) -> None:
         self.reduced_motion_preference = bool(enabled)

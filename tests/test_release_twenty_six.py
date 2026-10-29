@@ -14,7 +14,7 @@ from dd_simulator.ui.widgets.themed_dialog import DraggableTitleBar
 from dataclasses import replace
 
 from dd_simulator.app import build_application
-from dd_simulator.ui.widgets.codex_cards import CARD_COLUMNS, CARD_VISIBLE_ROWS
+from dd_simulator.ui.widgets.codex_cards import CARD_COLUMNS
 from dd_simulator.ui.widgets.inventory_grid import ItemHoverCard
 from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
 
@@ -88,7 +88,7 @@ def test_character_sheet_card_order_at_1600x900(tmp_path: Path) -> None:
     app.processEvents()
 
 
-def test_inventory_card_keeps_five_columns_and_scrolls_when_needed(
+def test_inventory_card_wraps_to_its_width_in_whole_rows_and_scrolls_when_needed(
     tmp_path: Path,
 ) -> None:
     app, window, _themes = _window(tmp_path)
@@ -96,16 +96,23 @@ def test_inventory_card_keeps_five_columns_and_scrolls_when_needed(
     scroll = window.findChild(QScrollArea, "inventoryCardScroll")
     assert scroll is card.scroll
     assert scroll.alignment() == (
-        Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
     )
-    # The demo bag fits the 5x5 viewport; the card does not reflow with the splitter.
-    assert card.grid.columns == CARD_COLUMNS
-    assert len(card.grid.slots) == CARD_COLUMNS * CARD_VISIBLE_ROWS
-    assert scroll.verticalScrollBar().maximum() == 0
-    for sizes in ([850, 750], [1200, 360]):
+    # The demo bag shows every slot: at least 36, in a whole rectangle of 5+ columns.
+    assert card.grid.columns >= CARD_COLUMNS
+    assert len(card.grid.slots) % card.grid.columns == 0 and len(card.grid.slots) >= 36
+    # A wider codex column wraps the bag to more columns, never below five, and the
+    # slot count stays a whole rectangle; slots keep their size.
+    size = card.grid.slot_size
+    widths = []
+    for sizes in ([850, 750], [1200, 360], [500, 1100]):
         window.concept_splitter.setSizes(sizes)
         app.processEvents()
-        assert card.grid.columns == CARD_COLUMNS
+        assert card.grid.columns >= CARD_COLUMNS
+        assert len(card.grid.slots) % card.grid.columns == 0 and len(card.grid.slots) >= 36
+        assert card.grid.slot_size == size
+        widths.append(card.grid.columns)
+    assert widths[1] > widths[0] >= widths[2]
 
     # An item at a deep bag position grows the grid to that row plus one and scrolls.
     item = next(value for value in window.dashboard.inventory_preview if not value.is_empty)

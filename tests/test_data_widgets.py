@@ -72,8 +72,10 @@ def test_phase_three_window_binds_counts_selection_and_tooltips(tmp_path: Path) 
     skills = window.skill_detail_list.findChildren(SkillDetailRow)
     resources = window.character_strip.findChildren(ResourceBar)
 
-    # The card lays the bag out at real positions: a 5x5 viewport, not a fixed 36-slot preview.
-    assert len(inventory) == window.inventory_card.grid.slot_count == 25
+    # The card lays the bag out at real positions in whole rows, never fewer than 36 slots.
+    columns = window.inventory_card.grid.columns
+    assert len(inventory) == window.inventory_card.grid.slot_count
+    assert len(inventory) % columns == 0 and len(inventory) >= 36
     assert sum(not bool(slot.property("empty")) for slot in inventory) == len(occupied)
     assert len(equipment) == 9
     assert len(skills) == 8

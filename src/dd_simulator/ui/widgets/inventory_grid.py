@@ -339,6 +339,9 @@ def _clear_grid(layout: QGridLayout) -> None:
         item = layout.takeAt(0)
         widget = item.widget()
         if widget is not None:
+            # detached now, so findChildren never sees a slot that is pending deletion
+            widget.hide()
+            widget.setParent(None)
             widget.deleteLater()
 
 

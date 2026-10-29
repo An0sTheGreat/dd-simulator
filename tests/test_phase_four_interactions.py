@@ -355,3 +355,24 @@ def test_legacy_removed_navigation_preference_returns_to_dashboard(tmp_path: Pat
     assert restored.current_page == "dashboard"
     assert restored.content_stack.currentIndex() == restored.page_indices["dashboard"]
     close_window(app, restored)
+
+
+def test_rarity_glow_pulse_toggles_and_persists(tmp_path: Path) -> None:
+    from dd_simulator.ui.item_icons import rarity_glow_pulsing
+
+    app, window, preferences_path = build_window(tmp_path)
+    try:
+        checkbox = window.settings_panel.glow_pulse_checkbox
+        assert checkbox.isChecked() and rarity_glow_pulsing()
+        checkbox.setChecked(False)
+        assert not rarity_glow_pulsing()
+    finally:
+        close_window(app, window)
+    app, window, _path = build_window(tmp_path)
+    try:
+        assert not window.settings_panel.glow_pulse_checkbox.isChecked()
+        assert not rarity_glow_pulsing()
+        window.settings_panel.glow_pulse_checkbox.setChecked(True)
+        assert rarity_glow_pulsing()
+    finally:
+        close_window(app, window)

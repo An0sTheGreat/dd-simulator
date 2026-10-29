@@ -29,6 +29,7 @@ from dd_simulator.ui.widgets.skills_grid import AbilityHoverCard
 
 CARD_COLUMNS = 5
 CARD_VISIBLE_ROWS = 5
+CARD_MIN_SLOTS = 36
 CARD_SLOT_SIZE = 68
 CARD_SLOT_SPACING = 3
 CARD_SCROLLBAR_GAP = 5  # between the fifth column and the scrollbar, as in the mockup
@@ -119,21 +120,29 @@ def icon_row(icon: QWidget, name: str, meta: str, *, rarity: str = "") -> QWidge
     return row
 
 
-def bag_slots(items: tuple[InventorySlotView, ...], capacity: int) -> tuple[InventorySlotView, ...]:
-    """Lay occupied items out by bag position: every row up to the last item, one spare row."""
+def bag_slots(
+    items: tuple[InventorySlotView, ...],
+    capacity: int,
+    *,
+    columns: int = CARD_COLUMNS,
+    visible_rows: int = CARD_VISIBLE_ROWS,
+) -> tuple[InventorySlotView, ...]:
+    """Lay occupied items out by bag position in whole rows: at least 36 slots, every
+    visible row, every row up to the last item plus one spare row."""
 
     placed = {
         item.position if item.position is not None else index: item
         for index, item in enumerate(items)
     }
     highest = max(placed, default=-1)
-    rows = max(CARD_VISIBLE_ROWS, highest // CARD_COLUMNS + 2)
-    count = min(max(0, capacity), rows * CARD_COLUMNS)
+    rows = max(-(-CARD_MIN_SLOTS // columns), visible_rows, highest // columns + 2)
+    count = min(max(0, capacity), rows * columns)
     return tuple(placed.get(position, InventorySlotView(None)) for position in range(count))
 
 
 class InventoryCard(QFrame):
-    """5x5 viewport over the whole bag; slot indices are real bag positions."""
+    """Viewport over the whole bag that wraps to as many whole columns and rows of
+    fixed-size slots as the card has room for; slot indices are real bag positions."""
 
     selection_changed = Signal(int)
     context_action_requested = Signal(int, str)
@@ -152,7 +161,7 @@ class InventoryCard(QFrame):
         self.setObjectName("inventoryCard")
         self.setProperty("codexCard", True)
         self.setAccessibleName("Inventory")
-        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.items: tuple[InventorySlotView, ...] = ()
         layout = QVBoxLayout(self)
         layout.setContentsMargins(8, 2, 8, 2)
@@ -176,7 +185,7 @@ class InventoryCard(QFrame):
         self.scroll.setAccessibleName("Inventory slots")
         self.scroll.setFrameShape(QFrame.Shape.NoFrame)
         self.scroll.setWidgetResizable(False)
-        self.scroll.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        self.scroll.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.scroll.setWidget(self.grid)
@@ -186,7 +195,7 @@ class InventoryCard(QFrame):
         bar.valueChanged.connect(self._refresh_footer)
         # Whole rows only, centred between heading and footer when the card is taller.
         layout.addStretch(1)
-        layout.addWidget(self.scroll, 0, Qt.AlignmentFlag.AlignHCenter)
+        layout.addWidget(self.scroll)
         layout.addStretch(1)
 
         footer = QHBoxLayout()
@@ -222,11 +231,13 @@ class InventoryCard(QFrame):
         # wider bar (no theme, another style) never covers the fifth column.
         bar = self.scroll.verticalScrollBar()
         bar.ensurePolished()
-        self.scroll.setFixedSize(
+        # never narrower than five columns; wider cards wrap to more (see _fit_rows)
+        self.scroll.setMinimumWidth(
             CARD_COLUMNS * self.pitch - CARD_SLOT_SPACING + CARD_SCROLLBAR_GAP
-            + bar.sizeHint().width(),
-            self.visible_rows * self.pitch - CARD_SLOT_SPACING,  # scroll area has no frame
+            + bar.sizeHint().width()
         )
+        # scroll area has no frame
+        self.scroll.setFixedHeight(self.visible_rows * self.pitch - CARD_SLOT_SPACING)
         # one wheel notch (3 steps) is about one row
         bar.setSingleStep(self.pitch // 3)
         # Let a short card show fewer whole rows instead of clipping the bottom one.
@@ -236,11 +247,31 @@ class InventoryCard(QFrame):
     def _fit_rows(self) -> None:
         chrome = self.sizeHint().height() - self.scroll.height()
         rows = (self.height() - chrome + CARD_SLOT_SPACING) // self.pitch
-        rows = max(1, min(CARD_VISIBLE_ROWS, rows))
-        if rows != self.visible_rows:
+        rows = max(1, rows)
+        bar = self.scroll.verticalScrollBar().sizeHint().width()
+        width = self.contentsRect().width() - self.layout().contentsMargins().left() * 2
+        columns = max(
+            CARD_COLUMNS,
+            (width - bar - CARD_SCROLLBAR_GAP + CARD_SLOT_SPACING) // self.pitch,
+        )
+        if (rows, columns) != (self.visible_rows, self.grid.columns):
             self.visible_rows = rows
+            self.grid.set_columns(columns)  # rewraps the existing slots in place
             self._fit_scroll()
+            count = len(bag_slots(self.items, self.capacity, columns=columns, visible_rows=rows))
+            if count != len(self.grid.slots):
+                self._rebuild_keeping_selection()
             self._refresh_footer()
+
+    def _rebuild_keeping_selection(self) -> None:
+        selected = [slot.index for slot in self.grid.slots if slot.property("selected")]
+        focused = [slot.index for slot in self.grid.slots if slot.hasFocus()]
+        self.set_inventory(self.items, capacity=self.capacity)
+        for slot in self.grid.slots:
+            if slot.index in selected:
+                slot.set_selected(True)
+            if slot.index in focused:
+                slot.setFocus()
 
     def resizeEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         super().resizeEvent(event)
@@ -253,7 +284,7 @@ class InventoryCard(QFrame):
             self._fit_rows()
 
     def set_scale(self, scale: float) -> None:
-        """Shrink the bag slots (keeping 5x5 visible) when the codex column is short."""
+        """Shrink the bag slots (keeping five rows visible) when the codex column is short."""
 
         size = round(CARD_SLOT_SIZE * max(0.6, min(1.0, scale)))
         if size == self.grid.slot_size:
@@ -261,7 +292,7 @@ class InventoryCard(QFrame):
         self.grid.slot_size = size
         self.pitch = size + CARD_SLOT_SPACING
         self._fit_scroll()
-        self.set_inventory(self.items, capacity=self.capacity)
+        self._rebuild_keeping_selection()
 
     def set_inventory(
         self,
@@ -276,7 +307,9 @@ class InventoryCard(QFrame):
         self.capacity = capacity
         if equipment is not None:
             self.grid.equipment = equipment
-        slots = bag_slots(items, capacity)
+        slots = bag_slots(
+            items, capacity, columns=self.grid.columns, visible_rows=self.visible_rows
+        )
         self.grid.slot_count = len(slots)
         self.grid.set_items(slots)
         for slot in self.grid.slots:
@@ -290,7 +323,7 @@ class InventoryCard(QFrame):
         bottom = self.scroll.verticalScrollBar().value() + self.scroll.height()
         return sum(
             1 for slot in self.grid.slots
-            if not slot.item.is_empty and (slot.index // CARD_COLUMNS) * self.pitch >= bottom
+            if not slot.item.is_empty and (slot.index // self.grid.columns) * self.pitch >= bottom
         )
 
     def _refresh_footer(self) -> None:
@@ -492,5 +525,6 @@ class CodexCardRow(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(8)
-        layout.addWidget(inventory)
+        # the bag wraps to the width it gets, so the two cards share the row evenly
+        layout.addWidget(inventory, 1)
         layout.addWidget(powers, 1)

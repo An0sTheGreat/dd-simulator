@@ -6,10 +6,11 @@ from dataclasses import dataclass
 from functools import lru_cache
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QVariantAnimation, Qt
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from PySide6.QtWidgets import QApplication, QGraphicsDropShadowEffect, QLabel
 
@@ -318,13 +319,69 @@ def _rarity_colours(theme_id: str) -> dict[str, str]:
 
 
 class _RarityGlow(QGraphicsDropShadowEffect):
+    def __init__(self, parent) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(parent)
+        self.base = QColor()
+        _GLOWS.append(self)
+
+    def set_base(self, colour: QColor) -> None:
+        self.base = colour
+        self.set_strength(_pulse_strength)
+
+    def set_strength(self, strength: float) -> None:
+        colour = QColor(self.base)
+        colour.setAlphaF(strength)
+        self.setColor(colour)
+
     def draw(self, painter) -> None:  # type: ignore[no-untyped-def]
-        super().draw(painter)
-        # a second pass at half opacity makes the glow about 1.5x as strong
+        # A half-opacity pass first, then the full pass: the glow is about 1.5x as
+        # strong and the item itself is drawn last, on top, untinted.
         painter.save()
         painter.setOpacity(0.5)
         super().draw(painter)
         painter.restore()
+        super().draw(painter)
+
+
+# ponytail: plain list pruned on each pulse tick; a weak set if icons churn heavily
+_GLOWS: list[_RarityGlow] = []
+_pulse: QVariantAnimation | None = None
+_pulse_strength = 1.0
+
+
+def _apply_pulse(phase: object) -> None:
+    global _pulse_strength
+    # a light breath between 60% and full strength
+    _pulse_strength = 0.8 + 0.2 * math.cos(2 * math.pi * float(phase))
+    for glow in list(_GLOWS):
+        try:
+            glow.set_strength(_pulse_strength)
+        except RuntimeError:  # its icon was deleted
+            _GLOWS.remove(glow)
+
+
+def set_rarity_glow_pulse(enabled: bool) -> None:
+    """Start or stop the shared, slow pulse of every rarity glow."""
+
+    global _pulse
+    if not enabled:
+        if _pulse is not None:
+            _pulse.stop()
+            _pulse = None
+        _apply_pulse(0.0)
+        return
+    if _pulse is None:
+        _pulse = QVariantAnimation(QApplication.instance())
+        _pulse.setStartValue(0.0)
+        _pulse.setEndValue(1.0)
+        _pulse.setDuration(2400)
+        _pulse.setLoopCount(-1)
+        _pulse.valueChanged.connect(_apply_pulse)
+        _pulse.start()
+
+
+def rarity_glow_pulsing() -> bool:
+    return _pulse is not None
 
 
 def apply_rarity_glow(icon: QLabel, rarity: str) -> None:
@@ -341,9 +398,9 @@ def apply_rarity_glow(icon: QLabel, rarity: str) -> None:
         glow = _RarityGlow(icon)
         glow.setOffset(0, 0)
         icon.setGraphicsEffect(glow)
-    # 9 px blur at the 59 px inventory icon; smaller icons get a tighter outline
-    glow.setBlurRadius(max(7, icon.width() * 9 // 59))
-    glow.setColor(QColor(colour))
+    # 27 px blur at the 59 px inventory icon; smaller icons get a tighter outline
+    glow.setBlurRadius(max(20, icon.width() * 27 // 59))
+    glow.set_base(QColor(colour))
 
 
 def ui_icon(name: str) -> QIcon:
