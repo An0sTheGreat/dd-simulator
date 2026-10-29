@@ -14,6 +14,7 @@ import zipfile
 from PySide6.QtCore import QEvent, QPoint, QSize, QThreadPool, QTimer, Qt, Signal
 from PySide6.QtGui import QCloseEvent, QFont, QGuiApplication
 from PySide6.QtWidgets import (
+    QApplication,
     QComboBox,
     QDialog,
     QFrame,

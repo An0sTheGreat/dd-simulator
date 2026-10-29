@@ -132,3 +132,23 @@ def _active_combat():  # type: ignore[no-untyped-def]
         id="encounter", status="active", round_number=1, environment="road", hazard="",
         starting_distance=30, end_reason="", combatants=(), recent_turns=(),
     )
+
+
+def test_window_builds_with_interface_sounds_enabled(tmp_path: Path, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    # Tests run with audio off; this takes the sound-on path the packaged app takes.
+    from dd_simulator.ui import audio
+
+    app = QApplication.instance() or QApplication([])
+    monkeypatch.setattr(audio, "audio_disabled", lambda: False)
+    manager = ThemeManager(
+        themes_root=THEMES_ROOT, preferences_path=tmp_path / "p.json", default_theme_id="high_fantasy"
+    )
+    window = MainWindow(manager.available_themes(), build_phase_three_dashboard(), config_dir=tmp_path)
+    try:
+        assert window.ui_sounds.enabled
+    finally:
+        app.removeEventFilter(window.ui_sounds)
+        window.music.stop()
+        window.close()
+        window.deleteLater()
+        app.processEvents()
