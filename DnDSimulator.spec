@@ -48,6 +48,7 @@ exe = EXE(
     [],
     exclude_binaries=True,
     name="DnDSimulator",
+    icon=str(icon_root / "app" / "dd_simulator.ico"),
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

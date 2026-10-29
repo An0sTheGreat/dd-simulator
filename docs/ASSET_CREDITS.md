@@ -126,7 +126,9 @@ confirming that the intended distribution complies with the supplied asset terms
 ## Concept T codex assets (UI redesign Phase 1)
 
 Imported by `scripts/import_codex_assets.py`, which records every source path and can be
-re-run to reproduce the runtime copies byte for byte.
+re-run to reproduce the runtime copies byte for byte. `scripts/flatten_codex_speckle.py`
+then flattens the speckled fill of the panel, tooltip, button and tab frames (stretched
+over large cards it showed as low-resolution spots); rerun it after a re-import.
 
 - **UI frames and markers.** Runtime copies: the PNGs in `src/dd_simulator/ui/assets/codex`
   (frames, original size) and `codex/markers` (downscaled to 64 px). Sources:
@@ -146,13 +148,20 @@ re-run to reproduce the runtime copies byte for byte.
   `Untitled RPG/Assets/Fonts/Oxanium`. SIL Open Font License 1.1; the license text ships
   beside the fonts as `oxanium-ofl.txt`.
 
+## Application icon (original, generated in code)
+
+- `src/dd_simulator/ui/assets/icons/app/dd_simulator.ico` (16-256 px) and `dd_simulator.png`
+  (512 px): a gold d20 on a crimson tile, drawn with QPainter by
+  `scripts/generate_app_icon.py`; the "20" uses the bundled Oxanium Bold. No third-party
+  art. Rerunning the script reproduces the files.
+
 ## Concept B title bar and page backgrounds (original, generated in code)
 
 - Original art, drawn procedurally with QPainter and seeded noise by
   `scripts/generate_chrome_textures.py`; no third-party source. Rerunning the script
   reproduces the files.
-- Modern Fantasy Simple (`themes/high_fantasy/assets`): `background_stone.jpg` (dark stone,
-  candlelight from the top), `header_crest.png`, `header_rule_left.png`,
+- Modern Fantasy Simple (`themes/high_fantasy/assets`): `background_stone.jpg` (smooth dark
+  umber, candlelight from the top), `header_crest.png`, `header_rule_left.png`,
   `header_rule_right.png`, `title_rule_left.png`, `title_rule_right.png`.
 - Modern Dark Simple (`themes/modern_proof/assets`): `background_charcoal.jpg`,
   `header_crest.png`, `header_rule_left.png`, `header_rule_right.png`,

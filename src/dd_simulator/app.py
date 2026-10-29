@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Sequence
 
 from PySide6.QtCore import QEvent, QTimer
-from PySide6.QtGui import QColor, QFont, QImage
+from PySide6.QtGui import QColor, QFont, QIcon, QImage
 from PySide6.QtWidgets import QApplication, QLabel, QProgressBar, QPushButton, QWidget
 
 from dd_simulator.state import (
@@ -51,6 +51,8 @@ from dd_simulator.state.turns import normalize_narrative_segment
 
 
 APP_NAME = "D&D Simulator"
+# drawn by scripts/generate_app_icon.py
+APP_ICON = Path(__file__).parent / "ui" / "assets" / "icons" / "app" / "dd_simulator.ico"
 ORGANIZATION_NAME = "D&D Simulator"
 LOGGER = logging.getLogger(__name__)
 def default_config_dir() -> Path:
@@ -102,6 +104,7 @@ def build_application(
     app = QApplication.instance()
     if app is None:
         app = QApplication(list(argv if argv is not None else sys.argv))
+    app.setWindowIcon(QIcon(str(APP_ICON)))
     register_application_fonts()
     base_application_font = app.property("dndBaseApplicationFont")
     if not isinstance(base_application_font, QFont):
@@ -212,6 +215,11 @@ def build_application(
 def main() -> int:
     """Launch the desktop application."""
 
+    if sys.platform == "win32":
+        import ctypes
+
+        # its own taskbar entry and icon, even when run from source under python.exe
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("DnDSimulator.Desktop")
     config_dir = default_config_dir()
     log_dir = config_dir / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -398,7 +406,8 @@ def _run_release_twenty_six_smoke(app: QApplication, window: MainWindow) -> None
         if window.scene_view.image_path is None:
             raise RuntimeError("Packaged location catalog image did not render")
         initial_point_size = app.font().pointSizeF()
-        window.settings_panel.font_size_increase.click()
+        window.settings_panel.font_size_slider.setValue(window.font_size_preference + 5)
+        window.settings_panel.font_size_apply.click()
         app.processEvents()
         if app.font().pointSizeF() <= initial_point_size:
             raise RuntimeError("Packaged global font scaling did not apply")
@@ -824,8 +833,8 @@ def _run_release_fifteen_smoke(app: QApplication, window: MainWindow) -> None:
         hover_card = window.findChild(QWidget, "itemHoverCard")
         if hover_card is None or len(hover_card.findChildren(QWidget, "itemHoverDetail")) != 7:
             raise RuntimeError("Packaged two-column item hover card did not load")
-        font_button = window.settings_panel.font_size_increase
-        if not font_button.isEnabled():
+        font_slider = window.settings_panel.font_size_slider
+        if not font_slider.isEnabled():
             raise RuntimeError("Packaged font-size preference is disabled")
         original_stylesheet = app.styleSheet()
         target_size = min(150, window.font_size_preference + 5)

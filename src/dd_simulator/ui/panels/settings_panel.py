@@ -110,7 +110,9 @@ class SettingsPanel(QWidget):
         form = QFormLayout()
         form.setHorizontalSpacing(18)
         form.setVerticalSpacing(10)
-        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)  # narrow column
+        # Labels above their controls: WrapLongRows only wraps once the width is known,
+        # so at large fonts the card's minimum height came out short and rows overlapped.
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
 
         self.theme_selector = QComboBox()
         self.theme_selector.setObjectName("settingsThemeSelector")
@@ -120,24 +122,33 @@ class SettingsPanel(QWidget):
         self.theme_selector.currentIndexChanged.connect(self._theme_changed)
         form.addRow(_row_label("Theme"), self.theme_selector)
 
-        font_controls = QHBoxLayout()
+        # Drag to a size, then Apply: restyling the whole window on every step is slow.
+        font_controls = QVBoxLayout()
         font_controls.setContentsMargins(0, 0, 0, 0)
-        self.font_size_decrease = SemanticButton("−", role="secondary")
-        self.font_size_decrease.setObjectName("decreaseFontSizeButton")
-        self.font_size_decrease.setAccessibleName("Decrease interface font size")
-        self.font_size_decrease.clicked.connect(lambda: self._adjust_font_size(-5))
-        self.font_size_increase = SemanticButton("+", role="secondary")
-        self.font_size_increase.setObjectName("increaseFontSizeButton")
-        self.font_size_increase.setAccessibleName("Increase interface font size")
-        self.font_size_increase.clicked.connect(lambda: self._adjust_font_size(5))
+        slider_row = QHBoxLayout()
+        slider_row.setContentsMargins(0, 0, 0, 0)
+        self.font_size_slider = QSlider(Qt.Orientation.Horizontal)
+        self.font_size_slider.setObjectName("fontSizeSlider")
+        self.font_size_slider.setAccessibleName("Interface font size")
+        self.font_size_slider.setRange(75, 150)
+        self.font_size_slider.setSingleStep(5)
+        self.font_size_slider.setPageStep(5)
+        self.font_size_slider.setValue(100)
+        self.font_size_slider.valueChanged.connect(self._font_size_slid)
         self.font_size_value = semantic_label(
             "100%", object_name="fontSizeValue", text_role="body"
         )
-        self.font_size_value.setAccessibleName("Current interface font size")
-        font_controls.addWidget(self.font_size_decrease)
-        font_controls.addWidget(self.font_size_increase)
-        font_controls.addWidget(self.font_size_value)
-        font_controls.addStretch(1)
+        self.font_size_value.setAccessibleName("Selected interface font size")
+        self.font_size_value.setMinimumWidth(44)
+        slider_row.addWidget(self.font_size_slider, 1)
+        slider_row.addWidget(self.font_size_value)
+        font_controls.addLayout(slider_row)
+        self.font_size_apply = SemanticButton("Apply", role="secondary")
+        self.font_size_apply.setObjectName("applyFontSizeButton")
+        self.font_size_apply.setAccessibleName("Apply interface font size")
+        self.font_size_apply.setEnabled(False)
+        self.font_size_apply.clicked.connect(self._apply_font_size)
+        font_controls.addWidget(self.font_size_apply, 0, Qt.AlignmentFlag.AlignLeft)
         self._font_size_percent = 100
         form.addRow(_row_label("Font size"), font_controls)
 
@@ -175,14 +186,16 @@ class SettingsPanel(QWidget):
         audio_form = QFormLayout()
         audio_form.setHorizontalSpacing(18)
         audio_form.setVerticalSpacing(10)
-        audio_form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)  # narrow column
+        audio_form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)  # as Display
 
         self.music_volume_slider = self._volume_slider("musicVolumeSlider", "Music volume")
-        audio_form.addRow(_row_label("Music volume"), self.music_volume_slider)
+        audio_form.addRow(_row_label("Music volume"), self._with_value(self.music_volume_slider))
         self.ambience_volume_slider = self._volume_slider(
             "ambienceVolumeSlider", "Ambience volume"
         )
-        audio_form.addRow(_row_label("Ambience volume"), self.ambience_volume_slider)
+        audio_form.addRow(
+            _row_label("Ambience volume"), self._with_value(self.ambience_volume_slider)
+        )
         self.mute_checkbox = QCheckBox("Mute music and ambience")
         self.mute_checkbox.setObjectName("muteAudioPreference")
         self.mute_checkbox.setAccessibleName("Mute music and ambience")
@@ -250,6 +263,20 @@ class SettingsPanel(QWidget):
             column.setStretch(len(cards) - 1, 1)  # columns end level with the Campaigns card
             columns.addLayout(column, 1)
 
+    @staticmethod
+    def _with_value(slider: QSlider) -> QHBoxLayout:
+        """The slider with its live percentage beside it."""
+
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
+        value = semantic_label(f"{slider.value()}%", object_name="sliderValue", text_role="body")
+        value.setMinimumWidth(44)
+        slider.valueChanged.connect(lambda level: value.setText(f"{level}%"))
+        slider.setProperty("valueLabel", value)  # select_audio sets values with signals blocked
+        row.addWidget(slider, 1)
+        row.addWidget(value)
+        return row
+
     def _volume_slider(self, object_name: str, accessible_name: str) -> QSlider:
         slider = QSlider(Qt.Orientation.Horizontal)
         slider.setObjectName(object_name)
@@ -275,6 +302,7 @@ class SettingsPanel(QWidget):
             widget.blockSignals(True)
             if isinstance(widget, QSlider):
                 widget.setValue(int(value))
+                widget.property("valueLabel").setText(f"{widget.value()}%")
             else:
                 widget.setChecked(bool(value))
             widget.blockSignals(False)
@@ -284,8 +312,16 @@ class SettingsPanel(QWidget):
         if theme_id:
             self.theme_requested.emit(str(theme_id))
 
-    def _adjust_font_size(self, delta: int) -> None:
-        value = min(150, max(75, self._font_size_percent + delta))
+    def _font_size_slid(self, value: int) -> None:
+        value = round(value / 5) * 5  # whole 5% steps, also when dragged
+        if value != self.font_size_slider.value():
+            self.font_size_slider.setValue(value)
+            return
+        self.font_size_value.setText(f"{value}%")
+        self.font_size_apply.setEnabled(value != self._font_size_percent)
+
+    def _apply_font_size(self) -> None:
+        value = self.font_size_slider.value()
         if value != self._font_size_percent:
             self.select_font_size(value)
             self.font_size_requested.emit(value)
@@ -398,9 +434,11 @@ class SettingsPanel(QWidget):
 
     def select_font_size(self, percent: int) -> None:
         self._font_size_percent = min(150, max(75, int(percent)))
+        self.font_size_slider.blockSignals(True)
+        self.font_size_slider.setValue(self._font_size_percent)
+        self.font_size_slider.blockSignals(False)
         self.font_size_value.setText(f"{self._font_size_percent}%")
-        self.font_size_decrease.setEnabled(self._font_size_percent > 75)
-        self.font_size_increase.setEnabled(self._font_size_percent < 150)
+        self.font_size_apply.setEnabled(False)
 
     def select_glow_pulse(self, enabled: bool) -> None:
         self.glow_pulse_checkbox.blockSignals(True)

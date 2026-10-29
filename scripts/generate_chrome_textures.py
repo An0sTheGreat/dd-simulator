@@ -37,41 +37,11 @@ def noise(w: int, h: int, seed: int) -> QImage:
     return QImage(rnd.randbytes(w * h), w, h, w, QImage.Format.Format_Grayscale8).copy()
 
 
-def overlay_noise(p: QPainter, cells_w: int, seed: int, opacity: float) -> None:
-    cells_h = max(2, round(cells_w * H / W))
-    img = noise(cells_w, cells_h, seed).scaled(
-        W, H, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation
-    )
-    p.save()
-    p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Overlay)
-    p.setOpacity(opacity)
-    p.drawImage(0, 0, img)
-    p.restore()
-
-
 def grain(p: QPainter, w: int, h: int, opacity: float, seed: int) -> None:
     p.save()
     p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Overlay)
     p.setOpacity(opacity)
     p.drawTiledPixmap(0, 0, w, h, QPixmap.fromImage(noise(512, 512, seed)))
-    p.restore()
-
-
-def cracks(p: QPainter, seed: int, count: int, color: QColor) -> None:
-    rnd = random.Random(seed)
-    p.save()
-    p.setRenderHint(QPainter.RenderHint.Antialiasing)
-    p.setPen(QPen(color, 1.0, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
-    for _ in range(count):
-        x, y = rnd.uniform(0, W), rnd.uniform(0, H)
-        path = QPainterPath(QPointF(x, y))
-        angle = rnd.uniform(0, math.tau)
-        for _ in range(rnd.randint(4, 9)):
-            angle += rnd.uniform(-0.7, 0.7)
-            step = rnd.uniform(10, 34)
-            x, y = x + math.cos(angle) * step, y + math.sin(angle) * step
-            path.lineTo(x, y)
-        p.drawPath(path)
     p.restore()
 
 
@@ -94,22 +64,21 @@ def top_glow(p: QPainter, w: int, h: int, stops: tuple[tuple[float, QColor], ...
 
 
 def stone(out: Path) -> None:
-    """High Fantasy: dark stone lit by candlelight from the top, with fine noise."""
+    """High Fantasy: smooth dark umber lit by candlelight from the top.
+
+    The stone mottling (scaled-up noise and cracks) read as low-resolution spots, so
+    only a 1:1 dither is left, to keep the JPG from banding."""
     img = QImage(W, H, QImage.Format.Format_RGB32)
     img.fill(QColor("#16140f"))
     p = QPainter(img)
-    overlay_noise(p, 6, 11, 0.55)
-    overlay_noise(p, 18, 12, 0.45)
-    overlay_noise(p, 60, 13, 0.25)
-    cracks(p, 14, 26, QColor(0, 0, 0, 90))
-    grain(p, W, H, 0.16, 15)
+    grain(p, W, H, 0.03, 15)
     top_glow(
         p, W, H,
         ((0.0, QColor(255, 168, 82, 70)), (0.45, QColor(220, 120, 50, 26)), (1.0, QColor(0, 0, 0, 0))),
     )
     vignette(p, W, H, 200, QPointF(W / 2, H * 0.35), math.hypot(W, H) * 0.58)
     p.end()
-    img.save(str(out / "background_stone.jpg"), "JPG", 80)
+    img.save(str(out / "background_stone.jpg"), "JPG", 92)
 
 
 def charcoal(out: Path) -> None:

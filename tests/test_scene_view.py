@@ -353,3 +353,23 @@ def test_quest_reward_chips_include_faction_reputation() -> None:
     chips = reward_chips(service.load_active_dashboard().quest_list)
     assert "LORD ARIC +1" in chips
     database.close()
+
+
+def test_quest_card_grows_to_show_every_objective_up_to_twice_the_heading(tmp_path: Path) -> None:
+    manager = ThemeManager(
+        themes_root=THEMES_ROOT, preferences_path=tmp_path / "prefs.json",
+        default_theme_id="high_fantasy",
+    )
+    manager.apply_loaded_theme(app(), manager.load_theme("high_fantasy"), persist=False)
+    for scale in (1.0, 1.5):  # the card fits, then it is taller than the cap and scrolls
+        manager.set_font_scale(app(), scale)
+        view = scene()
+        for _ in range(3):
+            QApplication.processEvents()
+        cap = 2 * view._heading.sizeHint().height()
+        host = view._card_host
+        content = host.heightForWidth(view.card_scroll.width())
+        assert view.card_scroll.maximumHeight() == cap, scale
+        assert view.card_scroll.minimumHeight() == min(content, cap), scale
+        if content <= cap:
+            assert view.card_scroll.verticalScrollBar().maximum() == 0, scale

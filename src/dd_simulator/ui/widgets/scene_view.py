@@ -893,6 +893,8 @@ class SceneView(QWidget):
         self.card_slot.addStretch(1)
         self.card_scroll.setWidget(cards)
         location_row.addWidget(self.card_scroll)
+        self._card_host, self._heading = cards, heading
+        cards.installEventFilter(self)
         layout.addLayout(location_row)
 
         self.conversation_slot = QVBoxLayout()
@@ -1008,6 +1010,27 @@ class SceneView(QWidget):
         # Narrow scene (1280 px window): the card yields width to the location heading.
         width = round(0.45 * (self.width() - 40))
         self.card_scroll.setFixedWidth(max(240, min(SCENE_CARD_WIDTH, width)))
+        self._fit_card_height()
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        if watched is self._card_host and event.type() == QEvent.Type.LayoutRequest:
+            self._fit_card_height()
+        return super().eventFilter(watched, event)
+
+    def _fit_card_height(self) -> None:
+        """Tall enough for the whole card, up to twice the location heading beside it and
+        never into the conversation's minimum height; past that the card scrolls."""
+
+        host = self._card_host
+        width = self.card_scroll.width()
+        need = host.heightForWidth(width) if host.hasHeightForWidth() else host.sizeHint().height()
+        current = self.card_scroll.minimumHeight()
+        spare = self.height() - self.layout().minimumSize().height() if self.isVisible() else 0
+        cap = 2 * self._heading.sizeHint().height()
+        self.card_scroll.setMaximumHeight(cap)
+        height = min(need, cap, max(0, current + spare))
+        if height != current:
+            self.card_scroll.setMinimumHeight(height)
 
     def paintEvent(self, _event) -> None:  # type: ignore[no-untyped-def]
         paint_backdrop(QPainter(self), self.rect(), self._art, self._overlay)

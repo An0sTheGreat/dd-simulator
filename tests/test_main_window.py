@@ -381,9 +381,17 @@ def test_settings_font_size_applies_live_and_persists(tmp_path: Path) -> None:
     app, window, theme_manager = build_application([], config_dir=tmp_path)
     default_stylesheet = app.styleSheet()
     default_point_size = app.font().pointSizeF()
-    window.settings_panel.font_size_increase.click()
+    panel = window.settings_panel
+    panel.font_size_slider.setValue(105)
+    # moving the slider only previews the value; Apply restyles the window
+    assert window.font_size_preference == 100
+    assert panel.font_size_value.text() == "105%" and panel.font_size_apply.isEnabled()
+    panel.font_size_slider.setValue(107)  # snaps to whole 5% steps
+    assert panel.font_size_slider.value() == 105
+    panel.font_size_apply.click()
     app.processEvents()
 
+    assert not panel.font_size_apply.isEnabled()
     assert window.font_size_preference == 105
     assert theme_manager.font_scale == 1.05
     assert app.styleSheet() != default_stylesheet
