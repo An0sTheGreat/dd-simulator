@@ -838,21 +838,24 @@ class JournalPage(NavigationPage):
         self.layout.addLayout(columns, 1)
 
 
+NAVIGATION_PAGE_NAMES = ("map", "people", "character_sheet", "journal")
+
+
+def create_navigation_page(name: str, dashboard: DashboardView) -> NavigationPage:
+    if name == "map":
+        map_page = NavigationPage(
+            "mapNavigationPage",
+            "MAP",
+            "Known locations and the current route; undiscovered locations remain hidden.",
+        )
+        map_page.layout.addWidget(WorldMapPanel(dashboard.world_map), 1)
+        return map_page
+    if name == "people":
+        return NpcNavigationPage(dashboard.npc_conversations)
+    if name == "character_sheet":
+        return CharacterSheetPage(dashboard)
+    return JournalPage(dashboard)
+
+
 def create_navigation_pages(dashboard: DashboardView) -> dict[str, NavigationPage]:
-    pages: dict[str, NavigationPage] = {}
-
-    map_page = NavigationPage(
-        "mapNavigationPage",
-        "MAP",
-        "Known locations and the current route; undiscovered locations remain hidden.",
-    )
-    map_page.layout.addWidget(WorldMapPanel(dashboard.world_map), 1)
-    pages["map"] = map_page
-
-    people = NpcNavigationPage(dashboard.npc_conversations)
-    pages["people"] = people
-
-    pages["character_sheet"] = CharacterSheetPage(dashboard)
-    pages["journal"] = JournalPage(dashboard)
-
-    return pages
+    return {name: create_navigation_page(name, dashboard) for name in NAVIGATION_PAGE_NAMES}

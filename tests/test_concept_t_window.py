@@ -876,3 +876,34 @@ def test_reloads_open_no_stray_windows_and_combat_turns_echo_without_greying(tmp
         window.close()
         window.deleteLater()
         app.processEvents()
+
+
+def test_turn_refresh_updates_in_place_and_rebuilds_hidden_pages_on_open(tmp_path: Path) -> None:
+    import time
+
+    from dd_simulator.state import CombatAction, CombatCommand
+
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window._show_navigation("dashboard")
+    app.processEvents()
+    service = window.game_state_service
+    service.start_combat()
+    window._refresh_turn_views(service.load_active_dashboard())
+    stack, splitter, scene = window.content_stack, window.concept_splitter, window.scene_view
+    journal = window.navigation_pages["journal"]
+    service.execute_combat_command(CombatCommand(CombatAction.PREPARE, preparation="scout"))
+    started = time.perf_counter()
+    window._refresh_turn_views(service.load_active_dashboard())
+    elapsed = time.perf_counter() - started
+    assert window.content_stack is stack and window.concept_splitter is splitter and window.scene_view is scene
+    assert window.conversation_view.messages[-1].turn_number == window.dashboard.narrative.messages[-1].turn_number
+    assert "journal" in window._stale_pages and window.navigation_pages["journal"] is journal
+    window._show_navigation("journal")
+    assert window.navigation_pages["journal"] is not journal and "journal" not in window._stale_pages
+    assert window.content_stack.currentWidget() is window.navigation_pages["journal"]
+    assert elapsed < 0.5, elapsed  # a full reload took ~1 s
+    window.close()
+    window.deleteLater()
+    app.processEvents()

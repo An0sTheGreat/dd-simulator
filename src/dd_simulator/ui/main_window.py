@@ -77,6 +77,8 @@ from dd_simulator.ui.panels.campaign_panels import (
 from dd_simulator.ui.panels.navigation_pages import (
     CharacterSheetPage,
     NavigationPage,
+    NAVIGATION_PAGE_NAMES,
+    create_navigation_page,
     create_navigation_pages,
 )
 from dd_simulator.ui.panels.settings_panel import SettingsPanel
@@ -349,7 +351,7 @@ class MainWindow(QMainWindow):
         self.current_page = "dashboard"
         self._dialog_dim_depth = 0
         self._last_turn_shown: int | None = None
-        self._character_sheet_stale = False
+        self._stale_pages: set[str] = set()  # pages built from an older dashboard
         self.page_indices: dict[str, int] = {}
         self.theme_selector = QComboBox()
         self.theme_selector.setObjectName("themeSelector")
@@ -403,6 +405,7 @@ class MainWindow(QMainWindow):
         self.page_indices["dashboard"] = self.content_stack.addWidget(self.concept_splitter)
         self.page_indices["crafting"] = self.content_stack.addWidget(self._build_crafting_page())
 
+        self._stale_pages.clear()
         self.navigation_pages = create_navigation_pages(self.dashboard)
         for target, page in self.navigation_pages.items():
             page.back_requested.connect(lambda name="dashboard": self.controller.navigate(name))
@@ -535,18 +538,100 @@ class MainWindow(QMainWindow):
             lambda: self._resolve_combat_action(CombatCommand(CombatAction.RECOVER))
         )
         self.conversation_view.older_requested.connect(self._load_older_messages)
-        map_page = self.navigation_pages.get("map")
-        if map_page is not None:
-            world_map = map_page.findChild(WorldMapPanel)
+        for name in ("map", "people"):
+            self._wire_navigation_page(name, self.navigation_pages.get(name))
+        self._connect_item_interactions()
+
+    def _wire_navigation_page(self, name: str, page: QWidget | None) -> None:
+        if page is None:
+            return
+        if name == "map":
+            world_map = page.findChild(WorldMapPanel)
             if world_map is not None:
                 world_map.travel_requested.connect(self._request_map_travel)
                 world_map.camp_requested.connect(self._request_map_camp)
-        people_page = self.navigation_pages.get("people")
-        if people_page is not None and hasattr(people_page, "dialogue_requested"):
-            people_page.dialogue_requested.connect(self._resolve_npc_dialogue)
-        if people_page is not None and hasattr(people_page, "trade_requested"):
-            people_page.trade_requested.connect(self._request_trade)
-        self._connect_item_interactions()
+        elif name == "people":
+            if hasattr(page, "dialogue_requested"):
+                page.dialogue_requested.connect(self._resolve_npc_dialogue)
+            if hasattr(page, "trade_requested"):
+                page.trade_requested.connect(self._request_trade)
+        elif name == "character_sheet":
+            page.crafting_requested.connect(lambda: self.controller.navigate("crafting"))
+
+    def _rebuild_page(self, name: str) -> None:
+        """Rebuild one dashboard-derived page in place, at its index in the stack."""
+
+        index = self.page_indices.get(name)
+        if index is None:
+            return
+        if name == "crafting":
+            page = self._build_crafting_page()
+        else:
+            old_page = self.navigation_pages.get(name)
+            selected = getattr(old_page, "selected_id", "")
+            event_filter = (
+                old_page.event_log.current_filter() if name == "journal" and old_page is not None else None
+            )
+            page = create_navigation_page(name, self.dashboard)
+            page.back_requested.connect(lambda target="dashboard": self.controller.navigate(target))
+            self._wire_navigation_page(name, page)
+            self.navigation_pages[name] = page
+            if selected and hasattr(page, "open_npc"):
+                page.open_npc(selected)
+            if event_filter is not None:
+                page.event_log.set_current_filter(event_filter)
+        old = self.content_stack.widget(index)
+        self.content_stack.removeWidget(old)
+        old.deleteLater()
+        self.content_stack.insertWidget(index, page)
+        for grid in page.findChildren(EquipmentGrid):
+            self._connect_equipment_grid(grid)
+
+    def _refresh_turn_views(self, dashboard: DashboardView) -> None:
+        """After a turn, update the dashboard's widgets in place instead of rebuilding
+        every page (about a second); pages off screen are rebuilt when next opened."""
+
+        previous = self.dashboard
+        with self._painting_frozen():
+            self._refresh_item_views(dashboard)  # bag, paperdoll, stats strip; sets self.dashboard
+            if dashboard.skills != previous.skills:
+                skills = SkillDetailList(dashboard.skills)
+                self._replace_in_layout(self.skill_detail_list, skills)
+                self.skill_detail_list = skills
+            if (dashboard.abilities, dashboard.spells) != (previous.abilities, previous.spells):
+                powers = PowersCard(dashboard.abilities, dashboard.spells)
+                self._replace_in_layout(self.powers_card, powers)
+                self.powers_card = powers
+                powers.action_activated.connect(self._activate_power)
+                powers.rest_requested.connect(
+                    lambda: self._resolve_combat_action(CombatCommand(CombatAction.RECOVER))
+                )
+            combat = dashboard.combat
+            self.powers_card.rest_button.setVisible(combat is None or combat.status != "active")
+            self._set_hotbar_actions(dashboard)
+            self.codex_column.bind(
+                self.character_strip, self.paperdoll_panel, self.skill_detail_list, self.hotbar,
+                self.inventory_card,
+            )
+            self.codex_column.fit()
+            scene = self.scene_view
+            if dashboard.location != previous.location:
+                scene.set_location(dashboard.location)
+            scene.set_clock(dashboard.location.day, dashboard.location.turn_number)
+            scene.set_quest(dashboard.quest, dashboard.quest_list)
+            scene.set_suggestions(dashboard.narrative.suggested_actions)
+            scene.set_combat(combat)
+            self._show_conversation(dashboard.narrative)
+            self._stale_pages.update(("crafting", *NAVIGATION_PAGE_NAMES))
+            if self.current_page != "dashboard":
+                self._show_navigation("dashboard")
+        QTimer.singleShot(0, self._show_pending_quest_reward)
+        QTimer.singleShot(0, self._show_pending_crafting_result)
+
+    def _replace_in_layout(self, old: QWidget, new: QWidget) -> None:
+        old.parentWidget().layout().replaceWidget(old, new, Qt.FindChildOption.FindChildrenRecursively)
+        old.hide()
+        old.deleteLater()
 
     def _start_custom_character_creation(self) -> None:
         self.character_creation_panel.begin_creation()
@@ -973,16 +1058,7 @@ class MainWindow(QMainWindow):
         layout.addLayout(row)
         # one row of ten quick slots across the column, above the bag and powers
         self.hotbar = Hotbar()
-        weapons = tuple(
-            (str(slot.item.name), slot.item.damage)
-            for slot in dashboard.equipment
-            if slot.item is not None and slot.item.damage
-        )
-        choices = hotbar_actions(
-            dashboard.abilities, dashboard.spells,
-            weapon_attack_option(weapons, dashboard.player.attack_bonus),
-        )
-        self.hotbar.set_actions(choices, self.hotbar_preference or default_slots(choices))
+        self._set_hotbar_actions(dashboard)
         self.hotbar.slot_used.connect(self._use_hotbar)
         self.hotbar.slots_changed.connect(self._on_hotbar_changed)
         layout.addWidget(self.hotbar)
@@ -1074,6 +1150,18 @@ class MainWindow(QMainWindow):
         self.crafting_page.craft_requested.connect(self._request_crafting)
         page.layout.addWidget(self.crafting_page, 1)
         return page
+
+    def _set_hotbar_actions(self, dashboard: DashboardView) -> None:
+        weapons = tuple(
+            (str(slot.item.name), slot.item.damage)
+            for slot in dashboard.equipment
+            if slot.item is not None and slot.item.damage
+        )
+        choices = hotbar_actions(
+            dashboard.abilities, dashboard.spells,
+            weapon_attack_option(weapons, dashboard.player.attack_bonus),
+        )
+        self.hotbar.set_actions(choices, self.hotbar_preference or default_slots(choices))
 
     def _use_hotbar(self, key: str) -> None:
         if key != ATTACK_KEY:
@@ -1390,7 +1478,7 @@ class MainWindow(QMainWindow):
         except GameStateError as exc:
             self._combat_resolution_failed(task, str(exc))
             return
-        self._reload_dashboard(dashboard, target_page="dashboard")
+        self._refresh_turn_views(dashboard)
         status = getattr(result, "status", "active")
         summaries = getattr(result, "summaries", ())
         detail = summaries[-1] if summaries else "Combat state updated"
@@ -1472,7 +1560,7 @@ class MainWindow(QMainWindow):
         except GameStateError as exc:
             self._show_status_message(str(exc))
             return
-        self._reload_dashboard(dashboard, target_page="dashboard")
+        self._refresh_turn_views(dashboard)
         self._show_status_message("Encounter rewards saved; adventure resumed")
 
     def _show_pending_quest_reward(self) -> None:
@@ -1551,7 +1639,7 @@ class MainWindow(QMainWindow):
         except GameStateError as exc:
             self._show_status_message(str(exc))
             return
-        self._reload_dashboard(dashboard, target_page="dashboard")
+        self._refresh_turn_views(dashboard)
         self._show_status_message("Quest rewards recorded")
 
     def _show_pending_level_up(self) -> None:
@@ -1716,7 +1804,7 @@ class MainWindow(QMainWindow):
         except GameStateError as exc:
             self.scene_view.choice_grid.show_resolution_error(str(exc))
             return
-        self._reload_dashboard(dashboard, target_page="dashboard")
+        self._refresh_turn_views(dashboard)
         self._show_skill_check(getattr(result, "skill_check", None))
         detail = "; ".join(result.state_summaries)
         self._show_status_message(
@@ -1748,9 +1836,10 @@ class MainWindow(QMainWindow):
         if target != self.current_page:
             play_ui_sound("page")
         self.current_page = target
-        if target == "character_sheet" and self._character_sheet_stale:
-            self._character_sheet_stale = False
-            self._refresh_character_sheet(self.dashboard)
+        if target in self._stale_pages:
+            self._stale_pages.discard(target)
+            with self._painting_frozen():
+                self._rebuild_page(target)
         self.content_stack.setCurrentIndex(self.page_indices[target])
         self.scene_view.tabs.set_current(target)
         self._show_status_message(
@@ -2267,21 +2356,6 @@ class MainWindow(QMainWindow):
         )
         return values
 
-    def _refresh_character_sheet(self, dashboard: DashboardView) -> None:
-        old_page = self.navigation_pages.get("character_sheet")
-        index = self.page_indices.get("character_sheet")
-        if old_page is None or index is None:
-            return
-        new_page = CharacterSheetPage(dashboard)
-        new_page.back_requested.connect(
-            lambda name="dashboard": self.controller.navigate(name)
-        )
-        new_page.crafting_requested.connect(lambda: self.controller.navigate("crafting"))
-        self.content_stack.removeWidget(old_page)
-        old_page.deleteLater()
-        self.content_stack.insertWidget(index, new_page)
-        self.navigation_pages["character_sheet"] = new_page
-
     def _refresh_item_views(self, dashboard: DashboardView) -> None:
         """Refresh item-dependent widgets without rebuilding the complete UI tree."""
 
@@ -2307,23 +2381,28 @@ class MainWindow(QMainWindow):
             self.codex_column.fit()
             # The hidden character sheet is rebuilt when next opened, not on every move.
             if current_page == "character_sheet":
-                self._refresh_character_sheet(dashboard)
+                self._rebuild_page("character_sheet")
             else:
-                self._character_sheet_stale = True
+                self._stale_pages.add("character_sheet")
             self.content_stack.setCurrentIndex(self.page_indices.get(current_page, 0))
             self._restore_inventory_ui_state(None)
 
     @contextmanager
     def _painting_frozen(self):  # type: ignore[no-untyped-def]
-        """Rebuild without painting half-built frames: the screen changes once, finished."""
+        """Rebuild without painting half-built frames: the screen changes once, finished.
 
-        was_enabled = self.updatesEnabled()
-        self.setUpdatesEnabled(False)
+        Freezes the central widget, never the window itself: on Windows, disabling
+        updates on a top-level window sends WM_SETREDRAW, which broke native resizing.
+        """
+
+        root = self.centralWidget() or self
+        was_enabled = root.updatesEnabled()
+        root.setUpdatesEnabled(False)
         try:
             yield
             QCoreApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
         finally:
-            self.setUpdatesEnabled(was_enabled)
+            root.setUpdatesEnabled(was_enabled)
 
     def _reload_dashboard(
         self,
