@@ -16,10 +16,9 @@ from dd_simulator.state import (
     CombatAction,
     GameStateDatabase,
     GameStateService,
-    SkillCheckResult,
 )
 from dd_simulator.state.combat import CombatService, EnemySpec
-from dd_simulator.ui.main_window import MainWindow, SkillCheckPopup
+from dd_simulator.ui.main_window import MainWindow
 from dd_simulator.ui.panels.common import highlight_recent_turn
 from dd_simulator.ui.models.presentation import ConversationView, NpcView
 from dd_simulator.ui.services.mock_data import build_phase_three_dashboard
@@ -428,21 +427,4 @@ def test_recent_turn_highlight_fades_smoothly_for_three_seconds() -> None:
     assert "rgba(255, 210, 80, 255)" in player.styleSheet()
     owner._recent_turn_clear()  # type: ignore[attr-defined]
     owner.deleteLater()
-    app.processEvents()
-
-
-def test_skill_check_popup_is_transient_and_complete(tmp_path: Path) -> None:
-    app, window = build_window(tmp_path)
-    result = SkillCheckResult("Persuasion", 14, 3, 17, 15, True)
-    popup = SkillCheckPopup(result, window)
-
-    assert popup.windowFlags() & Qt.WindowType.Popup
-    assert popup.findChild(QLabel, "skillCheckOutcome").text() == "SUCCESS"
-    text = "\n".join(label.text() for label in popup.findChildren(QLabel))
-    assert "Player roll: 14" in text
-    assert "Required to pass: 15" in text
-
-    popup.close()
-    window.close()
-    window.deleteLater()
     app.processEvents()

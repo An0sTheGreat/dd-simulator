@@ -27,7 +27,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from dd_simulator.state import SkillCheckResult
 from dd_simulator.ui.models.presentation import NarrativeMessageView
+from dd_simulator.ui.widgets.dice_roll import DiceRollBanner
 
 PORTRAIT_SIZE = 38
 NOTE_INDENT = 48
@@ -202,6 +204,7 @@ class ConversationView(QScrollArea):
         self.rows: list[ConversationMessage] = []
         self.note_rows: list[ConversationNotes] = []
         self.recent_rows: list[ConversationMessage] = []
+        self.roll_banner: DiceRollBanner | None = None
 
         thread = QWidget()
         thread.setObjectName("conversationThread")
@@ -262,6 +265,7 @@ class ConversationView(QScrollArea):
     # Content
     def set_messages(self, messages: Iterable[NarrativeMessageView], has_older: bool) -> None:
         self.clear_emphasis()
+        self.clear_roll()
         for widget in (*self.rows, *self.note_rows):
             self._layout.removeWidget(widget)
             widget.deleteLater()
@@ -275,6 +279,7 @@ class ConversationView(QScrollArea):
 
     def append_turn(self, messages: Iterable[NarrativeMessageView]) -> None:
         self.clear_emphasis()
+        self.clear_roll()
         added = self._insert(self._layout.count(), tuple(messages))
         self._relayout()
         bar = self.verticalScrollBar()
@@ -287,6 +292,28 @@ class ConversationView(QScrollArea):
             self.scroll_animation.setEndValue(bar.maximum())
             self.scroll_animation.start()
         self._emphasize(added)
+
+    def show_roll(self, result: SkillCheckResult, hold_ms: int) -> DiceRollBanner:
+        """Roll the dice just below the newest message; it removes itself after fading."""
+
+        self.clear_roll()
+        banner = DiceRollBanner(result, hold_ms=hold_ms, reduced_motion=self.reduced_motion)
+        self.roll_banner = banner
+        self._layout.addWidget(banner, 0, Qt.AlignmentFlag.AlignLeft)
+        banner.show()
+        banner.finished.connect(lambda: self.clear_roll() if self.roll_banner is banner else None)
+        self._relayout()
+        self._pin_bottom, self._keep_from_bottom = True, None
+        self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
+        banner.start()
+        return banner
+
+    def clear_roll(self) -> None:
+        if self.roll_banner is not None:
+            banner, self.roll_banner = self.roll_banner, None
+            self._layout.removeWidget(banner)
+            banner.hide()
+            banner.deleteLater()
 
     def prepend_messages(self, messages: Iterable[NarrativeMessageView], has_older: bool) -> None:
         bar = self.verticalScrollBar()

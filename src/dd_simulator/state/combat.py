@@ -454,11 +454,15 @@ class CombatService:
                 "DELETE FROM combat_conditions WHERE combatant_id = ? AND name = 'Guarded'",
                 (actor["id"],),
             )
+            before = int(connection.execute(
+                "SELECT COALESCE(MAX(sequence), -1) FROM combat_turns WHERE encounter_id = ?",
+                (encounter_id,),
+            ).fetchone()[0])
             player_summary = self._apply_player_action(
                 connection, encounter, actor, command
             )
             skill_check = self._player_skill_check(
-                connection, encounter_id, str(actor["id"]), command
+                connection, encounter_id, str(actor["id"]), command, before
             )
             summaries = [player_summary]
             narration_segments: tuple[NarrativeSegment, ...] = ()
@@ -515,27 +519,47 @@ class CombatService:
         encounter_id: str,
         actor_id: str,
         command: CombatCommand,
+        after_sequence: int = -1,
     ) -> SkillCheckResult | None:
-        if command.action not in {CombatAction.NEGOTIATE, CombatAction.FLEE}:
-            return None
+        """The d20 roll the player's action just made (attack, power, negotiate, flee)."""
+
         row = connection.execute(
-            "SELECT d20_roll, modifier, total, target_number FROM combat_turns "
-            "WHERE encounter_id = ? AND actor_id = ? AND target_number IS NOT NULL "
-            "ORDER BY sequence DESC LIMIT 1",
-            (encounter_id, actor_id),
+            "SELECT t.d20_roll, t.modifier, t.total, t.target_number, t.action_type, "
+            "t.action_key, c.name AS target_name FROM combat_turns t "
+            "LEFT JOIN combatants c ON c.id = t.target_id "
+            "WHERE t.encounter_id = ? AND t.actor_id = ? AND t.sequence > ? "
+            "AND t.d20_roll IS NOT NULL AND t.target_number IS NOT NULL "
+            "ORDER BY t.sequence DESC LIMIT 1",
+            (encounter_id, actor_id, after_sequence),
         ).fetchone()
         if row is None:
             return None
-        name = "Negotiation" if command.action is CombatAction.NEGOTIATE else "Survival"
         total = int(row["total"])
         target = int(row["target_number"])
+        success = total >= target
+        definition = CATALOG.get(str(row["action_key"] or ""))
+        label = "DC"
+        if command.action is CombatAction.NEGOTIATE:
+            name = "Negotiation"
+        elif command.action is CombatAction.FLEE:
+            name = "Survival"
+        elif definition is not None and definition.save_type and definition.effect in {
+            "direct_damage", "damage_condition"
+        }:
+            # the roll is the target's saving throw: the player succeeds when it fails
+            name = f"{definition.name}: {row['target_name'] or 'target'}'s {definition.save_type} save"
+            success = not success
+        else:
+            name = definition.name if definition is not None else "Attack"
+            label = "AC"
         return SkillCheckResult(
             name=name,
             roll=int(row["d20_roll"]),
             modifier=int(row["modifier"]),
             total=total,
             target=target,
-            success=total >= target,
+            success=success,
+            target_label=label,
         )
 
     def _apply_preparation(

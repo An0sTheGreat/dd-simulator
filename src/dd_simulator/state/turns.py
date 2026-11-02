@@ -33,6 +33,7 @@ class SkillCheckResult:
     total: int
     target: int
     success: bool
+    target_label: str = "DC"  # "AC" for attack rolls
 
 
 def sanitize_model_text(value: str) -> str:

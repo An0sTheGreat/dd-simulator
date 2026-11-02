@@ -130,6 +130,7 @@ from dd_simulator.ui.widgets.hotbar import (
     weapon_attack_option,
 )
 from dd_simulator.ui.widgets.conversation_view import ConversationView
+from dd_simulator.ui.widgets.dice_roll import DEFAULT_HOLD_SECONDS, HOLD_RANGE_SECONDS
 from dd_simulator.ui.widgets.crafting_page import CraftingPage
 from dd_simulator.ui.widgets.scene_view import ElidedLabel, SceneView
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
@@ -252,46 +253,6 @@ class CodexColumn(QWidget):
         self.fit()
 
 
-class SkillCheckPopup(QDialog):
-    """Themed transient result; Qt.Popup supplies click-outside dismissal."""
-
-    def __init__(self, result: SkillCheckResult, parent: QWidget) -> None:
-        super().__init__(parent, Qt.WindowType.Popup | Qt.WindowType.FramelessWindowHint)
-        self.setObjectName("skillCheckPopup")
-        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
-        self.setMinimumWidth(360)
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(18, 14, 18, 16)
-        header = QHBoxLayout()
-        title = QLabel(f"{result.name.upper()} CHECK")
-        title.setObjectName("skillCheckTitle")
-        header.addWidget(title, 1)
-        close_button = SemanticButton("×", role="secondary")
-        close_button.setObjectName("skillCheckCloseButton")
-        close_button.setFixedSize(30, 30)
-        close_button.clicked.connect(self.close)
-        header.addWidget(close_button)
-        layout.addLayout(header)
-        outcome = QLabel("SUCCESS" if result.success else "FAILURE")
-        outcome.setObjectName("skillCheckOutcome")
-        outcome.setProperty("checkState", "success" if result.success else "failure")
-        outcome.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(outcome)
-        layout.addWidget(QLabel(
-            f"Player roll: {result.roll}\n"
-            f"Modifier: {result.modifier:+d}\n"
-            f"Total: {result.total}\n"
-            f"Required to pass: {result.target}"
-        ))
-
-    def show_centered(self, parent: QWidget) -> None:
-        self.adjustSize()
-        center = parent.mapToGlobal(parent.rect().center())
-        self.move(center.x() - self.width() // 2, center.y() - self.height() // 2)
-        self.show()
-        self.raise_()
-
-
 class MainWindow(QMainWindow):
     """Resizable, themed campaign shell and Version 1 adventure dashboard."""
 
@@ -365,7 +326,6 @@ class MainWindow(QMainWindow):
         self._quest_reward_dialog: QuestRewardsDialog | None = None
         self._crafting_result_dialog: CraftingResultsDialog | None = None
         self._level_up_dialog: LevelUpDialog | None = None
-        self._skill_check_popup: SkillCheckPopup | None = None
         self._selected_inventory_item_id: str | None = None
         self.font_size_preference = 100
         self.reduced_motion_preference = False
@@ -377,6 +337,7 @@ class MainWindow(QMainWindow):
         self.music = MusicController(self)
         self.ui_sounds = UiSounds(self)
         self.sfx_volume_preference = DEFAULT_SFX_VOLUME
+        self.dice_roll_seconds_preference = DEFAULT_HOLD_SECONDS
         if self.ui_sounds.enabled and QApplication.instance() is not None:
             QApplication.instance().installEventFilter(self.ui_sounds)
         self._audio_save_timer = QTimer(self)
@@ -477,6 +438,7 @@ class MainWindow(QMainWindow):
         self._on_glow_pulse_changed(self.glow_pulse_preference, save=False)
         self.settings_panel.audio_requested.connect(self._on_audio_changed)
         self.settings_panel.sfx_volume_requested.connect(self._on_sfx_volume_changed)
+        self.settings_panel.dice_roll_seconds_requested.connect(self._on_dice_roll_seconds_changed)
         self._apply_audio_preferences()
         self.settings_panel.checkpoint_create_requested.connect(self._create_checkpoint)
         self.settings_panel.checkpoint_load_requested.connect(self._load_checkpoint)
@@ -1423,24 +1385,15 @@ class MainWindow(QMainWindow):
             self._show_pending_combat_reward()
 
     def _show_skill_check(self, result: SkillCheckResult | None) -> None:
+        """Roll the dice under the newest message of the conversation on screen."""
+
         if result is None:
             return
-        if self._skill_check_popup is not None:
-            previous = self._skill_check_popup
-            self._skill_check_popup = None
-            self.set_dialog_dimmed(False)
-            previous.close()
-        popup = SkillCheckPopup(result, self)
-        self._skill_check_popup = popup
-        self.set_dialog_dimmed(True)
-
-        def released(*_args: object) -> None:
-            if self._skill_check_popup is popup:
-                self._skill_check_popup = None
-                self.set_dialog_dimmed(False)
-
-        popup.destroyed.connect(released)
-        popup.show_centered(self)
+        people = self.navigation_pages.get("people")
+        thread = getattr(people, "thread", None) if self.current_page == "people" else None
+        view = thread if isinstance(thread, ConversationView) else self.conversation_view
+        view.reduced_motion = self.reduced_motion_preference
+        view.show_roll(result, int(self.dice_roll_seconds_preference * 1000))
 
     def _show_pending_combat_reward(self) -> None:
         encounter = self.dashboard.combat
@@ -2512,6 +2465,11 @@ class MainWindow(QMainWindow):
             value = ui.get(key)
             if isinstance(value, int) and not isinstance(value, bool):
                 setattr(self, attribute, min(100, max(0, value)))
+        dice = ui.get("dice_roll_seconds")
+        if isinstance(dice, (int, float)) and not isinstance(dice, bool):
+            low, high = HOLD_RANGE_SECONDS
+            self.dice_roll_seconds_preference = float(min(high, max(low, dice)))
+        self.settings_panel.select_dice_roll_seconds(self.dice_roll_seconds_preference)
         muted = ui.get("audio_muted")
         if isinstance(muted, bool):
             self.audio_muted_preference = muted
@@ -2543,6 +2501,7 @@ class MainWindow(QMainWindow):
                 "music_volume": self.music_volume_preference,
                 "ambience_volume": self.ambience_volume_preference,
                 "sfx_volume": self.sfx_volume_preference,
+                "dice_roll_seconds": self.dice_roll_seconds_preference,
                 "audio_muted": self.audio_muted_preference,
             }
         )
@@ -2681,6 +2640,8 @@ class MainWindow(QMainWindow):
         self.music_volume_preference = DEFAULT_MUSIC_VOLUME
         self.ambience_volume_preference = DEFAULT_AMBIENCE_VOLUME
         self.sfx_volume_preference = DEFAULT_SFX_VOLUME
+        self.dice_roll_seconds_preference = DEFAULT_HOLD_SECONDS
+        self.settings_panel.select_dice_roll_seconds(DEFAULT_HOLD_SECONDS)
         self.audio_muted_preference = False
         self._apply_audio_preferences()
         self.font_size_requested.emit(100)
@@ -2727,6 +2688,10 @@ class MainWindow(QMainWindow):
         self.ui_sounds.set_volume(volume, self.audio_muted_preference)
         self.ui_sounds.play("click")  # a sample at the new level
         self._audio_save_timer.start()
+
+    def _on_dice_roll_seconds_changed(self, seconds: float) -> None:
+        self.dice_roll_seconds_preference = float(seconds)
+        self._audio_save_timer.start()  # same debounced save as the sliders beside it
 
     def _flush_ui_preferences(self) -> None:
         if self._audio_save_timer.isActive():

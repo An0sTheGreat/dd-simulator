@@ -11,6 +11,7 @@ from dd_simulator.local_model import LocalModelModelInfo, ModelEvaluation
 from dd_simulator.ui.panels.common import semantic_label
 from dd_simulator.ui.themes.theme_schema import ThemeDefinition
 from dd_simulator.ui.widgets.codex_cards import codex_card, plain_label
+from dd_simulator.ui.widgets.dice_roll import DEFAULT_HOLD_SECONDS, HOLD_RANGE_SECONDS
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
 
 
@@ -31,6 +32,7 @@ class SettingsPanel(QWidget):
     glow_pulse_requested = Signal(bool)
     audio_requested = Signal(int, int, bool)  # music volume, ambience volume, muted
     sfx_volume_requested = Signal(int)
+    dice_roll_seconds_requested = Signal(float)
     reset_requested = Signal()
     back_requested = Signal()
     checkpoint_create_requested = Signal()
@@ -170,6 +172,21 @@ class SettingsPanel(QWidget):
         self.glow_pulse_checkbox.toggled.connect(self.glow_pulse_requested)
         form.addRow(_row_label("Rarity glow"), self.glow_pulse_checkbox)
 
+        self.dice_roll_slider = QSlider(Qt.Orientation.Horizontal)
+        self.dice_roll_slider.setObjectName("diceRollSecondsSlider")
+        self.dice_roll_slider.setAccessibleName("Dice roll display time")
+        self.dice_roll_slider.setToolTip(
+            "How long a dice roll stays under the conversation before its one-second fade"
+        )
+        low, high = HOLD_RANGE_SECONDS
+        self.dice_roll_slider.setRange(int(low), int(high))
+        self.dice_roll_slider.setPageStep(1)
+        self.dice_roll_slider.setValue(int(DEFAULT_HOLD_SECONDS))
+        self.dice_roll_slider.valueChanged.connect(
+            lambda seconds: self.dice_roll_seconds_requested.emit(float(seconds))
+        )
+        form.addRow(_row_label("Dice roll display"), self._with_value(self.dice_roll_slider, " s"))
+
         self.high_contrast_checkbox = QCheckBox("Increase interface contrast")
         self.high_contrast_checkbox.setObjectName("highContrastPreference")
         self.high_contrast_checkbox.setAccessibleName("Increase interface contrast")
@@ -273,14 +290,14 @@ class SettingsPanel(QWidget):
             columns.addLayout(column, 1)
 
     @staticmethod
-    def _with_value(slider: QSlider) -> QHBoxLayout:
-        """The slider with its live percentage beside it."""
+    def _with_value(slider: QSlider, suffix: str = "%") -> QHBoxLayout:
+        """The slider with its live value (a percentage by default) beside it."""
 
         row = QHBoxLayout()
         row.setContentsMargins(0, 0, 0, 0)
-        value = semantic_label(f"{slider.value()}%", object_name="sliderValue", text_role="body")
+        value = semantic_label(f"{slider.value()}{suffix}", object_name="sliderValue", text_role="body")
         value.setMinimumWidth(44)
-        slider.valueChanged.connect(lambda level: value.setText(f"{level}%"))
+        slider.valueChanged.connect(lambda level: value.setText(f"{level}{suffix}"))
         slider.setProperty("valueLabel", value)  # select_audio sets values with signals blocked
         row.addWidget(slider, 1)
         row.addWidget(value)
@@ -310,6 +327,12 @@ class SettingsPanel(QWidget):
         self.sfx_volume_slider.setValue(int(volume))
         self.sfx_volume_slider.blockSignals(False)
         self.sfx_volume_slider.property("valueLabel").setText(f"{self.sfx_volume_slider.value()}%")
+
+    def select_dice_roll_seconds(self, seconds: float) -> None:
+        self.dice_roll_slider.blockSignals(True)
+        self.dice_roll_slider.setValue(round(seconds))
+        self.dice_roll_slider.blockSignals(False)
+        self.dice_roll_slider.property("valueLabel").setText(f"{self.dice_roll_slider.value()} s")
 
     def select_audio(self, music: int, ambience: int, muted: bool) -> None:
         for widget, value in (
