@@ -1702,6 +1702,7 @@ class MainWindow(QMainWindow):
             self.scene_view.choice_grid.show_resolution_error(str(exc))
             return
         self._reload_dashboard(dashboard, target_page="dashboard")
+        self._show_skill_check(getattr(result, "skill_check", None))
         detail = "; ".join(result.state_summaries)
         self._show_status_message(
             "Turn committed" + (f": {detail}" if detail else "")

@@ -102,6 +102,7 @@ class ActionResolutionResult:
     turn_id: str
     narration: str
     state_summaries: tuple[str, ...]
+    skill_check: SkillCheckResult | None = None
 
 
 class ActionOutcomeProvider(Protocol):

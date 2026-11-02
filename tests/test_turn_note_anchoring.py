@@ -36,7 +36,9 @@ def test_people_exchange_keeps_the_action_notes_on_the_action_response(tmp_path:
         if message.kind == "player" and message.text == "Do you have work for me?"
     )
     action_response, npc_reply = turn[player_line - 1], turn[-1]
-    assert _notes(action_response) == [("resource", "−3 stamina")]
+    # the climb also rolls an Athletics story check, noted on the same turn
+    assert _notes(action_response)[0] == ("resource", "−3 stamina")
+    assert _notes(action_response)[1][1].startswith("Athletics ")
     assert npc_reply.kind == "spoken"
     assert ("quest", "Quest started · The Missing Ledger") in _notes(npc_reply)
     assert ("resource", "−3 stamina") not in _notes(npc_reply)

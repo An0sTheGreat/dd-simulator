@@ -77,6 +77,7 @@ from dd_simulator.state.turns import (
     claim_turn_notes,
     record_turn_note,
 )
+from dd_simulator.state.story_checks import roll_story_check
 from dd_simulator.state.travel import (
     CampResult,
     TravelNarrationProvider,
@@ -1358,6 +1359,24 @@ class GameStateService:
         context = self.build_action_context()
         campaign_id = str(context["campaign"]["id"])  # type: ignore[index]
         before_checksum = self.reliability.checksum(campaign_id)
+        with self.database.connect() as connection:
+            player = connection.execute(
+                "SELECT characters.id, campaign_clock.turn_number FROM characters "
+                "JOIN campaign_clock ON campaign_clock.campaign_id = characters.campaign_id "
+                "WHERE characters.campaign_id = ? AND characters.is_player = 1",
+                (campaign_id,),
+            ).fetchone()
+            skill_check = None if player is None else roll_story_check(
+                connection, campaign_id, str(player["id"]),
+                int(player["turn_number"]) + 1, normalized,
+            )
+        if skill_check is not None:
+            # Rolled by code before narration: the model narrates this result, never decides it.
+            context["skill_check"] = {
+                "check": skill_check.name, "d20": skill_check.roll,
+                "modifier": skill_check.modifier, "total": skill_check.total,
+                "difficulty": skill_check.target, "success": skill_check.success,
+            }
         outcome = provider.resolve_action(action=normalized, context=context)
         self._validate_action_outcome(outcome)
         if is_cancelled():
@@ -1380,6 +1399,11 @@ class GameStateService:
                 raise ActionValidationError("The active campaign has no player character.")
             character_id = str(character["id"])
             for change in outcome.state_changes:
+                if (
+                    skill_check is not None and not skill_check.success
+                    and change.operation in {"discover_item", "acquire_item"}
+                ):
+                    continue  # a failed check finds and takes nothing, whatever the prose says
                 summaries.append(
                     self._apply_turn_change(
                         connection,
@@ -1523,6 +1547,12 @@ class GameStateService:
                 ") VALUES (?, ?, ?, ?, ?, ?, ?)",
                 transcript_messages,
             )
+            if skill_check is not None:
+                record_turn_note(
+                    connection, campaign_id, "other",  # schema kinds have no "check"
+                    f"{skill_check.name} {skill_check.total} vs DC {skill_check.target}: "
+                    + ("success" if skill_check.success else "failed"),
+                )
             claim_turn_notes(connection, campaign_id, turn_number)
             event_summary = " ".join(outcome.narration.split())[:500]
             self._record_turn_event(
@@ -1539,6 +1569,7 @@ class GameStateService:
             turn_id=turn_id,
             narration=outcome.narration,
             state_summaries=tuple(summaries),
+            skill_check=skill_check,
         )
         self.reliability.record_audit(
             campaign_id, "player_action", normalized,

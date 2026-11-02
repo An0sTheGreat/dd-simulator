@@ -33,7 +33,9 @@ def test_notes_group_on_last_message_of_their_turn_only() -> None:
 
     messages, notes = _notes_by_turn(service)
     assert set(notes) == {2}
-    assert [(note.kind, note.text) for note in notes[2]] == [("resource", "−3 stamina")]
+    # the climb also rolls an Athletics story check, noted on the same turn
+    assert [(note.kind, note.text) for note in notes[2]][0] == ("resource", "−3 stamina")
+    assert [note.text for note in notes[2]][1].startswith("Athletics ")
     turn_two = [message for message in messages if message.turn_number == 2]
     assert turn_two[-1].notes and not any(message.notes for message in turn_two[:-1])
 

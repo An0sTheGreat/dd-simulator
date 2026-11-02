@@ -237,6 +237,9 @@ class LocalModelActionResolver:
             "reads, or studies an owned inventory item, include exactly one examine_item "
             "proposal for that item. Suggested actions must be natural player-facing "
             "language, must name items rather than IDs, and must never reveal internal IDs. "
+            "When game_context.skill_check is present, the game has already rolled it: "
+            "narrate the attempt succeeding or failing exactly as its success field says, "
+            "and after a failed check propose no discover_item or acquire_item. "
             "Do not propose combat, dice, new quests, new locations, arbitrary facts, or "
             "direct database changes. discover_item is allowed only after an explicit search, "
             "open, or loot action and must use an exact ID from available_loot. When the player takes "
@@ -265,7 +268,9 @@ class LocalModelActionResolver:
             instruction = (
                 DUNGEON_MASTER_SYSTEM
                 + "Continue the scene in direct response to the player's exact action using "
-                "only supplied facts. Write plain prose of no more than 125 words. Do not emit "
+                "only supplied facts. If game_context.skill_check is present, the attempt "
+                "succeeds or fails exactly as its success field says. "
+                "Write plain prose of no more than 125 words. Do not emit "
                 "JSON, tools, state changes, rewards, new quests, or Markdown."
             )
         user_data = {
