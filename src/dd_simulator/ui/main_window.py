@@ -1093,6 +1093,10 @@ class MainWindow(QMainWindow):
 
     def keyPressEvent(self, event) -> None:  # type: ignore[no-untyped-def]
         # Number keys reach the window only when no text field took them.
+        scene = getattr(self, "scene_view", None)
+        if self.current_page == "dashboard" and scene is not None and scene.choice_grid.handle_choice_key(event):
+            event.accept()
+            return
         hotbar = getattr(self, "hotbar", None)
         if (
             hotbar is not None

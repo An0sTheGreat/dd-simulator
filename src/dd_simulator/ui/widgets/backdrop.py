@@ -152,7 +152,7 @@ class BackdropRoot(QWidget):
         self._pixmap = QPixmap()
         self._rebuild = QTimer(self)
         self._rebuild.setSingleShot(True)
-        self._rebuild.setInterval(120)  # once a resize drag settles; meanwhile it stretches
+        self._rebuild.setInterval(300)  # once a resize drag settles; meanwhile it stretches
         self._rebuild.timeout.connect(self._render)
 
     def _render(self) -> None:
@@ -185,6 +185,5 @@ class BackdropRoot(QWidget):
             return
         if self._pixmap.deviceIndependentSize().toSize() == self.size():
             painter.drawPixmap(0, 0, self._pixmap)  # 1:1 on the device, dither intact
-        else:  # mid-resize, until the rebuild timer fires
-            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+        else:  # mid-resize, until the rebuild timer fires: fast scaling keeps the drag smooth
             painter.drawPixmap(self.rect(), self._pixmap)

@@ -736,21 +736,16 @@ class ChoiceGrid(QWidget):
 
     # Keys 1-6 ----------------------------------------------------------------
 
-    def showEvent(self, event) -> None:  # type: ignore[no-untyped-def]
-        super().showEvent(event)
-        QApplication.instance().installEventFilter(self)
+    def handle_choice_key(self, event) -> bool:  # type: ignore[no-untyped-def]
+        """Keys 1-6 pick a choice; the main window passes on the keys nothing else took.
 
-    def hideEvent(self, event) -> None:  # type: ignore[no-untyped-def]
-        QApplication.instance().removeEventFilter(self)
-        super().hideEvent(event)
+        (An application-wide event filter did this before, but it ran Python for every
+        event in the app, which made resizing and dragging lag.)
+        """
 
-    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
         if (
-            event.type() == QEvent.Type.KeyPress
-            and event.key() in CHOICE_KEYS
+            event.key() in CHOICE_KEYS
             and event.modifiers() in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.KeypadModifier)
-            and isinstance(watched, QWidget)
-            and watched.window() is self.window()
             and self.isVisible()
             and not isinstance(QApplication.focusWidget(), TEXT_ENTRY_WIDGETS)
             and not self.keys_deferred()
@@ -758,6 +753,13 @@ class ChoiceGrid(QWidget):
             self.activate_choice(CHOICE_KEYS[event.key()])
             return True
         return False
+
+    def keyPressEvent(self, event) -> None:  # type: ignore[no-untyped-def]
+        # keys pressed on a choice button bubble up here; others reach the main window
+        if self.handle_choice_key(event):
+            event.accept()
+            return
+        super().keyPressEvent(event)
 
     # NarrativePanel-equivalent progress, cancel and retry ----------------------
 

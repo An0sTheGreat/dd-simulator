@@ -10,9 +10,16 @@ import math
 from pathlib import Path
 import re
 
-from PySide6.QtCore import QVariantAnimation, Qt
-from PySide6.QtGui import QColor, QIcon, QPixmap
-from PySide6.QtWidgets import QApplication, QGraphicsDropShadowEffect, QLabel
+from PySide6.QtCore import QPoint, QRect, QRectF, QTimer, QVariantAnimation, Qt
+from PySide6.QtGui import QColor, QIcon, QImage, QPainter, QPixmap, QTransform
+from PySide6.QtWidgets import (
+    QApplication,
+    QGraphicsBlurEffect,
+    QGraphicsEffect,
+    QGraphicsPixmapItem,
+    QGraphicsScene,
+    QLabel,
+)
 
 
 ASSET_ROOT = Path(__file__).parent / "assets" / "icons"
@@ -318,29 +325,118 @@ def _rarity_colours(theme_id: str) -> dict[str, str]:
     return {key.removeprefix("rarity_"): value for key, value in codex.items() if key.startswith("rarity_")}
 
 
-class _RarityGlow(QGraphicsDropShadowEffect):
+class _RarityGlow(QGraphicsEffect):
+    """Rarity-coloured glow behind the icon's shape, blurred once and cached.
+
+    A QGraphicsDropShadowEffect re-blurs on every repaint, which with a dozen icons, a
+    65 px radius and the pulse kept the CPU busy and made resizing and dragging lag.
+    Here the blur is redone only when the icon, colour, radius or scale changes; the
+    pulse just repaints the cached glow at a different opacity.
+    """
+
     def __init__(self, parent) -> None:  # type: ignore[no-untyped-def]
         super().__init__(parent)
         self.base = QColor()
+        self.radius = 45.0
+        self.strength = 1.0
+        self._key: tuple | None = None
+        self._glow = QPixmap()
+        self._settle = QTimer(self)
+        self._settle.setSingleShot(True)
+        self._settle.setInterval(150)
+        self._settle.timeout.connect(self._reblur)
         _GLOWS.append(self)
 
+    def _reblur(self) -> None:
+        self._key = None
+        self.update()
+
+    def setBlurRadius(self, radius: float) -> None:  # noqa: N802 - Qt-style, as before
+        if radius != self.radius:
+            self.radius = float(radius)
+            self.updateBoundingRect()
+            self.update()
+
     def set_base(self, colour: QColor) -> None:
-        self.base = colour
+        if colour != self.base:
+            self.base = QColor(colour)
+            self.update()
         self.set_strength(_pulse_strength)
 
     def set_strength(self, strength: float) -> None:
-        colour = QColor(self.base)
-        colour.setAlphaF(strength)
-        self.setColor(colour)
+        if strength != self.strength:
+            self.strength = strength
+            self.update()
 
-    def draw(self, painter) -> None:  # type: ignore[no-untyped-def]
-        # A near-full-opacity pass first, then the full pass: the glow is about twice
-        # as strong and the item itself is drawn last, on top, untinted.
+    def boundingRectFor(self, rect: QRectF) -> QRectF:  # noqa: N802
+        margin = self.radius
+        return rect.adjusted(-margin, -margin, margin, margin)
+
+    def draw(self, painter: QPainter) -> None:
+        offset = QPoint()  # PySide fills it in place
+        pixmap = self.sourcePixmap(
+            Qt.CoordinateSystem.DeviceCoordinates, offset,
+            QGraphicsEffect.PixmapPadMode.PadToEffectiveBoundingRect,
+        )
+        if pixmap.isNull():
+            return
+        label = self.parent()
+        source = label.pixmap() if isinstance(label, QLabel) else QPixmap()
+        key = (source.cacheKey(), pixmap.size().toTuple(), self.base.rgba(), self.radius,
+               painter.device().devicePixelRatioF())
+        resizing = (
+            self._key is not None and not self._glow.isNull()
+            and key[2:] == self._key[2:]  # same colour, radius and scale: only size or icon scaling changed
+        )
+        if key != self._key and resizing:
+            # mid-resize: stretch the cached glow and blur afresh once the size settles
+            self._settle.start()
+        elif key != self._key:
+            self._key = key
+            self._glow = _blurred_glow(pixmap, self.base, self.radius * pixmap.devicePixelRatioF())
         painter.save()
-        painter.setOpacity(0.95)
-        super().draw(painter)
+        painter.setWorldTransform(QTransform())
+        painter.setOpacity(self.strength)
+        painter.drawPixmap(QRect(offset, pixmap.size()), self._glow)
+        painter.setOpacity(1.0)
+        painter.drawPixmap(offset, pixmap)  # the item last, on top, untinted
         painter.restore()
-        super().draw(painter)
+
+
+def _blurred_glow(source: QPixmap, colour: QColor, radius: float) -> QPixmap:
+    """The source's silhouette in ``colour``, blurred by ``radius`` and drawn twice
+    (0.95 then full opacity), as the old double drop-shadow pass looked."""
+
+    silhouette = QImage(source.size(), QImage.Format.Format_ARGB32_Premultiplied)
+    silhouette.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(silhouette)
+    painter.drawPixmap(0, 0, source)
+    painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
+    painter.fillRect(silhouette.rect(), colour)
+    painter.end()
+    scene = QGraphicsScene()
+    item = QGraphicsPixmapItem(QPixmap.fromImage(silhouette))
+    blur = QGraphicsBlurEffect()
+    blur.setBlurRadius(radius)
+    blur.setBlurHints(QGraphicsBlurEffect.BlurHint.QualityHint)
+    item.setGraphicsEffect(blur)
+    scene.addItem(item)
+    blurred = QImage(source.size(), QImage.Format.Format_ARGB32_Premultiplied)
+    blurred.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(blurred)
+    scene.render(painter, QRectF(blurred.rect()), QRectF(silhouette.rect()))
+    painter.end()
+    glow = QImage(source.size(), QImage.Format.Format_ARGB32_Premultiplied)
+    glow.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(glow)
+    painter.setOpacity(0.95)
+    painter.drawImage(0, 0, blurred)
+    painter.setOpacity(1.0)
+    painter.drawImage(0, 0, blurred)
+    painter.end()
+    result = QPixmap.fromImage(glow)
+    result.setDevicePixelRatio(source.devicePixelRatioF())
+    return result
 
 
 # ponytail: plain list pruned on each pulse tick; a weak set if icons churn heavily
@@ -351,8 +447,12 @@ _pulse_strength = 1.0
 
 def _apply_pulse(phase: object) -> None:
     global _pulse_strength
-    # a light breath between 60% and full strength
-    _pulse_strength = 0.8 + 0.2 * math.cos(2 * math.pi * float(phase))
+    # a light breath between 60% and full strength, in 1/50 steps so most animation
+    # ticks change nothing and repaint nothing
+    strength = round((0.8 + 0.2 * math.cos(2 * math.pi * float(phase))) * 50) / 50
+    if strength == _pulse_strength:
+        return
+    _pulse_strength = strength
     for glow in list(_GLOWS):
         try:
             glow.set_strength(_pulse_strength)
@@ -396,7 +496,6 @@ def apply_rarity_glow(icon: QLabel, rarity: str) -> None:
     glow = icon.graphicsEffect()
     if not isinstance(glow, _RarityGlow):
         glow = _RarityGlow(icon)
-        glow.setOffset(0, 0)
         icon.setGraphicsEffect(glow)
     # 65 px blur at the 59 px inventory icon; never under 45 px on small icons
     glow.setBlurRadius(max(45, icon.width() * 65 // 59))

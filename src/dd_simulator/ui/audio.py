@@ -15,7 +15,7 @@ import random
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import QObject, QTimer, QUrl
+from PySide6.QtCore import QEvent, QObject, QTimer, QUrl
 from PySide6.QtGui import QGuiApplication
 
 from dd_simulator.state.encounters import archetype_by_key
@@ -337,6 +337,8 @@ def play_ui_sound(name: str) -> None:
         _ui_sounds.play(name)
 
 
+_SOUND_EVENTS = frozenset((QEvent.Type.Enter, QEvent.Type.MouseButtonRelease))
+
 class UiSounds(QObject):
     """Short interface sounds (hover, click, page, item moves) on low-latency QSoundEffect.
 
@@ -401,10 +403,12 @@ class UiSounds(QObject):
     def eventFilter(self, watched: QObject, event: Any) -> bool:
         """Hover and click for every enabled button, checkbox and tab in the app."""
 
+        kind = event.type()  # runs for every event in the app: return early and cheaply
+        if kind not in _SOUND_EVENTS:
+            return False
         from PySide6.QtCore import QEvent, Qt
         from PySide6.QtWidgets import QAbstractButton, QAbstractSlider, QComboBox
 
-        kind = event.type()
         if kind == QEvent.Type.Enter and watched.isWidgetType() and watched.isEnabled():
             item_slot = (
                 watched.objectName() in ("inventorySlot", "equipmentSlot")
