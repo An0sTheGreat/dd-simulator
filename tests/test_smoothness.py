@@ -40,3 +40,36 @@ def test_no_application_wide_python_key_filter() -> None:
     from dd_simulator.ui.widgets.scene_view import ChoiceGrid
 
     assert not hasattr(ChoiceGrid, "eventFilter") or ChoiceGrid.eventFilter is QWidget.eventFilter
+
+
+def test_live_resize_shows_a_veil_and_lays_out_once_at_the_end(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    from PySide6.QtCore import Qt
+    from PySide6.QtTest import QTest
+
+    from dd_simulator.app import build_application
+
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    window.controller.navigate("dashboard")
+    app.processEvents()
+    host, content = window.resize_host, window.root
+    host.begin_live_resize()
+    assert host.live_resizing and host.veil.isVisible()
+    window.resize(1800, 950)
+    app.processEvents()
+    assert content.width() < 1800 and host.veil.width() == host.width()  # no layout mid-drag
+    host.end_live_resize()
+    app.processEvents()
+    assert not host.live_resizing and content.size() == host.size()
+
+    splitter = window.concept_splitter
+    assert not splitter.opaqueResize()
+    handle = splitter.handle(1)
+    QTest.mousePress(handle, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, handle.rect().center())
+    assert splitter.veil is not None and splitter.veil.isVisible()
+    QTest.mouseRelease(handle, Qt.MouseButton.LeftButton, Qt.KeyboardModifier.NoModifier, handle.rect().center())
+    assert splitter.veil is None
+    window.close()
+    window.deleteLater()
+    app.processEvents()

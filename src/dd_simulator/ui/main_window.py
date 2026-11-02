@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QSizePolicy,
     QSplitter,
+    QSplitterHandle,
     QScrollArea,
     QStackedWidget,
     QVBoxLayout,
@@ -134,6 +135,7 @@ from dd_simulator.ui.widgets.hotbar import (
 )
 from dd_simulator.ui.widgets.conversation_view import ConversationView
 from dd_simulator.ui.widgets.dice_roll import DEFAULT_HOLD_SECONDS, HOLD_RANGE_SECONDS
+from dd_simulator.ui.widgets.resize_veil import ResizeHost, VeilSplitterHandle, install_veil_handles
 from dd_simulator.ui.widgets.crafting_page import CraftingPage
 from dd_simulator.ui.widgets.scene_view import ElidedLabel, SceneView
 from dd_simulator.ui.widgets.semantic_button import SemanticButton
@@ -151,6 +153,8 @@ from dd_simulator.ui.widgets.world_map import (
 
 
 WM_NCHITTEST = 0x0084
+WM_SIZING = 0x0214  # an edge drag is resizing the window
+WM_EXITSIZEMOVE = 0x0232
 HTCLIENT = 1
 HTCAPTION = 2
 GWL_STYLE = -16
@@ -174,6 +178,10 @@ class RatioSplitter(QSplitter):
         self.ratio = ratio
         self.user_set = False
         self.splitterMoved.connect(self._remember_ratio)
+        install_veil_handles(self)
+
+    def createHandle(self) -> QSplitterHandle:  # noqa: N802
+        return VeilSplitterHandle(self.orientation(), self)
 
     def _remember_ratio(self, _position: int, _index: int) -> None:
         total = sum(self.sizes())
@@ -373,7 +381,8 @@ class MainWindow(QMainWindow):
         self.root_layout.setSpacing(8)
         self.root_layout.addWidget(self._build_header())
         self._build_content_stack()
-        self.setCentralWidget(self.root)
+        self.resize_host = ResizeHost(self.root)
+        self.setCentralWidget(self.resize_host)
 
         self.dialog_dimmer = QFrame(self)
         self.dialog_dimmer.setObjectName("dialogDimmer")
@@ -1004,6 +1013,10 @@ class MainWindow(QMainWindow):
             from ctypes import wintypes
 
             native_message = wintypes.MSG.from_address(int(message))
+            if native_message.message == WM_SIZING:
+                self.resize_host.begin_live_resize()
+            elif native_message.message == WM_EXITSIZEMOVE:
+                self.resize_host.end_live_resize()
             if native_message.message == WM_NCHITTEST:
                 packed_position = int(native_message.lParam)
                 screen_x = ctypes.c_short(packed_position & 0xFFFF).value
