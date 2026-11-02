@@ -807,3 +807,72 @@ def test_journal_entries_start_at_the_top_and_quest_counts_sit_beside_the_bar(
         assert label.fontMetrics().horizontalAdvance(label.text()) <= label.contentsRect().width()
         assert not label.geometry().intersects(bar.geometry()), label.text()
     close(app, window)
+
+
+def test_equipping_keeps_the_paperdoll_widget_and_size(tmp_path: Path) -> None:
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    app.processEvents()
+    window.codex_column.fit()
+    panel, size = window.paperdoll_panel, window.paperdoll_panel.size()
+    service = window.game_state_service
+    service.execute_item_command(ItemCommand(ItemAction.UNEQUIP, 0))
+    bag = service.load_active_dashboard().inventory_preview
+    window._refresh_item_views(service.load_active_dashboard())
+    source = next(i for i, item in enumerate(bag) if item.name and item.compatible_slots)
+    window._equip_inventory_to_equipment(source, 0)
+    app.processEvents()
+    assert window.paperdoll_panel is panel and panel.size() == size
+    assert window.updatesEnabled()
+    window.close()
+    window.deleteLater()
+    app.processEvents()
+
+
+def test_reloads_open_no_stray_windows_and_combat_turns_echo_without_greying(tmp_path: Path) -> None:
+    from PySide6.QtCore import QEvent, QObject
+
+    from dd_simulator.state import CombatAction, CombatCommand
+
+    app, window, _manager = build_application([], config_dir=tmp_path)
+    window.resize(1600, 900)
+    window.show()
+    app.processEvents()
+    shown: list[str] = []
+
+    class Spy(QObject):
+        def eventFilter(self, obj, event):  # type: ignore[no-untyped-def]
+            if event.type() == QEvent.Type.Show and isinstance(obj, QWidget) and obj.isWindow() and obj is not window:
+                shown.append(obj.objectName() or type(obj).__name__)
+            return False
+
+    spy = Spy()
+    app.installEventFilter(spy)
+    try:
+        service = window.game_state_service
+        window._reload_dashboard(service.load_active_dashboard())
+        assert shown == []  # quest progress labels used to flash up as tiny windows
+        service.start_combat()
+        window._reload_dashboard(service.load_active_dashboard())
+        enemy = next(c for c in window.dashboard.combat.combatants if c.side == "enemy")
+        from dd_simulator.ui import main_window as mw
+
+        before = [button.isEnabled() for button in window.scene_view.choice_grid.choice_buttons]
+        started: list[object] = []
+        original = mw.QThreadPool.globalInstance
+        mw.QThreadPool.globalInstance = lambda: type("P", (), {"start": lambda self, task: started.append(task)})()
+        try:
+            window._resolve_combat_action(CombatCommand(CombatAction.ATTACK, target_id=enemy.id))
+        finally:
+            mw.QThreadPool.globalInstance = original
+        assert started and window.powers_card.isEnabled()
+        assert [b.isEnabled() for b in window.scene_view.choice_grid.choice_buttons] == before
+        pending = window.conversation_view.pending_row
+        assert pending is not None and pending.text_label.text().startswith("Attack ")
+    finally:
+        app.removeEventFilter(spy)
+        window._combat_task = None
+        window.close()
+        window.deleteLater()
+        app.processEvents()

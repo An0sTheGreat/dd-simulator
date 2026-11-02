@@ -72,7 +72,8 @@ class QuestListItem(QFrame):
         self.progress_label = QLabel(f"{state}: {quest.progress_current} / {quest.progress_maximum}")
         self.progress_label.setObjectName("questProgressLabel")
         self.progress_label.setTextFormat(Qt.TextFormat.PlainText)
-        self.progress_label.setVisible(not self.completed)
+        if self.completed:  # setVisible(True) on a parentless label opens it as a tiny window
+            self.progress_label.hide()
         progress_row = QHBoxLayout()
         progress_row.setSpacing(6)
         progress_row.addWidget(progress, 1)

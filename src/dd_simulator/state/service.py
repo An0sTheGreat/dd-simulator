@@ -908,6 +908,19 @@ class GameStateService:
         )
         return result
 
+    def combat_command_text(self, command: CombatCommand) -> str:
+        """The transcript line a combat command will commit, for an instant echo."""
+
+        campaign_id = self.campaigns.active_campaign_id()
+        with self.database.connect() as connection:
+            encounter = connection.execute(
+                "SELECT id FROM combat_encounters WHERE campaign_id = ? AND status = 'active'",
+                (campaign_id,),
+            ).fetchone()
+            if encounter is None:
+                return ""
+            return CombatService._command_text(command, connection, str(encounter["id"]))  # noqa: SLF001
+
     def execute_combat_command(
         self,
         command: CombatCommand,

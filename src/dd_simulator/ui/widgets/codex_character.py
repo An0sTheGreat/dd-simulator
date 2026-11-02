@@ -153,18 +153,22 @@ class PaperdollPanel(EquipmentGrid):
         self.portrait.setObjectName("paperdollPortrait")
         self.portrait.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.portrait.lower()
-        stats = [f"AC {player.armor_class}"]
-        if attack_bonus is not None:
-            stats.append(f"ATK {attack_bonus:+d}")
-        stats.append(f"PROF +{player.proficiency_bonus}")
-        self.stats_label = QLabel(" · ".join(stats), self.portrait)
+        self.stats_label = QLabel(self.portrait)
         self.stats_label.setObjectName("paperdollStats")
         self.stats_label.setAlignment(
             Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom
         )
         self.stats_label.setWordWrap(True)
+        self.set_stats(player, attack_bonus)
         self.set_scale(1.0)
         self.set_portrait(player)
+
+    def set_stats(self, player: PlayerSummaryView, attack_bonus: int | None) -> None:
+        stats = [f"AC {player.armor_class}"]
+        if attack_bonus is not None:
+            stats.append(f"ATK {attack_bonus:+d}")
+        stats.append(f"PROF +{player.proficiency_bonus}")
+        self.stats_label.setText(" · ".join(stats))
 
     def _px(self, value: int) -> int:
         return round(value * self.scale)

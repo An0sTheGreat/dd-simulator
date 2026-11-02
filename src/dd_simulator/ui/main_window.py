@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from dataclasses import replace
+from contextlib import contextmanager
 import ctypes
 from pathlib import Path
 import math
@@ -11,7 +12,7 @@ import re
 import sys
 import zipfile
 
-from PySide6.QtCore import QEvent, QPoint, QSize, QThreadPool, QTimer, Qt, Signal
+from PySide6.QtCore import QCoreApplication, QEvent, QPoint, QSize, QThreadPool, QTimer, Qt, Signal
 from PySide6.QtGui import QCloseEvent, QFont, QGuiApplication
 from PySide6.QtWidgets import (
     QApplication,
@@ -348,6 +349,7 @@ class MainWindow(QMainWindow):
         self.current_page = "dashboard"
         self._dialog_dim_depth = 0
         self._last_turn_shown: int | None = None
+        self._character_sheet_stale = False
         self.page_indices: dict[str, int] = {}
         self.theme_selector = QComboBox()
         self.theme_selector.setObjectName("themeSelector")
@@ -992,6 +994,7 @@ class MainWindow(QMainWindow):
         self.powers_card = PowersCard(dashboard.abilities, dashboard.spells)
         self.codex_card_row = CodexCardRow(self.inventory_card, self.powers_card)
         layout.addWidget(self.codex_card_row, 1)
+        self.codex_column = codex
         codex.bind(
             self.character_strip, self.paperdoll_panel, self.skill_detail_list, self.hotbar,
             self.inventory_card,
@@ -1031,7 +1034,9 @@ class MainWindow(QMainWindow):
         messages = tuple(narrative.messages)
         shown = tuple(m for m in messages if last is None or m.turn_number <= last)
         fresh = tuple(m for m in messages if last is not None and m.turn_number > last)
-        self.conversation_view.set_messages(shown, narrative.has_older_messages)
+        if list(shown) != self.conversation_view.messages or self.conversation_view.has_older != narrative.has_older_messages:
+            # only a changed history is rebuilt; a new turn just appends below it
+            self.conversation_view.set_messages(shown, narrative.has_older_messages)
         if fresh:
             self.conversation_view.append_turn(fresh)
         self._last_turn_shown = max((m.turn_number for m in messages), default=0)
@@ -1116,11 +1121,10 @@ class MainWindow(QMainWindow):
         )
 
     def _set_combat_pending(self, pending: bool) -> None:
-        self.powers_card.setEnabled(not pending)
-        if pending:
-            for button in self.scene_view.choice_grid.choice_buttons:
-                button.setEnabled(False)
-        else:
+        # Nothing greys out while a turn resolves: _start_combat_task already refuses a
+        # second action, so the controls stay as they are and only the chat changes.
+        if not pending:
+            self.conversation_view.clear_pending()
             self.scene_view.set_combat(self.dashboard.combat)
 
     def _connect_item_interactions(self) -> None:
@@ -1345,6 +1349,13 @@ class MainWindow(QMainWindow):
             self._show_status_message("Combat requires a state-backed campaign")
             return
         self._set_combat_pending(True)
+        if command is not None:
+            try:
+                echo = self.game_state_service.combat_command_text(command)
+            except GameStateError:
+                echo = ""
+            if echo:
+                self.conversation_view.show_pending(echo)
         self._show_status_message(
             "Starting encounter..." if command is None else "Resolving combat turn..."
         )
@@ -1733,6 +1744,9 @@ class MainWindow(QMainWindow):
         if target != self.current_page:
             play_ui_sound("page")
         self.current_page = target
+        if target == "character_sheet" and self._character_sheet_stale:
+            self._character_sheet_stale = False
+            self._refresh_character_sheet(self.dashboard)
         self.content_stack.setCurrentIndex(self.page_indices[target])
         self.scene_view.tabs.set_current(target)
         self._show_status_message(
@@ -2268,30 +2282,55 @@ class MainWindow(QMainWindow):
         """Refresh item-dependent widgets without rebuilding the complete UI tree."""
 
         current_page = self.current_page
-        self.dashboard = dashboard
-        self._update_application_title()
-        self.inventory_card.set_inventory(
-            dashboard.inventory,
-            capacity=dashboard.inventory_capacity,
-            equipment=dashboard.equipment,
-        )
-        # Strip (purse, carry, resources) and paperdoll (AC, slots) are rebuilt in place.
-        for name, widget in (
-            ("character_strip", CharacterStrip(dashboard)),
-            ("paperdoll_panel", PaperdollPanel(
-                dashboard.player, dashboard.equipment, attack_bonus=dashboard.player.attack_bonus
-            )),
-        ):
-            old = getattr(self, name)
-            old.parentWidget().layout().replaceWidget(old, widget)
-            old.deleteLater()
-            setattr(self, name, widget)
-        self._connect_equipment_grid(self.paperdoll_panel)
-        self._refresh_character_sheet(dashboard)
-        self.content_stack.setCurrentIndex(self.page_indices.get(current_page, 0))
-        QTimer.singleShot(0, lambda: self._restore_inventory_ui_state(None))
+        with self._painting_frozen():
+            self.dashboard = dashboard
+            self._update_application_title()
+            self.inventory_card.set_inventory(
+                dashboard.inventory,
+                capacity=dashboard.inventory_capacity,
+                equipment=dashboard.equipment,
+            )
+            # The paperdoll keeps its widget, size and wiring: only its slots and stats change.
+            self.paperdoll_panel.set_slots(dashboard.equipment)
+            self.paperdoll_panel.set_stats(dashboard.player, dashboard.player.attack_bonus)
+            strip = CharacterStrip(dashboard)  # purse, carry and resource bars
+            self.character_strip.parentWidget().layout().replaceWidget(self.character_strip, strip)
+            self.character_strip.deleteLater()
+            self.character_strip = strip
+            self.codex_column.bind(
+                strip, self.paperdoll_panel, self.skill_detail_list, self.hotbar, self.inventory_card,
+            )
+            self.codex_column.fit()
+            # The hidden character sheet is rebuilt when next opened, not on every move.
+            if current_page == "character_sheet":
+                self._refresh_character_sheet(dashboard)
+            else:
+                self._character_sheet_stale = True
+            self.content_stack.setCurrentIndex(self.page_indices.get(current_page, 0))
+            self._restore_inventory_ui_state(None)
+
+    @contextmanager
+    def _painting_frozen(self):  # type: ignore[no-untyped-def]
+        """Rebuild without painting half-built frames: the screen changes once, finished."""
+
+        was_enabled = self.updatesEnabled()
+        self.setUpdatesEnabled(False)
+        try:
+            yield
+            QCoreApplication.sendPostedEvents(None, QEvent.Type.LayoutRequest)
+        finally:
+            self.setUpdatesEnabled(was_enabled)
 
     def _reload_dashboard(
+        self,
+        dashboard: DashboardView,
+        *,
+        target_page: str = "dashboard",
+    ) -> None:
+        with self._painting_frozen():
+            self._reload_dashboard_now(dashboard, target_page=target_page)
+
+    def _reload_dashboard_now(
         self,
         dashboard: DashboardView,
         *,

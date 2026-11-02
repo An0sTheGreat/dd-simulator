@@ -205,6 +205,7 @@ class ConversationView(QScrollArea):
         self.note_rows: list[ConversationNotes] = []
         self.recent_rows: list[ConversationMessage] = []
         self.roll_banner: DiceRollBanner | None = None
+        self.pending_row: ConversationMessage | None = None
 
         thread = QWidget()
         thread.setObjectName("conversationThread")
@@ -266,6 +267,7 @@ class ConversationView(QScrollArea):
     def set_messages(self, messages: Iterable[NarrativeMessageView], has_older: bool) -> None:
         self.clear_emphasis()
         self.clear_roll()
+        self.clear_pending()
         for widget in (*self.rows, *self.note_rows):
             self._layout.removeWidget(widget)
             widget.deleteLater()
@@ -280,6 +282,7 @@ class ConversationView(QScrollArea):
     def append_turn(self, messages: Iterable[NarrativeMessageView]) -> None:
         self.clear_emphasis()
         self.clear_roll()
+        self.clear_pending()  # the committed player message takes its place
         added = self._insert(self._layout.count(), tuple(messages))
         self._relayout()
         bar = self.verticalScrollBar()
@@ -307,6 +310,26 @@ class ConversationView(QScrollArea):
         self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
         banner.start()
         return banner
+
+    def show_pending(self, text: str) -> None:
+        """Echo the player's choice at once, while the turn resolves."""
+
+        self.clear_pending()
+        row = ConversationMessage(NarrativeMessageView("player", text))
+        row.fit_width(self._row_width())
+        self.pending_row = row
+        self._layout.addWidget(row)
+        row.show()
+        self._relayout()
+        self._pin_bottom, self._keep_from_bottom = True, None
+        self.verticalScrollBar().setValue(self.verticalScrollBar().maximum())
+
+    def clear_pending(self) -> None:
+        if self.pending_row is not None:
+            row, self.pending_row = self.pending_row, None
+            self._layout.removeWidget(row)
+            row.hide()
+            row.deleteLater()
 
     def clear_roll(self) -> None:
         if self.roll_banner is not None:
